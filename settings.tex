@@ -1,0 +1,117 @@
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usetikzlibrary{calc,arrows,shapes,positioning}
+\usepackage{xparse}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[font+=footnotesize,justification=justified,singlelinecheck=false,labelfont=bf,labelsep=period]{caption}
+\usepackage[justification=c]{subcaption}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{derivative}
+\usepackage[most]{tcolorbox}
+\usepackage[parfill]{parskip}
+\usepackage{graphicx}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{mdframed}
+\usepackage{algpseudocodex}
+
+% Figure support as explained in Gilles Castel's blog post
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+% Fix some stuff
+% http://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning
+\pdfsuppresswarningpagegroup=1
+
+% Example environment
+\newcounter{example}
+\newcommand\examplename{Example}
+\makeatletter
+\newcommand\listofexamples{%
+    \section*{List of examples}%
+    \@starttoc{loe}%
+}
+\renewcommand\theexample
+     {\@arabic\c@example}
+\def\fps@example{tbp}
+\def\ftype@example{1}
+\def\ext@example{loe}
+\def\fnum@example{\examplename\nobreakspace\theexample}
+\newenvironment{example}[1][htbp]
+  {\begin{@tufte@float}[#1]{example}{}
+    \begin{mdframed}[backgroundcolor=black!5,rightline=false,leftline=false]}
+    {\end{mdframed}
+  \end{@tufte@float}}
+\let\l@example\l@figure
+\makeatother
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+% Listing environment
+\newcounter{listing}
+\newcommand\listingname{Listing}
+\makeatletter
+\newcommand\listoflistings{%
+    \section*{List of listings}%
+%  \begin{fullwidth}%
+    \@starttoc{loe}%
+%  \end{fullwidth}%
+}
+\renewcommand\thelisting
+     {\@arabic\c@listing}
+\def\fps@listing{tbp}
+\def\ftype@listing{1}
+\def\ext@listing{loe}
+\def\fnum@listing{\listingname\nobreakspace\thelisting}
+\newenvironment{listing}[1][htbp]
+  {\begin{@tufte@float}[#1]{listing}{}
+    \begin{mdframed}[backgroundcolor=black!5,rightline=false,leftline=false]}
+    {\end{mdframed}
+  \end{@tufte@float}}
+\let\l@listing\l@figure
+\makeatother
+
+% Algorithm environment
+\newcounter{algorithm}
+\newcommand\algorithmname{Algorithm}
+\makeatletter
+\newcommand\listofalgorithms{%
+    \section*{List of algorithms}%
+    \@starttoc{loe}%
+}
+\renewcommand\thealgorithm
+     {\@arabic\c@algorithm}
+\def\fps@algorithm{tbp}
+\def\ftype@algorithm{1}
+\def\ext@algorithm{loe}
+\def\fnum@algorithm{\algorithmname\nobreakspace\thealgorithm}
+\newenvironment{algorithm}[1][htbp]
+  {\begin{@tufte@float}[#1]{algorithm}{}
+    \begin{mdframed}[backgroundcolor=white,rightline=false,leftline=false]}
+    {\end{mdframed}
+  \end{@tufte@float}}
+\let\l@algorithm\l@figure
+\makeatother

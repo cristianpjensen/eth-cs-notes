@@ -1,0 +1,153 @@
+% commands for drawing CCG derivations
+% neither requires nor loads any package.
+% this version avoids \! command by explicitly calling \kern.
+% -cem bozsahin, 2017--2021
+
+\newcommand{\cgf}[1]{\ensuremath{\mathtt{#1}}}     % CG category font. tt seems best in dimmed highlight + spacing
+\newcommand{\cat}{\cgf}                         %alias for cgf. use the one you like.
+\newcommand{\lf}[1]{\ensuremath{\colon\kern-1pt#1}}     % lf typeset with colon by default
+\newcommand{\blf}[1]{\ensuremath{#1}}           % bare lf typeset
+\newcommand{\mymath}[1]{\ensuremath{#1}}           % to avoid non-structural $..$ in bodies
+\newcommand{\so}[1]{\ensuremath{\mathit{#1}^{\prime}}}     % primed lf objects
+                                                       % avoid math kerning
+\newcommand{\sos}[2]{\ensuremath{\mathit{#1}_{#2}^{\prime}}}     % primed and subscripted lf object
+\newcommand{\fs}{\ensuremath{\kern-1pt /\kern-1pt}}           % /: in any environment
+\newcommand{\bs}{\ensuremath{\kern-.3pt \backslash\kern-.2pt}}  % \: in any environment
+\newcommand{\us}{\ensuremath{\kern-2pt \mid\kern-2pt}}        % |: non-directional slash
+\newcommand{\lds}{\ensuremath{\bs\kern-2.5pt\bs}} % double slashes, left, right, up
+\newcommand{\rds}{\ensuremath{\fs\kern-1pt\fs\,}}
+\newcommand{\uds}{\ensuremath{\us\kern-1pt\us}}
+\newcommand{\bss}{\lds} % aliases
+\newcommand{\fss}{\rds}
+\newcommand{\uss}{\uds}
+
+% combinators
+\newcommand{\combf}[1]{\ensuremath{\mathbf{#1}}} % combinator font
+\newcommand{\combb}{\ensuremath{\combf{B}}}      % Combinator B in any environment
+\newcommand{\combi}{\ensuremath{\combf{I}}}      % I
+\newcommand{\combk}{\ensuremath{\combf{K}}}      % K
+\newcommand{\combc}{\ensuremath{\combf{C}}}      % C
+\newcommand{\combs}{\ensuremath{\combf{S}}}      % S 
+\newcommand{\combw}{\ensuremath{\combf{W}}}      % W
+\newcommand{\combd}{\ensuremath{\combf{D}}}      % D
+\newcommand{\combo}{\ensuremath{\combf{O}}}      % O
+\newcommand{\combu}{\ensuremath{\combf{U}}}      % U
+\newcommand{\comba}{\ensuremath{\combf{A}}}      % A (actually, not a comb)
+\newcommand{\combt}{\ensuremath{\combf{T}}}      % T (=C*)
+\newcommand{\combcs}{\ensuremath{\combf{C_\star}}}    % C*
+\newcommand{\combphi}{\ensuremath{\combf{\Phi}}}      % Phi
+\newcommand{\combpsi}{\ensuremath{\combf{\Psi}}}      % Psi
+\newcommand{\combz}{\ensuremath{\combf{Z}}}
+\newcommand{\combj}{\ensuremath{\combf{J}}}
+\newcommand{\combl}{\ensuremath{\combf{L}}}  % the lost combinator fz(gw)=B^2CBB.
+\newcommand{\comby}{\ensuremath{\combf{Y}}}
+\newcommand{\combe}{\ensuremath{\combf{E}}}
+\newcommand{\combx}{\ensuremath{\combf{X}}}
+\newcommand{\combsprime}{\ensuremath{\combf{\combs^{\prime\prime}}}}
+\newcommand{\combsprimex}{\ensuremath{\combf{\combs_{\times}^{\prime\prime}}}}
+
+% ccg rule names 
+\newcommand{\cgfa}{\mbox{\ensuremath{>}}}   % CCG rule names in derivations
+\newcommand{\cgba}{\mbox{\ensuremath{<}}}   % eg, this is backward appl A<
+\newcommand{\cgtr}{\mbox{\ensuremath{\combt}}}
+\newcommand{\cgftr}{\mbox{\ensuremath{>\kern-2pt\combt}}}
+\newcommand{\cgbtr}{\mbox{\ensuremath{<\kern-2pt\combt}}}
+\newcommand{\cgdcomp}{\mbox{\ensuremath{<<}}} % decomposition
+\newcommand{\cgdcompf}{\mbox{\ensuremath{>>}}} % fwd decomposition
+\newcommand{\cgbxp}{\mbox{\ensuremath{<\kern-4pt\combt_\times}}} % contraposition
+\newcommand{\cgfxp}{\mbox{\ensuremath{>\kern-4pt\combt_\times}}}
+\newcommand{\cgfc}{\mbox{\ensuremath{>\kern-2pt\combb}}}   % forward composition
+\newcommand{\cgbc}{\mbox{\ensuremath{<\kern-2pt\combb}}}
+\newcommand{\cgfx}{\mbox{\ensuremath{>\kern-2pt\combb_\times}}}    % forward crossing comp Bx>
+\newcommand{\cgfxx}{\mbox{\ensuremath{>\kern-2pt\combb_\times^2}}} % this is Bx^2
+\newcommand{\cgbxx}{\mbox{\ensuremath{<\kern-2pt\combb_\times^2}}} % this is Bx^2
+\newcommand{\cgbdx}{\mbox{\ensuremath{<\kern-2pt\combd_\times}}} % this is Dx
+\newcommand{\cgfdx}{\mbox{\ensuremath{>\kern-p4t\combd_\times}}} % this is Dx
+\newcommand{\cgbd}{\mbox{\ensuremath{<\kern-2pt\combd}}} % 
+\newcommand{\cgfd}{\mbox{\ensuremath{>\kern-2pt\combd}}} % 
+\newcommand{\cgfo}{\mbox{\ensuremath{>\kern-2pt\combo}}} % 
+\newcommand{\cgbo}{\mbox{\ensuremath{<\kern-2pt\combo}}} % 
+\newcommand{\cgofx}{\mbox{\ensuremath{>\kern-2pt\combo_\times}}} % 
+\newcommand{\cgobx}{\mbox{\ensuremath{<\kern-2pt\combo_\times}}} %
+\newcommand{\cgbu}{\mbox{\ensuremath{<\kern-2pt\combu}}}
+\newcommand{\cgboo}{\mbox{\ensuremath{<\kern-2pt\combo^2}}} % 
+\newcommand{\cgbdd}{\mbox{\ensuremath{<\kern-2pt\combd^2}}} % this is <D^2  
+\newcommand{\cgbcc}{\mbox{\ensuremath{<\kern-2pt\combb^2}}} % this is Bx^2 
+\newcommand{\cgfcc}{\mbox{\ensuremath{>\kern-2pt\combb^2}}} % this is Bx^2 
+\newcommand{\cgbx}{\mbox{\ensuremath{<\kern-2pt\combb_\times}}}
+\newcommand{\cgsbx}{\mbox{\ensuremath{<\kern-2pt\combs_\times}}}  % <Sx
+\newcommand{\cgsfx}{\mbox{\ensuremath{>\kern-2pt\combs_\times}}}
+\newcommand{\cgsbxx}{\mbox{\ensuremath{<\kern-2pt\combs_\times^2}}}
+\newcommand{\cgsfxx}{\mbox{\ensuremath{>\kern-2pt\combs_\times^2}}}
+\newcommand{\cgsbb}{\mbox{\ensuremath{<\kern-2pt\combs^2}}}
+\newcommand{\cgsff}{\mbox{\ensuremath{>\kern-2pt\combs^2}}}
+\newcommand{\cgsb}{\mbox{\ensuremath{<\kern-2pt\combs}}}
+\newcommand{\cgsf}{\mbox{\ensuremath{>\kern-2pt\combs}}}
+\newcommand{\cgsprimef}{\mbox{\ensuremath{>\kern-2pt\combs^{\prime\prime}}}}
+\newcommand{\cgsprimeb}{\mbox{\ensuremath{<\kern-2pt\combs^{\prime\prime}}}}
+\newcommand{\cgsprimefx}{\mbox{\ensuremath{>\kern-2pt\combs^{\prime\prime}_\times}}}
+\newcommand{\cgsprimebx}{\mbox{\ensuremath{<\kern-2pt\combs^{\prime\prime}_\times}}}
+
+% a CCG syntactic category with features (subscripts, superscripts, exponents)
+\newcommand{\cgs}[2]{\cgf{#1}\ensuremath{_{\mathrm{\scriptstyle #2}}}}% subscripted CG cat, eg NPnom
+\newcommand{\cgss}[3]{\cgf{#1}\ensuremath{_{\mathrm{\scriptstyle #2}}^{#3}}}% sub+sup CG cat, eg NPnom^r
+
+% CCG derivation lines
+\newcommand{\mc}[2]                     % centered multicolumn, 
+  {\multicolumn{#1}{c}{#2}}             % #1 = no. of columns, #2 = body.
+\newcommand{\ml}[2]                     % centered multicolumn, 
+  {\multicolumn{#1}{l}{#2}}
+\newcommand{\mr}[2]       
+  {\multicolumn{#1}{r}{#2}}
+\newcommand{\cgex}[2]                        % CCG derivations, \cgex{}{} 
+  {\renewcommand{\arraystretch}{0.5}
+  \begin{tabular}[t]{@{}*{#1}{c@{\ }}}       % #1 = no. of columns, #2 = body
+     #2
+  \end{tabular}}
+
+\newcounter{cgcols}
+
+\makeatletter
+  \newcommand*{\xwhilenum}[1]{\@whilesw{\ifnum #1}\fi }
+\makeatother
+
+% nice column repeat, cannibalised from jfbu in stackexchange
+% this is one way to avoid one continuous line of \cline
+% use this if there are multiple columns, or \cgul if there is only one
+\newcommand{\cglines}[1]{\setcounter{cgcols}{#1}\xwhilenum{\value{cgcols}>1}{\addtocounter{cgcols}{-1}\hrulefill&}\hrulefill}
+	
+\newcommand{\cgline}[2]                 % writing a CG line. 2 arguments
+ {\mc{#1}{\hrulefill\ensuremath{\raisebox{-1pt}{\tiny #2}}}}% #1=# col #2=rule type 
+\newcommand{\cgul}{\cgline{1}{}}        % used for drawing lines 
+\newcommand{\cgres}[2]                  % CG result #1=#0f columns #2=result
+    {\mc{#1}{#2}}
+\newcommand{\badline}[2]                % showing bad derivations
+ {\mc{#1}{\hrulefill{\scriptsize\raisebox{-.6ex}{*}\,#2}}}      % #1=# of col #2=what fail
+
+% Baldridge modal slashes
+\newcommand{\fxs}        %forward crossing slash
+{\ensuremath{\fs_{\kern-1pt\scriptstyle\times}}}
+\newcommand{\bxs}        % backward crossing slash
+{\ensuremath{\bs_{\kern-1pt\scriptstyle\times}}}
+\newcommand{\fdots}      %forward dot slash
+{\ensuremath{\fs_{\kern-1pt\scriptstyle\cdot}}}
+\newcommand{\bdots}      % backward dot slash
+{\ensuremath{\bs_{\kern-1pt\scriptstyle\cdot}}}
+\newcommand{\fds}        %forward diamond slash
+{\ensuremath{\fs_{\kern-1pt\scriptstyle\diamond}}}
+\newcommand{\bds}        % backward diamond slash
+{\ensuremath{\bs_{\kern-1pt\scriptstyle\diamond}}}
+\newcommand{\fstars}     %forward star slash
+{\ensuremath{\fs_{\kern-1pt\scriptstyle\star}}}
+\newcommand{\bstars}     % backward star slash
+{\ensuremath{\bs_{\kern-1pt\scriptstyle\star}}}
+\newcommand{\ustars}     %  star slash
+{\ensuremath{\us_{\kern-1pt\scriptstyle\star}}}
+
+% environments
+
+\newenvironment{ccgg}[4]{% glossed ccg examples as an environment, 1: columns 2:data 3: gloss 4: derivations
+	\cgex{#1}{#2\\ #3\\ \cglines{#1}\\ #4}}{}
+
+\newenvironment{ccg}[3]{% ccg examples as an environment, 1: columns 2:data 3: derivations
+	\cgex{#1}{#2\\ \cglines{#1}\\ #3}}{}
