@@ -1,0 +1,148 @@
+\section{Dependency parsing}
+
+\textit{Dependency parsing} is an alternative to constituency parsing. The
+basic idea is to link every word with its \textit{syntactic head}.\sidenote{We
+encode this as an arc in a graph, see
+\Cref{fig:dependency-parse,fig:non-projective-dependency-tree}.}
+
+\begin{figure}[h!]
+    \centering
+    \incfig{dependency-parse}
+    \caption{Projective dependency tree of ``The boy eats Rösti.``}
+    \label{fig:dependency-parse}
+\end{figure}
+
+In a dependency tree, only one word gets to be the root, and each word has a
+single parent, called its \textit{syntactic head}. This allows for words to be
+linked that have other words in between not part of this structure, in contrast
+to constituency parsings.
+
+There are two types of dependency trees, projective and non-projective.
+Projective dependency trees do not allow for crossing arcs, which make them
+closely related to constituency trees. Non-projective dependency trees do allow
+for crossing arcs, which will be the focus of this text. An example of a
+non-projective dependency tree can be found in
+\Cref{fig:non-projective-dependency-tree}.
+
+\begin{figure}[ht]
+    \centering
+    \incfig{non-projective-dependency-tree}
+    \caption{Non-projective dependency tree, without labels, of ``Ryan ate
+    Rösti, which was delicious.``}
+    \label{fig:non-projective-dependency-tree}
+\end{figure}
+
+As always, we want to be able to parameterize a probability distribution over
+non-projective spanning trees, given a sentence $\vec{w}$. So, we need to be
+able to compute the normalizer $Z$. However, there are $(N-1)^{N-2}$ spanning
+trees with the single root constraint, thus we need to design a more efficient
+algorithm that makes use of its structure. We do this by decomposing the
+scoring function over the edges, \[
+  \score(\vec{t},\vec{w}) \doteq \score(r,\vec{w}) \sum_{(i\to j)\in\vec{t}} \score(i,j,\vec{w})
+.\]
+Thus, we only need a matrix $\mat{A}$, containing $\exp \score(i,j,\vec{w})$ and a
+vector $\vec{\rho}$, containing $\exp \score(r,\vec{w})$.
+
+\begin{theorem}[Kirchhoff's matrix-tree theorem \citep{kirchhoff1847ueber}] \label{thm:kirchhoff}
+  For an undirected unweighted graph $\mathcal{G}$ with $N$ vertices, let
+  $\mat{L}$ be the graph Laplacian, \[
+    L_{ij} = \begin{cases}
+      -A_{ij} & i \neq j \\
+      \sum_{k \neq i} A_{kj} & \mathrm{otherwise},
+    \end{cases}
+  \]
+  where $\mat{A}$ is the adjacency matrix, \ie, $A_{ij}=1$ if $i \sim j$,
+  otherwise $A_{ij}=0$. Let $\hat{\mat{L}}_i \in \R^{(N-1)\times(N-1)}$ be the
+  matrix created by removing the $i$-th row and column of $\mat{L}$. Then, we
+  have \[
+    N_T(\mathcal{G}) = \det{\hat{\mat{L}}_i}
+  ,\]
+  where $N_T(\mathcal{G})$ is the number of trees in $\mathcal{G}$.
+\end{theorem}
+
+\citet{tutte1948dissection} generalized Kirchhoff's MTT to directed trees,
+which allows us to compute the normalizer $Z(\vec{w})$ in $\bigo{N^3}$ as
+follows,\sidenote{Since computing the determinant can be done in $\bigo{N^3}$.}
+\[
+  Z(\bm{w}) = \det{\mat{L}}
+.\]
+However, this does not account for the single-root constraint.
+\citet{koo2007structured} further generalized Tutte's MTT by modifying the
+graph Laplacian, \[
+  L_{ij} = \begin{cases}
+    \rho_j & i = 1 \\
+    -A_{ij} & i \neq j \\
+    \sum_{k \neq i} A_{kj} & \mathrm{otherwise}.
+  \end{cases}
+\]
+So, we can now compute $Z(\vec{w}) = \det{\mat{L}}$ in $\bigo{N^3}$.
+
+However, we are not able to semiringify this algorithm. Thus, we must design a
+new algorithm for inference.
+
+\subsection{Chu-Liu-Edmonds algorithm}
+
+A valid dependency tree must adhere to the following three constraints,
+\begin{itemize}
+  \item All non-root nodes have exactly one incoming edge;
+  \item No cycles;
+  \item Only one outgoing edge from the root.
+\end{itemize}
+
+This is called an \textit{arborescence},\sidenote[][-0.75cm]{The first two
+constraints are satisfied by the maximum-weight spanning tree, which we could
+compute with Kruskal's algorithm. However, it does not adhere to the third
+constraint, because Kruskal's algorithm only works for undirected graphs.} and
+we can find the maximum-weight arborescence with the Chu-Liu-Edmonds algorithm
+\citep{chu1965shortest,edmonds1967optimum}, sped up to $\bigo{N^2}$ by
+\citet{tarjan1977finding}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{clu}
+    \caption{Example graph on which the Chu-Liu-Edmonds algorithm will be
+    illustrated.}
+    \label{fig:clu}
+\end{figure}
+
+The algorithm starts by constructing the \textit{greedy graph}, which is the
+graph that takes the best incoming edge to each node, except the root. See
+\Cref{fig:clu-greedy}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{clu-greedy}
+    \caption{\textbf{Greedy} graph. This graph contains a cycle.}
+    \label{fig:clu-greedy}
+\end{figure}
+
+If the greedy graph contains a cycle, we \textit{contract} the cycle into a
+single node $c$, and break the cycle by reweighting the enter edges, which are
+the edges that go into $c$. See \Cref{fig:clu-contract}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{clu-contract}
+    \caption{Contract the cycle by reweighting the \textbf{enter} edges.}
+    \label{fig:clu-contract}
+\end{figure}
+
+Then, we pick the greedy graph from the contracted graph. If there is more than
+one edge emanating from the root, we need to delete edges outgoing from the root
+to satisfy the single-root constraint. We remove the edge with the lowest
+\textit{swap score}, which is the difference between the next-best incoming edge
+and the current incoming edge of each node in the graph. After this, we expand
+the graph by selecting edges from $c$ that break the cycle and ensure the
+single-parent constraint. See \Cref{fig:clu-expand}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{clu-contract-greedy}
+    \caption{Expand by picking the greedy graph from the contracted graph. Then,
+    if there are more than one edges emanating from $r$, remove the edge with
+    the lowest swap score. Then pick the edges that break the cycle within $c$.}
+    \label{fig:clu-expand}
+\end{figure}
+
+Do these steps recursively until a graph results that satisfies all three
+constraints. This tree is the best scoring dependency tree.

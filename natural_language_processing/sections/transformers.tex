@@ -1,0 +1,67 @@
+\section{Transformers} \label{sec:transformers}
+
+Attention is a mechanism in neural networks that a model can learn to make
+predictions by selectively attending to a given set of data by using query
+$\bm{q}$, key $\bm{k}$, and value $\bm{v}$ vector representations. The query
+and key vectors are used to determine how much weight should be given to the
+value vector.\sidenote{Note the parallel with dictionaries/hashmaps in
+programming languages, but, in the attention mechanism, we do a
+``soft-lookup``.} The weights are computed by as
+$\bm{\alpha}_i=\text{softmax}(\bm{q}_i^\top\bm{k}_i)$, so the values after the
+attention block can be computed as \[
+  \text{att}(\bm{x}_i) = \sum_{j} \alpha_{ij} \bm{v}_i
+.\]
+
+\begin{marginfigure}
+    \centering
+    \incfig{attention}
+    \caption{Self-attention mechanism.}
+    \label{fig:attention}
+\end{marginfigure}
+
+Self-attention blocks learn the query, key, and value representations from
+data. More specifically, it learns matrices $\bm{W}_Q$, $\bm{W}_K$, and
+$\bm{W}_V$ and computes the vectors from these matrices:
+\begin{align*}
+  \bm{q}_i &= \bm{W}_Q^\top \bm{x}_i \\
+  \bm{k}_i &= \bm{W}_K^\top \bm{x}_i \\
+  \bm{v}_i &= \bm{W}_V^\top \bm{x}_i
+.\end{align*}
+Then, we can use these to compute the output of the self-attention block: \[
+  \text{self-att}(\bm{X}) = \text{softmax}\left( \frac{(\bm{W}_Q^\top\bm{X})^\top(\bm{W}_K^\top\bm{X})}{\sqrt{d_q}} \right) \bm{W}_V^\top\bm{X}
+,\]
+where $d_q$ is the square root of the dimensionality of the query and key
+vectors. Furthermore, we need to add a positional encoding to provide
+ordering information to the model.\sidenote{The self-attention operation is
+permutation invariant.} This is done by a sinusoidal positional encoding and
+are simply combined with $\bm{x}_i$ by addition.
+
+\begin{figure}[ht]
+    \centering
+    \incfig{transformer}
+    \caption{Transformer encoder/decoder architecture.}
+    \label{fig:transformer}
+\end{figure}
+
+Transformers \citep{vaswani2017attention} use multi-headed self-attention,
+which is a module where self-attention is applied $M$ times independently to
+the data. Thus, this module learns $M$ different ways of looking at the same
+dataset. The outputs of each self-attention block is concatenated and linearly
+transformed to the expected dimensionality. Transformers follow this by
+normalization and MLP layers, as can be seen in \Cref{fig:transformer}.
+
+\subsection{Translation}
+
+Translation is a sequence-to-sequence problem, where we want to compute the
+probability that $\vec{y}$ is the translation of $\vec{x}$. We can do this with
+transformers by encoding the input sequence $\vec{x}$ using encoders, and
+feeding this representation of the input to a decoder. The decoder takes as
+input the input sequence and the already generated (incomplete) sequence
+$\vec{y}_{<i}$. It then runs the decoder as in \Cref{fig:transformer} and
+projects the output to a probability distribution over tokens using a linear
+layer, followed by softmax.
+
+This will not give us the globally optimal translation $\vec{y}$, but performs
+very well in practice.
+
+TODO: Figure of translation architecture with encoders and decoders.

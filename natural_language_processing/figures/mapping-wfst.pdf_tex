@@ -1,0 +1,107 @@
+%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'mapping-wfst.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{283.46456693bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.8)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{mapping-wfst.pdf}}%
+    \put(0.29563298,0.5450727){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\alpha$\end{tabular}}}}%
+    \put(0.66549832,0.54400837){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\beta$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{mapping-wfst.pdf}}%
+    \put(0.47889089,0.22381687){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\gamma$\end{tabular}}}}%
+    \put(0.46722313,0.7075348){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
+    \put(0.46251946,0.67800264){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
+    \put(0.46607575,0.64847047){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
+    \put(0.46433304,0.61893831){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
+    \put(0.65941129,0.41241726){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
+    \put(0.65470761,0.38288509){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
+    \put(0.6582639,0.35335293){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
+    \put(0.6565212,0.32382076){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
+    \put(0.250295,0.41308246){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
+    \put(0.24559132,0.3835503){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
+    \put(0.24914761,0.35401813){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
+    \put(0.24740491,0.32448596){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
+    \put(0.41291354,0.11750763){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
+    \put(0.40820986,0.08797547){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
+    \put(0.41176615,0.0584433){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
+    \put(0.41002345,0.02891113){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
+    \put(0.49718872,0.11757691){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.500745,0.08804475){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.4990023,0.05851258){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.5665522,0.22550307){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{mapping-wfst.pdf}}%
+    \put(0.18029369,0.73087106){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
+    \put(0.17559001,0.7013389){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
+    \put(0.1791463,0.67180673){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
+    \put(0.1774036,0.64227456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
+    \put(0.26456887,0.73094034){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.26812515,0.70140818){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.26638245,0.67187601){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.33393235,0.8388665){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{mapping-wfst.pdf}}%
+    \put(0.64327347,0.73087106){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
+    \put(0.63856979,0.7013389){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
+    \put(0.64212608,0.67180673){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
+    \put(0.64038338,0.64227456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
+    \put(0.72754865,0.73094034){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.73110493,0.70140818){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.72936223,0.67187601){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.79691213,0.8388665){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{mapping-wfst.pdf}}%
+    \put(0.4682948,0.43225193){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{mapping-wfst.pdf}}%
+    \put(0.26729951,0.11355594){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{insertion}}\end{tabular}}}}%
+    \put(0.23211677,0.05664158){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{substitution}}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{mapping-wfst.pdf}}%
+    \put(0.61116679,0.0898199){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{deletion}}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%

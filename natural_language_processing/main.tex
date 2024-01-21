@@ -7,6 +7,13 @@
 \usepackage{qtree}
 \usepackage{natbib}
 
+\def\bos{\smallcaps{BOS}}
+\def\eos{\smallcaps{EOS}}
+
+\def\score{\mathrm{score}}
+\def\softmax{\mathrm{softmax}}
+\def\mathcount{\mathrm{count}}
+
 \title{Natural Language Processing}
 \author{Cristian Perez Jensen}
 
@@ -16,9 +23,35 @@
 \maketitle
 \newpage
 \tableofcontents
+\newpage
+\input{notation}
 \newpage\pagenumbering{arabic}
 
 \input{sections/backpropagation}
+
+\input{sections/log-linear_modelling}
+
+\input{sections/multi-layer_perceptrons}
+
+\input{sections/structured_prediction}
+
+\input{sections/language_modelling}
+
+\input{sections/semirings}
+
+\input{sections/part-of-speech_tagging}
+
+\input{sections/finite-state_automata}
+
+\input{sections/transliteration}
+
+\input{sections/context-free_parsing}
+
+\input{sections/dependency_parsing}
+
+\input{sections/semantic_parsing}
+
+\input{sections/transformers}
 
 \bibliography{main}
 \bibliographystyle{plainnat}

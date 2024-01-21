@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="100mm"
+   height="50mm"
+   viewBox="0 0 100 50"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="lambda-calculus-example.svg">
+  <defs
+     id="defs2">
+    <marker
+       markerWidth="0.911"
+       markerHeight="1.690"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="marker-arrow-0.5308">
+      <g
+         id="g50"
+         transform="scale(2.153529264004019)">
+        <path
+           id="path48"
+           inkscape:connector-curvature="0"
+           style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+           d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722" />
+      </g>
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.9774956"
+     inkscape:cx="96.889712"
+     inkscape:cy="167.80823"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showborder="true"
+     width="200mm"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="2488"
+     inkscape:window-height="1376"
+     inkscape:window-x="1512"
+     inkscape:window-y="517"
+     inkscape:window-maximized="1"
+     inkscape:snap-grids="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid815"
+       units="mm"
+       spacingx="10"
+       spacingy="10"
+       empspacing="4"
+       dotted="false"
+       visible="false" />
+    <inkscape:grid
+       type="xygrid"
+       id="grid92" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-247)">
+    <text
+       id="text10"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="254.34315"
+       x="16.288073"><tspan
+         id="tspan8"
+         sodipodi:role="line"
+         x="16.288073"
+         y="254.34315"
+         style="stroke-width:0.26458332">$\mathrm{S}: \mathrm{Likes}(\smallcaps{Alex}, \smallcaps{Bob})$</tspan></text>
+    <text
+       id="text24"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="266.81583"
+       x="2.1553223"><tspan
+         id="tspan22"
+         sodipodi:role="line"
+         x="2.1553223"
+         y="266.81583"
+         style="stroke-width:0.26458332">$\mathrm{NP}: \smallcaps{Alex}$</tspan></text>
+    <text
+       id="text38"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="266.77054"
+       x="43.34671"><tspan
+         id="tspan36"
+         sodipodi:role="line"
+         x="43.34671"
+         y="266.77054"
+         style="stroke-width:0.26458332">$\mathrm{VP}: (\lambda x. \mathrm{Likes}(x, \smallcaps{Bob}))$</tspan></text>
+    <text
+       id="text52"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="279.34586"
+       x="21.758486"><tspan
+         id="tspan50"
+         sodipodi:role="line"
+         x="21.758486"
+         y="279.34586"
+         style="stroke-width:0.26458332">$\mathrm{V}: (\lambda y.(\lambda x. \mathrm{Likes}(x,y)))$</tspan></text>
+    <text
+       id="text66"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="279.36887"
+       x="80.8647"><tspan
+         id="tspan64"
+         sodipodi:role="line"
+         x="80.8647"
+         y="279.36887"
+         style="stroke-width:0.26458332">$\mathrm{NP}: \smallcaps{Bob}$</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 34.992172,256.2179 -24.979166,6.61458 z"
+       id="path88"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 34.992171,256.2179 26.458334,6.61458"
+       id="path94"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 61.151165,268.74151 -24.979167,6.61458 z"
+       id="path88-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 61.151164,268.74151 26.458331,6.61458"
+       id="path94-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 36.044904,281.27846 -0.06157,6.68944"
+       id="path130"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 10.074576,268.04929 -0.06157,6.68944"
+       id="path130-7"
+       inkscape:connector-curvature="0" />
+    <text
+       id="text157"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="278.26947"
+       x="6.7025919"><tspan
+         id="tspan155"
+         sodipodi:role="line"
+         x="6.7025919"
+         y="278.26947"
+         style="stroke-width:0.26458332">Alex</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 87.535463,281.18104 -0.06157,6.68944"
+       id="path130-5"
+       inkscape:connector-curvature="0" />
+    <text
+       id="text186"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="291.50366"
+       x="85.3424"><tspan
+         id="tspan184"
+         sodipodi:role="line"
+         x="85.3424"
+         y="291.50366"
+         style="stroke-width:0.26458332">Bob</tspan></text>
+    <text
+       id="text200"
+       xml:space="preserve"
+       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="291.6438"
+       x="32.452816"><tspan
+         id="tspan198"
+         sodipodi:role="line"
+         x="32.452816"
+         y="291.6438"
+         style="stroke-width:0.26458332">likes</tspan></text>
+  </g>
+</svg>

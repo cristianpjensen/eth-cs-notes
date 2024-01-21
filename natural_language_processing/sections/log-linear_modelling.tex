@@ -1,0 +1,92 @@
+\section{Log-linear modelling} \label{sec:log-linear-modelling}
+
+Let's say we want to model the conditional probability $p(y\mid x)$. A naive
+way of doing this is the following, \[
+  p(y\mid x) \doteq \frac{\mathcount(x,y)}{\mathcount(x)}
+.\]
+There are two main problems with this interpretation of discrete conditional
+probability,
+\begin{itemize}
+  \item Suppose $\mathcount(x,y)=0$, then the probability will be $0$, \ie,
+    the model says that $y$ is impossible in context $x$;
+  \item There is no way to look at finer-grained aspects of $x$, \ie, some
+    values of $x$ might be related.
+\end{itemize}
+
+Thus, we need a more general framework for modelling conditional
+distributions. One such general framework is to simply exponentiate some
+scoring function that we construct,\sidenote{The exponentiation makes sure
+that it is non-negative.} and let the conditional probability be proportional
+to it, \[
+  p(y\mid x) \propto \exp \score(x, y) > 0
+.\]
+The linear scoring function looks like the following, \[
+  \score(x,y) = \transpose{\vec{\theta}} \vec{f}(x, y) > 0
+\]
+with feature weights $\vec{\theta}\in\R^K$ and $\vec{f}(x,y)\in\R^K$ as a
+vector describing $y$ in context $x$. The conditional probability then looks
+like the following,
+\begin{align*}
+  p_{\vec{\theta}}(y\mid x) &= \frac{1}{Z_{\vec{\theta}}} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt) \\
+  Z_{\vec{\theta}}(x) &= \sum_{y'\in\mathcal{Y}} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt)
+.\end{align*}
+This is called log-linear modelling, because if we take the logarithm of the
+conditional probability, we get a linear model, \[
+  \log p_{\vec{\theta}}(y \mid x) = \transpose{\vec{\theta}} \vec{f}(x,y) - \log Z_{\vec{\theta}}(x)
+.\]
+
+The design of the \textit{feature function} $\vec{f}(x,y)$ is a big portion of
+the work in log-linear modelling. It can be split into two parts: preprocessing
+and extracting features. The preprocessing simply consists of steps such as tokenization,
+lower-casing, stemming, stop-word removal, and reducing vocabulary. After the
+preprocessing, we can obtain features. Examples include one-hot encoding,
+bag-of-words, $n$-grams, and word embeddings.
+
+\textit{Maximum likelihood estimation} (MLE) is a way of finding the parameters
+$\vec{\theta}\in\Theta$ that minimize the \textit{negative log-likelihood} of
+the training data, \ie, we want to minimize the following, \[
+  \hat{\vec{\theta}} = \argmin_{\vec{\theta}\in\Theta} \sum_{(x,y)\in\mathcal{D}} -\log p_{\vec{\theta}}(y\mid x)
+,\]
+where $\Theta$ is a compact (bounded and closed) subset of
+$\mathbb{R}^K$.\sidenote{The reason for not taking
+$\bm{\theta}\in\mathbb{R}^K$ is that the weights will likely go to infinity.}
+In log-linear modelling, this objective function is convex, thus any local
+minimum is a global minimum. We usually optimize the log-likelihood with
+gradient-based methods,
+\begin{align*}
+  \pdv*{\log p_{\vec{\theta}}(y \mid x)}{\vec{\theta}} &= \pdv*{\transpose{\vec{\theta}} \vec{f}(x,y) - \log Z_{\vec{\theta}}}{\vec{\theta}}(x) \\
+  &= \vec{f}(x,y) - \pdv*{\log Z_{\vec{\theta}}}{\vec{\theta}}(x) \\
+  &= \vec{f}(x,y) - \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \pdv*{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) }{\vec{\theta}} \\
+  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \pdv*{\transpose{\vec{\theta}} \vec{f}(x,y')}{\vec{\theta}} \\
+  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
+  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y')
+.\end{align*}
+Due to convexity, the global minimum is the only point that has its gradient
+equal $0$. Thus, at the optimal parameters, the following is the case, \[
+  \vec{f}(x,y) = \sum_{y'\in\mathcal{Y}}p_{\vec{\theta}}(y'\mid x)\vec{f}(x,y')
+.\]
+Therefore, the optimum is where the observed feature counts $\vec{f}(x,y)$ look
+like the expected feature counts
+$\sum_{y'\in\mathcal{Y}}p_{\vec{\theta}}(y'\mid x)\vec{f}(x,y')$. In other
+words, the training data looks exactly like what our model predicts through the
+eyes of our feature function $\bm{f}$. This is referred to as
+\textit{expectation matching}.
+
+\subsection{Softmax}
+
+\marginnote[1.5em]{The probability simplex $\Delta^{K-1}$ is a subspace
+of $\R^K_{\geq 0}$ such that the sum of the components of its elements is $1$.
+It is denoted as $\Delta^{K-1}$, because it has $K-1$ free parameters,
+and looks like a triangle in three dimensions.}
+
+The $\softmax: \R^K \to \Delta^{K-1}$ function is the default way of building
+probabilistic models using neural networks, because it maps vectors to
+categorical probability distributions. It is basically the same as log-linear
+modelling. It is defined as \[
+  \softmax(\vec{h})_y \doteq \frac{\exp \lft( \nicefrac{h_y}{T} \rgt)}{\sum_{y'\in\mathcal{Y}} \exp \lft( \nicefrac{h_{y'}}{T} \rgt)}
+.\]
+Usually, the temperature is set to $T=1$.\sidenote{As $T\rightarrow 0$,
+softmax becomes the argmax function and as $T\rightarrow \infty$, softmax
+becomes a uniform categorical distribution.} This is a generalization of
+log-linear modelling, where, instead of $\transpose{\vec{\theta}}
+\vec{f}(x,y)$, we can use any function of the input.

@@ -38,12 +38,12 @@ jobs:
         git clone --depth=1 --branch gh-pages git@github.com:cristianpjensen/eth-cs-notes.git "$GITHUB_WORKSPACE/deploy"
 
         # (*) To add a file, add the following command for that file
-        cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing/summary.pdf"
+        cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
         # (*) To add a file, add it to the branch
-        git add natural_language_processing/summary.pdf
+        git add natural_language_processing-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push

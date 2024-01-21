@@ -1,0 +1,88 @@
+%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'pos-graph.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{283.46456693bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.5)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{pos-graph.pdf}}%
+    \put(0.09738028,0.26763051){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{pos-graph.pdf}}%
+    \put(0.09738026,0.40645587){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{pos-graph.pdf}}%
+    \put(0.08161607,0.12814002){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{pos-graph.pdf}}%
+    \put(0.30780256,0.267717){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{pos-graph.pdf}}%
+    \put(0.30780255,0.40654236){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{pos-graph.pdf}}%
+    \put(0.29203834,0.12822649){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{pos-graph.pdf}}%
+    \put(0.51822491,0.26794115){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{pos-graph.pdf}}%
+    \put(0.51822489,0.40676652){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{pos-graph.pdf}}%
+    \put(0.50246069,0.12845065){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{pos-graph.pdf}}%
+    \put(0.72864714,0.26792365){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{pos-graph.pdf}}%
+    \put(0.72864712,0.40674902){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{pos-graph.pdf}}%
+    \put(0.71288292,0.12843315){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{pos-graph.pdf}}%
+    \put(0.84267241,0.26830362){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.84300498,0.04313303){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.07644084,0.04386942){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{The}\end{tabular}}}}%
+    \put(0.27950823,0.04386942){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{man}\end{tabular}}}}%
+    \put(0.47559094,0.04386942){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{walks}\end{tabular}}}}%
+    \put(0.71092055,0.04386942){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{the}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
