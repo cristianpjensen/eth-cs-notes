@@ -1,17 +1,16 @@
 \section{Finite-state automata} \label{sec:fsa}
 
-\marginnote[-2cm]{An $n$-gram LM can be represented by a WFSA by setting the states to
-  the $n$-length substrings. The initial states are all \bos. Every state is a
-  final state, since we can end on any state. Two states map to each other if
-  the two $n$-length substrings can follow each other, and the weight is the
-probability of the target vertex. The initial and final weights are all
-$\bm{1}$.}
+\marginnote[-2cm]{An $n$-gram LM can be represented by a WFSA by setting the
+states to be the history. The initial states are all $\bos$. We can only end on
+the $\eos$ state. A state can go to another if the history can follow the other
+and the weight is the probability of that happening. The initial and final
+weights are all $\bm{1}$.}
 
-\marginnote[1em]{A CRF can also be represented by a WFSA, where each POS tag is a
-  state. We can start and end on any state. The transitions then go from tag to
-  tag, where the weight is the score of the target tag following the source tag.
-  The initial weights are then the score of the tag following \bos, and the
-target weights are the score of \eos following the tag.}
+\marginnote[1em]{A CRF can also be represented by a WFSA, where each POS tag is
+a state. We can start and end on any state. The transitions then go from tag to
+tag, where the weight is the score of the target tag following the source tag.
+The initial weights are then the score of the tag following $\bos$, and the
+target weights are the score of $\eos$ following the tag.}
 
 A \textit{finite-state automaton} (FSA) is a computational device that
 determines whether a string $\vec{s}\in\Sigma^*$ is an element of a given
@@ -22,12 +21,12 @@ transition function $\delta$ and the letters $a\in\bm{s}$. If there is a path
 from an initial state to a final state while taking transitions as specified,
 the FSA accepts the string and is part of its language.
 
-\marginnote[-0.65cm]{The Kleene star of an alphabet $\Sigma$ is defined as \[ \Sigma^*
+\marginnote[0.5em]{The Kleene star of an alphabet $\Sigma$ is defined as \[ \Sigma^*
 \doteq \bigcup_{n=0}^\infty \Sigma^n .\]}
 
 \begin{definition}[Finite-state automaton]
-  A finite-state automaton is defined by a 5-tuple $\mathcal{A}=\langle \Sigma,
-  Q, I, F, \delta \rangle$, where
+  A finite-state automaton is a 5-tuple $\mathcal{A}=\langle \Sigma, Q, I, F,
+  \delta \rangle$, such that
   \begin{itemize}
     \item $\Sigma$ is an alphabet;
     \item $Q$ is a finite set of states;
@@ -46,22 +45,8 @@ the FSA accepts the string and is part of its language.
   \incfig{example-fsa}
   \caption{The graph of a simple FSA, where initial states are denoted by an
   incoming arrow and final states are denoted by a double circle. This defines
-  the language $L = \{ b(ca)^*cc, a(b)^*cb(ca)^*cc \}$.}
+  the language $L = \{ b(ca)^*cc, a(b)^*cb(ca)^*cc \}$. TODO: Fix text placements.}
   \label{fig:example-fsa}
-\end{marginfigure}
-
-\begin{marginfigure}[0.5cm]
-  \centering
-  \incfig{example-wfst}
-  \caption{The graph of a simple WFST, where initial states are denoted by an
-  incoming arrow and final states are denoted by a double circle. Example
-  mappings that this WFST defines are
-  \begin{align*}
-    \smallcaps{DEYTAX} &\to \smallcaps{DATA} & (0.175) \\
-    \smallcaps{DAEDXAX} &\to \smallcaps{DATA} & (0.075) \\
-    \smallcaps{DUW} &\to \smallcaps{DEW} & (0.5)
-  .\end{align*}}
-  \label{fig:example-wfst}
 \end{marginfigure}
 
 A \textit{weighted finite-state automation} (WFSA) adds weights from a semiring
@@ -77,6 +62,21 @@ characters to output characters. Formally, $\delta \subseteq Q \times (\Sigma
 Q$, where $\Omega$ is the output alphabet.
 
 \subsection{WFST composition}
+
+\begin{marginfigure}[0.5cm]
+  \centering
+  \incfig{example-wfst}
+  \caption{The graph of a simple WFST, where initial states are denoted by an
+  incoming arrow and final states are denoted by a double circle. Example
+  mappings that this WFST defines are
+  \begin{align*}
+    \smallcaps{DEYTAX} &\to \smallcaps{DATA} & (0.175) \\
+    \smallcaps{DAEDXAX} &\to \smallcaps{DATA} & (0.075) \\
+    \smallcaps{DUW} &\to \smallcaps{DEW} & (0.5)
+  .\end{align*}
+  TODO: Fix text placements.}
+  \label{fig:example-wfst}
+\end{marginfigure}
 
 WFST composition of two transducers $\mathcal{T}_1$ and $\mathcal{T}_2$ is a
 common operation that involves mapping the inputs of $\mathcal{T}_1$ to the
@@ -169,12 +169,12 @@ these to compute the normalizer with the following matrix multiplication, \[
   \label{alg:lehmann}
 
   \begin{algorithmic}[1]
-    \Function{Lehmann}{$\mat{W}$}
-      \LComment{$\mat{W}\in \R^{|Q| \times |Q|}$ is a matrix over a closed semiring}
+    \Function{Lehmann}{$\mat{W},\langle \mathcal{W},\oplus,\otimes,\bm{0},\bm{1} \rangle$}
+      \LComment{$\mat{W}\in \mathcal{W}^{|Q| \times |Q|}$ is a matrix over a closed semiring}
       \State $\mat{R}^{(0)} \gets \mat{W}$
       \For {$j\gets 1,\ldots,|Q|$}
         \For {$i\gets 1,\ldots,|Q|$}
-          \For {$k\gets 1,\ldots,|Q|$} \Comment{Loop through pairs of states}
+          \For {$k\gets 1,\ldots,|Q|$}
             \State $\mat{R}_{ik}^{(j)} \gets \mat{R}_{ik}^{(j-1)} \oplus \mat{R}_{ij}^{(j-1)} \otimes \lft( \mat{R}_{jj}^{(j-1)} \rgt)^* \otimes \mat{R}_{jk}^{(j-1)}$
           \EndFor
         \EndFor
@@ -185,4 +185,49 @@ these to compute the normalizer with the following matrix multiplication, \[
   \end{algorithmic}
 \end{algorithm}
 
-TODO: Intuitition of Lehmann's algorithm.
+Lehmann's algorithm is a dynamic programming algorithm where
+$\mat{R}_{ik}^{(j)}$ is the semiring-sum over all paths between $i$ and $k$
+through $\{ 1,\ldots, j \}$. The base case is then the weight matrix $\mat{W}$
+since that contains the weights of going from $i$ to $k$ directly.
+
+Intuitively, the recurrence relationship, \[
+  \mat{R}_{ik}^{(j)} = \mat{R}_{ik}^{(j-1)} \oplus \mat{R}_{ij}^{(j-1)} \otimes \lft( \mat{R}_{jj}^{(j-1)} \rgt)^* \otimes \mat{R}_{jk}^{(j-1)}
+,\]
+says that the sum over all paths through $\{ 1,\ldots,j \}$ is equal to the sum
+over all paths through $\{ 1,\ldots,j-1 \}$ plus the sum over all paths through
+$j$. The recurrence here is that we can use $\mat{R}_{ik}^{(j-1)}$ as the sum
+over all paths through $\{ 1,\ldots,j-1 \}$. We can compute the sum over all
+paths through $j$ by the following, \[
+  \mat{R}_{ij}^{(j-1)} \otimes \lft( \mat{R}_{jj}^{(j-1)} \rgt)^* \otimes \mat{R}_{jk}^{(j-1)}
+,\]
+which is the weight of all paths from $i$ to $j$, $j$ to $j$ (cycles), and
+finally $j$ to $k$.
+
+\begin{algorithm}
+  \caption{Floyd-Warshall algorithm to compute the shortest path distance
+  between any two vertices in a graph without negative cycles. This is very
+  similar to Lehmann's algorithm in the semiring $\langle \R, \min, +, \infty,
+  0 \rangle$.}
+  \label{alg:floyd-warshall}
+
+  \begin{algorithmic}[1]
+    \Function{Floyd-Warshall}{$\mat{W}$}
+      \State $\mat{R}^{(0)} \gets \mat{W}$
+      \For {$j\gets 1,\ldots,|Q|$}
+        \For {$i\gets 1,\ldots,|Q|$}
+          \For {$k\gets 1,\ldots,|Q|$}
+            \State $\mat{R}_{ik}^{(j)} \gets \min \lft\{ \mat{R}_{ik}^{(j-1)}, \mat{R}_{ij}^{(j-1)} + \mat{R}_{jk}^{(j-1)} \rgt\}$
+          \EndFor
+        \EndFor
+      \EndFor
+
+      \State \Return $\min \lft\{ \mat{I}, \mat{R}^{(|Q|)} \rgt\}$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The Floyd-Warshall algorithm \citep{floyd1962algorithm,warshall1962theorem} has
+the same intuition as Lehmann's algorithm. It is also a dynamic program with
+the same state space. Also, the recurrence relationship is very similar, but it
+assumes no negative cycles, thus it does not need the Kleene star to account
+for cycles from $j$ to $j$.

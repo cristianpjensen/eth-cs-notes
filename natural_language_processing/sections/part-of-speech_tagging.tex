@@ -11,13 +11,13 @@
 \end{figure}
 
 In \textit{part-of-speech tagging} (POS tagging), we want to predict a POS tag
-$t\in\mathcal{T}$ for every word of the input sentence $\vec{w}$ of length $N$,
-\ie, given an $N$-dimensional input sequence of words $\vec{w} \in \Sigma^N$,
-we want to output an $N$-dimensional sequence of tags $\vec{t} \in
+$t\in\mathcal{T}$ for every word of the input sentence $\vec{w}$ of length $N$.
+In other words, given an $N$-dimensional input sequence of words $\vec{w} \in
+\Sigma^N$, we want to output an $N$-dimensional sequence of tags $\vec{t} \in
 \mathcal{T}^N$. This can be seen as searching through a POS graph as in
 \Cref{fig:pos-graph}. The output space $\mathcal{T}^N$ is exponential, so we
-need to design an algorithm to efficiently compute the normalizer
-$Z_{\vec{\theta}}$, and find the maximum scoring tagging.
+need to design an algorithm to efficiently compute the normalizer $Z(\vec{w})$,
+and find the maximum scoring tagging.
 
 \subsection{Conditional random fields}
 
@@ -102,7 +102,7 @@ this rederivation, which compute the normalizer in $\bigo{N \cdot
 \end{algorithm}
 
 Under the real semiring, we can thus use these algorithms to compute the
-normalizer $Z$ during training. For inference, the Viterbi algorithm is a
-version of the backward algorithm under the Viterbi semiring. Furthermore, the
-Viterbi algorithm keeps track of backpoints to find the maximally scoring
-tagging.
+normalizer $Z(\vec{w})$ during training. For inference, the Viterbi algorithm
+is a version of the backward algorithm under the Viterbi semiring, where
+backpointers to the argmax are kept such that the maximally scoring tagging can
+be constructed by backtracking the backpointer.

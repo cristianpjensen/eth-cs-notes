@@ -72,16 +72,16 @@ grammatical. Any sentence that can be yielded by a tree that consists of
 rules defined by the grammar is deemed grammatical.
 
 \begin{definition}[Context-free grammar]
-  A context-free grammar (CFG) is defined as $G=\langle \mathcal{N}, \cat{S},
-  \Sigma,\mathcal{R} \rangle$, where
+  A context-free grammar (CFG) is a 4-tuple $G=\langle \mathcal{N}, \cat{S},
+  \Sigma,\mathcal{R} \rangle$, such that
   \begin{enumerate}
-    \item $\mathcal{N}$: A set of non-terminal symbols, written as uppercase
-      letters $\cat{N}_1, \cat{N}_2, \ldots$.
-    \item \cat{S}: A distinguished start non-terminal. Every complete parse tree
-      must have this symbol at its root.
-    \item $\Sigma$: An alphabet of terminal symbols, written as lowercase
-      letters $a_1,a_2,\ldots$.
-    \item $\mathcal{R}$: A set of production rules of the following form, \[
+    \item $\mathcal{N}$ is a set of non-terminal symbols, written as uppercase
+      letters $\cat{N}_1, \cat{N}_2, \ldots$;
+    \item $\cat{S} \in \mathcal{N}$ is a distinguished start non-terminal.
+      Every complete parse tree must have this symbol at its root;
+    \item $\Sigma$ is an alphabet of terminal symbols, written as lowercase
+      letters $a_1,a_2,\ldots$;
+    \item $\mathcal{R}$ is a set of production rules of the following form, \[
         \cat{N} \to \bm{\alpha}
       ,\]
       where $\cat{N}\in\mathcal{N}$ and $\bm{\alpha}\in (\mathcal{N} \cup
@@ -100,11 +100,10 @@ pick the best tree, we can assign a probability to each rule, and pick the
 tree with the highest probability.
 
 \begin{definition}[Probabilistic context-free grammar]
-
-  A probabilistic CFG is defined as $G=\langle \mathcal{N}, S,
-  \Sigma,\mathcal{R}, p \rangle$, where $p: \mathcal{R}\to [0,1]$ is a
-  locally normalized probability distribution over rules. The probability of
-  a tree under a PCFG is defined as follows, \[
+  A probabilistic CFG is a 5-tuple $G=\langle \mathcal{N}, S,
+  \Sigma,\mathcal{R}, p \rangle$, where $p: \mathcal{R}\to [0,1]$ is a locally
+  normalized probability distribution over rules. The probability of a tree
+  under a PCFG is defined as follows, \[
     p(\bm{t} \mid s) = \prod_{r\in\bm{t}} p(r)
   .\]
 \end{definition}
@@ -119,7 +118,6 @@ problem that the normalizer $Z(\vec{w})$ will diverge if the ruleset contains a
 cycle rule, \eg, $\cat{N}\to\cat{N}$.
 
 \begin{definition}[Chomsky normal form]
-
   A grammar is in Chomsky normal form if all rules are of the following form,
   \begin{align*}
     \cat{N}_1 &\to \cat{N}_2 \cat{N}_3 \\
@@ -128,9 +126,8 @@ cycle rule, \eg, $\cat{N}\to\cat{N}$.
 \end{definition}
 
 \begin{theorem}[CNF theorem]
-  The CNF theorem states that for any grammar $G$, we can find another
-  grammar $G'$ that accepts the same set of strings and probabilities as $G$
-  and is in CNF.
+  For any grammar $G$, we can find another grammar $G'$ that accepts the same
+  set of strings and probabilities as $G$ and is in CNF.
 \end{theorem}
 
 A CFG in \textit{Chomsky normal form} (CNF) does not contain any cyclic rules,
@@ -189,12 +186,14 @@ efficiently compute the normalizer. The Cocke-Kasami-Younger (CKY)
 algorithm provides an efficient dynamic program to compute the normalizer
 $Z(\vec{w})$ of CFGs in CNF. It works by looking at iteratively larger spans,
 and the subtrees that make up these spans, since a span from $i$ to $j$ can
-only be made up of smaller spans within this span, \eg, there might be a
-subtrees that cover $i$ to $i+1$ and $i+1$ to $j$. See
-\Cref{fig:cky-chart} for an illustration of how the algorithm works. It starts
-from the bottom of the chart and works its way up using dynamic programming.
+only be made up of smaller spans within this span. \Eg, in
+\Cref{fig:cky-chart}, \cat{PP} covers the subtrees with root \cat{P} that
+covers $\smallcaps{in}$ and \cat{NP}, which covers $\smallcaps{my pajamas}$.
+Furhter see \Cref{fig:cky-chart} for an illustration of how the algorithm works
+fully. It starts from the bottom of the chart and works its way up using
+dynamic programming.
 
 This algorithm runs in $\bigo{N^3\cdot |\mathcal{R}|}$, where $N$ is the length
-of the sentence. We could also semiringify this algorithm to compute the best
-parse, where the Viterbi semiring finds the maximally scoring tree, and the
-real semiring computes the normalizer.
+of the sentence. We can semiringify this algorithm to compute the best parse,
+where the Viterbi semiring finds the maximally scoring tree, and the real
+semiring computes the normalizer.

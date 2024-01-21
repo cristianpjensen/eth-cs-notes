@@ -6,7 +6,7 @@
     \item $\odot$ is associative for all values in $\mathbb{K}$. $\forall x,y,z
       \in \mathbb{K}$, \[
         (x\odot y)\odot z = x\odot (y\odot z)
-      .\]
+      ;\]
   \item $\bm{e}\in \mathbb{K}$ is the identity element. $\forall x \in
     \mathbb{K}$, \[
         x \odot \bm{e} = x
@@ -18,13 +18,13 @@
   A semiring is a 5-tuple $\langle \mathbb{K},\oplus,\otimes,\bm{0},\bm{1}
   \rangle$, such that
   \begin{enumerate}
-    \item $\langle \mathbb{K},\oplus,\bm{0} \rangle$ is a commutative monoid.
-    \item $\langle \mathbb{K},\otimes,\bm{1} \rangle$ is a monoid.
+    \item $\langle \mathbb{K},\oplus,\bm{0} \rangle$ is a commutative monoid;
+    \item $\langle \mathbb{K},\otimes,\bm{1} \rangle$ is a monoid;
     \item $\otimes$ distributes over $\oplus$. $\forall x,y,z\in \mathbb{K}$,
       \begin{align*}
         (x\oplus y) \otimes z &= (x\otimes z) \oplus (y \otimes z) \\
         z\otimes (x \oplus y) &= (z\otimes x) \oplus (z\otimes y)
-      .\end{align*}
+      ;\end{align*}
     \item $\bm{0}$ is an annihilator for $\otimes$. $\forall x \in \mathbb{K}$,
       \begin{align*}
         \bm{0} \otimes x &= \bm{0} \\
@@ -48,8 +48,6 @@ want to use for example the Viterbi semiring $\langle [0,1], \max, \times, 0, 1
 \rangle$ to compute the following, \[
   \max_{\vec{y}\in\mathcal{Y}} \prod_{n=1}^N \exp \score(y_n)
 .\]
-
-\subsection{Closed semirings}
 
 \begin{definition}[Closed semiring]
   A closed semiring is a semiring with an additional unary operation: the

@@ -2,15 +2,17 @@
 
 Attention is a mechanism in neural networks that a model can learn to make
 predictions by selectively attending to a given set of data by using query
-$\bm{q}$, key $\bm{k}$, and value $\bm{v}$ vector representations. The query
+$\vec{q}$, key $\vec{k}$, and value $\vec{v}$ vector representations. The query
 and key vectors are used to determine how much weight should be given to the
 value vector.\sidenote{Note the parallel with dictionaries/hashmaps in
 programming languages, but, in the attention mechanism, we do a
-``soft-lookup``.} The weights are computed by as
-$\bm{\alpha}_i=\text{softmax}(\bm{q}_i^\top\bm{k}_i)$, so the values after the
-attention block can be computed as \[
-  \text{att}(\bm{x}_i) = \sum_{j} \alpha_{ij} \bm{v}_i
-.\]
+``soft-lookup``.} The weights are computed by
+$\mat{a}_{ij}=\softmax(\transpose{\vec{q}_j}\vec{k}_i)$, so the values after the
+attention block can be computed as follows, \[
+  \text{att}(\vec{x}_i) = \sum_{j} \vec{a}_{ij} \vec{v}_i
+,\]
+which is a linear combination of the values according to the attention weights
+computed by the query and keys.
 
 \begin{marginfigure}
     \centering
@@ -23,18 +25,18 @@ Self-attention blocks learn the query, key, and value representations from
 data. More specifically, it learns matrices $\bm{W}_Q$, $\bm{W}_K$, and
 $\bm{W}_V$ and computes the vectors from these matrices:
 \begin{align*}
-  \bm{q}_i &= \bm{W}_Q^\top \bm{x}_i \\
-  \bm{k}_i &= \bm{W}_K^\top \bm{x}_i \\
-  \bm{v}_i &= \bm{W}_V^\top \bm{x}_i
+  \vec{q}_i &= \transpose{\mat{W}_Q} \vec{x}_i \\
+  \vec{k}_i &= \transpose{\mat{W}_K} \vec{x}_i \\
+  \vec{v}_i &= \transpose{\mat{W}_V} \vec{x}_i
 .\end{align*}
 Then, we can use these to compute the output of the self-attention block: \[
-  \text{self-att}(\bm{X}) = \text{softmax}\left( \frac{(\bm{W}_Q^\top\bm{X})^\top(\bm{W}_K^\top\bm{X})}{\sqrt{d_q}} \right) \bm{W}_V^\top\bm{X}
+  \text{self-att}(\mat{X}) = \softmax \lft( \frac{\transpose{(\transpose{\mat{W}_Q} \mat{X})}(\transpose{\mat{W}_K}\mat{X})}{\sqrt{d_q}} \rgt) \transpose{\mat{W}_V}\mat{X}
 ,\]
 where $d_q$ is the square root of the dimensionality of the query and key
-vectors. Furthermore, we need to add a positional encoding to provide
-ordering information to the model.\sidenote{The self-attention operation is
-permutation invariant.} This is done by a sinusoidal positional encoding and
-are simply combined with $\bm{x}_i$ by addition.
+vectors. Furthermore, we need to add a positional encoding to provide ordering
+information to the model.\sidenote{The self-attention operation is permutation
+invariant.} This is done by a sinusoidal positional encoding and are simply
+combined with $\mat{X}$ by addition.
 
 \begin{figure}[ht]
     \centering

@@ -8,7 +8,8 @@ encode this as an arc in a graph, see
 \begin{figure}[h!]
     \centering
     \incfig{dependency-parse}
-    \caption{Projective dependency tree of ``The boy eats Rösti.``}
+    \caption{Projective dependency tree of ``The boy eats Rösti.`` TODO: Small
+    caps the text and remove the constituents.}
     \label{fig:dependency-parse}
 \end{figure}
 
@@ -28,17 +29,17 @@ non-projective dependency tree can be found in
     \centering
     \incfig{non-projective-dependency-tree}
     \caption{Non-projective dependency tree, without labels, of ``Ryan ate
-    Rösti, which was delicious.``}
+    Rösti, which was delicious.`` TODO: Small caps the text.}
     \label{fig:non-projective-dependency-tree}
 \end{figure}
 
 As always, we want to be able to parameterize a probability distribution over
 non-projective spanning trees, given a sentence $\vec{w}$. So, we need to be
-able to compute the normalizer $Z$. However, there are $(N-1)^{N-2}$ spanning
-trees with the single root constraint, thus we need to design a more efficient
-algorithm that makes use of its structure. We do this by decomposing the
-scoring function over the edges, \[
-  \score(\vec{t},\vec{w}) \doteq \score(r,\vec{w}) \sum_{(i\to j)\in\vec{t}} \score(i,j,\vec{w})
+able to compute the normalizer $Z(\vec{w})$. However, there are $(N-1)^{N-2}$
+spanning trees with the single root constraint, thus we need to design a more
+efficient algorithm that makes use of its structure. We do this by decomposing
+the scoring function over the edges, \[
+  \score(\vec{t},\vec{w}) \doteq \score(r,\vec{w}) + \sum_{(i\to j)\in\vec{t}} \score(i,j,\vec{w})
 .\]
 Thus, we only need a matrix $\mat{A}$, containing $\exp \score(i,j,\vec{w})$ and a
 vector $\vec{\rho}$, containing $\exp \score(r,\vec{w})$.
@@ -46,13 +47,13 @@ vector $\vec{\rho}$, containing $\exp \score(r,\vec{w})$.
 \begin{theorem}[Kirchhoff's matrix-tree theorem \citep{kirchhoff1847ueber}] \label{thm:kirchhoff}
   For an undirected unweighted graph $\mathcal{G}$ with $N$ vertices, let
   $\mat{L}$ be the graph Laplacian, \[
-    L_{ij} = \begin{cases}
-      -A_{ij} & i \neq j \\
-      \sum_{k \neq i} A_{kj} & \mathrm{otherwise},
+    \mat{L}_{ij} = \begin{cases}
+      -\mat{A}_{ij} & i \neq j \\
+      \sum_{k \neq i} \mat{A}_{kj} & \mathrm{otherwise},
     \end{cases}
   \]
-  where $\mat{A}$ is the adjacency matrix, \ie, $A_{ij}=1$ if $i \sim j$,
-  otherwise $A_{ij}=0$. Let $\hat{\mat{L}}_i \in \R^{(N-1)\times(N-1)}$ be the
+  where $\mat{A}$ is the adjacency matrix, \ie, $\mat{A}_{ij}=1$ if $i \sim j$,
+  otherwise $\mat{A}_{ij}=0$. Let $\hat{\mat{L}}_i \in \R^{(N-1)\times(N-1)}$ be the
   matrix created by removing the $i$-th row and column of $\mat{L}$. Then, we
   have \[
     N_T(\mathcal{G}) = \det{\hat{\mat{L}}_i}
@@ -69,10 +70,10 @@ follows,\sidenote{Since computing the determinant can be done in $\bigo{N^3}$.}
 However, this does not account for the single-root constraint.
 \citet{koo2007structured} further generalized Tutte's MTT by modifying the
 graph Laplacian, \[
-  L_{ij} = \begin{cases}
-    \rho_j & i = 1 \\
-    -A_{ij} & i \neq j \\
-    \sum_{k \neq i} A_{kj} & \mathrm{otherwise}.
+  \mat{L}_{ij} = \begin{cases}
+    \vec{\rho}_j & i = 1 \\
+    -\mat{A}_{ij} & i \neq j \\
+    \sum_{k \neq i} \mat{A}_{kj} & \mathrm{otherwise}.
   \end{cases}
 \]
 So, we can now compute $Z(\vec{w}) = \det{\mat{L}}$ in $\bigo{N^3}$.

@@ -136,15 +136,12 @@ more expressive power than context-free grammars. CCGs allow us to model
 CFGs cannot.
 
 \begin{definition}[Combinatory categorial grammar]
-
-  A combinatory categorial grammar is a 5-tuple \[
-  \langle V_T, V_N, S, f, R\rangle
-  ,\]
-  where
+  A combinatory categorial grammar is a 5-tuple $\langle V_T, V_N, \cat{S}, f,
+  R\rangle$, such that
   \begin{itemize}
     \item $V_T$ is a finite set of terminals;
     \item $V_N$ is the finite set of atomic categories;
-    \item $S \in V_N$ is the distinguished start category;
+    \item $\cat{S} \in V_N$ is the distinguished start category;
     \item $f$ is a function mapping terminals $V_T \cup \{ \epsilon \}$ to
       finite subsets of $C(V_N)$;
     \item $R$ is a finite set of combinatory rules.
@@ -171,8 +168,6 @@ The rules $R$ are the following (inspired by combinatory logic),
   \forall \cat{T}\in V_N : \cat{X} &\implies \cat{T \bs (T \fs X)} & \text{\footnotesize $(\mathbf{T}_<)$}
 ,\end{align*}
 of which there are also generalized versions.
-
-TODO: CCG parsing?
 
 \begin{figure*}
   \begin{subfigure}{0.3\textwidth}
