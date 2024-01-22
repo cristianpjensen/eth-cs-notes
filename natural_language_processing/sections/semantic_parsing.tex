@@ -25,6 +25,50 @@ since we have not heard most possible order of words that form a sentence.
 Proverbs are edge cases to this principle, since those words have meaning
 together that are independent of its parts.}
 
+\subsection{Linear-indexed grammars}
+
+\textit{Linear-indexed grammars} (LIG) \citep{aho1968indexed} are a mildly
+context-sensitive family of grammars. The structure of an LIG is very similar
+to that of a CFG, but non-terminal symbols have an associated stack that can be
+passed to exactly one child,\sidenote{The fact that the stack can only be pased
+to exactly one child is what makes it linear.} \[
+  \cat{N}[\sigma] \to \bm{\alpha} \; \cat{M}[\sigma] \; \bm{\beta}
+.\]
+
+\begin{definition}
+  A linear-indexed grammar is a 5-tuple $\langle \mathcal{N}, \cat{S}, I,
+  \Sigma, \mathcal{R} \rangle$, such that
+  \begin{itemize}
+    \item $\mathcal{N}$ is a set of non-terminal symbols, written as uppercase
+      letters $\cat{N},\cat{M},\ldots$;
+    \item $\cat{S}\in\mathcal{N}$ is a distinguished start non-terminal;
+    \item $I$ is a finite set of indices, written as function letters
+      $f,g,h,\ldots$;
+    \item $\Sigma$ is an alphabet of terminal symbols, written as lowercase
+      letters $a_1,a_2,\ldots$;
+    \item $\mathcal{R}$ is a set of production rules of one of the following
+      forms,
+      \begin{align*}
+        \cat{N}[\sigma] &\to \bm{\alpha} \; \cat{M}[\sigma] \; \bm{\beta} \\
+        \cat{N}[\sigma] &\to \bm{\alpha} \; \cat{M}[f\sigma] \; \bm{\beta} & \text{\footnotesize push} \\
+        \cat{N}[f\sigma] &\to \bm{\alpha} \; \cat{M}[\sigma] \; \bm{\beta} & \text{\footnotesize pop}
+      .\end{align*}
+  \end{itemize}
+\end{definition}
+
+To make a grammar that encodes the subset $\{ a^n b^n c^n \mid n\in\mathbb{Z}
+\}$ is impossible with a CFG, but it is possible with an LIG, using the
+following grammar,
+\begin{align*}
+  \cat{S}[\sigma] &\to a \cat{S}[f\sigma] c \\
+  \cat{S}[\sigma] &\to \cat{T}[\sigma] \\
+  \cat{T}[f\sigma] &\to \cat{T}[\sigma] b \\
+  \cat{T}[] &\to \epsilon
+.\end{align*}
+Intuitively, it keeps track of how many times $a$ and $c$ are added on either
+side. Then, once it uses switches over to $\cat{T}$ from $\cat{S}$ after adding
+$n$ $a$s and $n$ $c$s on either side, we add $n$ $b$s in the middle.
+
 \subsection{Lambda calculus}
 
 \textit{Lambda calculus} \citep{church1932set} is a model for semantic
@@ -210,7 +254,3 @@ of which there are also generalized versions.
   \end{subfigure}
   \caption{Simple example CCG derivations.}
 \end{figure*}
-
-\subsection{Linear-indexed grammar}
-
-TODO
