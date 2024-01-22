@@ -24,6 +24,20 @@ the parameters to obtain a categorical probability distribution, \[
 .\]
 Basically, the only difference is that we now learn the feature function.
 
+Using backpropagation, we can compute the derivative of a weight matrix
+$\mat{W}_k$ of an MLP as follows,
+\begin{align*}
+  \pdv{\ell}{\mat{W}_k} &= \pdv{\ell}{y} \pdv{y}{\vec{h}_n} \lft( \prod_{m=k+1}^n \pdv{\vec{h}_m}{\vec{h}_{m-1}} \rgt) \pdv{\vec{h}_k}{\mat{W}_k} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_n} \lft( \prod_{m=k+1}^n \pdv*{\sigma_m \lft( \transpose{\mat{W}_m} \vec{h}_{m-1} \rgt)}{\vec{h}_{m-1}} \rgt) \pdv*{\sigma_k \lft( \transpose{\mat{W}_k} \vec{h}_{k-1} \rgt)}{\mat{W}_k} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_n} \lft( \prod_{m=k+1}^n \sigma_m' \lft( \transpose{\mat{W}_m} \vec{h}_{m-1} \rgt) \mat{W}_m \rgt) \sigma_k' \lft( \transpose{\mat{W}_k} \vec{h}_{k-1} \rgt) \vec{h}_{k-1}
+  \intertext{If we use the ReLU activation function, this becomes the following,}
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_n} \lft( \prod_{m=k+1}^n \mathbb{1} \{ \transpose{\mat{W}_m} \vec{h}_{m-1} > 0 \} \cdot \mat{W}_m \rgt) \mathbb{1} \{ \transpose{\mat{W}_k} \vec{h}_{k-1} > 0 \} \cdot \vec{h}_{k-1}
+.\end{align*}
+This is the cause of ``dead`` neurons. When their values become negative, their
+derivative becomes 0. Thus, there is no way for gradient descent to learn
+anymore. Also, the derivative of all children of ``dead`` neurons become 0,
+because of the chain rule.
+
 \subsection{Word embeddings}
 
 To be able to use MLPs, we would need a continuous vector encoding of
@@ -69,6 +83,14 @@ context and word embeddings.
 
 \subsection{Sentiment analysis}
 
+\begin{figure}[h!]
+    \centering
+    \incfig{sentiment-analysis}
+    \caption{Architecture of a simple sentiment classifier, where
+    $f_{\vec{\theta}}$ is a multi-layer perceptron.}
+    \label{fig:sentiment-analysis}
+\end{figure}
+
 An example application is sentiment analysis \citep{pang2008opinion}, which
 classifies sentences as positive or negative. MLPs and word embeddings can be
 used for this and work very well \citep{iyyer2015deep}. The model first embeds
@@ -77,10 +99,3 @@ representation of the sentence.\sidenote{Pooling together discards word order,
 but for this simple task, it will still work very well.} Then, this vector is
 passed into an MLP, which is used as input to a softmax with 2 outputs
 (positive or negative).
-
-\begin{figure}[h!]
-    \centering
-    \incfig{sentiment-analysis}
-    \caption{Architecture of a simple sentiment classifier.}
-    \label{fig:sentiment-analysis}
-\end{figure}

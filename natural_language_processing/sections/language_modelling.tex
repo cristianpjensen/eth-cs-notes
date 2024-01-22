@@ -1,3 +1,5 @@
+\newcommand{\const}{\mathrm{const.}}
+
 \section{Language modelling} \label{sec:lm}
 
 In language modelling, $\Sigma$ is a finite, non-empty set of symbols. In the
@@ -99,7 +101,8 @@ is similar to the encoding of the history, it is more likely.
     \centering
     \incfig{rnn}
     \caption{Diagram of the RNN architecture. Each hidden state $\vec{h}_i$ has
-    ``seen`` all previous tokens $\vec{x}_{1:{i-1}}$. TODO: Update $t$ to be $i$.}
+    ``seen`` all previous tokens $\vec{x}_{1:{i-1}}$. TODO: Update $t$ to be
+    $i$. TODO: Add nodes for $\mat{W}_h$, $\mat{W}_x$, $\vec{b}$.}
     \label{fig:rnn}
 \end{figure}
 
@@ -122,3 +125,17 @@ because computing the gradient of the parameters involves a lot of matrix
 operations that usually have values between -1 and 1. The LSTM
 \citep{hochreiter1997long} and GRU \citep{cho2014learning} architectures seek
 to solve this problem.
+
+\begin{align*}
+  \pdv{\ell}{\mat{W}_h} &= \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \pdv{\vec{h}_N}{\mat{W}_h} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \sum_{i=1}^N \pdv{\vec{h}_N}{\vec{h}_i} \pdv{\vec{h}_i}{\mat{W}_h} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \sum_{i=1}^N \lft( \prod_{m=i+1}^N \pdv{\vec{h}_m}{\vec{h}_{m-1}} \rgt) \pdv{\vec{h}_i}{\mat{W}_h} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \sum_{i=1}^N \lft( \prod_{m=i+1}^N \pdv*{\sigma\lft( \mat{W}_h\vec{h}_{i-1} + \const \rgt)}{\vec{h}_{m-1}} \rgt) \pdv*{\sigma \lft( \mat{W}_h\vec{h}_{i-1} + \const \rgt)}{\mat{W}_h} \\
+  &= \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \sum_{i=1}^N \lft( \prod_{m=i+1}^N \sigma' \lft( \mat{W}_h\vec{h}_{i-1} + \const \rgt) \mat{W}_h \rgt) \sigma'\lft( \mat{W}_h\vec{h}_{i-1} + \const \rgt) \vec{h}_{i-1} \\
+  \intertext{If we use the $\tanh$ activation function with a derivative
+  approximately equal to $1$, we get the following,}
+  &\approx \pdv{\ell}{y} \pdv{y}{\vec{h}_N} \sum_{i=1}^N \vec{h}_{i-1} \prod_{m=i+1}^N \mat{W}_h \\
+\end{align*}
+This contains many multiplications of $\mat{W}_h$ with itself, which causes
+exploding or vanishing gradient (dependent on whether the determinant of
+$\mat{W}_h$ is greater than or less than $1$).

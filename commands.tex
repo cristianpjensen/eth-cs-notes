@@ -48,6 +48,10 @@
 % Math comment in smaller font size
 \newcommand{\mathcomment}[1]{\mathrm{\footnotesize #1}}
 
+% Gradient and Hessian operator
+\newcommand{\grad}[2]{\vec{\nabla}_{\!\! #2} #1}
+\newcommand{\hess}[2]{\mat{H}_{#2} #1}
+
 % Notation environment if necessary
 \newenvironment{notation}
   {\begin{fullwidth}

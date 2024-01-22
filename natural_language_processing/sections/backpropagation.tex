@@ -14,10 +14,9 @@ some loss function, \[
   \sum_{(\vec{x},\vec{y})\in\mathcal{D}} \ell(f_{\vec{\theta}}(\vec{x}),\vec{y})
 .\]
 
-We need this function's gradient
-$\pdv*{f_{\vec{\theta}}(\vec{x})}{\vec{\theta}}$ to be able to use an algorithm
-such as gradient descent to optimize it.\sidenote{Most of the time, this
-function cannot be solved in closed form.} For a composite function, it is time
+We need this function's gradient to be able to use an algorithm such as
+gradient descent to optimize it.\sidenote{Most of the time, this function
+cannot be solved in closed form.} For a composite function, it is time
 consuming to derive the gradient by hand. Thus, we use backpropagation to
 automatically compute the gradients, as long as we have access to the
 derivatives of its primitive functions.
@@ -103,7 +102,7 @@ the amount of computation scales linearly with the number of edges.
   \end{algorithmic}
 \end{algorithm}
 
-The general framework that any backpropagation framework uses is the following:
+The general framework that any backpropagation framework uses is the following,
 \begin{enumerate}
   \item Write down a composite function as a hypergraph with intermediate
     variables as nodes and hyperedges labeled with primitive functions;

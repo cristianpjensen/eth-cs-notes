@@ -13,11 +13,11 @@ probability,
     values of $x$ might be related.
 \end{itemize}
 
-Thus, we need a more general framework for modelling conditional
-distributions. One such general framework is to simply exponentiate some
-scoring function that we construct,\sidenote{The exponentiation makes sure
-that it is non-negative.} and let the conditional probability be proportional
-to it, \[
+Thus, we need a more general framework for modelling conditional distributions.
+One such general framework is to simply exponentiate some scoring function
+$\score: \mathcal{X} \times \mathcal{Y} \to \R$ that we construct,\sidenote{The
+exponentiation makes sure that it is non-negative.} and let the conditional
+probability be proportional to it, \[
   p(y\mid x) \propto \exp \score(x, y) > 0
 .\]
 The linear scoring function looks like the following, \[
@@ -54,23 +54,43 @@ In log-linear modelling, this objective function is convex, thus any local
 minimum is a global minimum. We usually optimize the log-likelihood with
 gradient-based methods,
 \begin{align*}
-  \pdv*{\log p_{\vec{\theta}}(y \mid x)}{\vec{\theta}} &= \pdv*{\transpose{\vec{\theta}} \vec{f}(x,y) - \log Z_{\vec{\theta}}}{\vec{\theta}}(x) \\
-  &= \vec{f}(x,y) - \pdv*{\log Z_{\vec{\theta}}}{\vec{\theta}}(x) \\
-  &= \vec{f}(x,y) - \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \pdv*{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) }{\vec{\theta}} \\
-  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \pdv*{\transpose{\vec{\theta}} \vec{f}(x,y')}{\vec{\theta}} \\
-  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
-  &= \vec{f}(x,y) - \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y')
+  \grad{- \log p_{\vec{\theta}}(y \mid x)}{\vec{\theta}} &= \grad{\log Z_{\vec{\theta}}(x) - \transpose{\vec{\theta}} \vec{f}(x,y)}{\vec{\theta}} \\ 
+  &= \grad{\log Z_{\vec{\theta}}(x)}{\vec{\theta}} - \grad{\transpose{\vec{\theta}} \vec{f}(x,y)}{\vec{\theta}} \\
+  &= \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \grad{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt)}{\vec{\theta}} - \vec{f}(x,y) \\
+  &= \sum_{y'\in\mathcal{Y}} \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \grad{\transpose{\vec{\theta}} \vec{f}(x,y')}{\vec{\theta}} - \vec{f}(x,y) \\
+  &= \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y) \\
+  &= \E_{y'} [\vec{f}(x,y')] - \vec{f}(x,y)
 .\end{align*}
 Due to convexity, the global minimum is the only point that has its gradient
 equal $0$. Thus, at the optimal parameters, the following is the case, \[
-  \vec{f}(x,y) = \sum_{y'\in\mathcal{Y}}p_{\vec{\theta}}(y'\mid x)\vec{f}(x,y')
+  \vec{f}(x,y) = \E_{y'} [\vec{f}(x,y')]
 .\]
 Therefore, the optimum is where the observed feature counts $\vec{f}(x,y)$ look
-like the expected feature counts
-$\sum_{y'\in\mathcal{Y}}p_{\vec{\theta}}(y'\mid x)\vec{f}(x,y')$. In other
-words, the training data looks exactly like what our model predicts through the
-eyes of our feature function $\bm{f}$. This is referred to as
+like the expected feature counts $\E_{y'} [\vec{f}(x,y')]$ through the lens of
+the model. In other words, the training data looks exactly like what our model
+predicts through the eyes of our feature function. This is referred to as
 \textit{expectation matching}.
+
+Furthemore, we can derive the Hessian of the negative log-likelihood to be the
+variance of $\vec{f}(x,\cdot)$,
+
+\begin{align*}
+  \grad{p_{\vec{\theta}}(y\mid x)}{\transpose{\vec{\theta}}} &= \grad{Z_{\vec{\theta}}(x)^{-1} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt)}{\transpose{\vec{\theta}}} \\
+  &= Z_{\vec{\theta}}(x)^{-1} \grad{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt)}{\transpose{\vec{\theta}}} + \lft( \grad{Z_{\vec{\theta}}(x)^{-1}}{\transpose{\vec{\theta}}} \rgt) \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt) \\
+  &= \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt) \grad{\transpose{\vec{\theta}} \vec{f}(x,y)}{\transpose{\vec{\theta}}} - \frac{1}{Z_{\vec{\theta}}(x)^2} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt) \grad{Z_{\vec{\theta}}(x)}{\transpose{\vec{\theta}}} \\
+  &= p_{\vec{\theta}}(y\mid x) \transpose{\vec{f}(x,y)} - p_{\vec{\theta}}(y\mid x) \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \grad{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt)}{\transpose{\vec{\theta}}} \\
+  &= p_{\vec{\theta}}(y\mid x) \transpose{\vec{f}(x,y)} - p_{\vec{\theta}}(y\mid x) \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \grad{\transpose{\vec{\theta}} \vec{f}(x,y')}{\transpose{\vec{\theta}}} \\
+  &= p_{\vec{\theta}}(y\mid x) \transpose{\vec{f}(x,y)} - p_{\vec{\theta}}(y\mid x) \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \transpose{\vec{f}(x,y')} \\
+  &= p_{\vec{\theta}}(y\mid x) \lft( \transpose{\vec{f}(x,y)} - \E_{y'} \lft[ \transpose{\vec{f}(x,y')} \rgt] \rgt). \\
+  \\
+  \hess{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} &= \grad{ \grad{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} }{\transpose{\vec{\theta}}} \\
+  &= \grad{\sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y)}{\transpose{\vec{\theta}}} \\
+  &= \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') \grad{p_{\vec{\theta}}(y'\mid x)}{\transpose{\vec{\theta}}} \\
+  &= \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') p_{\vec{\theta}}(y'\mid x) \lft( \transpose{\vec{f}(x,y')} - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \rgt) \\
+  &= \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \transpose{\vec{f}(x,y')}  - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
+  &= \E_y \lft[ \vec{f}(x,y) \transpose{\vec{f}(x,y)} \rgt]  - \E_y \lft[ \transpose{\vec{f}(x,y)} \rgt] \E_y \lft[ \vec{f}(x,y) \rgt] \\
+  &= \mathrm{Cov}_y \lft[ \vec{f}(x,y) \rgt]
+.\end{align*}
 
 \subsection{Softmax}
 
@@ -90,3 +110,22 @@ softmax becomes the argmax function and as $T\rightarrow \infty$, softmax
 becomes a uniform categorical distribution.} This is a generalization of
 log-linear modelling, where, instead of $\transpose{\vec{\theta}}
 \vec{f}(x,y)$, we can use any function of the input.
+
+\subsection{The exponential family}
+
+The \textit{exponential family} is a family of probability distributions of the
+following form, \[
+  p_{\vec{\theta}}(x) = \frac{1}{Z_{\vec{\theta}}} h(x) \exp \lft( \transpose{\vec{\theta}} \vec{\phi}(x) \rgt)
+,\]
+where $Z_{\vec{\theta}}$ is the partition function that normalizes the
+probability distribution, $h(x)$ determines the support of the function,
+$\vec{\theta}$ are the canonical parameters, and $\vec{\phi}(x)$ are the
+sufficient statistics. Importantly, $h(x)$ may not depend on $\vec{\theta}$.
+Any distribution that can be brought into this form is part of this
+family.\sidenote{Notice that the form of the exponential family is a
+generalization of softmax.}
+
+The advantage of the exponential family is that they have conjugate priors,
+which make intractable posteriors tractable. Intuitively, this is because the
+posterior must be in the same form as the prior, thus we must be able to
+summarize the data into a finite vector (sufficient statistics).
