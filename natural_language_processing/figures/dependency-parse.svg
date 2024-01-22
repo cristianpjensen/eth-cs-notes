@@ -359,6 +359,23 @@
            d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722" />
       </g>
     </marker>
+    <marker
+       markerWidth="0.911"
+       markerHeight="1.690"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="marker-arrow-0.5308-75">
+      <g
+         id="g125"
+         transform="scale(2.153529264004019)">
+        <path
+           id="path123"
+           inkscape:connector-curvature="0"
+           style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+           d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722" />
+      </g>
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -367,9 +384,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9549912"
-     inkscape:cx="216.44782"
-     inkscape:cy="35.737381"
+     inkscape:zoom="3.9774956"
+     inkscape:cx="177.43983"
+     inkscape:cy="-12.478458"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -418,7 +435,7 @@
          id="tspan816"
          x="11.656363"
          y="293.2699"
-         style="font-size:3.88055563px;stroke-width:0.26458332">The</tspan></text>
+         style="font-size:3.88055563px;stroke-width:0.26458332">\smallcaps{The}</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -429,7 +446,7 @@
          id="tspan820"
          x="34.408165"
          y="292.89377"
-         style="font-size:3.88055563px;stroke-width:0.26458332">boy</tspan></text>
+         style="font-size:3.88055563px;stroke-width:0.26458332">\smallcaps{boy}</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -440,18 +457,18 @@
          id="tspan824"
          x="56.864372"
          y="293.15811"
-         style="font-size:3.88055563px;stroke-width:0.26458332">eats</tspan></text>
+         style="font-size:3.88055563px;stroke-width:0.26458332">\smallcaps{eats}</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.88055563px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="79.201218"
+       x="78.602539"
        y="293.2699"
        id="text830"><tspan
          sodipodi:role="line"
          id="tspan828"
-         x="79.201218"
+         x="78.602539"
          y="293.2699"
-         style="stroke-width:0.26458332">Rösti</tspan></text>
+         style="stroke-width:0.26458332">\smallcaps{Rösti}</tspan></text>
     <text
        id="text99"
        xml:space="preserve"
@@ -486,38 +503,5 @@
        id="path128-9-4"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
-    <text
-       id="text105"
-       xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="283.22733"
-       x="45.47855"><tspan
-         id="tspan103"
-         sodipodi:role="line"
-         x="45.47855"
-         y="283.22733"
-         style="stroke-width:0.26458332">\smallcaps{sub}</tspan></text>
-    <text
-       id="text105-7"
-       xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="283.23566"
-       x="68.253357"><tspan
-         id="tspan103-5"
-         sodipodi:role="line"
-         x="68.253357"
-         y="283.23566"
-         style="stroke-width:0.26458332">\smallcaps{obj}</tspan></text>
-    <text
-       id="text105-3"
-       xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="283.23566"
-       x="22.620586"><tspan
-         id="tspan103-56"
-         sodipodi:role="line"
-         x="22.620586"
-         y="283.23566"
-         style="stroke-width:0.26458332">\smallcaps{det}</tspan></text>
   </g>
 </svg>

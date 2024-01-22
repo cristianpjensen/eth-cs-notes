@@ -53,14 +53,11 @@
   \begin{picture}(1,0.25)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0.11656363,0.03730103){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}The\end{tabular}}}}%
-    \put(0.34408165,0.04106232){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}boy\end{tabular}}}}%
-    \put(0.56864372,0.03841888){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}eats\end{tabular}}}}%
-    \put(0.79201218,0.03730103){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rösti\end{tabular}}}}%
+    \put(0.11656363,0.03730103){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{The}\end{tabular}}}}%
+    \put(0.34408165,0.04106232){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{boy}\end{tabular}}}}%
+    \put(0.56864372,0.03841888){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{eats}\end{tabular}}}}%
+    \put(0.78602539,0.03730103){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{Rösti}\end{tabular}}}}%
     \put(0.58830971,0.19690765){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$r$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{dependency-parse.pdf}}%
-    \put(0.4547855,0.13772675){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{sub}\end{tabular}}}}%
-    \put(0.68253357,0.13764343){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{obj}\end{tabular}}}}%
-    \put(0.22620586,0.13764343){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{det}\end{tabular}}}}%
   \end{picture}%
 \endgroup%

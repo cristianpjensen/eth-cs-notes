@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{283.46456693bp}%
+    \setlength{\unitlength}{141.73228346bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,26 +50,27 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.7)%
+  \begin{picture}(1,1.4)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{transformer.pdf}}%
-    \put(0.33377812,0.19743847){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}multi-head self-attention\end{tabular}}}}%
-    \put(0.43886364,0.32184938){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
+    \put(0.37220716,0.39487671){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MHSA\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{transformer.pdf}}%
-    \put(0.47899212,0.40963577){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MLPs\end{tabular}}}}%
-    \put(0.49787094,0.26164764){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.32428023,0.64369877){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
+    \put(0.44539253,0.52521729){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{transformer.pdf}}%
-    \put(0.43886368,0.53571677){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
+    \put(0.44566116,0.95453857){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{transformer.pdf}}%
-    \put(0.49802544,0.47609329){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.44286354,0.07746277){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{X}$\end{tabular}}}}%
+    \put(0.07462638,0.41515137){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize residual connections}\end{tabular}}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{transformer.pdf}}%
-    \put(0.49649231,0.02975128){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{X}$\end{tabular}}}}%
-    \put(0.20208914,0.2142276){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize residual connections}\end{tabular}}}}}%
+    \put(0.44048717,1.29417755){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\R^d$\end{tabular}}}}%
+    \put(0.44523342,0.19846985){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=6]{transformer.pdf}}%
-    \put(0.46803089,0.64708878){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mathrm{output}$\end{tabular}}}}%
-    \put(0.56386372,0.09556458){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize positional embeddings}\end{tabular}}}}%
-    \put(0.49775276,0.09521973){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.38349599,0.82291159){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MLPs\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=7]{transformer.pdf}}%
+    \put(0.32428023,1.07189995){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
+    \put(0.67014145,0.19089966){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{P}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{transformer.pdf}}%
   \end{picture}%
 \endgroup%

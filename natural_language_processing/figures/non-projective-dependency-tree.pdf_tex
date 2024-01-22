@@ -53,14 +53,14 @@
   \begin{picture}(1,0.25)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0.04603591,0.03285492){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Ryan\end{tabular}}}}%
-    \put(0.16780056,0.03064575){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}ate\end{tabular}}}}%
-    \put(0.26606535,0.02988373){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rösti\end{tabular}}}}%
-    \put(0.3953812,0.02988373){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}for\end{tabular}}}}%
-    \put(0.49447926,0.02981262){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}lunch\end{tabular}}}}%
-    \put(0.60964222,0.02988373){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}which\end{tabular}}}}%
-    \put(0.73983665,0.03252563){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}was\end{tabular}}}}%
-    \put(0.81137589,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}delicious\end{tabular}}}}%
+    \put(0.04603591,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{Ryan}\end{tabular}}}}%
+    \put(0.16019379,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{ate}\end{tabular}}}}%
+    \put(0.26242733,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{Rösti}\end{tabular}}}}%
+    \put(0.3953812,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{for}\end{tabular}}}}%
+    \put(0.48786469,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{lunch}\end{tabular}}}}%
+    \put(0.60964222,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{which}\end{tabular}}}}%
+    \put(0.72859192,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{was}\end{tabular}}}}%
+    \put(0.81137589,0.03228821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{delicious}\end{tabular}}}}%
     \put(0.17848858,0.20254669){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$r$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{non-projective-dependency-tree.pdf}}%
   \end{picture}%

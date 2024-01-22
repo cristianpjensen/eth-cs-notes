@@ -38,14 +38,12 @@ information to the model.\sidenote{The self-attention operation is permutation
 equivariant.} This is done by a sinusoidal positional encoding and are simply
 combined with $\mat{X}$ by addition.
 
-\begin{figure}[ht]
+\begin{marginfigure}
     \centering
     \incfig{transformer}
-    \caption{Transformer encoder/decoder architecture. Decoder follows this by
-    a linear projection and softmax to parameterize a distribution over next
-    words.}
+    \caption{Transformer encoder architecture.}
     \label{fig:transformer}
-\end{figure}
+\end{marginfigure}
 
 Transformers \citep{vaswani2017attention} use multi-headed self-attention,
 which is a module where self-attention is applied $M$ times independently to
@@ -61,9 +59,16 @@ probability that $\vec{y}$ is the translation of $\vec{x}$. We can do this with
 transformers by encoding the input sequence $\vec{x}$ using encoders, and
 feeding this representation of the input to a decoder. The decoder takes as
 input the input sequence and the already generated (incomplete) sequence
-$\vec{y}_{<i}$. It then runs the decoder as in \Cref{fig:transformer} and
+$\vec{y}_{<i}$. It then runs the encoder as in \Cref{fig:transformer} and
 projects the output to a probability distribution over tokens using a linear
 layer, followed by softmax.
+
+\begin{figure}[ht]
+    \centering
+    \incfig{translation-architecture}
+    \caption{Translation architecture}
+    \label{fig:translation-architecture}
+\end{figure}
 
 In previous problem statements, we were usually able to compute the globally
 maximum output using some dynamic program. However, in this case, that is not
@@ -74,5 +79,3 @@ every path of the $\bigo{|\Sigma|^{N_{\max}}}$ paths, but we use beam search.
 Beam search keeps track of a maximum of $k$ paths at any given time. Then, it
 prunes paths that are the worst. This is still not globally optimal, but it is
 a bit better than the greedy approach.
-
-TODO: Figure of translation architecture with encoders and decoders.

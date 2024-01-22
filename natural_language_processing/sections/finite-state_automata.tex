@@ -45,7 +45,7 @@ the FSA accepts the string and is part of its language.
   \incfig{example-fsa}
   \caption{The graph of a simple FSA, where initial states are denoted by an
   incoming arrow and final states are denoted by a double circle. This defines
-  the language $L = \{ b(ca)^*cc, a(b)^*cb(ca)^*cc \}$. TODO: Fix text placements.}
+  the language $L = \{ b(ca)^*cc, a(b)^*cb(ca)^*cc \}$.}
   \label{fig:example-fsa}
 \end{marginfigure}
 
@@ -62,21 +62,6 @@ characters to output characters. Formally, $\delta \subseteq Q \times (\Sigma
 Q$, where $\Omega$ is the output alphabet.
 
 \subsection{WFST composition}
-
-\begin{marginfigure}[0.5cm]
-  \centering
-  \incfig{example-wfst}
-  \caption{The graph of a simple WFST, where initial states are denoted by an
-  incoming arrow and final states are denoted by a double circle. Example
-  mappings that this WFST defines are
-  \begin{align*}
-    \smallcaps{DEYTAX} &\to \smallcaps{DATA} & (0.175) \\
-    \smallcaps{DAEDXAX} &\to \smallcaps{DATA} & (0.075) \\
-    \smallcaps{DUW} &\to \smallcaps{DEW} & (0.5)
-  .\end{align*}
-  TODO: Fix text placements.}
-  \label{fig:example-wfst}
-\end{marginfigure}
 
 WFST composition of two transducers $\mathcal{T}_1$ and $\mathcal{T}_2$ is a
 common operation that involves mapping the inputs of $\mathcal{T}_1$ to the
