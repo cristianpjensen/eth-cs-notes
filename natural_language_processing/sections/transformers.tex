@@ -35,13 +35,15 @@ Then, we can use these to compute the output of the self-attention block: \[
 where $d_q$ is the square root of the dimensionality of the query and key
 vectors. Furthermore, we need to add a positional encoding to provide ordering
 information to the model.\sidenote{The self-attention operation is permutation
-invariant.} This is done by a sinusoidal positional encoding and are simply
+equivariant.} This is done by a sinusoidal positional encoding and are simply
 combined with $\mat{X}$ by addition.
 
 \begin{figure}[ht]
     \centering
     \incfig{transformer}
-    \caption{Transformer encoder/decoder architecture.}
+    \caption{Transformer encoder/decoder architecture. Decoder follows this by
+    a linear projection and softmax to parameterize a distribution over next
+    words.}
     \label{fig:transformer}
 \end{figure}
 
@@ -63,14 +65,14 @@ $\vec{y}_{<i}$. It then runs the decoder as in \Cref{fig:transformer} and
 projects the output to a probability distribution over tokens using a linear
 layer, followed by softmax.
 
-Usually we are able to compute the globally maximum output using some dynamic
-program. However, in this case, that is not possible. This model is only
-locally normalized. But, we can do something more optimal than greedily picking
-the next token. We can view this problem as a graph search problem over
-possible output sentences. We still cannot explore every path of the
-$\bigo{|\Sigma|^{N_{\max}}}$ paths, but we use beam search. Beam search keeps
-track of a maximum of $k$ paths at any given time. Then, it prunes paths that
-are the worst. This is still not globally optimal, but it is a bit better than
-the greedy approach.
+In previous problem statements, we were usually able to compute the globally
+maximum output using some dynamic program. However, in this case, that is not
+possible. This model is only locally normalized. But, we can do something more
+optimal than greedily picking the next token. We can view this problem as a
+graph search problem over possible output sentences. We still cannot explore
+every path of the $\bigo{|\Sigma|^{N_{\max}}}$ paths, but we use beam search.
+Beam search keeps track of a maximum of $k$ paths at any given time. Then, it
+prunes paths that are the worst. This is still not globally optimal, but it is
+a bit better than the greedy approach.
 
 TODO: Figure of translation architecture with encoders and decoders.

@@ -30,7 +30,7 @@ together that are independent of its parts.}
 \textit{Linear-indexed grammars} (LIG) \citep{aho1968indexed} are a mildly
 context-sensitive family of grammars. The structure of an LIG is very similar
 to that of a CFG, but non-terminal symbols have an associated stack that can be
-passed to exactly one child,\sidenote{The fact that the stack can only be pased
+passed to exactly one child,\sidenote{The fact that the stack can only be passed
 to exactly one child is what makes it linear.} \[
   \cat{N}[\sigma] \to \bm{\alpha} \; \cat{M}[\sigma] \; \bm{\beta}
 .\]
@@ -60,14 +60,15 @@ To make a grammar that encodes the subset $\{ a^n b^n c^n \mid n\in\mathbb{Z}
 \}$ is impossible with a CFG, but it is possible with an LIG, using the
 following grammar,
 \begin{align*}
-  \cat{S}[\sigma] &\to a \cat{S}[f\sigma] c \\
+  \cat{S}[\sigma] &\to a \; \cat{S}[f\sigma] \; c \\
   \cat{S}[\sigma] &\to \cat{T}[\sigma] \\
-  \cat{T}[f\sigma] &\to \cat{T}[\sigma] b \\
+  \cat{T}[f\sigma] &\to \cat{T}[\sigma] \; b \\
   \cat{T}[] &\to \epsilon
 .\end{align*}
 Intuitively, it keeps track of how many times $a$ and $c$ are added on either
-side. Then, once it uses switches over to $\cat{T}$ from $\cat{S}$ after adding
-$n$ $a$s and $n$ $c$s on either side, we add $n$ $b$s in the middle.
+side. Then, once it switches over to $\cat{T}$ from $\cat{S}$ after adding $n$
+times $a$ and $n$ times $c$ on either side, we add $n$ times $b$ in the middle.
+The stack allows us to ``count`` to $n$.
 
 \subsection{Lambda calculus}
 
@@ -204,7 +205,7 @@ categories.\sidenote{Unlike CFGs, which encode structure in their rules.}
 
 The rules $R$ are the following (inspired by combinatory logic),
 \begin{align*}
-  \cat{X \fs Y} \hspace{1em} \cat{Y} &\implies \cat{x} & \text{\footnotesize $(>)$} \\
+  \cat{X \fs Y} \hspace{1em} \cat{Y} &\implies \cat{X} & \text{\footnotesize $(>)$} \\
   \cat{Y} \hspace{1em} \cat{X \bs Y} &\implies \cat{X} & \text{\footnotesize $(<)$} \\
   \cat{X \fs Y} \hspace{1em} \cat{Y \fs Z} &\implies \cat{X \fs Z} & \text{\footnotesize $(\mathbf{B}_>)$} \\
   \cat{Y \bs Z} \hspace{1em} \cat{X \bs Z} &\implies \cat{X \bs Z} & \text{\footnotesize $(\mathbf{B}_<)$} \\

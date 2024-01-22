@@ -21,7 +21,7 @@ probability be proportional to it, \[
   p(y\mid x) \propto \exp \score(x, y) > 0
 .\]
 The linear scoring function looks like the following, \[
-  \score(x,y) = \transpose{\vec{\theta}} \vec{f}(x, y) > 0
+  \score(x,y) = \transpose{\vec{\theta}} \vec{f}(x, y)
 \]
 with feature weights $\vec{\theta}\in\R^K$ and $\vec{f}(x,y)\in\R^K$ as a
 vector describing $y$ in context $x$. The conditional probability then looks
@@ -72,7 +72,7 @@ predicts through the eyes of our feature function. This is referred to as
 \textit{expectation matching}.
 
 Furthemore, we can derive the Hessian of the negative log-likelihood to be the
-variance of $\vec{f}(x,\cdot)$,
+covariance matrix of $\vec{f}(x,\cdot)$ \wrt $\vec{\theta}$,
 
 \begin{align*}
   \grad{p_{\vec{\theta}}(y\mid x)}{\transpose{\vec{\theta}}} &= \grad{Z_{\vec{\theta}}(x)^{-1} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y) \rgt)}{\transpose{\vec{\theta}}} \\
@@ -89,7 +89,7 @@ variance of $\vec{f}(x,\cdot)$,
   &= \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') p_{\vec{\theta}}(y'\mid x) \lft( \transpose{\vec{f}(x,y')} - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \rgt) \\
   &= \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \transpose{\vec{f}(x,y')}  - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
   &= \E_y \lft[ \vec{f}(x,y) \transpose{\vec{f}(x,y)} \rgt]  - \E_y \lft[ \transpose{\vec{f}(x,y)} \rgt] \E_y \lft[ \vec{f}(x,y) \rgt] \\
-  &= \mathrm{Cov}_y \lft[ \vec{f}(x,y) \rgt]
+  &= \mathrm{Cov}_{y \sim p_{\vec{\theta}}(\cdot\mid x)} \lft[ \vec{f}(x,y) \rgt]
 .\end{align*}
 
 \subsection{Softmax}
