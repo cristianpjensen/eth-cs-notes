@@ -104,11 +104,18 @@ which is the window size, so it has a physical meaning. However, the
 selection of $h$ is not trivial, and the method is computationally quite
 expensive.
 
-TODO: Mean-shift figure (lecture 6, slide 66).
+\begin{marginfigure}
+    \centering
+    \incfig{mean-shift}
+    \caption{Iteration of mean-shift where points move toward a mode.}
+    \label{fig:mean-shift}
+\end{marginfigure}
 
 \subsection{Hough transform}
 
-Remark: This is not an algorithm for segmentation, why is it here?
+\begin{remark}
+This is not an algorithm for segmentation, but rather for finding features.
+\end{remark}
 
 The \textit{Hough transform} uses the structure of shapes to recognize them in
 an image. First, we have to find the edges of the objects in the image, so we
@@ -240,7 +247,7 @@ be the same value for close pixels.
 \begin{marginfigure}
     \centering
     \incfig{hypercolumns}
-    \caption{Hypercolumns}
+    \caption{Hypercolumns.}
     \label{fig:hypercolumns}
 \end{marginfigure}
 

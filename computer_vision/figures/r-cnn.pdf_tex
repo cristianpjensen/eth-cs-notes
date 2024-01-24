@@ -1,6 +1,6 @@
 %% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
-%% Accompanies image file 'hypercolumns.pdf' (pdf, eps, ps)
+%% Accompanies image file 'r-cnn.pdf' (pdf, eps, ps)
 %%
 %% To include the image in your LaTeX document, write
 %%   \input{<filename>.pdf_tex}
@@ -50,16 +50,19 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.8)%
+  \begin{picture}(1,1)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0,0){\includegraphics[width=\unitlength,page=1]{hypercolumns.pdf}}%
-    \put(0.05590961,0.22429138){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{input image}\end{tabular}}}}}%
-    \put(0.22433113,0.05352356){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{classifcation network}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=2]{hypercolumns.pdf}}%
-    \put(0.11206588,0.71161743){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{activations}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=3]{hypercolumns.pdf}}%
-    \put(0.59284801,0.71239868){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\substack{\textit{pixel classification}\\\textit{network}}$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=4]{hypercolumns.pdf}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{r-cnn.pdf}}%
+    \put(0.31598289,0.58100777){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}CNN\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{r-cnn.pdf}}%
+    \put(0.32158059,0.72589226){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}SVM\end{tabular}}}}%
+    \put(0.01911423,0.72932114){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Bbox reg\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{r-cnn.pdf}}%
+    \put(0.71626371,0.68890087){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}CNN\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{r-cnn.pdf}}%
+    \put(0.72186142,0.83378536){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}SVM\end{tabular}}}}%
+    \put(0.41939506,0.83721424){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Bbox reg\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{r-cnn.pdf}}%
   \end{picture}%
 \endgroup%

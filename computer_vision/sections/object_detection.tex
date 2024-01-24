@@ -8,7 +8,7 @@ their location within the image.
 
 The most naive idea is to run a classification model on every patch within the
 image. We can use all previously discussed idea for the representation of the
-patches, such as a gradient historgram or pixel intensities.
+patches, such as a gradient histogram or pixel intensities.
 
 \subsection{Boosting with weak classifiers}
 
@@ -40,7 +40,7 @@ trains a new weak classifier $h_m$ that minimizes the weighted error function,
 \[
   J_m = \sum_{i=1}^n w_i^{(m)} \mathbb{1} \{ h_m(x_i) \neq y_i \}
 .\]
-Then, it estaimtes the weighted error of this classifier on the dataset, \[
+Then, it estimates the weighted error of this classifier on the dataset, \[
   \epsilon_m = \frac{1}{\sum_{i=1}^n w_i^{(m)}} \sum_{i=1}^n w_i^{(m)} \mathbb{1} \{ h_m(x_i) \neq y_i \}
 .\]
 Then, it calculates the weighting coefficient for $h_m(x)$, which is large if
@@ -81,15 +81,20 @@ classify a small number of patches.
 
 \paragraph{R-CNN.}
 
+\begin{marginfigure}
+    \centering
+    \incfig{r-cnn}
+    \caption{R-CNN architecture.}
+    \label{fig:r-cnn}
+\end{marginfigure}
+
 R-CNN \citep{girshick2014rich} works by first extracting approximately 2000
 region proposals using selective search. Then, it warps the region proposals to
-constant-sizes images patches and passes them to a classification network,
+constant-sized images patches and passes them to a classification network,
 which classifies the region (CNN followed by support vector machine).
 
 The problem with R-CNN is that the training and testing is still slow (47
 seconds per test image).
-
-TODO: R-CNN figure architecture figure.
 
 \paragraph{Fast R-CNN.}
 
@@ -101,7 +106,12 @@ that outputs a probability distribution over classifications. The reason for
 that this model is faster is because we only need to run a single CNN, instead
 of 2000 for each region proposal.
 
-TODO: Fast R-CNN figure architecture figure.
+\begin{marginfigure}
+    \centering
+    \incfig{fast-r-cnn}
+    \caption{Fast R-CNN architecture.}
+    \label{fig:fast-r-cnn}
+\end{marginfigure}
 
 \paragraph{Faster R-CNN.} 
 
@@ -116,11 +126,16 @@ This network has four loss functions that need to be optimized: Region proposal
 loss, Region classification loss, and another bounding-box regression loss on
 the eventual classification network.
 
-TODO: Faster R-CNN figure architecture figure.
+\begin{marginfigure}
+    \centering
+    \incfig{faster-r-cnn}
+    \caption{Faster R-CNN architecture.}
+    \label{fig:faster-r-cnn}
+\end{marginfigure}
 
 \paragraph{You only look once.}
 
-All R-CNN approaches require a call to a classifcation network for every region
+All R-CNN approaches require a call to a classification network for every region
 proposal. However, this slows down the algorithm. YOLO \citep{redmon2016you}
 predicts bounding boxes and class probabilities in a single pass.
 It works by dividing the input image into an $S\times S$ grid. If the center of
