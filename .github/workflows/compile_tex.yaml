@@ -13,16 +13,23 @@ jobs:
       uses: actions/checkout@v3
 
       # (*) To add a file, add the following section for it
-    - name: Compile NLP
+    - name: Compile natural language processing summary
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         working_directory: natural_language_processing
 
+    - name: Compile computer vision summary
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: computer_vision
+
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
         file natural_language_processing/main.pdf | grep -q ' PDF '
+        file computer_vision/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
@@ -39,11 +46,13 @@ jobs:
 
         # (*) To add a file, add the following command for that file
         cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing-summary.pdf"
+        cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
         # (*) To add a file, add it to the branch
         git add natural_language_processing-summary.pdf
+        git add computer_vision-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push

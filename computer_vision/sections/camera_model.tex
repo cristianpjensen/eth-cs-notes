@@ -1,0 +1,64 @@
+\section{Camera model}
+
+The pinhole camera is a mathematical model of how perspective cameras work.
+It assumes that the pinhole is infinitely small, so it only lets one lightray
+through per point in the space.\sidenote[][-1.5cm]{If the pinhole camera is not
+infinitely small, the image would become blurry. However, in reality, an
+infinitely small pinhole is impossible and a very small pinhole would not let
+enough light through to see anything. The solution to this are lenses that
+map all light coming from a point to its corresponding point in the image.}
+
+\subsection{Internal camera matrix}
+
+\begin{figure}[ht]
+    \centering
+    \incfig{internal-camera}
+    \caption{Illustration of how the intrinsic camera matrix works.}
+    \label{fig:internal-camera}
+\end{figure}
+
+The coordinate frame of the pinhole camera is chosen such that the origin is in
+the center of the pinhole. The image plane behind the camera is in the plane
+where $z_c=-f$, where $f$ is the focal distance. The $z$-axis is called the
+principal axis and goes in the direction where the camera is pointing toward. If
+we know a three-dimensional point $\vec{X}_c$, then it is possible to calculate
+the image coordinate $\vec{x}$ of that point projected onto the image plane: \[
+  x=-f\frac{x_c}{z_c}, \;\;\; y=-f\frac{y_c}{z_c}
+.\]
+The minus-sign indicates that the projected image is upside down. To get rid of
+this mirroring, we use a virtual pinhole camera in which the image plane is put
+at $z_c=f$, \ie, in front of the pinhole. In this model, we have \[
+  x=f\frac{x_c}{z_c}, \;\;\; y=f\frac{y_c}{z_c}
+.\]
+Using homogeneous coordinates, we can model this with the following, \[
+  \tilde{\vec{x}} = \begin{bmatrix} f_x & s & c_x & 0 \\ 0 & f_y & c_y & 0 \\ 0
+  & 0 & 1 & 0 \end{bmatrix}\tilde{\vec{X}}_c = \bm{K}\tilde{\vec{X}}_c
+.\]
+In practice, we often set $f_x=f_y$ and $s=0$. The translation $\bm{c}$ moves
+the origin of the image from the middle to the top left of the image plane,
+which makes computation easier.\sidenote{Computation becomes easier then,
+because most libraries, such as \texttt{NumPy} and \texttt{PyTorch}, start the
+coordinates from the top left.}
+
+\subsection{External camera matrix}
+
+\begin{figure}[ht]
+    \centering
+    \incfig{pinhole-in-space}
+    \caption{$\mat{F}$ is the rigid transformation that the camera made within
+    the world space. To convert world coordinates such that the camera is the
+    origin, we transform them by $\inv{\mat{F}}$.}
+    \label{fig:pinhole-in-space}
+\end{figure}
+
+The camera will generally not be in the origin of the three-dimensional world
+space. So, we need the transformation that moved the camera from the origin
+to its point. Let \[
+  \mat{F}=\begin{bmatrix} \mat{R} & \vec{t} \\ \transpose{\vec{0}} & 1 \end{bmatrix}
+\]
+be this transformation, then the projection of a point $\vec{X}_w$ in
+world space onto the image plane is given by the following,\sidenote{We take the inverse of
+$\mat{F}$, because we want to move the origin of the points to the origin of
+the camera.} \[
+  \tilde{\vec{x}} = \mat{K}\inv{\mat{F}}\overline{\vec{X}}_w
+.\]

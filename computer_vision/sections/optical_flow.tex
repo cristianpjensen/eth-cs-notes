@@ -1,0 +1,128 @@
+\section{Optical flow}
+
+\textit{Optical flow} is the pattern of apparent motion of objects, sufaces,
+and edges in a visual scene caused by the relative motion between an observer
+and the scene.\sidenote{Contrast this with \textit{motion field}, which is a
+2D image presenting the projection of the 3D motion of points in the scene onto
+the image plane.} In other words, optical flow does not represent the actual
+motion of the objects in the scene (that would not be computable from images),
+but rather the motion of the pixels in the image plane. Optical flow is merely
+an approximation of the motion field. But, in most cases, it is a pretty good
+approximation.
+
+The problem statement of optical flow is to estimate the motion, \ie, velocity,
+of each pixel, given two consecutive image frames. To solve this problem,
+optical flow makes the following two assumptions,
+\begin{itemize}
+  \item \textit{Brightness constancy}: when a point $\vec{x}=[x, y]$ in the
+    image at timepoint $t$ moves to point $\vec{x}+\delta_{\vec{x}}$ in the
+    image at timepoint $t+\delta_t$, its luminance does not change, \[
+      \tens{I}[x+\delta_x,y+\delta_y,t+\delta_t] = \tens{I}[x,y,t]
+    ;\]
+  \item \textit{Small motion}: the pixels do not move far between image frames.
+    The implication of this is that we can use the Taylor expansion for a very
+    good approximation around the point we care about.
+\end{itemize}
+
+Now, we can derive how to determine the velocity $\vec{v}=[u,v]$ at point
+$\vec{x}=[x,y]$ as follows,
+\begin{align*}
+  \tens{I}[x,y,t] &= \tens{I}[x+\delta_x,y+\delta_y,t+\delta_t] & \text{\footnotesize brightness constancy} \\
+  &= \tens{I}[x,y,t] + \tens{I}_x\delta_x + \tens{I}_y\delta_y + \tens{I}_t\delta_t & \text{\footnotesize Taylor approximation}
+,\end{align*}
+where $\tens{I}_x,\tens{I}_y,\tens{I}_t$ are the derivatives at the implied
+location $[x,y,t]$. From this, we can derive the \textit{brightness constancy
+equation},
+\begin{align*}
+  \tens{I}[x,y,t] + \tens{I}_x\delta_x + \tens{I}_y\delta_y + \tens{I}_t\delta_t &= \tens{I}[x,y,t] \\
+  \tens{I}_x\delta_x + \tens{I}_y\delta_y + \tens{I}_t\delta_t &= 0 \\
+  \tens{I}_x\frac{\delta_x}{\delta_t} + \tens{I}_y\frac{\delta_y}{\delta_t} + \tens{I}_t &= 0 \\
+  \tens{I}_xu + \tens{I}_yv &= -\tens{I}_t
+.\end{align*}
+However, it cannot be solved, because we have two unknowns $u$ and $v$ with one
+equation per pixel. This is called the \textit{aperture problem}. The way this
+is dealt with is the difference between the Lucas-Kanade and Horn-Schunck
+algorithms, \ie, their difference is how they add more constraints to make the
+problem tractable.
+
+\subsection{Lucas-Kanade}
+
+Lucas-Kanade applies a local method that assumes that pixels in the same
+area, \ie, a patch around the pixel, have the same velocity. This gives us an
+additional constraint for every pixel in the area, which we can solve by
+least-squares estimation:
+\begin{align*}
+  \begin{bmatrix}
+    \tens{I}_x[x_1,y_1,t] & \tens{I}_y[x_1,x_2,t] \\
+    \vdots & \vdots \\
+    \tens{I}_x[x_n,y_n,t] & \tens{I}_y[x_n,x_n,t]
+  \end{bmatrix}
+  \begin{bmatrix}
+    u \\ v
+  \end{bmatrix}
+  &=
+  -\begin{bmatrix}
+    \tens{I}_t[x_1,y_1,t] \\
+    \vdots \\
+    \tens{I}_t[x_n,y_n,t]
+  \end{bmatrix} \\
+  \mat{A}\vec{v} &= -\mat{b}
+.\end{align*}
+This is equivalent to solving:
+\begin{align*}
+  \transpose{\mat{A}}\mat{A}\vec{v} &= -\transpose{\mat{A}}\vec{b} \\
+  \sum_{(x,y)\in P}
+  \begin{bmatrix}
+    \tens{I}_x^2 & \tens{I}_x \tens{I}_y \\
+    \tens{I}_x \tens{I}_y & \tens{I}_y^2
+  \end{bmatrix}
+  \begin{bmatrix}
+    u \\ v
+  \end{bmatrix}
+  &=
+  - \sum_{(x,y)\in P}
+  \begin{bmatrix}
+    \tens{I}_x \tens{I}_t \\
+    \tens{I}_y \tens{I}_t \\
+  \end{bmatrix}
+\end{align*}
+
+This is the same matrix as the structure tensor we saw in the Harris corner
+detector. Thus, corners are good places to compute flow. If there are no
+corners, and \eg only a line, then we have the aperture problem.
+
+\subsection{Horn-Schunck}
+
+Horn-Schunck applies a global method that assumes optical flow fields to be
+smooth. It seeks to minimize the following energy function,\sidenote{In the
+discrete case that we care about, the integrals are replaced by sums.} \[
+  E = \int\int \underbrace{(\tens{I}_x u_{xy} + \tens{I}_y v_{xy} + \tens{I}_t)^2}_{\text{brightness change penalty}} + \underbrace{\lambda (\lVert \nabla u_{xy} \rVert^2 + \lVert \nabla v_{xy} \rVert^2)}_{\text{flow change penalty}} dxdy
+,\]
+where $u_{xy}$ and $v_{xy}$ are the velocities at $[x,y]$ forming a flow field.
+The first term minimizes the brightness change, which enforces the brightness
+constancy assumption. The second term minimizes the change in flow, which
+enforces the smooth flow field assumption. In the discrete case, this can be
+seen as minimizing the difference in flow between neighbors, resulting in
+smoother flow. A larger $\lambda$ leads to a smoother flow field.
+
+The derivatives of this function are the following,
+\begin{align*}
+  \pdv{E}{u_{kl}} &= 2(u_{kl} - \bar{u}_{kl}) + 2\lambda (\tens{I}_x u_{kl} + \tens{I}_y u_{kl}+ \tens{I}_t) \tens{I}_x \\
+  \pdv{E}{v_{kl}} &= 2(v_{kl} - \bar{v}_{kl}) + 2\lambda (\tens{I}_x u_{kl} + \tens{I}_y u_{kl}+ \tens{I}_t) \tens{I}_y
+,\end{align*}
+where $\bar{u}_{kl}$ and $\bar{v}_{kl}$ are the average flow of the 4
+neighbors. The extrema of $E$ can be found by setting the derivatives to zero
+and solving for the unknowns $u$ and $v$. These form a linear system that can
+be solved iteratively using update equations,
+\begin{align*}
+  \hat{u}_{kl} &= \bar{u}_{kl} - \frac{\tens{I}_x \bar{u}_{kl} + \tens{I}_y \bar{v}_{kl} + \tens{I}_t}{\lambda^{-1} + \tens{I}_x^2 + \tens{I}_y^2} \tens{I}_x \\
+  \hat{v}_{kl} &= \bar{v}_{kl} - \frac{\tens{I}_x \bar{u}_{kl} + \tens{I}_y \bar{v}_{kl} + \tens{I}_t}{\lambda^{-1} + \tens{I}_x^2 + \tens{I}_y^2} \tens{I}_y
+.\end{align*}
+These update equations are used to update the flow field iteratively until
+convergence, starting from zero flow field.
+
+This can also be used to compute flow field of frames with larger motions by
+using coarse-to-fine flow estimation. This is done by first downscaling the
+image until the displacement is 1 pixel. Then, compute flow of that and
+upscale the image and flow field. Repeat this step until you are back at the
+original image.

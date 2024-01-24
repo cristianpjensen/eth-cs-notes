@@ -1,0 +1,56 @@
+\section{Tracking} \label{sec:tracking}
+
+Tracking is the following of the movement of an object (point, region, or
+template), \ie we want to find the position of the object in the consecutive
+frames. Thus, the problem statement is that we want to find the position of
+an object in frame $\bm{f}_{t+1}$, given that we know its position in frame
+$\bm{f}_t$.
+
+To make sure that the object detection location does not ``teleport``, we can
+give the models the prior that objects have a constant
+velocity.\sidenote{This is especially useful when the camera is stationary.}
+We can do this by penalizing points that are not in the direction of the
+current velocity of the object.
+
+\subsection{Point}
+
+Optical flow.
+
+\subsection{Template}
+
+Compute distance of all patches in the next frame to the template and
+minimize. What if the object makes some transformation? Generalize to other
+parametric models that can account for this by minimizing the transformation
+made in each patch. The Lucas-Kanade template tracker ....
+
+\subsection{Tracking by detection}
+
+We can also track by detecting keypoints in each frame and minimizing the
+distance of the feature descriptor of the point we are tracking.
+
+We can also use this to track a region by matching keypoint descriptors of
+the template with the next frame. Then, removing outliers with \eg RANSAC.
+The bounding box in the next frame is then the box that encapsulates all
+points that are left.
+
+However, in many cases, we do not have an exact template, but we want to
+track any object of a specific type. We can do this by detecting the objects
+independently in each frame and then associating the detections over time
+with a bipartite matching algorithm.\sidenote{This is especially important
+when there are multiple objects in the scene.}
+
+\subsection{Online learning}
+
+Often, the template changes throughout frames, however, until now we have
+assumed that the template is constant. However, it is more realistic to
+assume that the appearance of the trackee changes. Thus, online learning
+collects all detected features of the tracked object throughout the frames
+and the background. Then, it uses these to train the detector every frame.
+Thus, the detector improves every frame.
+
+The advantage of this is that it is robust to changes to the environment, \eg
+if we go from a dark to a bright environment.
+
+However, the disadvantage is that the representation of the object can
+gradually drift to something else. But, this can be avoided by not allowing
+the model to drift too far from our initial template.

@@ -208,7 +208,7 @@ The rules $R$ are the following (inspired by combinatory logic),
   \cat{X \fs Y} \hspace{1em} \cat{Y} &\implies \cat{X} & \text{\footnotesize $(>)$} \\
   \cat{Y} \hspace{1em} \cat{X \bs Y} &\implies \cat{X} & \text{\footnotesize $(<)$} \\
   \cat{X \fs Y} \hspace{1em} \cat{Y \fs Z} &\implies \cat{X \fs Z} & \text{\footnotesize $(\mathbf{B}_>)$} \\
-  \cat{Y \bs Z} \hspace{1em} \cat{X \bs Z} &\implies \cat{X \bs Z} & \text{\footnotesize $(\mathbf{B}_<)$} \\
+  \cat{Y \bs Z} \hspace{1em} \cat{X \bs Y} &\implies \cat{X \bs Z} & \text{\footnotesize $(\mathbf{B}_<)$} \\
   \forall \cat{T}\in V_N : \cat{X} &\implies \cat{T \fs (T \bs X)} & \text{\footnotesize $(\mathbf{T}_>)$} \\
   \forall \cat{T}\in V_N : \cat{X} &\implies \cat{T \bs (T \fs X)} & \text{\footnotesize $(\mathbf{T}_<)$}
 ,\end{align*}

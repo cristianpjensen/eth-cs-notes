@@ -1,0 +1,134 @@
+\section{Epipolar geometry}
+
+\begin{figure}[h!]
+    \centering
+    \incfig{epipolar-geometry}
+    \caption{Epipolar geometry.}
+    \label{fig:epipolar-geometry}
+\end{figure}
+
+In epipolar (two-view) geometry, there are three main questions that we need
+to answer to find the 3-dimensional position of points that two cameras
+depict:
+\begin{enumerate}
+  \item Given a point $\bm{x}$ in image 1, how does this constrain the
+    position of the corresponding point $\bm{x}'$ in image 2?
+  \item Given a set of corresponding image points $\{ \bm{x}_i
+    \leftrightarrow \bm{x}_i' \}_{i=1}^n$, what are the matrices $\mat{P}$ and
+    $\mat{P'}$ for the two cameras?
+  \item Given corresponding image points $\{ \bm{x}_i \leftrightarrow
+    \bm{x}_i' \}_{i=1}^n$ and cameras $\mat{P},\mat{P}'$, what is the position
+    of $\bm{X}$ in space.
+\end{enumerate}
+
+A point $\bm{X}$ is shown on an image by projecting that point onto the focal
+center of a camera. Thus, a point the 3-dimensional point corresponding to
+$\bm{x}$ in an image 1 has to be on the line that projects onto that point.
+If we project this line onto image 2, we get all the possible points where
+this point $\bm{x}$ could appear in image 2. However, since we know it did
+not appear behind camera 1, we know that it cannot appear left of the
+epipolar point $\bm{e}'$ in image 2. The epipolar point is the projection of
+camera 1's position onto camera 2's image plane.
+
+As can be seen in Figure ..., this constructs the epipolar plane. If we know
+that a point is on an epipolar plane, we also know on which lines this point
+will appear in both images. Thus, we have a bundle of planes that go through
+the baseline that map lines to lines between the images.
+
+In summary, an epipole is the projection of the projection center of the
+other camera. \Ie, it is the vanishing point of the other camera. The
+baseline is the line between the two epipolar poles, and the epipolar plane
+is a plane containing the baseline. Lastly, an epipolar line is the
+intersection of the epipolar plane with the image, which always comes in
+corresponding pairs.
+
+\subsection{Correspondence geometry}
+
+\begin{figure}[ht]
+    \centering
+    \incfig{image-1-constraint}
+    \caption{Knowing $\vec{x}_1$ constrains its corresponding point $\vec{x}_2$
+    to be on the epipolar line $\vec{\ell}_2$, and not behind $\vec{e}_2$,
+    because then $\vec{x}_1$ would be behind camera 1, which is not possible.}
+    \label{fig:image-1-constraint}
+\end{figure}
+
+\begin{definition}[Cross-product matrix]
+  The cross product matrix is the conversion of a vector to a matrix that
+  would be equivalent to performing a cross product with that vector, \[
+    [\bm{a}]_\times \doteq \begin{bmatrix}
+      0 & a_3 & -a_2 \\
+      -a_3 & 0 & a_1 \\
+      a_2 & -a_1 & 0
+    \end{bmatrix}
+  .\]
+\end{definition}
+
+The fundamental matrix $\mat{F}$ is the matrix that maps points from image 1
+to lines in image 2, and vice versa.\sidenote{Since the points are
+2-dimensional and the lines are 1-dimensional, $\mat{F}$ must be rank 2.}
+Assume we know the camera matrices $\mat{P},\mat{P}'$ of the two cameras. Then,
+the epipolar point in image 2 is $\mat{P}'\bm{C}$. To get the epipolar line
+$\bm{\ell}'$, we need some point on the line. \sidenote{Since we already know
+one point on that line, which is the epipolar point, we can then compute the
+line between them with the cross product.} We can get some point on the
+projection line onto $\bm{x}$ by the pseudo-inverse of $\mat{P}$, denoted by
+$\mat{P}^+$.\sidenote{The pseudo-inverse can be computed with SVD as
+$\mat{P}^+=\mat{V}\frac{1}{\mat{\Sigma}}\mat{U}^\top$.} Thus, we can find a point
+on $\bm{\ell}'$ by computing $\mat{P}'\mat{P}^+ \bm{x}$. In consusion, we can
+compute the line by the following equation,\sidenote{Note that $\bm{C}$ is a
+3-dimensional point (denoted as slanted), not a matrix.} \[
+  \bm{\ell}' = \mat{P}'\bm{C}\times \mat{P}'\mat{P}^+\bm{x}
+.\]
+Thus, we define the fundamental matrix as \[
+  \mat{F} = [\bm{e}']_\times \mat{P}'\mat{P}^+
+.\]
+
+The fundamental matrix has to satisfy the condition that for any pair of
+corresponding points $\bm{x}\leftrightarrow\bm{x}'$, the following
+holds,\sidenote{Recall that if $\bm{x}'$ is on line $\bm{\ell}'$, it should
+satisfy $\bm{x}'^\top\bm{\ell}'=0$.} \[
+  \bm{x}'^\top \mat{F}\bm{x} = 0
+.\]
+
+\paragraph{Computing the fundamental matrix.}
+
+Given that we know 8 point correspondences,\sidenote{We assume that all our
+point correspondences are correct, \ie they satisfy
+$\bm{x}'^\top\mat{F}\bm{x}=0$.} we can compute $\mat{F}$ using direct
+linear transformation, \[
+  \begin{bmatrix}
+    x_i'x_i & x'_iy_i & \bm{x}' & y_i'x_i & y_1'y_i & y_i' & x_1 & y_1 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    f_{11} \\
+    f_{12} \\
+    f_{13} \\
+    f_{21} \\
+    f_{22} \\
+    f_{23} \\
+    f_{31} \\
+    f_{32} \\
+    f_{33}
+  \end{bmatrix}
+  = \begin{bmatrix} 0 \end{bmatrix}
+.\]
+However, the problem with this is that the values of the matrix grow very
+large, because of the multiplications. Using DLT, this will always result in
+the best matrix being very similar to the following, \[
+  \begin{bmatrix}
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & 1
+  \end{bmatrix}
+.\]
+Thus, we need to first normalize the coordinates of the images to be in $[-1,
+1]\times[-1, 1]$ before computing $\mat{F}$.
+
+\paragraph{Singularity constraint.}
+
+Enforce the rank 2 constraint of $\mat{F}$. ...
+
+\subsection{Camera geometry}
+
+\subsection{Scene geometry}

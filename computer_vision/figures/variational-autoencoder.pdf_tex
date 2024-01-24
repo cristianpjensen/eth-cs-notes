@@ -1,0 +1,73 @@
+%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'variational-autoencoder.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{283.46456693bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.4)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0.17903622,0.17086487){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{x}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{variational-autoencoder.pdf}}%
+    \put(0.26371244,0.18779816){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize encoder}\end{tabular}}}}%
+    \put(0.42363167,0.17107941){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{\mu},\vec{\sigma}$\end{tabular}}}}%
+    \put(0.31200027,0.0763736){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{\epsilon}\sample\MultiGauss$\end{tabular}}}}%
+    \put(0.59789898,0.17133545){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{z}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{variational-autoencoder.pdf}}%
+    \put(0.55206451,0.11947266){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize reparameterization trick}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{variational-autoencoder.pdf}}%
+    \put(0.67998817,0.18779816){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize decoder}\end{tabular}}}}%
+    \put(0.83811981,0.17133545){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\hat{\vec{x}}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{variational-autoencoder.pdf}}%
+    \put(0.13455016,0.30863342){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$D_{KL}(\Gauss[\vec{\mu}][\vec{\sigma}],\MultiGauss)$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{variational-autoencoder.pdf}}%
+    \put(0.65714622,0.30891144){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\| \vec{x}-\hat{\vec{x}} \|^2$\end{tabular}}}}%
+    \put(0.00560513,0.30850403){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{losses:}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
