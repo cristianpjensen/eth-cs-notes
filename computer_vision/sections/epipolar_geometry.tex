@@ -115,19 +115,22 @@ that would be equivalent to performing a cross product with that vector, \[
 \begin{definition}[Fundamental matrix]
   \label{def:fundamental-matrix}
 
-  The fundamental matrix $\mat{F}$ is defined as the following,\sidenote{The
+  The fundamental matrix $\mat{F}$ is defined as satisfying the following for
+  all point correspondences in image 1 and 2,\sidenote{The
   fundamental matrix has 7 degrees of freedom, because it is a $3\times 3$
-  matrix, is defined up to scale, and $\det{\mat{F}}=0$.}
-  \begin{align*}
-    \mat{F} &\doteq [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \\
-    \mat{F} &\doteq [\mat{P}_1 \vec{C}_2]_\times \mat{P}_1 \mat{P}_2^+
-  .\end{align*}
-  The fundamental matrix relates points in one image plane with lines in the
-  other by the following equation, \[
-    \transpose{\vec{x}_1} \mat{F} \vec{x}_2 = 0
+  matrix, is defined up to scale, and $\det{\mat{F}}=0$ (rank 2).} \[
+    \transpose{\vec{x}_2} \mat{F} \vec{x}_1 = 0
   .\]
-  \Ie, $\vec{x}_1$ must be on the line $\mat{F} \vec{x}_2$ and $\vec{x}_2$
-  must be on the line $\transpose{\vec{x}_1} \mat{F} = \mat{F} \vec{x}_1$.
+  The fundamental matrix relates points in one image plane with lines in the
+  other. \Ie, $\vec{x}_2$ must be on the line $\mat{F} \vec{x}_1$ and
+  $\vec{x}_1$ must be on the line $\transpose{\vec{x}_2} \mat{F} =
+  \transpose{\mat{F}} \vec{x}_2$.
+
+  It satisfies the following equations \wrt the camera matrices,
+  \begin{align*}
+    \mat{F} &= [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \\
+    \transpose{\mat{F}} &= [\mat{P}_1 \vec{C}_2]_\times \mat{P}_1 \mat{P}_2^+
+  .\end{align*}
 \end{definition}
 
 \begin{definition}[Essential matrix]
@@ -136,13 +139,18 @@ that would be equivalent to performing a cross product with that vector, \[
   matrix (\cref{def:fundamental-matrix}),\sidenote{The essential matrix has 5
   degrees of freedom, because it has the same parameters as the fundamental
   matrix, minus the focal length and skew.} \[
-    \transpose{\vec{x}_1} \mat{E} \vec{x}_2 = 0
-  .\]
+    \transpose{\hat{\vec{x}}_2} \mat{E} \hat{\vec{x}}_1 = 0
+  ,\]
+  where $\hat{\vec{x}} = \inv{\mat{K}} \vec{x}$.
+
   The difference is that the essential matrix assumes that the cameras are
-  calibrated. This means that the intrinsic camera parameters are known.
+  calibrated. This means that the intrinsic camera parameters are known. We have
+  the following relation between the two matrices, \[
+    \mat{E} = \transpose{\mat{K}} \mat{F} \mat{K}
+  .\]
 \end{definition}
 
-\paragraph{Computing the fundamental matrix.}
+\paragraph{8-point algorithm.}
 
 Given that we know 8 point correspondences,\sidenote{We assume that all our
 point correspondences are correct, \ie, they satisfy
@@ -166,10 +174,13 @@ $\transpose{\vec{x}'}\mat{F}\vec{x}=0$, \[
     f_{33}
   \end{bmatrix}
   = \vec{0}
-.\]
-However, the problem with this is that the values of the matrix grow very
-large, because of the multiplications. Using DLT, this will always result in
-the best matrix being very similar to the following, \[
+,\]
+after which we use the SVD trick to find the best algebraic solution.
+
+However, the problem with this is that the values of the matrix grow very large,
+because of the multiplications, while the last column vector remains 1. Using
+DLT, this will always result in the best matrix being very similar to the
+following, \[
   \begin{bmatrix}
     0 & 0 & 0 \\
     0 & 0 & 0 \\
@@ -179,10 +190,74 @@ the best matrix being very similar to the following, \[
 Thus, we need to first normalize the coordinates of the images to be in $[-1,
 1]\times[-1, 1]$ before computing $\mat{F}$.
 
-\paragraph{Singularity constraint.}
+Now, we also need to enforce the \textit{singularity constraint} (rank 2,
+$\det{\mat{F}}=0$) of $\mat{F}$, since DLT will give a rank 3 matrix. One
+possible solution to this is to set the smallest singular value to equal 0 using
+SVD. However, this does not necessarily yield the best results, because we are
+adjusting it a posteriori.
 
-Enforce the rank 2 constraint of $\mat{F}$. ...
+\paragraph{7-point algorithm.}
+
+We would like our algorithm to only be able to give rank-2 matrices. (Let
+$\mat{A}$ be the matrix we constructed in DLT.) We could use 7
+point-correspondences, making $\mat{A}$ a $7\times 9$ matrix. Thus, this matrix
+has a 2-dimensional null space, which we denote by $\vec{f}_1$ and $\vec{f}_2$
+(with corresponding fundamental matrices $\mat{F}_1$ and $\mat{F}_2$). This
+means that we have a family of solutions to the problem such that $\mat{A}
+(\vec{f}_1 + \lambda \vec{f}_2) =
+\vec{0}$, \[
+  \mat{F}_1 + \lambda \mat{F}_2
+.\]
+However, this does not necessarily give a rank-2 matrix. The solution to this
+problem satisfies the following, \[
+  \det{\mat{F}_1 + \lambda \mat{F}_2} = 0
+,\]
+which results in a cubic equation with 1 or 3 solutions for $\lambda$.
+
+\paragraph{5-point algorithm.}
+
+The essential matrix only has 5 degrees of freedom, thus we only need 5 point
+correspondences to compute it. However, as in the 7-point algorithm, this
+results in a 4-dimensional null space. Furthermore, we additionally have the
+constraint that $\mat{E}$ has two equal non-zero singular values. This results
+in 10 cubic polynomials that need to be solved for.
 
 \subsection{Camera geometry}
 
+From the essential matrix,\sidenote{Or the fundamental matrix, since they are
+closely related by \[ \mat{E} = \transpose{\mat{K}} \mat{F} \mat{K} ,\] as we
+have already seen.} we can compute the relative pose between the 2 cameras
+\citep{longuet1981computer}. This is done by first decomposing $\mat{E} =
+\mat{U} \mat{\Sigma} \transpose{\mat{V}}$.\sidenote{We know the following, \[
+  \mat{\Sigma} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 0
+\end{bmatrix} ,\] because of the constraints on the essential matrix.} Then, we
+can compute the four possible relative poses as the following,
+\begin{align*}
+  \vec{T} = \mat{U}_3,& \hspace{0.2cm} \mat{R} = \mat{U}\mat{W}\transpose{\mat{V}} \\
+  \vec{T} = -\mat{U}_3,& \hspace{0.2cm} \mat{R} = \mat{U}\mat{W}\transpose{\mat{V}} \\
+  \vec{T} = \mat{U}_3,& \hspace{0.2cm} \mat{R} = \mat{U}\transpose{\mat{W}}\transpose{\mat{V}} \\
+  \vec{T} = -\mat{U}_3,& \hspace{0.2cm} \mat{R} = \mat{U}\transpose{\mat{W}}\transpose{\mat{V}}
+,\end{align*}
+where $\mat{W}$ is the following matrix, \[
+  \mat{W} = \begin{bmatrix} 
+    0 & -1 & 0 \\
+    1 & 0 & 0 \\
+    0 & 0 & 1
+  \end{bmatrix} 
+.\]
+
+For each configuration, we then check for the \textit{Cheirality condition},
+\ie, the reconstructed points must be in front of the cameras.
+
 \subsection{Scene geometry}
+
+From the relative camera pose and point correspondences, we can triangulate the
+points to find them in three dimensions. A possible solution would be to
+backproject the $\vec{x}_1$ and $\vec{x}_2$ and find their intersection.
+However, due to noise, the two backprojections will never truly intersect.
+
+A better idea is to combine the two camera models to get a linear system of
+equations, and then determining $\vec{X}$ by SVD. \ldots This extends naturally
+to more than 2 cameras. TODO
+
+Three views: TODO

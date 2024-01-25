@@ -62,4 +62,7 @@ $\mat{F}$, because we want to move the origin of the points to the origin of
 the camera.} \[
   \tilde{\vec{x}} = \mat{K}\inv{\mat{F}}\overline{\vec{X}}_w
 .\]
-We denote this matrix by $\mat{P} = \mat{K}\inv{\mat{F}}$.
+We denote this matrix by $\mat{P} = \mat{K}\inv{\mat{F}}$,\sidenote{$\mat{P}$
+has 11 degrees of freedom.} and can be estimated by DLT with 6
+$(\vec{X}_w,\vec{x})$ correspondences. Again, DLT only minimizes the algebraic
+error, which we can then perfect by minimizing a geometric error.

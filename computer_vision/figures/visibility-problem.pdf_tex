@@ -50,12 +50,13 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.4)%
+  \begin{picture}(1,0.5)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{visibility-problem.pdf}}%
-    \put(0.43452721,0.33162292){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize 3D structure}\end{tabular}}}}%
+    \put(0.57940052,0.41279205){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize 3D structure}\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{visibility-problem.pdf}}%
-    \put(0.71133087,0.1999649){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize invisible}\end{tabular}}}}%
+    \put(0.69002655,0.24004639){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize invisible}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{visibility-problem.pdf}}%
   \end{picture}%
 \endgroup%

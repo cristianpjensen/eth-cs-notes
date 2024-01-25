@@ -1,11 +1,22 @@
 \section{Structure from motion} \label{sec:sfm}
 
+In structure from motion (SfM), we have $m$ images of $n$ fixed
+three-dimensional points. We then want to estimate the camera matrices of all
+images and the positions of the points.
+
 \begin{figure}[ht]
     \centering
     \incfig{structure-from-motion}
     \caption{Structure from motion}
     \label{fig:structure-from-motion}
 \end{figure}
+
+Idea: Initialize 3D structure by triangulation from two images. Then, for each
+additional view, determine the camera matrix and 2D-3D correspondences, and
+refine/extend the 3D structure by triangulation (see last assignment).
+
+See lecture slides from
+\url{https://www.uio.no/studier/emner/matnat/its/nedlagte-emner/UNIK4690/v16/forelesninger}.
 
 \subsection{RANSAC}
 
