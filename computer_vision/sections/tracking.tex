@@ -1,32 +1,81 @@
 \section{Tracking} \label{sec:tracking}
 
 Tracking is the following of the movement of an object (point, region, or
-template), \ie we want to find the position of the object in the consecutive
-frames. Thus, the problem statement is that we want to find the position of
-an object in frame $\bm{f}_{t+1}$, given that we know its position in frame
-$\bm{f}_t$.
+template), \ie, we want to find the position of the object in the consecutive
+frames. Thus, the problem statement is that we want to find the position of an
+object in frame $t+1$, given that we know its position in frame $t$.
 
 To make sure that the object detection location does not ``teleport``, we can
-give the models the prior that objects have a constant
-velocity.\sidenote{This is especially useful when the camera is stationary.}
-We can do this by penalizing points that are not in the direction of the
-current velocity of the object.
+give the models the prior that objects have a constant velocity.\sidenote{This
+is especially useful when the camera is stationary.} We can do this by
+penalizing points that are not in the direction of the current velocity of the
+object.
 
 \subsection{Point}
 
-Optical flow.
+If we want to track a point between frames, we can make the assumption that the
+color of the point will remain the same, and optimize the following error
+function (one-dimensional case),
+\begin{align*}
+  E(h) &= ( \tens{I}[x,t]) - \tens{I}[x+h,t+1] )^2 \\
+  &\approx ( \tens{I}[x,t] - \tens{I}[x,t+1] - h\tens{I}_x[x,t])^2 \\
+  \pdv*{E(h)}{h} &= -2 \tens{I}_x[x,t] ( \tens{I}[x,t] - \tens{I}[x,t+1] - h\tens{I}_x[x,t]). \\
+  \intertext{At the minimum, where the derivative is 0, we get the following,}
+  h &= \frac{\tens{I}[x,t+1] - \tens{I}[x,t]}{\tens{I}_x[x,t]}
+.\end{align*}
+
+However, if the gradient is 0, \ie, when the image region is flat,
+$\tens{I}_x[x,t]$ will be 0 and thus we have no information about which
+direction the point moved in. This is very similar to the problem in optical
+flow, called the aperture problem.
+
+Furthermore, we assume to always move toward the closest minimum. But, the
+image is non-convex in general, which has multiple solutions. This can be
+solved by a high framerate, because then the movement between frames is small.
+
+Like in optical flow, in two dimensions, we need more constraints to solve for
+the displacement. And, like in optical flow, we can solve this by either
+solving it globally (Horn-Schunck) or locally (Lucas-Kanade).
 
 \subsection{Template}
 
-Compute distance of all patches in the next frame to the template and
-minimize. What if the object makes some transformation? Generalize to other
-parametric models that can account for this by minimizing the transformation
-made in each patch. The Lucas-Kanade template tracker ....
+In template tracking, we want to track an object between frames, represented by
+a bounding box, which we call its template. The most naive solution is to
+simply compare pixel intensities and minimizing the following error function, \[
+  E(u,v) = \sum_{x,y} (\tens{I}[x+u,y+v] - \tens{T}[x,y])^2
+,\]
+where $\tens{T}$ is the template. However, the object in the template might
+make a transformation such as a rotation or scaling. We could also parameterize
+those transformations, instead of only a translation, by generalizing the
+previous error function to any transformation family $W$,
+\begin{align*}
+  E(\vec{p}) &= \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x}; \vec{p})] - \tens{T}[\vec{x}] \rgt)^2, \\
+  \intertext{where $\vec{p}$ parameterizes a ``warp`` $W$. However, we cannot
+  directly solve for $\vec{p}$, thus we iteratively improve it by updating it
+  with some $\delta_{\vec{p}}$,}
+  &= \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p} + \delta_{\vec{p}})] - \tens{T}[\vec{x}] \rgt)^2 \\
+  &\approx \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{\vec{p}} - \tens{T}[\vec{x}] \rgt)^2 & \text{\footnotesize Taylor approx} \\
+  &= \sum_{\vec{x}} ( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} - \tens{T}[\vec{x}] )^2 & \text{\footnotesize chain rule} \\
+  \pdv*{E(\vec{p})}{\delta_{\vec{p}}} &= \sum_{\vec{x}} 2 \transpose{\lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)} \lft( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} - \tens{T}[\vec{x}] \rgt). \\
+  \intertext{We can then solve for $\delta_{\vec{p}}$ by setting the gradient to 0,}
+  \delta_{\vec{p}} &= \inv{\mat{H}} \sum_{\vec{x}} \transpose{ \lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)} \lft( \tens{T}[\vec{x}] - \tens{I}[W(\vec{x};\vec{p})] \rgt), \\
+  \intertext{with Hessian matrix $\mat{H}$ defined as follows,}
+  \mat{H} &= \sum_{\vec{x}} \transpose{ \lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)}  \lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)
+.\end{align*}
+We iteratively update the warp by $\delta_{\vec{p}}$ until convergence.
+
+However, this method is not robus to image noise, since it assumes that pixel
+intensities remain the same between frames. Furthermore, some three-dimensional
+transformations are impossible to parameterize as a two-dimensional warp of an
+image. For example, a person turning around \wrt the camera cannot be
+parameterized as a two-dimensional warp.
 
 \subsection{Tracking by detection}
 
 We can also track by detecting keypoints in each frame and minimizing the
-distance of the feature descriptor of the point we are tracking.
+distance to the feature descriptor of the point we are tracking. This does not
+require the assumption that the image intensities remain the same, and can
+track large displacements.
 
 We can also use this to track a region by matching keypoint descriptors of
 the template with the next frame. Then, removing outliers with \eg RANSAC.
@@ -34,23 +83,23 @@ The bounding box in the next frame is then the box that encapsulates all
 points that are left.
 
 However, in many cases, we do not have an exact template, but we want to
-track any object of a specific type. We can do this by detecting the objects
+track any object of a specific type. This can be done by detecting the objects
 independently in each frame and then associating the detections over time
-with a bipartite matching algorithm.\sidenote{This is especially important
-when there are multiple objects in the scene.}
+with a bipartite matching algorithm. This is especially important
+when there are multiple objects in the scene.
 
 \subsection{Online learning}
 
-Often, the template changes throughout frames, however, until now we have
-assumed that the template is constant. However, it is more realistic to
-assume that the appearance of the trackee changes. Thus, online learning
-collects all detected features of the tracked object throughout the frames
+Often, the template changes throughout frames, but, until now we have assumed
+that the template is constant. However, it is more realistic to assume that the
+appearance of the tracked object changes. Online learning accounts for this by
+collecting all detected features of the tracked object throughout the frames
 and the background. Then, it uses these to train the detector every frame.
-Thus, the detector improves every frame.
+Thus, the detector improves every frame, and updates it representation of the
+object.
 
-The advantage of this is that it is robust to changes to the environment, \eg
-if we go from a dark to a bright environment.
-
-However, the disadvantage is that the representation of the object can
-gradually drift to something else. But, this can be avoided by not allowing
-the model to drift too far from our initial template.
+The advantage of this is that it is robust to changes to the environment, \eg,
+if we go from a dark to a bright environment. However, the disadvantage is that
+the representation of the object can gradually drift to something else. But,
+this can be avoided by not allowing the model to drift too far from our
+initial template with additional constraints.
