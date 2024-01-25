@@ -1,5 +1,19 @@
 \section{Epipolar geometry}
 
+\begin{remark}
+  In this section, all points are in projective space. They are not denoted by
+  $\tilde{\vec{x}}$ and $\tilde{\vec{X}}$, but rather by $\vec{x}$ and
+  $\vec{X}$.
+\end{remark}
+
+Epipolar geometry is the geometry of stereo vision, where two cameras view a
+scene. When two cameras view a scene from distinct positions, there are
+geometric relations between the 3-dimensional points and their 2-dimensional
+projections on the image planes. These geometric relations lead to constraints
+between the image points that we can make use of. These relations are derived
+based on the assumption that the two cameras are approximated by the pinhole
+camera model (\cref{sec:camera-model}).
+
 \begin{figure}[h!]
     \centering
     \incfig{epipolar-geometry}
@@ -7,98 +21,138 @@
     \label{fig:epipolar-geometry}
 \end{figure}
 
-In epipolar (two-view) geometry, there are three main questions that we need
-to answer to find the 3-dimensional position of points that two cameras
-depict:
-\begin{enumerate}
-  \item Given a point $\bm{x}$ in image 1, how does this constrain the
-    position of the corresponding point $\bm{x}'$ in image 2?
-  \item Given a set of corresponding image points $\{ \bm{x}_i
-    \leftrightarrow \bm{x}_i' \}_{i=1}^n$, what are the matrices $\mat{P}$ and
-    $\mat{P'}$ for the two cameras?
-  \item Given corresponding image points $\{ \bm{x}_i \leftrightarrow
-    \bm{x}_i' \}_{i=1}^n$ and cameras $\mat{P},\mat{P}'$, what is the position
-    of $\bm{X}$ in space.
-\end{enumerate}
+\Cref{fig:epipolar-geometry} shows the geometric relationships between the
+3-dimensional points and its projections onto the images. $\vec{X}$ is the
+3-dimensional point that is projected onto camera 1 as $\vec{x}_1$ and camera 2
+as $\vec{x}_2$ (as seen in the pinhole camera model). Together, $\vec{C}_1$,
+$\vec{C}_2$, and $\vec{X}$ form the \textit{epipolar plane} $\vec{\pi}$.
+$\vec{x}_1$ and $\vec{x}_2$ must also be on this plane. More specifically, the
+intersections between the epipolar plane and image planes are lines called the
+\textit{epipolar lines} $\vec{\ell}_1$ and $\vec{\ell}_2$. $\vec{x}_1$ must be
+on $\vec{\ell}_1$ and $\vec{x}_2$ must be on $\vec{\ell}_2$. 
 
-A point $\bm{X}$ is shown on an image by projecting that point onto the focal
-center of a camera. Thus, a point the 3-dimensional point corresponding to
-$\bm{x}$ in an image 1 has to be on the line that projects onto that point.
-If we project this line onto image 2, we get all the possible points where
-this point $\bm{x}$ could appear in image 2. However, since we know it did
-not appear behind camera 1, we know that it cannot appear left of the
-epipolar point $\bm{e}'$ in image 2. The epipolar point is the projection of
-camera 1's position onto camera 2's image plane.
+We can also see this from a different perspective. The projections of
+$\vec{C}_2$ onto image 1, and $\vec{C}_1$ onto image 2, are called the
+\textit{epipoles} $\vec{e}_1$ and $\vec{e}_2$. These are computed as follows,
+\begin{align*}
+  \vec{e}_1 &= \mat{P}_1 \vec{C}_2 \\
+  \vec{e}_2 &= \mat{P}_2 \vec{C}_1
+,\end{align*}
+where $\mat{P}_1$ and $\mat{P}_2$ are the camera matrices of cameras 1 and 2,
+respectively. The line formed between $\vec{x}_1$ and $\vec{e}_1$ is the
+epipolar line (same for $\vec{x}_2$ and $\vec{e}_2$). This gives us the
+following constraint,
+\begin{align*}
+  \vec{\ell}_1 &= \vec{e}_1 \times \vec{x}_1 \\
+  \vec{\ell}_2 &= \vec{e}_2 \times \vec{x}_2
+.\end{align*}
+Intuitively, this is because both $\vec{C}_1$ and $\vec{C}_2$ are on the
+epipolar plane, thus so must be $\vec{e}_1$ and $\vec{e}_2$. The epipolar lines
+are the intersection of the epipolar plane with the image planes, and we know
+two points that are on both, $\vec{x}$ and $\vec{e}$, which form a line.
 
-As can be seen in Figure ..., this constructs the epipolar plane. If we know
-that a point is on an epipolar plane, we also know on which lines this point
-will appear in both images. Thus, we have a bundle of planes that go through
-the baseline that map lines to lines between the images.
+Notice that $\vec{x}_1$ cannot be ``behind`` $\vec{e}_1$, because that would
+imply that $\vec{X}$ is behind $\vec{C}_1$, which is not the case, because
+$\vec{X}$ is visible in image 1. The same holds for camera 2.
 
-In summary, an epipole is the projection of the projection center of the
-other camera. \Ie, it is the vanishing point of the other camera. The
-baseline is the line between the two epipolar poles, and the epipolar plane
-is a plane containing the baseline. Lastly, an epipolar line is the
-intersection of the epipolar plane with the image, which always comes in
-corresponding pairs.
+% In epipolar (two-view) geometry, there are three main questions that we need
+% to answer to find the 3-dimensional position of points that two cameras
+% depict,
+% \begin{enumerate}
+%   \item Given a point $\bm{x}$ in image 1, how does this constrain the
+%     position of the corresponding point $\bm{x}'$ in image 2?
+%   \item Given a set of corresponding image points $\{ \bm{x}_i
+%     \leftrightarrow \bm{x}_i' \}_{i=1}^n$, what are the matrices $\mat{P}$ and
+%     $\mat{P'}$ for the two cameras?
+%   \item Given corresponding image points $\{ \bm{x}_i \leftrightarrow
+%     \bm{x}_i' \}_{i=1}^n$ and cameras $\mat{P},\mat{P}'$, what is the position
+%     of $\bm{X}$ in space.
+% \end{enumerate}
 
 \subsection{Correspondence geometry}
+
+We need to find out in what way $\vec{x}_1$ constrains the location of
+$\vec{x}_2$ in image 2, without knowing $\vec{X}$. $\vec{x}_1$ constrains the
+point $\vec{X}$ to be on the projection line from $\vec{C}_1$ to $\vec{x}_1$,
+as can be seen in \Cref{fig:image-1-constraint,fig:internal-camera}.
 
 \begin{figure}[ht]
     \centering
     \incfig{image-1-constraint}
     \caption{Knowing $\vec{x}_1$ constrains its corresponding point $\vec{x}_2$
     to be on the epipolar line $\vec{\ell}_2$, and not behind $\vec{e}_2$,
-    because then $\vec{x}_1$ would be behind camera 1, which is not possible.}
+    because then $\vec{X}$ would be behind camera 1, which is not the case.}
     \label{fig:image-1-constraint}
 \end{figure}
 
-\begin{definition}[Cross-product matrix]
-  The cross product matrix is the conversion of a vector to a matrix that
-  would be equivalent to performing a cross product with that vector, \[
-    [\bm{a}]_\times \doteq \begin{bmatrix}
-      0 & a_3 & -a_2 \\
-      -a_3 & 0 & a_1 \\
-      a_2 & -a_1 & 0
-    \end{bmatrix}
+The key insight into constraining $\vec{x}_2$ is that we do not need to know
+the exact location of $\vec{X}$. We only need to find a second point on
+$\vec{\ell}_2$ to compute it with the cross product (we already know
+$\vec{e}_2$). Furthermore, the projection line emanating from $\vec{x}_1$ is on
+the epipolar plane, thus any point on this projection line is also on the
+epipolar plane. If we project that point onto image plane 2, we get a second
+point on $\vec{\ell}_2$. We can compute a point on the projection line by using
+the pseudo-inverse $\mat{P}_1^+$.\sidenote{The pseudo-inverse can be computed
+with SVD as $\mat{M}^+=\mat{V}\frac{1}{\mat{\Sigma}}\transpose{\mat{U}}$.}
+A 3-dimensional point $\vec{X}'$ on the projection line between $\vec{C}_1$ and
+$\vec{x}_1$ can be computed as follows, \[
+  \vec{X}' = \mat{P}_1^+ \vec{x}_1
+.\]
+The epipolar line $\vec{\ell}_2$ can be computed by the cross product between
+the epipole $\vec{e}_2$ and this point on image plane 2, \[
+  \vec{\ell}_2 = \mat{P}_2 \vec{C}_1 \times \mat{P}_2 \mat{P}_1^+ \vec{x}_1
+.\]
+
+\marginnote{The cross product matrix is the conversion of a vector to a matrix
+that would be equivalent to performing a cross product with that vector, \[
+  [\vec{a}]_\times \doteq \begin{bmatrix}
+    0 & a_3 & -a_2 \\
+    -a_3 & 0 & a_1 \\
+    a_2 & -a_1 & 0
+  \end{bmatrix}
+.\]}
+
+\begin{definition}[Fundamental matrix]
+  \label{def:fundamental-matrix}
+
+  The fundamental matrix $\mat{F}$ is defined as the following,\sidenote{The
+  fundamental matrix has 7 degrees of freedom, because it is a $3\times 3$
+  matrix, is defined up to scale, and $\det{\mat{F}}=0$.}
+  \begin{align*}
+    \mat{F} &\doteq [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \\
+    \mat{F} &\doteq [\mat{P}_1 \vec{C}_2]_\times \mat{P}_1 \mat{P}_2^+
+  .\end{align*}
+  The fundamental matrix relates points in one image plane with lines in the
+  other by the following equation, \[
+    \transpose{\vec{x}_1} \mat{F} \vec{x}_2 = 0
   .\]
+  \Ie, $\vec{x}_1$ must be on the line $\mat{F} \vec{x}_2$ and $\vec{x}_2$
+  must be on the line $\transpose{\vec{x}_1} \mat{F} = \mat{F} \vec{x}_1$.
 \end{definition}
 
-The fundamental matrix $\mat{F}$ is the matrix that maps points from image 1
-to lines in image 2, and vice versa.\sidenote{Since the points are
-2-dimensional and the lines are 1-dimensional, $\mat{F}$ must be rank 2.}
-Assume we know the camera matrices $\mat{P},\mat{P}'$ of the two cameras. Then,
-the epipolar point in image 2 is $\mat{P}'\bm{C}$. To get the epipolar line
-$\bm{\ell}'$, we need some point on the line. \sidenote{Since we already know
-one point on that line, which is the epipolar point, we can then compute the
-line between them with the cross product.} We can get some point on the
-projection line onto $\bm{x}$ by the pseudo-inverse of $\mat{P}$, denoted by
-$\mat{P}^+$.\sidenote{The pseudo-inverse can be computed with SVD as
-$\mat{P}^+=\mat{V}\frac{1}{\mat{\Sigma}}\mat{U}^\top$.} Thus, we can find a point
-on $\bm{\ell}'$ by computing $\mat{P}'\mat{P}^+ \bm{x}$. In consusion, we can
-compute the line by the following equation,\sidenote{Note that $\bm{C}$ is a
-3-dimensional point (denoted as slanted), not a matrix.} \[
-  \bm{\ell}' = \mat{P}'\bm{C}\times \mat{P}'\mat{P}^+\bm{x}
-.\]
-Thus, we define the fundamental matrix as \[
-  \mat{F} = [\bm{e}']_\times \mat{P}'\mat{P}^+
-.\]
-
-The fundamental matrix has to satisfy the condition that for any pair of
-corresponding points $\bm{x}\leftrightarrow\bm{x}'$, the following
-holds,\sidenote{Recall that if $\bm{x}'$ is on line $\bm{\ell}'$, it should
-satisfy $\bm{x}'^\top\bm{\ell}'=0$.} \[
-  \bm{x}'^\top \mat{F}\bm{x} = 0
-.\]
+\begin{definition}[Essential matrix]
+  The essential matrix $\mat{E}$ relates points in one image plane with lines
+  in the other by the following equation in the same way as the fundamental
+  matrix (\cref{def:fundamental-matrix}),\sidenote{The essential matrix has 5
+  degrees of freedom, because it has the same parameters as the fundamental
+  matrix, minus the focal length and skew.} \[
+    \transpose{\vec{x}_1} \mat{E} \vec{x}_2 = 0
+  .\]
+  The difference is that the essential matrix assumes that the cameras are
+  calibrated. This means that the intrinsic camera parameters are known.
+\end{definition}
 
 \paragraph{Computing the fundamental matrix.}
 
 Given that we know 8 point correspondences,\sidenote{We assume that all our
-point correspondences are correct, \ie they satisfy
-$\bm{x}'^\top\mat{F}\bm{x}=0$.} we can compute $\mat{F}$ using direct
-linear transformation, \[
+point correspondences are correct, \ie, they satisfy
+$\transpose{\vec{x}_1}\mat{F}\vec{x}_2=0$.} we can compute $\mat{F}$ using
+direct linear transformation (DLT) derived from
+$\transpose{\vec{x}'}\mat{F}\vec{x}=0$, \[
   \begin{bmatrix}
-    x_i'x_i & x'_iy_i & \bm{x}' & y_i'x_i & y_1'y_i & y_i' & x_1 & y_1 & 1
+    x_1'x_1 & x'_1y_1 & x_1' & y_1'x_1 & y_1'y_1 & y_1' & x_1 & y_1 & 1 \\
+    \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+    x_n'x_n & x'_ny_n & x_n' & y_n'x_n & y_n'y_n & y_n' & x_n & y_n & 1
   \end{bmatrix}
   \begin{bmatrix}
     f_{11} \\
@@ -111,7 +165,7 @@ linear transformation, \[
     f_{32} \\
     f_{33}
   \end{bmatrix}
-  = \begin{bmatrix} 0 \end{bmatrix}
+  = \vec{0}
 .\]
 However, the problem with this is that the values of the matrix grow very
 large, because of the multiplications. Using DLT, this will always result in

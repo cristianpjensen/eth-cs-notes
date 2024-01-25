@@ -1,4 +1,4 @@
-\section{Camera model}
+\section{Camera model} \label{sec:camera-model}
 
 The pinhole camera is a mathematical model of how perspective cameras work.
 It assumes that the pinhole is infinitely small, so it only lets one lightray
@@ -62,3 +62,4 @@ $\mat{F}$, because we want to move the origin of the points to the origin of
 the camera.} \[
   \tilde{\vec{x}} = \mat{K}\inv{\mat{F}}\overline{\vec{X}}_w
 .\]
+We denote this matrix by $\mat{P} = \mat{K}\inv{\mat{F}}$.
