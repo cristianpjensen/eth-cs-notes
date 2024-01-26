@@ -1,6 +1,6 @@
 \section{Part-of-speech tagging} \label{sec:pos-tagging}
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \incfig{pos-graph}
     \caption{Example POS graph with $\mathcal{T} = \{ \cat{N}, \cat{V},
@@ -28,6 +28,15 @@ sample without considering neighboring samples in the structure, a CRF does
 take context into account. In other words, CRFs are a model for computing the
 normalizer $Z$ in a structured labelling case.
 
+\marginnote{Note that the bigram assumption does not
+mean that the current tag only depends on the previous and current word,
+because the word representations can be anything. \Eg, if we use a
+bidirectional RNN for the word representations, the tags will still depend on
+the entire input sentence. However, a problem that this can cause is that it
+cannot correctly tag garden-path sentences, since we cannot change the start of
+the tagging after seeing the end of the tagging. An example garden-path
+sentence is ``The horse raced past the barn fell.``}
+
 In the sequence labelling case of POS tagging, we will assume that tags only
 depend on their immediate neighbors, \[
   \score(\vec{t},\vec{w}) = \sum_{n=1}^N \score(\langle t_{n-1},t_n \rangle, \vec{w}, n)
@@ -37,15 +46,6 @@ which can be further decomposed into transition and emission scores, \[
 .\]
 This balances how likely $t_n$ is to follow $t_{n-1}$ and how likely word $w_n$
 is to be assigned tag $t_n$.
-
-Note that our bigram assumption does not mean that the current tag only depends
-on the previous and current word, because the word representations can be
-anything. \Eg, if we use a bidirectional RNN for the word representations, the
-tags will still depend on the entire input sentence. However, a problem that
-this can cause is that it cannot correctly tag garden-path sentences, since we
-cannot change the start of the tagging after seeing the end of the
-tagging.\sidenote{An example garden-path sentence is ``The horse raced past the
-barn fell.``}
 
 We can use the new decomposed scoring function to find an efficient algorithm
 for computing the normalizer under a semiring,
@@ -61,7 +61,8 @@ this rederivation, which compute the normalizer in $\bigo{N \cdot
 
 \begin{algorithm}
   \caption{Backward algorithm that computes the semiring-sum over all taggings
-  of a sentence $\vec{w}$.}
+  of a sentence $\vec{w}$. It can be seen as iteratively computing the larger
+  semiring-sum from the derived equation.}
   \label{alg:backward-algorithm}
 
   \begin{algorithmic}[1]
@@ -84,7 +85,7 @@ this rederivation, which compute the normalizer in $\bigo{N \cdot
 \begin{algorithm}
   \caption{Forward algorithm that computes the same thing as
   \Cref{alg:backward-algorithm}, but then in a different fashion. This version
-  is more intuitive.}
+  is more intuitive, because it starts at the beginning and ends at the end.}
   \label{alg:forward-algorithm}
 
   \begin{algorithmic}[1]
@@ -102,8 +103,8 @@ this rederivation, which compute the normalizer in $\bigo{N \cdot
   \end{algorithmic}
 \end{algorithm}
 
-Under the real semiring, we can thus use these algorithms to compute the
-normalizer $Z(\vec{w})$ during training. For inference, the Viterbi algorithm
-is a version of the backward algorithm under the Viterbi semiring, where
-backpointers to the argmax are kept such that the maximally scoring tagging can
-be constructed by backtracking the backpointer.
+We can thus use these algorithms to compute the normalizer $Z(\vec{w})$ during
+training. For inference, the Viterbi algorithm is a version of the backward
+algorithm under the Viterbi semiring, where backpointers to the argmax are kept
+such that the maximally scoring tagging can be constructed by backtracking the
+backpointer.

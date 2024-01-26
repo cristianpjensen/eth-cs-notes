@@ -43,23 +43,25 @@ preprocessing, we can obtain features. Examples include one-hot encoding,
 bag-of-words, $n$-grams, and word embeddings.
 
 \textit{Maximum likelihood estimation} (MLE) is a way of finding the parameters
-$\vec{\theta}\in\Theta$ that minimize the \textit{negative log-likelihood} of
-the training data, \ie, we want to minimize the following, \[
-  \hat{\vec{\theta}} = \argmin_{\vec{\theta}\in\Theta} \sum_{(x,y)\in\mathcal{D}} -\log p_{\vec{\theta}}(y\mid x)
-,\]
-where $\Theta$ is a compact (bounded and closed) subset of
-$\mathbb{R}^K$.\sidenote{The reason for not taking
-$\bm{\theta}\in\mathbb{R}^K$ is that the weights will likely go to infinity.}
-In log-linear modelling, this objective function is convex, thus any local
-minimum is a global minimum. We usually optimize the log-likelihood with
-gradient-based methods,
+$\vec{\theta}\in\Theta$ that minimizes the \textit{negative log-likelihood}
+(a.k.a. \textit{cross entropy}) of the training data, \ie, we want to minimize
+the following, 
 \begin{align*}
-  \grad{- \log p_{\vec{\theta}}(y \mid x)}{\vec{\theta}} &= \grad{\log Z_{\vec{\theta}}(x) - \transpose{\vec{\theta}} \vec{f}(x,y)}{\vec{\theta}} \\ 
-  &= \grad{\log Z_{\vec{\theta}}(x)}{\vec{\theta}} - \grad{\transpose{\vec{\theta}} \vec{f}(x,y)}{\vec{\theta}} \\
-  &= \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \grad{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt)}{\vec{\theta}} - \vec{f}(x,y) \\
-  &= \sum_{y'\in\mathcal{Y}} \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \grad{\transpose{\vec{\theta}} \vec{f}(x,y')}{\vec{\theta}} - \vec{f}(x,y) \\
-  &= \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y) \\
-  &= \E_{y'} [\vec{f}(x,y')] - \vec{f}(x,y)
+  \hat{\vec{\theta}} &= \argmin_{\vec{\theta}\in\Theta} -\log \prod_{(x,y)\in\mathcal{D}} p_{\vec{\theta}}(y \mid x) \\
+  &= \argmin_{\vec{\theta}\in\Theta} \sum_{(x,y)\in\mathcal{D}} -\log p_{\vec{\theta}}(y\mid x)
+,\end{align*}
+where $\Theta$ is a compact (bounded and closed) subset of $\R^K$.\sidenote{The
+reason for not taking $\vec{\theta}\in\R^K$ is that the weights will likely go
+to infinity.} In log-linear modelling, this objective function is convex, thus
+any local minimum is a global minimum. We usually optimize the log-likelihood
+with gradient-based methods,
+\begin{align*}
+  \grad{\sum_{(x,y)\in\mathcal{D}} - \log p_{\vec{\theta}}(y \mid x)}{\vec{\theta}} &= \sum_{(x,y)\in\mathcal{D}} \grad{\lft( \log Z_{\vec{\theta}}(x) - \transpose{\vec{\theta}} \vec{f}(x,y) \rgt)}{\vec{\theta}} \\ 
+  &= \sum_{(x,y)\in\mathcal{D}} \grad{\log Z_{\vec{\theta}}(x)}{\vec{\theta}} - \grad{\transpose{\vec{\theta}} \vec{f}(x,y)}{\vec{\theta}} \\
+  &= \sum_{(x,y)\in\mathcal{D}} \frac{1}{Z_{\vec{\theta}}(x)} \sum_{y'\in\mathcal{Y}} \grad{\exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt)}{\vec{\theta}} - \vec{f}(x,y) \\
+  &= \sum_{(x,y)\in\mathcal{D}} \sum_{y'\in\mathcal{Y}} \frac{1}{Z_{\vec{\theta}}(x)} \exp \lft( \transpose{\vec{\theta}} \vec{f}(x,y') \rgt) \grad{\transpose{\vec{\theta}} \vec{f}(x,y')}{\vec{\theta}} - \vec{f}(x,y) \\
+  &= \sum_{(x,y)\in\mathcal{D}} \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y) \\
+  &= \sum_{(x,y)\in\mathcal{D}} \E_{y'} [\vec{f}(x,y')] - \sum_{(x,y)\in\mathcal{D}} \vec{f}(x,y)
 .\end{align*}
 Due to convexity, the global minimum is the only point that has its gradient
 equal $0$. Thus, at the optimal parameters, the following is the case, \[
@@ -83,13 +85,13 @@ covariance matrix of $\vec{f}(x,\cdot)$ \wrt $\vec{\theta}$,
   &= p_{\vec{\theta}}(y\mid x) \transpose{\vec{f}(x,y)} - p_{\vec{\theta}}(y\mid x) \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \transpose{\vec{f}(x,y')} \\
   &= p_{\vec{\theta}}(y\mid x) \lft( \transpose{\vec{f}(x,y)} - \E_{y'} \lft[ \transpose{\vec{f}(x,y')} \rgt] \rgt). \\
   \\
-  \hess{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} &= \grad{ \grad{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} }{\transpose{\vec{\theta}}} \\
-  &= \grad{\sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y)}{\transpose{\vec{\theta}}} \\
-  &= \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') \grad{p_{\vec{\theta}}(y'\mid x)}{\transpose{\vec{\theta}}} \\
-  &= \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') p_{\vec{\theta}}(y'\mid x) \lft( \transpose{\vec{f}(x,y')} - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \rgt) \\
-  &= \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \transpose{\vec{f}(x,y')}  - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
-  &= \E_y \lft[ \vec{f}(x,y) \transpose{\vec{f}(x,y)} \rgt]  - \E_y \lft[ \transpose{\vec{f}(x,y)} \rgt] \E_y \lft[ \vec{f}(x,y) \rgt] \\
-  &= \mathrm{Cov}_{y \sim p_{\vec{\theta}}(\cdot\mid x)} \lft[ \vec{f}(x,y) \rgt]
+  \hess{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} &= \sum_{(x,y)\in\mathcal{D}} \grad{ \grad{-\log p_{\vec{\theta}}(y\mid x)}{\vec{\theta}} }{\transpose{\vec{\theta}}} \\
+  &= \sum_{(x,y)\in\mathcal{D}} \grad{\sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') - \vec{f}(x,y)}{\transpose{\vec{\theta}}} \\
+  &= \sum_{(x,y)\in\mathcal{D}} \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') \grad{p_{\vec{\theta}}(y'\mid x)}{\transpose{\vec{\theta}}} \\
+  &= \sum_{(x,y)\in\mathcal{D}} \sum_{y'\in\mathcal{Y}} \vec{f}(x,y') p_{\vec{\theta}}(y'\mid x) \lft( \transpose{\vec{f}(x,y')} - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \rgt) \\
+  &= \sum_{(x,y)\in\mathcal{D}} \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \transpose{\vec{f}(x,y')}  - \E_{y''} \lft[ \transpose{\vec{f}(x,y'')} \rgt] \sum_{y'\in\mathcal{Y}} p_{\vec{\theta}}(y'\mid x) \vec{f}(x,y') \\
+  &= \sum_{(x,y)\in\mathcal{D}} \E_{y'} \lft[ \vec{f}(x,y) \transpose{\vec{f}(x,y)} \rgt]  - \E_{y'} \lft[ \transpose{\vec{f}(x,y)} \rgt] \E_{y'} \lft[ \vec{f}(x,y) \rgt] \\
+  &= \sum_{(x,y)\in\mathcal{D}} \mathrm{Cov}_{y' \sim p_{\vec{\theta}}(\cdot\mid x)} \lft[ \vec{f}(x,y') \rgt]
 .\end{align*}
 
 \subsection{Softmax}
