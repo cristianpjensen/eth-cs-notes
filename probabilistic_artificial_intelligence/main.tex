@@ -1,0 +1,39 @@
+\documentclass[justified]{tufte-handout}
+
+\input{../settings}
+\input{../commands}
+
+\usepackage{natbib}
+
+\usepackage{pgfplots}
+\usepackage{filecontents}
+\pgfplotsset{
+colormap={whiteblack}{color(0cm)=(white); color(1cm)=(black)},
+compat=1.16,
+}
+
+\usepgfplotslibrary{fillbetween}
+
+\title{Probabilistic Artificial Intelligence}
+\author{Cristian Perez Jensen}
+
+\begin{document}
+
+\pagenumbering{roman}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+\input{notation}
+\newpage\pagenumbering{arabic}
+
+\input{sections/probability_review}
+
+\input{sections/bayesian_linear_regression}
+
+\input{sections/gaussian_processes}
+
+\bibliography{main}
+\bibliographystyle{plainnat}
+
+\end{document}
