@@ -97,5 +97,5 @@ used for this and work very well \citep{iyyer2015deep}. The model first embeds
 all the words in the sentence and pools them together into one vector
 representation of the sentence.\sidenote{Pooling together discards word order,
 but for this simple task, it will still work very well.} Then, this vector is
-passed into an MLP, which is used as input to a softmax with 2 outputs
-(positive or negative).
+passed into an MLP, which is used as input to a softmax with a single output
+that tells us how positive the sentence is.

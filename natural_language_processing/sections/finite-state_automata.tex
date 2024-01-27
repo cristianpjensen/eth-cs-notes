@@ -145,7 +145,7 @@ cycles. Thus, we need to design an algorithm that can compute this potentially
 infinite semiring-sum. Lehmann's algorithm \citep{lehmann1977algebraic}
 computes the semiring-sum matrix $\mat{R}$ over all inner paths between all
 pairs of nodes in $\bigo{|Q|^3}$ under a closed semiring. Then, we can use
-these to compute the normalizer with the following matrix multiplication, \[
+these to compute the normalizer with the following equation, \[
   Z(\mathcal{T}) \doteq \bigoplus_{i,k \in Q} \lambda(q_i) \otimes \mat{R}_{ik} \otimes \rho(q_k)
 .\]
 
