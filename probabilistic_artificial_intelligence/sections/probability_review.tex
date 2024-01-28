@@ -148,6 +148,68 @@ Gaussian random vector, then the following properties hold,
     .\]
 \end{itemize}
 
-\subsection{Entropy}
+\subsection{Kalman filters}
 
 TODO
+
+\subsection{Entropy}
+
+\begin{definition}[Entropy]
+  \textit{Entropy} measures the expected surprisal of a distribution $p$, \[
+    H[p] \doteq \E_{x\sim p}[-\log p(x)]
+  .\]
+  $-\log p(x)$ is also called the surprisal value of $x$, because it decreases
+  as the probability grows, and is exactly 0 if the probability is 1.
+\end{definition}
+
+\begin{definition}[Kullback-Leibler divergence]
+  \textit{Kullback-Leibler divergence} (KL divergence) is a common metric that
+  measures dissimilarity between two distributions $p$ and $q$, \[
+    KL(p \| q) \doteq \mathbb{E}_{\theta\sim p} \left[ \log \frac{p(\theta)}{q(\theta)} \right]
+  .\]
+  Intuitively, $KL(p \| q)$ measures the information loss when approximating
+  $p$ with $q$.
+\end{definition}
+
+\begin{definition}[Mutual information]
+  Given random variables $X$ and $Y$, the mutual information $I(X;Y)$
+  quantifies how much observing $Y$ reduces uncertainty about $X$, as
+  measured by its entropy, in expectation over $Y$. \[
+    I(X;Y) \doteq H[X] - H[X \mid Y]
+  ,\]
+  where $H[X]$ and $H[X\mid Y]$ quantify the uncertainty about $X$ before and
+  after observing $Y$.
+\end{definition}
+
+\begin{properties}[Mutual information]
+  Mutual information is symmetric, \[
+    I(X;Y) = I(Y;X)
+  .\]
+  Mutual information is positive (\textit{information never hurts}), \[
+    I(X;Y) \geq 0
+  .\]
+\end{properties}
+
+\begin{example}
+  \caption{Mutual information of noisy Gaussian observations.}
+
+  Let 
+  \begin{align*}
+    \vec{X} &\sim \mathcal{N}(\vec{\mu},\mat{\Sigma}) \\
+    \vec{Y} &= \vec{X}+\vec{\epsilon}, \hspace{1cm} \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \sigma_n^2 \mat{I})
+  .\end{align*}
+  Then,
+  \begin{align*}
+    I(\vec{X};\vec{Y}) &= H[\vec{Y}] - H[\vec{Y}\mid \vec{X}] \\
+    &= H[\vec{Y}] - H[\vec{\epsilon}] \\
+    &= \frac{1}{2}\log(2\pi e)^d \det{\mat{\Sigma} + \sigma_n^2 \mat{I}} - \frac{1}{2}\log(2\pi e)^d(\sigma_n^2 \mat{I}) \\
+    &= \frac{1}{2} \log \det{\mat{I} + \sigma_n^{-2}\mat{\Sigma}}
+  \end{align*}
+\end{example}
+
+\begin{definition}[Conditional mutual information]
+  \begin{align*}
+    I(X;Y\mid Z) &\doteq H[X\mid Z] - H[X\mid Y,Z]. \\
+    &= I(X;Y,Z) - I(X;Z)
+  \end{align*}
+\end{definition}

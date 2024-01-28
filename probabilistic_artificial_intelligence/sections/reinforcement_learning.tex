@@ -1,0 +1,190 @@
+\section{Reinforcement learning} \label{sec:rl}
+
+In \textit{reinforcement learning} (RL), we are concerned with acting in
+unknown environments. These environments are still modeled by MDPs, but in RL,
+we do not have access to the transition probabilities $p$ and reward function
+$r$. Thus, RL is at the intersection of probabilistic planning (MDPs) and
+learning, \ie, everything we have learned thus far comes together here.
+
+\begin{remark}
+  We will start by assuming that the state-action space is finite. Then, we will
+  move on to potentially infinite state spaces. After that, we will learn about
+  infinite action spaces.
+\end{remark}
+
+Since the environment is unknown, we need to explore the state-action space to
+find where the reward lies. However, we also want to act optimally by
+exploiting what we have learned thus far. This is called the
+exploration/exploitation dilemma and is what algorithms need to solve.
+
+Another way that reinforcement learning differs from supervised learning is
+that data depends on past actions. Trajectory data looks like the following, \[
+  \tau = (\langle x_0, a_0, r_0, x_1 \rangle, \langle x_1, a_1, r_1, x_2 \rangle, \ldots)
+.\]
+
+We differentiate between RL algorithms in two major ways. The first is whether
+the algorithm has control over its data: an algorithm is called
+\textit{on-policy} if it controls its own actions from which it learns, and
+\textit{off-policy} if it can learn from any data. Furthermore, we
+differentiate between \textit{model-based} and \textit{model-free} algorithms.
+Model-based algorithms learn the underlying MDP and solve it using value or
+policy iteration. Model-free algorithms only learn the value function, since,
+due to Bellman's theorem, that is all that is needed to act optimally.
+
+\begin{table}[t]
+  \caption{RL algorithms covered in this text with their types.}
+  \label{tab:rl-algos}
+  \centering
+  \begin{tabular}[c]{llll}
+    \toprule
+    \textbf{Algorithm} & \multicolumn{2}{c}{\textbf{Classification}} & \textbf{Space compl.} \\
+    \midrule
+    $\epsilon$-greedy & On/off-policy & Model-based & $\bigo{|\mathcal{A}| \cdot |\X|^2}$ \\
+    $R_{\max}$ & On/off-policy & Model-based & $\bigo{|\mathcal{A}| \cdot |\X|^2}$ \\
+    TD-learning & On-policy & Model-free & $\bigo{|\X|}$ \\
+    Q-learning & Off-policy & Model-free & $\bigo{|\mathcal{A}| \cdot |\X|}$ \\
+    Deep Q Network & Off-policy & Model-free \\
+    Policy gradient & On-policy & Model-free \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Model-based}
+
+In model-based RL, we learn the MDP, \ie, we estimate the transition
+probabilities $p(x'\mid x,a)$ and reward function $r(x,a)$ from the data,
+\begin{align*}
+  \hat{p}(x'\mid x, a) &= \frac{\mathrm{count}(x' \mid x, a)}{\mathrm{count}(x, a)} \\
+  \hat{r}(x, a) &= \frac{1}{\mathrm{count}(x,a)} \sum_{\substack{t=0 \\ x_t = x \\ a_t = a}}^\infty r_t
+\end{align*}
+Then, we optimize the policy by value or policy iteration, based on the
+estimated MDP.
+
+\paragraph{$\epsilon$-greedy.}
+
+\marginnote{A sequence $x_t$ satisfies the Robbins Monro conditions if \[
+  \sum_{t=0}^\infty x_t = \infty, \hspace{1em} \sum_{t=0}^\infty x_t^2 < \infty .\]
+\Eg, $x_t = \frac{1}{t}.$}
+
+At iteration $t$, pick random action with probability $\epsilon_t$, or best
+action (according to internal MDP) with probability $1-\epsilon_t$. Guaranteed
+to converge to optimal policy if the $\epsilon_t$ sequence satisfies the
+Robbins Monro conditions. The advantage of this method is that it is extremely
+simple and has a clear interpretation \wrt the exploration-exploitation
+dilemma. The disadvantage is that it does not quickly eliminate clearly
+suboptimal actions. This is because it explores the state space in an
+uninformed manner. In other words, it explores while ignoring all past
+experience.
+
+\paragraph{$R_{\max}$ algorithm.}
+
+$R_{\max}$ solves the problem of $\epsilon$-greedy by using the
+\textit{Optimism in the face of uncertainty} principle. It assumes that any
+unexplored states are ``fairy tale`` states with high reward. More formally, if
+$r(x,a)$ is unknown, we set $\hat{r}(x,a)=R_{\max}$. Similarly, if $p(x'\mid
+x,a)$ is unknown, we set $\hat{p}(x^\star\mid x,a)=1$ for some ``fairy tale`` state,
+\begin{align*}
+  \hat{p}(x^\star\mid x^\star, a) &= 1 & \forall a \in \mathcal{A} \\
+  \hat{r}(x^\star, a) &= R_{\max} & \forall a \in \mathcal{A}
+.\end{align*}
+This gives us an algorithm that has a bias toward exploring, but once it has
+explored a part of the state-action space, and observed it to be suboptimal, it
+can quickly eliminate it. Furthermore, the algorithm does not have to
+explicitly choose between exploration and exploitation, because it is done by
+assuming that the unexplored states are optimal.
+
+\subsection{Model-free}
+
+The problem with model-based RL is that it has high space requirements for
+storing the MDP, \ie, $\bigo{|\mathcal{A}|\cdot |\mathcal{X}|^2}$. Furthermore,
+it requires repeatedly solving the underlying MDP, which is expensive with
+policy or value iteration. In \textit{model-free} RL, we estimate the value
+function directly, because that is all we need to act optimally, according to
+Bellman's theorem. Thus, we also do not need to do any planning, eliminating
+much computational complexity.
+
+\paragraph{Temporal difference-learning.}
+
+TD-learning directly computes the value function. Recall the Bellman
+expectation equation, 
+\begin{align*}
+  V^\pi(x) &= r(x,\pi(x)) + \gamma \sum_{x'\in\X} p(x'\mid x,\pi(x)) V^\pi(x'). \\
+  \intertext{Since we do not have access to $r$ and $p$, we have to make a
+  Monte Carlo estimate given a single data point $\langle x,a,r,x' \rangle$,}
+  &\approx r + \gamma V^\pi(x')
+.\end{align*}
+The idea is that we make this approximation repeatedly as the agent collects
+new data, which achieves the same effect as averaging over many data points.
+However, there is still a problem: $V^\pi$ depends on the unknown $V^\pi$.
+
+The key idea is to use a bootstrapping estimate of the value function. In other
+words, instead of the true value function $V^\pi$, we will use a running
+estimate $\hat{V}^\pi$. However, due to relying on a single sample, the value
+function will have a high variance, which is why we mix the new estimate with
+the previous one using a learning rate $\alpha_t$, \[
+  \hat{V}^\pi(x) \gets (1-\alpha_t) \hat{V}^\pi(x) + \alpha_t(r + \gamma \hat{V}^\pi(x'))
+.\]
+If the learning rate $\alpha_t$ satisfies the Robbins Monro conditions and all
+states are chosen infinitely often, $\hat{V}^\pi$ is guaranteed to converge to
+the optimal value function $V^\pi$.
+
+Note that, due to the Monte Carlo approximation \wrt transitions attained by
+following policy $\pi$, TD-learning is a fundamentally on-policy method.
+Further note that the space requirement of this algorithm is $\bigo{|\X|}$.
+
+\paragraph{Q-learning.}
+
+A generalization of TD-learning is Q-learning. Instead of directly learning the
+value function, which makes it inherently on-policy, it learns state-action
+values $Q(x,a)$. Then, we can compute $V^\pi(x) = \max_{a} Q(x,a)$. Like in
+TD-learning, we mix in the new esimate with the previous one according to
+learning rate $\alpha_t$, \[
+  \hat{Q}(x,a) \gets (1-\alpha_t) \hat{Q}(x,a) + \alpha_t \lft( r + \gamma \max_{a'\in\mathcal{A}} \hat{Q}(x',a') \rgt)
+.\]
+The advantage of Q-learning is that it is off-policy. Thus, we can generate as
+much data as we need using a different algorithm, such as $\epsilon$-greedy,
+and then estimate the Q-values from there.
+
+Again, Q-learning is optimal if it satisfies the Robbins Monro conditions and
+all state-action pairs are chosen infinitely often. The space complexity of
+Q-learning is $\bigo{|\mathcal{A}| \cdot |\mathcal{X}|}$.
+
+\subsection{Machine learning}
+
+Q-learning requires too much memory for large state spaces, or even infinite
+memory is required for continuous domains $\rightarrow$ approximate with
+function approximators.
+
+The input could be anything that machine learning can process, \eg, video game
+frames with CNN or language with RNN.
+
+\paragraph{Deep Q-network.}
+
+Estimate Q-value using neural network with state-action pair input.
+
+Problem: maximization bias. Solution: double DQN.
+
+Problem: $\argmax_{a\in\mathcal{A}} Q(x_t, a; \vec{\theta})$ is intractable if
+$\mathcal{A}$ is large/infinite.
+
+\paragraph{Policy search methods.}
+
+Solution to DQN problem: Learn a parameterized policy $\pi(x; \vec{\theta})$.
+The output is then the action.
+
+How to compute gradient? $\ldots$.
+
+Problem: large variance. Solution: baselines.
+
+\paragraph{Actor-critic methods.}
+
+Learn both a parameterized policy and a value function estimator. They both
+induce each other, so they can be part of the other's loss function.
+
+\subsection{Model-based deep reinforcement learning}
+
+Main benefit: Learning a model can help dramatically reduce the sample
+complexity compared to model-free techniques (though not necessarily
+computational cost).
+
+\end{document}

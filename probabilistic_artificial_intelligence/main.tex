@@ -14,6 +14,10 @@ compat=1.16,
 
 \usepgfplotslibrary{fillbetween}
 
+\usepackage{tikz}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz/]
+
 \title{Probabilistic Artificial Intelligence}
 \author{Cristian Perez Jensen}
 
@@ -24,7 +28,7 @@ compat=1.16,
 \newpage
 \tableofcontents
 \newpage
-\input{notation}
+\input{sections/notation}
 \newpage\pagenumbering{arabic}
 
 \input{sections/probability_review}
@@ -32,6 +36,20 @@ compat=1.16,
 \input{sections/bayesian_linear_regression}
 
 \input{sections/gaussian_processes}
+
+\input{sections/variational_inference}
+
+\input{sections/markov_chain_monte_carlo}
+
+\input{sections/bayesian_neural_networks}
+
+\input{sections/active_learning}
+
+\input{sections/bayesian_optimization}
+
+\input{sections/markov_decision_processes}
+
+\input{sections/reinforcement_learning}
 
 \bibliography{main}
 \bibliographystyle{plainnat}

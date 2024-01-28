@@ -30,7 +30,7 @@ then the distribution
 over $\vec{f} = \transpose{\vec{w}} \transpose{\mat{X}} = \mat{X} \vec{w}$
 becomes the following, \[
   \vec{f} \sim \mathcal{N} \lft( \transpose{\mat{X}} \vec{0},\transpose{\mat{X}}
-  \mat{I} \mat{X} \rgt) = \mathcal{N}(\vec{0},\transpose{\mat{X}} \mat{X})
+  \mat{I} \mat{X} \rgt) = \mathcal{N} \lft( \vec{0},\transpose{\mat{X}} \mat{X} \rgt)
 .\]
 Notice that the data points enter as inner products, thus we do not necessarily
 need to let them linearly depend. We could also use any kernel
@@ -64,10 +64,10 @@ kernel, \[
   \frac{|\vec{x}-\vec{x}'|}{p} \rgt) \rgt)
 ,\]
 where $\sigma^2$ is the overall variance, $\ell$ is the lengthscale, and $p$ is
-the period. \Cref{fig:gp-per-kernel} shows the periodic kernel function \wrt
-$x'=0$. As can be seen, pairs of points $(x,x')$ with high covariance $k(x,x')$
-have close values in all sampled function realizations. This makes sense, since
-$k$ parametrizes the covariance.
+the period. It also shows the periodic kernel function \wrt $x=0$. As can be
+seen, pairs of points $(x,x')$ with high covariance $k(x,x')$ have close values
+in all sampled function realizations. This makes sense, since $k$ parametrizes
+the covariance.
 
 \begin{marginfigure}
     \begin{tikzpicture}
@@ -96,11 +96,7 @@ $k$ parametrizes the covariance.
         \addplot [fill=black, fill opacity=0.1] fill between [of=upper2 and lower2];
       \end{axis}
     \end{tikzpicture}
-    \caption{A priori samples of a Gaussian process with the periodic kernel.}
-    \label{fig:gp-prior}
-\end{marginfigure}
-
-\begin{marginfigure}
+    \vfill
     \begin{tikzpicture}
       \begin{axis}[
         width=\textwidth,
@@ -117,8 +113,9 @@ $k$ parametrizes the covariance.
         \addplot [thick] table [x=x, y=k, col sep=comma] {data/gaussian_processes/periodic_kernel.csv};
       \end{axis}
     \end{tikzpicture}
-    \caption{Periodic kernel function \wrt $x'=0$.}
-    \label{fig:gp-per-kernel}
+    \caption{A priori samples of a Gaussian process with the periodic kernel.
+    The second plot shows the kernel function \wrt $x=0$.}
+    \label{fig:gp-prior}
 \end{marginfigure}
 
 \subsection{Learning and inference}
@@ -164,7 +161,7 @@ Adding aleatoric noise, we get the probability distribution over $y^\star$: \[
   y^\star\mid\vec{x}^\star,\mat{X},\bm{y}\sim\mathcal{N}(\mu^\star,k^\star+\sigma_n^2)
 .\]
 
-\begin{marginfigure}
+\begin{marginfigure}[-4.5cm]
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -217,9 +214,9 @@ Adding aleatoric noise, we get the probability distribution over $y^\star$: \[
       \addplot [thick] table [x=x, y=k at 0 periodic, col sep=comma] {data/gaussian_processes/posterior_samples.csv};
     \end{axis}
   \end{tikzpicture}
-  \label{fig:posterior}
   \caption{The periodic kernel function hyperparameters used are $\sigma^2=1$,
   $\ell=1$, and $p=3$. The second plot shows the covariance \wrt $x=0$.}
+  \label{fig:gp-posterior-periodic}
 \end{marginfigure}
 
 \begin{marginfigure}[.5cm]
@@ -278,19 +275,19 @@ Adding aleatoric noise, we get the probability distribution over $y^\star$: \[
       \legend{$x=0$,$x=\nicefrac{3}{2}$,$x=-1$}
     \end{axis}
   \end{tikzpicture}
-  \label{fig:gp-posterior-linear}
   \caption{Posterior linear kernel. The second plot shows the covariance \wrt several
   points.}
+  \label{fig:gp-posterior-linear}
 \end{marginfigure}
 
 \subsection{Kernel functions}
 
-Suppose we have two covariance functions \[
+Suppose we have two covariance functions, \[
   k_1 : \mathcal{X} \times \mathcal{X} \to \mathbb{R}, \hspace{1em} k_2 :
   \mathcal{X} \times \mathcal{X} \to \mathbb{R}
 ,\]
 $c>0$, and $f$ is a polynomial with positive coefficients or the exponential
-function. Then, the following functions are valid covariance functions:
+function. Then, the following functions are valid covariance functions,
 \begin{align*}
   k(\vec{x},\vec{x}') &= k_1(\vec{x},\vec{x}')+k_2(\vec{x},\vec{x}') \\
   k(\vec{x},\vec{x}') &= k_1(\vec{x},\vec{x}')\cdot k_2(\vec{x},\vec{x}') \\
@@ -311,24 +308,29 @@ The following is a list of popular kernels,
   \item \textit{Linear kernel}, \[
       k(\vec{x},\vec{x}') = \transpose{\vec{x}}\vec{x}' + \sigma_0^2
     .\]
-    Its posterior can be seen in \Cref{fig:gp-posterior-linear};
+    Its posterior can be seen in Figure \ref{fig:gp-posterior-linear};
 
   \item \textit{Gaussian kernel} (a.k.a. \textit{Squared Exponential} or
     \textit{RBF}), \[
       k(\vec{x},\vec{x}') = \exp \lft( -\frac{\lVert \vec{x}-\vec{x}'
       \rVert^2_2}{2\ell^2} \rgt)
     .\]
-    Its posterior can be seen in \Cref{fig:gp-posterior-gaussian};
+    Points that are close together have a high covariance, while points further
+    away have a lower one. This is what makes it smooth, and continuous. Its
+    posterior can be seen in \Cref{fig:gp-posterior-gaussian};
 
   \item \textit{Exponential kernel}, \[
       k(\vec{x},\vec{x}') = \exp \lft( -\frac{\lVert \vec{x}-\vec{x}' \rVert}{\ell} \rgt)
     .\]
-    Its posterior can be seen in \Cref{fig:gp-posterior-exponential}.
+    Points that are close together have a high covariance. However, because it
+    uses the $\ell_1$-distance, the covariance function is not smooth, but
+    ``linear on two sides``.  This is why it has so many peaks. Its posterior
+    can be seen in \Cref{fig:gp-posterior-exponential}.
 \end{itemize}
 
 \subsection{Model selection}
 
-\begin{marginfigure}[-1.5cm]
+\begin{marginfigure}[-4.5cm]
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -385,9 +387,9 @@ The following is a list of popular kernels,
     \end{axis}
   \end{tikzpicture}
 
-  \label{fig:gp-posterior-gaussian}
   \caption{Posterior Gaussian kernel. The second plot shows the covariance \wrt several
   points.}
+  \label{fig:gp-posterior-gaussian}
 \end{marginfigure}
 
 \begin{marginfigure}[.5cm]
@@ -446,47 +448,50 @@ The following is a list of popular kernels,
       \legend{$x=0$,$x=\nicefrac{3}{2}$,$x=-1$}
     \end{axis}
   \end{tikzpicture}
-  \label{fig:gp-posterior-exponential}
   \caption{Posterior exponential kernel. The second plot shows the covariance \wrt several
   points.}
+  \label{fig:gp-posterior-exponential}
 \end{marginfigure}
 
-As can be seen in Figures \Cref{fig:gp-posterior,fig:posterior-exponential}, the
-hyperparameters matter a lot for whether a GP can model the datapoints
+As can be seen in
+\Cref{fig:gp-posterior-linear,fig:gp-posterior-gaussian,fig:gp-posterior-periodic,fig:gp-posterior-exponential},
+the hyperparameters matter a lot for whether a GP can model the datapoints
 correctly. These hyperparameters can be learned by maximizing its predictive
 performance on the data. (Hyperparamater fitting on the training data does not
-cause overfitting.  This will become clear.)
+cause overfitting. This will become clear.)
 
 Suppose we have data $\{(\vec{x}_i^\star,y_i^\star)\}_{i=1}^n$, then we would
 like to choose hyperparameters, such that the performance on this data is
 maximized. There are several choices for measuring predictive performance.
-The most naive option is mean squared error: \[
+The most naive option is mean squared error, \[
   \text{MSE}_{\theta}(y^\star,\vec{x}^\star) = (y^\star - \mu_{\theta}^\star(\vec{x}^\star))^2
 .\]
 This metric ignores aleatoric ($\sigma_n^2$) and epistemic
-($k(\vec{x}^\star,\vec{x}^star)$) uncertainty, thus it will not work well for
+($k(\vec{x}^\star,\vec{x}^\star)$) uncertainty, thus it will not work well for
 measuring the performance of GPs. Another option is to just add the variance
-to the loss, so it will be minimzed: \[
+to the loss, so it also will be minimized, \[
   \tilde{\text{MSE}}_{\theta}(y^\star,\vec{x}^\star) = \text{MSE}_{\theta}(y^\star,\vec{x}^\star) + k_{\theta}^\star(\vec{x}^\star,\vec{x}^\star)
 .\]
-The problem with this is that it encourages low epistemic uncertainty and
-still ignores the aleatoric uncertainty.
+The problem with this is that it encourages low epistemic uncertainty which
+will cause the loss function to favor models that have low epistemic
+uncertainty without it necessarily being true. Furthermore, it still ignores
+the aleatoric uncertainty.
 
 The Bayesian perspective provides an alternative approach: maximizing the
-marginal likelihood of the data:
+likelihood of the data,
 \begin{align*}
-  \text{NML}_{\theta}(y^\star,\vec{x}^\star) &= \mathcal{N}(y^\star; f_{\theta}^\star(\vec{x}^\star), \sigma_n^2) \\
+  \ell \ell_{\theta}(y^\star,\vec{x}^\star) &= \mathcal{N}(y^\star; f_{\theta}^\star(\vec{x}^\star), \sigma_n^2) \\
   &= \mathcal{N}(y^\star; \mu_{\theta}^\star, k_{\theta}^\star(\vec{x}^\star,\vec{x}^\star) + \sigma_n^2)
 .\end{align*}
 
-We can optimize $\theta$ as follows:
+We can optimize $\theta$ as follows,
 \begin{align*}
   \hat{\theta} &= \argmax_\theta p(\bm{y}^\star\mid \mat{X}^\star, \theta) \\
   &= \argmax_\theta \int p(\bm{y}^\star\mid f,\mat{X}^\star, \theta) p(f\mid \theta) df \\
   &= \argmax_\theta \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
   &= \argmin_\theta -\log \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
-  &= \argmin_\theta \frac{n}{2} \log 2\pi + \frac{1}{2}\log |k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}|+ \frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star \\
-  &= \argmin_\theta \underbrace{\frac{1}{2}\log |k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}|}_{\text{Complexity penalty}} + \underbrace{\frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star}_{\text{``Goodness`` of fit}}
+  &= \argmin_\theta \frac{n}{2} \log 2\pi + \frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}+ \frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star \\
+  &= \argmin_\theta \underbrace{\frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}}_{\text{complexity penalty}} + \underbrace{\frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star}_{\text{``goodness`` of fit}}
 .\end{align*}
 As can be seen, the loss function seeks a balance between the ``goodness`` of
 the fit and complexity. If we increase the aleatoric uncertainty
@@ -498,18 +503,18 @@ why we do not need a validation dataset.
 \subsection{Efficiency}
 
 The time complexity of computing the posterior is $\Theta(n^3)$\sidenote{For
-BLR, this is $O(dn^2)$.} and the space complexity of storing
+BLR, this is $\bigo{dn^2}$.} and the space complexity of storing
 $k(\mat{X},\mat{X})$ is $\Theta(n^2)$. The main approaches for accelerating GP
-posterior computation are exploiting parallelism (GPU),\sidenote{This yields
-a significant speedup, but does not address the cubic scaling in $n$.} local
-GP methods, kernel function approximations, and inducing point methods.
+posterior computation are exploiting parallelism (GPU),\sidenote{This yields a
+significant speedup, but does not address the cubic scaling in $n$.} local GP
+methods, kernel function approximations, and inducing point methods.
 
 \paragraph{Local GP methods.}
 
 The basic idea is that, for covariance functions that decay with
 distance,\sidenote{Think of stationary kernels such as the Gaussian and
 exponential kernels.} we only need to condition on close points to $\vec{x}$.
-\Ie to make a prediction at point $\vec{x}$, we only need to condition on
+\Ie, to make a prediction at point $\vec{x}$, we only need to condition on
 points $\vec{x}'$ where $|k(\vec{x},\vec{x}')|\geq \tau$ for some threshold
 $\tau$. The problem with this method is that it is still expensive if there
 are many close points.
@@ -518,23 +523,23 @@ are many close points.
 
 The key idea of approximating kernel functions is that we can construct an
 $m$-dimensional feature map with $m \ll n$ that approximates the true kernel
-function: \[
-  k(\vec{x},\vec{x}')\approx \phi(\vec{x})^\top\phi(\vec{x}') \hspace{1em} \phi(\vec{x})\in\mathbb{R}^m
+function, \[
+  k(\vec{x},\vec{x}')\approx \transpose{\vec{\phi}(\vec{x})} \vec{\phi}(\vec{x}') \hspace{1em} \vec{\phi}(\vec{x})\in\R^m
 .\]
-The apply BLR. The computational cost becomes $O(nm^2 + m^3)$ instead of
-$O(n^3)$.
+Then, apply BLR. The computational cost becomes $\bigo{nm^2 + m^3}$ instead of
+$\bigo{n^3}$.
 
-An example is Random Fourier Features (RFF) that reduces stationary kernels
-to their Fourier transform. Then, samples from this $m$ times and defines it
-as the feature map $\phi$. The problem with RFFs is that they approximate the
-kernel function globally, however this might not be necessary, since we only
-need accurate representation for the training and test points.
+An example is Random Fourier Features (RFF) that reduces stationary kernels to
+their Fourier transform. Then, samples from this $m$ times and defines it as
+the feature map $\vec{\phi}$. The problem with RFFs is that they approximate
+the kernel function globally, however this might not be necessary, since we
+only need accurate representation for the training and test points.
 
 \paragraph{Inducing point methods.}
 
-The idea behind inducing point methods is that we won't need all data. In
-areas where there are a lot of data points, we can safely throw some away.
-This method needs to figure out which points are safe to throw away, \ie find
-points inducing points $\mathcal{U}$ that we need to keep to approximate well.
-This can be done by choosing them randomly or we could treat $\mathcal{U}$ as
+The idea behind inducing point methods is that we won't need all data. In areas
+where there are a lot of data points, we can safely throw some away. This
+method needs to figure out which points are safe to throw away, \ie, find
+inducing points $\mathcal{U}$ that we need to keep to approximate well. This
+can be done by choosing them randomly or we could treat $\mathcal{U}$ as
 hyperparameters and maximize the marginal likelihood of the data.

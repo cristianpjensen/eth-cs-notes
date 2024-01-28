@@ -1,0 +1,95 @@
+\section{Bayesian optimization} \label{sec:bo}
+
+\begin{marginfigure}
+  \centering
+  \caption{TODO: Illustration of Bayesian optimization. We pass an input
+  $\vec{x}_t$ into he unknown function $f$ to obtain a noisy observation
+  $y_t$.}
+  \label{fig:bo}
+\end{marginfigure}
+
+In \textit{Bayesian optimization}, we do not only want to reduce uncertainty,
+but we also want to maximize some objective.\sidenote{This is in contrast with
+active learning. An example of this is automatically tuning the hyperparameters
+of a machine learning model. In this scenario, we would both want to minimize
+the uncertainty of the parameter space and maximize the performance of the
+eventual model.} This means that we have to make a trade-off between
+exploration (minimizing uncertainty) and exploitation (maximizing performance).
+
+\begin{definition}[Regret]
+  The cumulative regret for a time horizon $T$ associated with choices
+  $\vec{x}_1,\ldots,\vec{x}_T$ is defined as \[
+    R_T \doteq \sum_{t=1}^T \underbrace{\lft(\max_{\vec{x}} f(\vec{x}) - f(\vec{x}_t)\rgt)}_{\text{``instantaneous regret``}}
+  .\]
+  The regret can be interpreted as the additive loss with respect to the
+  maximally achievable value $\max_{\vec{x}} f(\vec{x})$.
+\end{definition}
+
+The goal is to find algorithms that achieve a sublinear regret, \[
+  \lim_{T\to\infty} \frac{R_T}{T} = 0
+.\]
+This leads to the algorithm converging on the maximum $\max_{\vec{x}}
+f(\vec{x})$. Note that using an algorithm that explores forever will result in
+the regret growing linearly, because we will never settle on a maximum value.
+In contrast, if we use an algorithm that never explores and thus only
+exploits, we might never find $\max_{\vec{x}} f(\vec{x})$. Thus, achieving
+sublinear regret requires balancing exploration and exploitation.
+
+\subsection{Acquisition functions}
+
+\paragraph{Upper confidence bound.}
+
+The principle of \textit{optimism in the face of uncertainty} naturally
+suggests picking the point where we can hope for the optimal outcome. This
+corresponds to maximizing the \textit{upper confidence bound}
+(UCB),\sidenote{This assumes that the parameters of the model (\eg GP) are
+known. However, this is not the case in practice. Thus, in practice, we can
+alternate between learning the hyperparameters from the currently selected
+data, and selecting the next datapoint. However, this introduces a danger of
+overfitting. This can be solved by either placing a hyperprior on the
+hyperparameters, or occasionally selecting some points at random.} \[
+  \vec{x}_t = \argmax_{\vec{x}\in\mathcal{X}} \mu_{t-1}(\vec{x}) + \beta_t \sigma_{t-1}(\vec{x})
+,\]
+where $\beta_t$ regulates how confident we are in our current model. A high
+$\beta_t$ leads the model to explore, while a low $\beta_t$ leads the model
+to exploit. This acquisition function naturally trades exploitation by
+preferring a large posterior mean with exploration by preferring a large
+posterior variance.
+
+If $f$ can be represented by our model and we choose $\beta_t$ ``correctly``, \[
+  R_T \in \mathcal{O}^\star \lft( \sqrt{\frac{\gamma_T}{T}} \rgt)
+,\]
+where \[
+  \gamma_T = \max_{|S|\leq T} I(f;\vec{y}_S)
+,\]
+quantifies the maximum information gain. Thus, the maximum information gain
+$\gamma_T$ determines the regret of the UCB algorithm.
+
+\begin{margintable}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Kernel} & \textbf{$\gamma_T$ bound} \\
+    \midrule
+    Linear & $\bigo{d\log T}$ \\
+    Gaussian & $\bigo{(\log T)^{d+1}}$ \\
+    Mat\'ern ($\nu > \nicefrac{1}{2}$) & $\bigo{T^{\frac{d}{2\nu+d}} (\log T)^{\frac{2\nu}{2\nu+d}}}$ \\
+    \bottomrule
+  \end{tabular}
+
+  \caption{Information gain bounds of common Gaussian process kernels. These
+  guarantee sublinear regret, which means that they are guaranteed to converge
+  to the maximum value of the function.}
+  \label{tab:information-gain-bounds}
+\end{margintable}
+
+\paragraph{Thompson sampling.}
+
+At every iteration $t$, Thompson sampling draws a function realization from the
+Gaussian process, \[
+  \tilde{f}_t \sim p(f\mid \vec{x}_{1:t},y_{1:t})
+,\] and selects \[
+  \vec{x}_{t+1} = \argmax_{\vec{x}\in\mathcal{X}} \tilde{f}_t(\vec{x})
+.\]
+The randomness in the realization of $\tilde{f}_t$ is sufficient to trade
+exploration and exploitation. Similarly to UCB, it has sublinear regret bounds.
