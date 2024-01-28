@@ -1,5 +1,14 @@
 \section{Reinforcement learning} \label{sec:rl}
 
+\begin{marginfigure}
+    \centering
+    \incfig{reinforcement-learning}
+    \caption{In reinforcement learning, an agent interacts with its environment.
+    After playing an action $a_t$, it observes reward $r_t$ and its new state
+    $x_{t+1}$.}
+    \label{fig:reinforcement-learning}
+\end{marginfigure}
+
 In \textit{reinforcement learning} (RL), we are concerned with acting in
 unknown environments. These environments are still modeled by MDPs, but in RL,
 we do not have access to the transition probabilities $p$ and reward function
@@ -44,7 +53,7 @@ due to Bellman's theorem, that is all that is needed to act optimally.
     TD-learning & On-policy & Model-free & $\bigo{|\X|}$ \\
     Q-learning & Off-policy & Model-free & $\bigo{|\mathcal{A}| \cdot |\X|}$ \\
     Deep Q Network & Off-policy & Model-free \\
-    Policy gradient & On-policy & Model-free \\
+    REINFORCE & On-policy & Model-free \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -141,47 +150,157 @@ TD-learning, we mix in the new esimate with the previous one according to
 learning rate $\alpha_t$, \[
   \hat{Q}(x,a) \gets (1-\alpha_t) \hat{Q}(x,a) + \alpha_t \lft( r + \gamma \max_{a'\in\mathcal{A}} \hat{Q}(x',a') \rgt)
 .\]
-The advantage of Q-learning is that it is off-policy. Thus, we can generate as
-much data as we need using a different algorithm, such as $\epsilon$-greedy,
-and then estimate the Q-values from there.
+The advantage of Q-learning is that it is off-policy, because the value is
+conditioned on the action. Thus, we can generate as much data as we need using a
+different algorithm, such as $\epsilon$-greedy, and then estimate the Q-values
+from there.
 
 Again, Q-learning is optimal if it satisfies the Robbins Monro conditions and
 all state-action pairs are chosen infinitely often. The space complexity of
 Q-learning is $\bigo{|\mathcal{A}| \cdot |\mathcal{X}|}$.
 
-\subsection{Machine learning}
+\subsection{Model-free deep RL}
 
-Q-learning requires too much memory for large state spaces, or even infinite
-memory is required for continuous domains $\rightarrow$ approximate with
-function approximators.
+\marginnote{In deep RL, the input could be anything that machine learning can
+process, \eg, video game frames with CNN or language with RNN.}
 
-The input could be anything that machine learning can process, \eg, video game
-frames with CNN or language with RNN.
+The problem with all previously discussed methods is that they are only feasible
+in a small finite domain. In continuous domains, we would need an infinite
+amount of memory to store all values. Thus, we need to approximate this
+regression problem with function approximators, a.k.a. machine learning.
+
+Let $V^\pi(x;\vec{\theta})$ be the function approximator that approximates the
+value function. Just like in TD-learning, we make the following Monte Carlo
+estimation for a given data point $\langle x, a, r, x' \rangle$, \[
+  V^\pi(x) \approx r + \gamma V^\pi(x')
+.\]
+Then, we can define the loss function of our value function as the squared error
+from the true value function,
+\begin{align*}
+  \ell(\vec{\theta} ; x, r, x') &\doteq \frac{1}{2} \lft( V^\pi(x;\vec{\theta}) - V^\pi(x) \rgt), \\
+  \intertext{which we estimate by using the Monte Carlo estimation,}
+  &\approx \frac{1}{2} \lft( V^\pi(x;\vec{\theta}) - \lft( r + \gamma V^\pi\lft(x'; \vec{\theta}^{\mathrm{old}}\rgt)\rgt) \rgt)^2
+.\end{align*}
+
+The gradient of this loss is equal to the following, \[
+  \grad{\ell(\vec{\theta} ; x,r,x')}{V^\pi(x;\vec{\theta})} = V^\pi(x;\vec{\theta}) - \lft( r + \gamma V^\pi\lft(x'; \vec{\theta}^{\mathrm{old}}\rgt)\rgt)
+.\]
+Using stochastic gradient descent, we then get the following update rule,
+\begin{align*}
+  V^\pi(x;\vec{\theta}) &\gets V^\pi(x;\vec{\theta}) - \alpha_t \lft(V^\pi(x;\vec{\theta}) - \lft( r + \gamma V^\pi\lft(x'; \vec{\theta}^{\mathrm{old}}\rgt)\rgt)\rgt) \\
+  &= (1-\alpha_t) V^\pi(x;\vec{\theta}) + \alpha_t \lft( r + \gamma V^\pi\lft(x'; \vec{\theta}^{\mathrm{old}}\rgt)\rgt)
+,\end{align*}
+which is the same as the TD-learning update rule. Thus, the TD-learning update
+rule can be viewed as gradient descent on the squared loss!
 
 \paragraph{Deep Q-network.}
 
-Estimate Q-value using neural network with state-action pair input.
+The same result
+holds for the Q-learning update rule, where we do gradient descent on \[
+  \ell(\vec{\theta}; x,a,x',r) = \frac{1}{2} \lft( Q(x,a;\vec{\theta}) - \lft(r + \gamma \max_{a'} Q\lft(x',a; \vec{\theta}^{\mathrm{old}}\rgt) \rgt) \rgt)^2
+.\]
+This equation is called the \textit{Bellman error}.
 
-Problem: maximization bias. Solution: double DQN.
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{DeepQNetwork}{$\tau$}
+      \State {initialize $\vec{\theta}$}
+      \While {not converged}
+        \State {pop $\langle x,a,r,x' \rangle$ from $\tau$}
+        \State {$\vec{\theta} \gets \vec{\theta} - \alpha_t \delta \grad{Q(x,a;\vec{\theta})}{\vec{\theta}}$}
+        \State {where $\delta \doteq \lft( Q(x,a;\vec{\theta}) - \lft(r + \gamma \max_{a'} Q\lft(x',a; \vec{\theta}^{\mathrm{old}}\rgt) \rgt) \rgt)$}
+      \EndWhile
+    \EndFunction
+  \end{algorithmic}
+  \caption{Q-learning with function approximation.}
+\end{algorithm}
 
-Problem: $\argmax_{a\in\mathcal{A}} Q(x_t, a; \vec{\theta})$ is intractable if
-$\mathcal{A}$ is large/infinite.
+However, this algorithm is quite slow to converge. To accelerate, we clone the
+network and maintain a constant ``target`` value across episodes, which we
+update once in a while.
+
+Furthermore, deep Q networks suffer from ``maximization bias``, which means that
+it tends to overestimate the actual Q value. This is caused by the
+$\max$-operator used in the update rule, which also maximizes noise in the data.
+This is solved by the double deep Q network, where we use two target networks.
+We then take the minimum at each iteration of the two predictions by the two
+target networks.
 
 \paragraph{Policy search methods.}
 
-Solution to DQN problem: Learn a parameterized policy $\pi(x; \vec{\theta})$.
-The output is then the action.
+The problem with deep Q networks is that if the action-space is large or
+infinite, the $\max_{a'} Q(x',a;\vec{\theta})$ is no longer feasible. The
+solution to this is learning a parametrized policy $\pi(x;\vec{\theta})$, where
+the output is the action. In this case, we want to maximize the expected
+trajectory reward,
+\begin{align*}
+  J(\vec{\theta}) &= \E_{x_{0:T},a_{0:T} \sim \pi_{\vec{\theta}}} \lft[ \sum_{t=0}^T \gamma^t r(x_t,a_t) \rgt] \\
+                  &= \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ r(\tau) \rgt]
+.\end{align*}
 
-How to compute gradient? $\ldots$.
+\begin{theorem}
+  The following holds, \[
+    \grad{J(\vec{\theta})}{\vec{\theta}} = \grad{\E_{\tau \sim \pi_{\vec{\theta}}} [r(\tau)]}{\vec{\theta}} = \E_{\tau\sim \pi_{\vec{\theta}}}[r(\tau)\grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}}]
+  .\]
 
-Problem: large variance. Solution: baselines.
+  \label{thm:reinforce-grad}
+\end{theorem}
+
+\begin{proof}
+  \begin{align*}
+    \grad{J(\vec{\theta})}{\vec{\theta}} &= \grad{\int \pi_{\vec{\theta}}(\tau) r(\tau) d\tau}{\vec{\theta}} \\
+    &= \int \grad{\pi_{\vec{\theta}}(\tau) r(\tau)}{\vec{\theta}} d\tau \\
+    &= \int \pi_{\vec{\theta}}(\tau) r(\tau) \grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}} d\tau & \text{\footnotesize chain rule} \\
+    &= \E_{\tau\sim \pi_{\vec{\theta}}}[r(\tau)\grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}}]
+  .\end{align*}
+\end{proof}
+
+Using \Cref{thm:reinforce-grad}, we do not need to use the reparameterization
+trick to be able to compute gradients. We only need to compute $\grad{\log
+\pi_{\vec{\theta}}(\tau)}{\vec{\theta}}$. We can compute this gradient as
+follows,
+\begin{align*}
+  \pi_{\vec{\theta}}(\tau) &= p(x_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t\mid x_t) p(x_{t+1}\mid x_t,a_t) \\
+  \grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}} &= \grad{\log p(x_0)}{\vec{\theta}} + \sum_{t=0}^T \grad{\log \pi_{\vec{\theta}}(a_t \mid x_t)}{\vec{\theta}} + \sum_{t=0}^T \grad{\log p(x_{t+1}\mid x_t,a_t)}{\vec{\theta}} \\
+  &= \sum_{t=0}^T \grad{\log \pi_{\vec{\theta}}(a_t \mid x_t)}{\vec{\theta}}
+.\end{align*}
+So, to be able to compute gradients \wrt $\vec{\theta}$, we do not even need to
+know the underlying MDP! Putting this together, we get the following gradient, \[
+  \grad{J(\vec{\theta})}{\vec{\theta}} = \E_{\tau\sim \pi_{\vec{\theta}}} \lft[ r(\tau) \sum_{t=0}^T \grad{\log \pi_{\vec{\theta}}(a_t \mid x_t)}{\vec{\theta}} \rgt]
+.\]
+
+Even though these gradients are unbiased, they typically have large variance. We
+can reduce the variance by introducing \textit{baselines}, \[
+  \E_{\tau\sim \pi_{\vec{\theta}}}[r(\tau)\grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}}] = \E_{\tau\sim \pi_{\vec{\theta}}}[(r(\tau) - b(\tau))\grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}}]
+,\]
+which have the same gradient. Thus, we are able to shift the reward up or down
+without influencing the gradient.
+
+\begin{algorithm}
+  \begin{algorithmic}
+    \Function{REINFORCE}{}
+      \State {initialize $\vec{\theta}$}
+      \Repeat
+        \State {generate an episode $\tau$}
+        \For {$t=1,\ldots,T$}
+          \State {$G_t \gets r_t$}
+          \State {$\vec{\theta} \gets \vec{\theta} + \eta \gamma^t G_t
+          \grad{\log \pi_{\vec{\theta}}(a_t \mid x_t)}{\vec{\theta}}$}
+        \EndFor
+    \EndFunction
+  \end{algorithmic}
+  \caption{The REINFORCE algorithm, where the baseline at timestep $t$ is set to
+  be $\sum_{t'=0}^{t-1} \gamma^{t'}r_{t'}$. \[ G_t = r(\tau) - b_t =
+  \sum_{t'=t}^T \gamma^{t'-t} r_t.\] Intuitively, $G_t$ is the reward to go
+  following action $a_t$.}
+\end{algorithm}
 
 \paragraph{Actor-critic methods.}
 
-Learn both a parameterized policy and a value function estimator. They both
+Learn both a parametrized policy and a value function estimator. They both
 induce each other, so they can be part of the other's loss function.
 
-\subsection{Model-based deep reinforcement learning}
+\subsection{Model-based deep RL}
 
 Main benefit: Learning a model can help dramatically reduce the sample
 complexity compared to model-free techniques (though not necessarily

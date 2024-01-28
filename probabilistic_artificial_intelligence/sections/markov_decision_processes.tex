@@ -93,6 +93,13 @@ Intuitively, this means that the value of the current state corresponds to the
 reward from the next action, plus the discounted sum of expected future rewards
 obtained from the subsequent states (which are their values).
 
+\begin{marginfigure}
+    \centering
+    \incfig{cyclic-dependency}
+    \caption{Cyclic dependency between value function and greedy policy.}
+    \label{fig:cyclic-dependency}
+\end{marginfigure}
+
 \begin{theorem}[Bellman's theorem] \label{thm:bellman}
   A policy $\pi^\star$ is optimal iff it is greedy \wrt its own value function
   $V^\star$.
