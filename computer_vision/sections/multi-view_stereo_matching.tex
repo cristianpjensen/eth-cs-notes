@@ -1,19 +1,118 @@
 \section{Multi-view stereo matching}
 
-Idea: Depth from two images. Similar to eye-sight?
+In humans and machines, depth perception is very important to interact with the
+environment. In humans, this is done by two eyes that are slightly different.
+From this difference, depth can be estimated. We can do the same with cameras
+with potentially even more views, which could result in better depth
+estimation.
 
-Idea: Use multiple views for better depth estimation.
+\marginnote{If the cameras are not perfectly on the same $x$-axis or do not
+have the same rotation, we can solve it by rectifying them using a homography
+\citep{loop1999computing}. Geometrically, this means first projecting the two
+images onto a common plane that is parallel to the baseline. It can also be
+seen as rectifying the epipolar lines.}
 
-\begin{figure}[ht]
+The standard setup in stereo geometry is two identical cameras that are only
+dislaced on the $x$-axis. In other words, they have the same rotation and
+height. Then, it is easy to compute the fundamental matrix, \[
+  \mat{F} = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}
+.\]
+Then, we have the following epipolar lines,
+\begin{align*}
+  \vec{\ell}_1 &= \transpose{\vec{x}_2} \mat{F} = \transpose{\begin{bmatrix} 0 & 1 & -y_2 \end{bmatrix}} \\
+  \vec{\ell}_2 &= \mat{F} \vec{x}_1 = \transpose{\begin{bmatrix} 0 & 1 & -y_1 \end{bmatrix}}
+,\end{align*}
+which tells us that all points will have the same $y$-axis, and vary on the
+$x$-axis.
+
+If there is a three-dimensional point at $\vec{X} = [X,Y,Z]$, then we have the
+following relationships with the two-dimensional points on the image planes,
+\begin{align*}
+  x_1 &= f \frac{X}{Z} \margintag{Under the assumption that camera 1 is at the origin \wrt camera 2.} \\
+  y_1 &= f \frac{Y}{Z} \\
+  x_2 &= f \frac{X+b_x}{Z} \margintag{Translating camera to the left is the same as translating the world to the right. $b_x$ is the baseline on the $x$-axis.} \\
+  y_2 &= f \frac{Y}{Z} \\
+\end{align*}
+The \textit{stereo disparity} (which is the difference in pixel locations) $d=
+x_1 - x_2$ can then be computed as follows,
+\begin{align*}
+  d &= x_1 - x_2 \\
+  &= f \frac{X}{Z} - f \frac{X-b_x}{Z} \\
+  &= f \frac{b_x}{Z} \\
+  \intertext{We can then solve for the depth $Z$,}
+  Z &= \frac{f b_x}{d} \\
+  \intertext{Furthermore, we can compute how much the disparity changes as the
+  depth changes,}
+  \odv{d}{Z} &= \odv*{\frac{f b_x}{Z}}{Z} \\
+  &= \frac{f b_x}{Z^2}
+,\end{align*}
+which tells us that the uncertainty in the pixel location grows quadratically
+with depth, causing large depth error. But, this uncertainty is also inversely
+proportional to the baseline, thus we can increase $b_x$ to see depth better at
+deep locations. However, this also comes at the cost that the search problem of
+matching the pixels between images is much harder, because there are more
+occlusions. Furthermore, the disparity becomes smaller as the baseline
+increases, which makes it harder to achieve fine-grained resolution, since
+pixels are not infinitely small. See \Cref{fig:stereo-baseline} for an
+illustration of this.
+
+\begin{figure}[t]
     \centering
     \incfig{stereo-baseline}
-    \caption{Stereo baseline}
+    \caption{In stereopsis, a large baseline makes it easier to estimate the
+    depth of further points, but it will miss close points. TODO: Make the
+    missed points more evident.}
     \label{fig:stereo-baseline}
 \end{figure}
 
-\begin{figure}[ht]
+\paragraph{Matching.}
+
+Now, we need to figure out how to match the pixels in one image to another. We
+know that they are on the same lines. Note that the search is limited to the
+epipolar line, so we only need to match along the common epipolar line of the
+two image planes. We also need to points to enforce spatial consistency, since
+close points in the environment are also between the image planes. Also, we can
+never turn back, \ie, if $x_1$ is matched to $x_2$, then $x_1' > x_1$ cannot
+match to a point $x_2' < x_1$. We then associate with each matching of pixels a
+cost that is computed from their intensities. We can then use a matching
+algorithm to compute the optimal matching \citep{baker1981depth}.
+
+TODO: Matching algorithm figure.
+
+\paragraph{Multi-view stereo.}
+
+We can also add more cameras to the setup. An obvious advantage is that we can
+set the cameras up such that we have multiple baselines
+\citep{okutomi1993multiple}. This has the result that we no longer have the
+trade-off between large and small baseline, because we can use both. This makes
+it possible to compute the depth of far points accurately and deal with the
+visibility problem of large baselines. An example of a multi-view setup being
+more robust to occlusions is \Cref{fig:visibility-problem}. The left two
+cameras would not be able to find the depth of the point on the cube, but the
+introduction of the right camera made it possible.
+
+\begin{figure}[t]
     \centering
     \incfig{visibility-problem}
-    \caption{Visibility problem}
+    \caption{Visibility problem that is resolved by adding a third camera.}
     \label{fig:visibility-problem}
 \end{figure}
+
+\paragraph{Volumetric stereo.}
+
+In volumetric stereo, we discretize the three-dimensional space into
+voxels.\sidenote{A voxel is a ``three-dimensional pixel``.} We then ``carve``
+the geometry out of these voxels. This gives us a reconstruction of the scene,
+from which we can create a depth map by taking the first occupied voxel for
+each pixel. We assign a photoconsistency cost to each voxel, and then we make
+the minimum cost cut in this graph.
+
+We can also use \textit{visibility-first} methods. In these methods, we first
+handle the visibility problem, and then we carve out the voxels. We do this by
+first segmenting the foreground from the background for every camera. We then
+backproject the foreground silhouette to the image plane. All these pixels are
+visible from this camera. The visual hull is then the intersection of these
+silhouettes. We only keep the voxels that are part of the visual hull, which
+gives us a tight bound on the object.
+
+TODO: Visual hull figure.
