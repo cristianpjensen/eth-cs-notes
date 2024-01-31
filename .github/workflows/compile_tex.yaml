@@ -29,6 +29,7 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: probabilistic_artificial_intelligence
 
     - name: Compile algorithms lab
