@@ -161,9 +161,7 @@ CNF.
         \EndFor
       \EndFor
 
-      \LComment{Compute score of every span in $\bigo{N^3\cdot |\mathcal{R}|}$}
-
-      \For {$\ell=2,\ldots,N$}
+      \For {$\ell=2,\ldots,N$} \Comment{Compute score of every span in $\bigo{N^3\cdot |\mathcal{R}|}$}
         \For {$i=1,\ldots,N-\ell+1$}
           \State {$k \gets i + \ell$}
           \For {$j=i+1,\ldots,k-1$}

@@ -155,8 +155,8 @@ these to compute the normalizer with the following equation, \[
 
   \begin{algorithmic}[1]
     \Function{Lehmann}{$\mat{W},\langle \mathcal{W},\oplus,\otimes,\bm{0},\bm{1} \rangle$}
-      \LComment{$\mat{W}\in \mathcal{W}^{|Q| \times |Q|}$ is a matrix over a closed semiring}
       \State $\mat{R}^{(0)} \gets \mat{W}$
+      \Comment{$\mat{W}\in \mathcal{W}^{|Q| \times |Q|}$ is a matrix over a closed semiring}
       \For {$j\gets 1,\ldots,|Q|$}
         \For {$i\gets 1,\ldots,|Q|$}
           \For {$k\gets 1,\ldots,|Q|$}
