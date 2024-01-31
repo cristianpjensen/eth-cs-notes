@@ -150,7 +150,77 @@ Gaussian random vector, then the following properties hold,
 
 \subsection{Kalman filters}
 
-TODO
+\begin{marginfigure}
+    \centering
+    \incfig{kalman-graphical-model}
+    \caption{Directed graphical model of a Kalman filter with hidden states
+    $\vec{X}_t$ and observables $\vec{Y}_t$.}
+    \label{fig:kalman-graphical-model}
+\end{marginfigure}
+
+\begin{definition}[Kalman filter]
+  A Kalman filter is specified by a Gaussian prior over the states, \[
+    X_0 \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})
+  ,\]
+  and a conditional linear Gaussian \textit{motion model} and \textit{sensor
+  model},
+  \begin{align*}
+    X_{t+1} &\doteq \mat{F}X_t + \vec{\epsilon}_t & \mat{F} \in \R^{d\times d}, \hspace{0.5cm} \vec{\epsilon}_t \sim \mathcal{N}(\vec{0},\mat{\Sigma}_x) \margintag{$\mat{F}$ is assumed to be known.} \\
+    Y_t &\doteq \mat{H}X_t + \vec{\eta}_t & \mat{H} \in \R^{m\times d}, \hspace{0.5cm} \vec{\eta}_t \sim \mathcal{N}(\vec{0},\mat{\Sigma}_y) \margintag{$\mat{H}$ is assumed to be known.}
+  ,\end{align*}
+  respectively.
+\end{definition}
+
+From the directed graphical model in \Cref{fig:kalman-graphical-model}, we can
+observe the following conditional independences,
+\begin{gather*}
+  X_{t+1} \bot \vec{X}_{1:t-1}, \vec{Y}_{1:t-1} \mid X_t \\
+  Y_t \bot \vec{X}_{1:t-1} \mid X_t \\
+  Y_t \bot \vec{Y}_{1:t-1} \mid X_{t-1}
+.\end{gather*}
+
+These lead to the following factorization of the joint distribution,
+\begin{align*}
+  p(\vec{x}_{1:t},\vec{y}_{1:t}) &= \prod_{i=1}^t p(x_i \mid \vec{x}_{1:i-1}) p(y_i \mid \vec{x}_{1:t}, \vec{y}_{1:i-1}) \\
+  &= p(x_1) p(y_1\mid x_1) \prod_{i=2}^t p(x_i\mid x_{i-1}) p(y_i \mid x_i)
+.\end{align*}
+
+We now want to do \textit{Bayesian filtering} on a Kalman filter, which involves
+keeping tack of an agent's state using noisy observations $Y$. It is described
+by the recursive scheme in \Cref{fig:bayesian-filtering}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{bayesian-filtering}
+    \caption{The recursive scheme of Bayesian filtering.}
+    \label{fig:bayesian-filtering}
+\end{figure}
+
+We can do the update by the following,
+\begin{align*}
+  p(x_t \mid \vec{y}_{1:t}) &= \frac{1}{Z} p(x_t \mid \vec{y}_{1:t-1}) p(y_t\mid x_t, \vec{y}_{1:t-1}) \\
+  &= \frac{1}{Z} p(x_t \mid \vec{y}_{1:t-1}) p(y_t\mid x_t)
+.\end{align*}
+Furthermore, we can do the prediction by the following,
+\begin{align*}
+  p(x_{t+1}\mid \vec{y}_{1:t}) &= \int p(x_{t+1}, x_t \mid y_{1:t}) dx_t \\
+  &= \int p(x_{t+1} \mid x_t, \vec{y}_{1:t}) p(x_t\mid \vec{y}_{1:t}) dx_t \\
+  &= \int p(x_{t+1} \mid x_t) p(x_t\mid \vec{y}_{1:t}) dx_t
+.\end{align*}
+In general, these distributions are very complicated, but for Gaussians (as in
+the Kalman filter), they can be expressed in closed form. The general formula
+for the \textit{Kalman update} is as follows, given the prior belief $X_t \mid
+\vec{y}_{1:t} \sim \mathcal{N}(\vec{\mu}_t, \mat{\Sigma}_t)$,
+\begin{align*}
+  X_{t+1} \mid \vec{y}_{1:t+1} &\sim \mathcal{N}(\vec{\mu}_{t+1}, \mat{\Sigma}_{t+1}) \\
+  \vec{\mu}_{t+1} &\doteq \mat{F} \vec{\mu}_t + \mat{K}_{t+1}(\vec{y}_{t+1} - \mat{H}\mat{F} \vec{\mu}_t) \\
+  \mat{\Sigma}_{t+1} &\doteq (\mat{I} - \mat{K}_{t+1} \mat{H}) (\mat{F}\mat{\Sigma}_t\transpose{\mat{F}} + \mat{\Sigma}_x), \\
+  \intertext{where $\mat{K}_{t+1}$ is the \textit{Kalman gain},}
+  \mat{K}_{t+1} &\doteq (\mat{F}\mat{\Sigma}_t \transpose{\mat{F}} + \mat{\Sigma}_x) \transpose{\mat{H}} \inv{(\mat{H}(\mat{F}\mat{\Sigma}_t\transpose{\mat{F}} + \mat{\Sigma}_x) \transpose{\mat{H}} + \mat{\Sigma}_y)}
+.\end{align*}
+The term $(\vec{y}_{t+1} - \mat{H}\mat{F}\vec{\mu}_t)$ measures the error in the
+predicted observation and the Kalman gain $\mat{K}_{t+1}$ measures the relevance
+of the new observation compared to the prediction.
 
 \subsection{Entropy}
 

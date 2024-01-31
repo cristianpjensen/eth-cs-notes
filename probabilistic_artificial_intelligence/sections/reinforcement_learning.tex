@@ -313,7 +313,12 @@ This is necessary to be able to update its parameters correctly.
 
 \paragraph{Actor-critic methods.}
 
-\marginnote{TODO: Actor-critic figure.}
+\begin{marginfigure}
+    \centering
+    \incfig{actor-critic}
+    \caption{Illustration of an iteration of actor-critic methods.}
+    \label{fig:actor-critic}
+\end{marginfigure}
 
 We can reinterpret the REINFORCE gradient as follows,
 \begin{align*}
@@ -414,7 +419,13 @@ have.} Thus, we often use heuristic global optimization methods. The
 \textit{random shooting} method generates $m$ sets of random samples
 $a_{t:t+H-1}$, and then picks the sequence that optimizes the objective.
 
-TODO: Figure of finite horizon (see slide 8).
+\begin{figure}[ht]
+    \centering
+    \incfig{finite-horizon}
+    \caption{Illustration of the effect of a finite horizon. Only after two
+    steps, the agent could ``see`` the obstacle within its horizon.}
+    \label{fig:finite-horizon}
+\end{figure}
 
 However, if we have sparse rewards, this will inherently not work, because we
 might not look far enough into the future. But, if we have access to a value

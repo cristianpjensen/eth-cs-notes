@@ -8,29 +8,6 @@ where the uncertainty is high. This assumes that there is some cost associated
 with collecting data points, making it important to be careful about which data
 points to pick that maximize the information obtained.
 
-\begin{marginfigure}
-  \centering
-  \begin{subfigure}[b]{\textwidth}
-    \caption{To do: Prior.}
-    \label{fig:prior-infogain}
-  \end{subfigure}
-  \vfill
-  \begin{subfigure}[b]{\textwidth}
-    \caption{To do: Posterior with data points that have high information
-    gain.}
-    \label{fig:high-infogain}
-  \end{subfigure}
-  \vfill
-  \begin{subfigure}[b]{\textwidth}
-    \caption{To do: Posterior with data points that have low information
-    gain.}
-    \label{fig:low-infogain}
-  \end{subfigure}
-  \caption{Before and after observing different subsets
-  $S\subseteq\mathcal{X}$.}
-  \label{fig:infogain}
-\end{marginfigure}
-
 Let $\mathcal{X}$ be a set of possible observations of $f$, and $y_{\vec{x}}$
 the observation at $\vec{x}\in\mathcal{X}$, \[
   y_{\vec{x}} \doteq f(\vec{x}) + \epsilon_{\vec{x}}, \hspace{1cm} \vec{\epsilon}_{\vec{x}} \in \mathcal{N}(\bm{0},\sigma_n^2 \bm{I})
