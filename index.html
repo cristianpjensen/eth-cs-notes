@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        padding-top: 40px;
+        font-weight: medium;
+      }
+
+      a {
+        color: black;
+      }
+
+      ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+        flex-direction: column;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      function formatFileName(s) {
+        s = s.split(".")[0]
+        s = s.replaceAll("_", " ");
+        s = s.replaceAll("-", " – ");
+
+        const str_arr = s.split(" ");
+
+        for (i = 0; i < str_arr.length; i++) {
+          str_arr[i] = str_arr[i][0].toUpperCase() + str_arr[i].slice(1);
+        }
+
+        return str_arr.join(" ");
+      }
+
+      (async () => {
+
+
+        const response = await fetch("https://api.github.com/repos/cristianpjensen/eth-cs-notes/contents?ref=gh-pages");
+        const data = await response.json();
+        let htmlString = '<ul>';
+        
+        for (let file of data) {
+          htmlString += `<li><a href="${file.path}">${formatFileName(file.name)}</a></li>`;
+        }
+
+        htmlString += '</ul>';
+        document.getElementsByTagName('body')[0].innerHTML = htmlString;
+      })()
+    </script>
+  <body>
+
+</html>
