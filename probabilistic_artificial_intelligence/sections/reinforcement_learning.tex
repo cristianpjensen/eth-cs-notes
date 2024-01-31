@@ -287,6 +287,7 @@ without influencing the gradient.
           \State {$\vec{\theta} \gets \vec{\theta} + \eta \gamma^t G_t
           \grad{\log \pi_{\vec{\theta}}(a_t \mid x_t)}{\vec{\theta}}$}
         \EndFor
+      \Until {done}
     \EndFunction
   \end{algorithmic}
   \caption{The REINFORCE algorithm, where the baseline at timestep $t$ is set to

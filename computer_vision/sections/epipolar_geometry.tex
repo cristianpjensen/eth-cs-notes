@@ -299,7 +299,7 @@ Thus, we need to find a best intersection. A natural best estimate is the
 mid-point of the shortest line between the two backprojection lines. This
 minimizes the 3-dimensional error, but not the reprojection error. We could
 further optimize this estimate to minimize the reprojection error, \[
-  d(\vec{x}_1, \mat{P}_1 \hat{\vec{X}}) + d(\vec{x}_2, \mat{P}_2 \hat{\vec{X}})
+  d(\vec{x}_1, \mat{P}_1 \hat{\vec{X}})^2 + d(\vec{x}_2, \mat{P}_2 \hat{\vec{X}})^2
 .\]
 
 TODO: Mid-point with reprojection figure.
