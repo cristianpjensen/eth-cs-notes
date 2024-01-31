@@ -25,11 +25,18 @@ jobs:
         root_file: main.tex
         working_directory: computer_vision
 
+    - name: Compile probabilistic artificial intelligence
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: probabilistic_artificial_intelligence
+
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
         file natural_language_processing/main.pdf | grep -q ' PDF '
         file computer_vision/main.pdf | grep -q ' PDF '
+        file probabilistic_artificial_intelligence/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
@@ -47,12 +54,14 @@ jobs:
         # (*) To add a file, add the following command for that file
         cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing-summary.pdf"
         cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
+        cp -f probabilistic_artificial_intelligence/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
         # (*) To add a file, add it to the branch
         git add natural_language_processing-summary.pdf
         git add computer_vision-summary.pdf
+        git add probabilistic_artificial_intelligence-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push
