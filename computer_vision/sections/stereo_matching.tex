@@ -13,7 +13,7 @@ images onto a common plane that is parallel to the baseline. It can also be
 seen as rectifying the epipolar lines.}
 
 The standard setup in stereo geometry is two identical cameras that are only
-dislaced on the $x$-axis. In other words, they have the same rotation and
+displaced on the $x$-axis. In other words, they have the same rotation and
 height. Then, it is easy to compute the fundamental matrix, \[
   \mat{F} = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}
 .\]
@@ -60,10 +60,18 @@ illustration of this.
     \centering
     \incfig{stereo-baseline}
     \caption{In stereopsis, a large baseline makes it easier to estimate the
-    depth of further points, but it will miss close points. TODO: Make the
-    missed points more evident.}
+    depth of further points, but it will miss close points.}
     \label{fig:stereo-baseline}
 \end{figure}
+
+\begin{marginfigure}
+    \centering
+    \incfig{matching-algorithm}
+    \caption{Matching algorithm, where the points on the corresponding lines are
+      being matched to each other. A line to the right means that there is an
+      obstruction.}
+    \label{fig:matching-algorithm}
+\end{marginfigure}
 
 Now, we need to figure out how to match the pixels in one image to another. We
 know that they are on the same lines. Note that the search is limited to the
@@ -74,8 +82,6 @@ never turn back, \ie, if $x_1$ is matched to $x_2$, then $x_1' > x_1$ cannot
 match to a point $x_2' < x_1$. We then associate with each matching of pixels a
 cost that is computed from their intensities. We can then use a matching
 algorithm to compute the optimal matching \citep{baker1981depth}.
-
-\marginnote{TODO: Matching algorithm figure.}
 
 \subsection{Multi-view stereo}
 
@@ -89,7 +95,7 @@ more robust to occlusions is \Cref{fig:visibility-problem}. The left two
 cameras would not be able to find the depth of the point on the cube, but the
 introduction of the right camera made it possible.
 
-\begin{figure}[t]
+\begin{figure}
     \centering
     \incfig{visibility-problem}
     \caption{Visibility problem that is resolved by adding a third camera.}
@@ -105,7 +111,12 @@ from which we can create a depth map by taking the first occupied voxel for
 each pixel. We assign a photoconsistency cost to each voxel, and then we make
 the minimum cost cut in this graph.
 
-\marginnote{TODO: Voxel figure.}
+\begin{marginfigure}
+    \centering
+    \incfig{voxel}
+    \caption{Above view of voxel carving.}
+    \label{fig:voxel}
+\end{marginfigure}
 
 We can also use \textit{visibility-first} methods. In these methods, we first
 handle the visibility problem, and then we carve out the voxels. We do this by
@@ -115,4 +126,11 @@ visible from this camera. The visual hull is then the intersection of these
 silhouettes. We only keep the voxels that are part of the visual hull, which
 gives us a tight bound on the object.
 
-\marginnote{TODO: Visual hull figure.}
+\begin{marginfigure}[0.5cm]
+    \centering
+    \incfig{visual-hull}
+    \caption{The visual hull of the object with three cameras. As we increase
+      the amount of cameras, the intersection becomes smaller and thus the bound
+      on the object tighter.}
+    \label{fig:visual-hull}
+\end{marginfigure}

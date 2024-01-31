@@ -292,7 +292,12 @@ backprojections that satisfies the following, \[
   \det{\begin{bmatrix} \transpose{\vec{\ell}_{x_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{y_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{x_2}} \mat{P}_2 \\ \transpose{\vec{\ell}_{y_2}} \mat{P}_2 \end{bmatrix}} = 0
 .\]
 
-TODO: Backprojection figure.
+\begin{figure}[b]
+    \centering
+    \incfig{mid-point-reprojection}
+    \caption{Mid-point reprojection.}
+    \label{fig:mid-point-reprojection}
+\end{figure}
 
 However, due to noise, the two backprojections will never truly intersect.
 Thus, we need to find a best intersection. A natural best estimate is the
@@ -301,5 +306,3 @@ minimizes the 3-dimensional error, but not the reprojection error. We could
 further optimize this estimate to minimize the reprojection error, \[
   d(\vec{x}_1, \mat{P}_1 \hat{\vec{X}})^2 + d(\vec{x}_2, \mat{P}_2 \hat{\vec{X}})^2
 .\]
-
-TODO: Mid-point with reprojection figure.

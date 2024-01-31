@@ -1,6 +1,6 @@
 %% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
-%% Accompanies image file 'stereo-baseline.pdf' (pdf, eps, ps)
+%% Accompanies image file 'visual-hull.pdf' (pdf, eps, ps)
 %%
 %% To include the image in your LaTeX document, write
 %%   \input{<filename>.pdf_tex}
@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{283.46456693bp}%
+    \setlength{\unitlength}{141.73228346bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,15 +50,9 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.4)%
+  \begin{picture}(1,1)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0,0){\includegraphics[width=\unitlength,page=1]{stereo-baseline.pdf}}%
-    \put(0.16622528,0.02279968){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize small baseline}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=2]{stereo-baseline.pdf}}%
-    \put(0.6462043,0.0234845){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize large baseline}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=3]{stereo-baseline.pdf}}%
-    \put(0.00098055,0.15430786){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize single pixel}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=4]{stereo-baseline.pdf}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{visual-hull.pdf}}%
   \end{picture}%
 \endgroup%

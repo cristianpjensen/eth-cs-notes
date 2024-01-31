@@ -163,12 +163,12 @@ corner.
 The Harris detector is only able to find keypoints at a fixed scale. However,
 we would like to be able to detect keypoints at any scale and use this scale to
 match keypoints of different scales. In other words, we want to be able to
-match keypoints in a zoomed-in version of an image to points in a zoomed-out
+match keypoints in a zoomed in version of an image to points in a zoomed out
 one. The naive approach would be to compare descriptors while varying the patch
 size, but this results in a combinatorial search problem.
 
 A better idea is to do detection over a scale space, which has three dimensions
-$x,y,\sigma$, where the $\sigma$ parameterizes the convolution with a Laplacian
+$x,y,\sigma$, where the $\sigma$ parametrizes the convolution with a Laplacian
 of Gaussian (second derivative of the Gaussian). This ``blurs`` the image so only
 large structures remain. Then, we compute the response function for all points
 $(x,y,\sigma)$, and call points that are a maximum in a $3\times 3\times 3$
@@ -181,7 +181,7 @@ SIFT \citep{lowe2004distinctive} is an algorithm that uses the orientation of
 gradients within a patch to compute a descriptor (step 4 in the general
 approach). It does so by dividing the found patch into a $4\times 4$ grid and
 computing the 8-bin histogram of gradient orientations, weighted by their
-magnitude, within each gridcell. This results in a $4\times 4\times
+magnitude, within each grid cell. This results in a $4\times 4\times
 8=128$-dimensional vector representation of a keypoint.
 
 We can assign an orientation to a keypoint by creating a histogram of local

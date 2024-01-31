@@ -45,12 +45,12 @@ simply compare pixel intensities and minimizing the following error function, \[
   E(u,v) = \sum_{x,y} (\tens{I}[x+u,y+v] - \tens{T}[x,y])^2
 ,\]
 where $\tens{T}$ is the template. However, the object in the template might
-make a transformation such as a rotation or scaling. We could also parameterize
+make a transformation such as a rotation or scaling. We could also parametrize
 those transformations, instead of only a translation, by generalizing the
 previous error function to any transformation family $W$,
 \begin{align*}
   E(\vec{p}) &= \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x}; \vec{p})] - \tens{T}[\vec{x}] \rgt)^2, \\
-  \intertext{where $\vec{p}$ parameterizes a ``warp`` $W$. However, we cannot
+  \intertext{where $\vec{p}$ parametrizes a ``warp`` $W$. However, we cannot
   directly solve for $\vec{p}$, thus we iteratively improve it by updating it
   with some $\delta_{\vec{p}}$,}
   &= \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p} + \delta_{\vec{p}})] - \tens{T}[\vec{x}] \rgt)^2 \\
@@ -66,11 +66,11 @@ previous error function to any transformation family $W$,
 .\end{align*}
 We iteratively update the warp by $\delta_{\vec{p}}$ until convergence.
 
-However, this method is not robus to image noise, since it assumes that pixel
+However, this method is not robust to image noise, since it assumes that pixel
 intensities remain the same between frames. Furthermore, some three-dimensional
-transformations are impossible to parameterize as a two-dimensional warp of an
+transformations are impossible to parametrize as a two-dimensional warp of an
 image. For example, a person turning around \wrt the camera cannot be
-parameterized as a two-dimensional warp.
+parametrized as a two-dimensional warp.
 
 \subsection{Tracking by detection}
 

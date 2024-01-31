@@ -9,12 +9,13 @@ $\mat{P}_1, \ldots, \mat{P}_m$, and the positions of the points $\vec{X}_1,
 The fact that we have more than 2 viewpoints enables us to reveal and remove
 more mismatches.
 
-\begin{marginfigure}
+\begin{figure}[t]
     \centering
     \incfig{structure-from-motion}
-    \caption{Structure from motion. TODO: Fix size.}
+    \caption{Structure from motion. We iteratively extend and refine the
+    recovered structure.}
     \label{fig:structure-from-motion}
-\end{marginfigure}
+\end{figure}
 
 In \textit{sequential SfM}, we initialize the three-dimensional structure from
 two images, using the same technique as in the previous section. Then, for each

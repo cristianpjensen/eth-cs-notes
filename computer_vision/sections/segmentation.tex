@@ -74,7 +74,7 @@ The advantage of this approach is that it is probabilistic and can predict new
 data points, because it is generative. This also has the advantage that we can
 detect outliers. Furthermore, it can be stored in $\bigo{kd^2}$, which is quite
 compact. The problems are that we still need to know the number of components
-$k$, and we need a good initializiation.\sidenote{It is often a good idea to
+$k$, and we need a good initialization.\sidenote{It is often a good idea to
 start from the output of $k$-means.}
 
 \subsection{Mean-shift}
@@ -127,7 +127,7 @@ this instead of $y=ax+b$, because this has a bounded parameter domain.} \[
 .\]
 Then, we represent all lines through all the points on the edges in a
 parameter space. \Eg, the point $[0,1]$ lies on all lines with $\rho=1$, thus
-all lines in this point are repsented by the line $\rho=1$ in parameter
+all lines in this point are represented by the line $\rho=1$ in parameter
 space. Then, we need to identify peaks in the parameter space. These peaks
 make up the geometry of the objects in the image.
 
@@ -210,7 +210,7 @@ models, which are optimized to predict the training labels.
 \paragraph{$k$-nearest neighbors.}
 
 The simplest learning-based approach is $k$-nearest neighbors (kNN). In kNN,
-every point is labeled to be the mode of its $k$ nearest neighbors in the
+every point is labelled to be the mode of its $k$ nearest neighbors in the
 training data. The ``nearest`` neighbors refer to the points in the feature
 space with the smallest distance to the current feature vector, not the
 nearest point in the image.
@@ -224,7 +224,7 @@ related task, such as classification, and dataset (pretraining). Then, we
 initialize our segmentation model with these weights as much as possible and
 train on the actual dataset (finetuning). This makes the assumption that
 pretrained weights are easier to train for segmentation than a random
-initalization.
+initialization.
 
 \paragraph{Hypercolumns.}
 
@@ -259,7 +259,7 @@ for pretraining on a classification task, because linear layers and $1\times 1$
 convolutional layers have the same parameters. Then, at the end of the model,
 the images are not turned into vectors, but rather feature maps. Then dependent
 on how much the images were downsampled by the model, we upsample the feature
-map from different layers of the nerwork to be of same size as the input image
+map from different layers of the network to be of same size as the input image
 with a transposed convolution. Now, we have features per pixel that can be used
 to predict the label per pixel with $1\times 1$ convolution.
 
