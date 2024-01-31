@@ -31,12 +31,19 @@ jobs:
         root_file: main.tex
         working_directory: probabilistic_artificial_intelligence
 
+    - name: Compile algorithms lab
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: algorithms_lab
+
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
         file natural_language_processing/main.pdf | grep -q ' PDF '
         file computer_vision/main.pdf | grep -q ' PDF '
         file probabilistic_artificial_intelligence/main.pdf | grep -q ' PDF '
+        file algorithms_lab/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
@@ -55,6 +62,7 @@ jobs:
         cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing-summary.pdf"
         cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
         cp -f probabilistic_artificial_intelligence/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence-summary.pdf"
+        cp -f algorithms_lab/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
@@ -62,6 +70,7 @@ jobs:
         git add natural_language_processing-summary.pdf
         git add computer_vision-summary.pdf
         git add probabilistic_artificial_intelligence-summary.pdf
+        git add algorithms_lab-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push
