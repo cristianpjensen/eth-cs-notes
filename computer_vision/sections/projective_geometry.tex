@@ -101,7 +101,8 @@ $\vec{x}_i'$.}
     h_{31}x_i + h_{32}y_i + h_{33}
   \end{bmatrix}
 .\end{align*}
-\marginnote{\textit{Singular value decomposition} (SVD) decomposes a matrix
+\marginnote{
+  \textit{Singular value decomposition} (SVD) decomposes a matrix
   $\mat{A} = \mat{U}\mat{\Sigma}\transpose{\mat{V}}$, where $\mat{U}$ and
   $\mat{V}$ are unitary matrices, and $\mat{\Sigma}$ is a diagonal scaling
   matrix. The SVD is very useful for solving (overdetermined) equations of the
@@ -109,8 +110,7 @@ $\vec{x}_i'$.}
     \mat{A}\vec{x} = \vec{0}
   .\]
   Now, when solving such equations, we want to minimize $\| \mat{A}\vec{x} \|$
-  subject to $\| \bm{x} \|=1$. We can solve for this by using SVD,
-  \begin{align*}
+  subject to $\| \bm{x} \|=1$. We can solve for this by using SVD, \begin{align*}
     &\min \| \mat{A}\vec{x} \| & \| \vec{x} \| = 1 \\
     &\min \| \mat{U}\bm{\Sigma}\transpose{\mat{V}}\vec{x} \| & \| \vec{x} \| = 1 \\
     &\min \| \mat{\Sigma}\transpose{\mat{V}}\vec{x} \| & \| \vec{x} \| = 1 \\
@@ -123,6 +123,7 @@ $\vec{x}_i'$.}
     \vec{x} = \mat{V} \begin{bmatrix} 0 & \cdots & 0 & 1 \end{bmatrix}^\top = \mat{V}_n \\
   ,\]
   where $\mat{V}_n$ is the last column vector of $\mat{V}$.}
+
 Now, when we revert them back to the real coordinate system, we get the
 following,
 \begin{align*}
