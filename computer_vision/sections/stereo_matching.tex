@@ -1,4 +1,4 @@
-\section{Multi-view stereo matching}
+\section{Stereo matching}
 
 In humans and machines, depth perception is very important to interact with the
 environment. In humans, this is done by two eyes that are slightly different.
@@ -65,8 +65,6 @@ illustration of this.
     \label{fig:stereo-baseline}
 \end{figure}
 
-\paragraph{Matching.}
-
 Now, we need to figure out how to match the pixels in one image to another. We
 know that they are on the same lines. Note that the search is limited to the
 epipolar line, so we only need to match along the common epipolar line of the
@@ -77,9 +75,9 @@ match to a point $x_2' < x_1$. We then associate with each matching of pixels a
 cost that is computed from their intensities. We can then use a matching
 algorithm to compute the optimal matching \citep{baker1981depth}.
 
-TODO: Matching algorithm figure.
+\marginnote{TODO: Matching algorithm figure.}
 
-\paragraph{Multi-view stereo.}
+\subsection{Multi-view stereo}
 
 We can also add more cameras to the setup. An obvious advantage is that we can
 set the cameras up such that we have multiple baselines
@@ -98,7 +96,7 @@ introduction of the right camera made it possible.
     \label{fig:visibility-problem}
 \end{figure}
 
-\paragraph{Volumetric stereo.}
+\subsection{Volumetric stereo}
 
 In volumetric stereo, we discretize the three-dimensional space into
 voxels.\sidenote{A voxel is a ``three-dimensional pixel``.} We then ``carve``
@@ -106,6 +104,8 @@ the geometry out of these voxels. This gives us a reconstruction of the scene,
 from which we can create a depth map by taking the first occupied voxel for
 each pixel. We assign a photoconsistency cost to each voxel, and then we make
 the minimum cost cut in this graph.
+
+\marginnote{TODO: Voxel figure.}
 
 We can also use \textit{visibility-first} methods. In these methods, we first
 handle the visibility problem, and then we carve out the voxels. We do this by
@@ -115,4 +115,4 @@ visible from this camera. The visual hull is then the intersection of these
 silhouettes. We only keep the voxels that are part of the visual hull, which
 gives us a tight bound on the object.
 
-TODO: Visual hull figure.
+\marginnote{TODO: Visual hull figure.}
