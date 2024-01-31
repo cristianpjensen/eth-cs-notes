@@ -304,4 +304,5 @@ TSWLatexianTemp*
 
 .DS_Store
 
-tikz/
+*.dep
+
