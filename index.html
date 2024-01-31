@@ -48,7 +48,9 @@
         let htmlString = '<ul>';
         
         for (let file of data) {
-          htmlString += `<li><a href="${file.path}">${formatFileName(file.name)}</a></li>`;
+          if (file.name != "index.html") {
+            htmlString += `<li><a href="${file.path}">${formatFileName(file.name)}</a></li>`;
+          }
         }
 
         htmlString += '</ul>';
