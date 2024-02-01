@@ -16,7 +16,7 @@ An example of a weak classifier is the rectangle filter. It is essentially a
 large gradient calculation, where we compute the sum of one patch minus the sum
 of another next to it. We can compute these very quickly using a sliding window
 approach, for which we only need to compute a cumulative sum over the integral
-image in $\bigo{H\cdot W}$. Then, we can compute the sum of any patch in
+image in $\bigo{HW}$. Then, we can compute the sum of any patch in
 $\bigo{1}$. We then classify the patch based on the difference of sums of the
 patches.
 
@@ -81,16 +81,16 @@ classify a small number of patches.
 
 \paragraph{R-CNN.}
 
-\begin{marginfigure}
+\begin{marginfigure}[6cm]
     \centering
     \incfig{r-cnn}
     \caption{R-CNN architecture.}
     \label{fig:r-cnn}
 \end{marginfigure}
 
-R-CNN \citep{girshick2014rich} works by first extracting approximately 2000
-region proposals using selective search. Then, it warps the region proposals to
-constant-sized images patches and passes them to a classification network,
+R-CNN works by first extracting approximately 2000 region proposals using
+selective search \citep{girshick2014rich}. Then, it warps the region proposals
+to constant-sized images patches and passes them to a classification network,
 which classifies the region (CNN followed by support vector machine).
 
 The problem with R-CNN is that the training and testing is still slow (47
@@ -98,15 +98,15 @@ seconds per test image).
 
 \paragraph{Fast R-CNN.}
 
-Fast R-CNN \citep{girshick2015fast} solves the problem of R-CNN by first
-feeding the entire input image into a CNN to generate a feature map. Then, the
-region proposals are identified within this feature map. This is then reshaped
-to a constant-sized representation which is passed to a fully connected layer
-that outputs a probability distribution over classifications. The reason for
-that this model is faster is because we only need to run a single CNN, instead
-of 2000 for each region proposal.
+Fast R-CNN solves the problem of R-CNN by first feeding the entire input image
+into a CNN to generate a feature map \citep{girshick2015fast}. Then, the region
+proposals are identified within this feature map. This is then reshaped to a
+constant-sized representation which is passed to a fully connected layer that
+outputs a probability distribution over classifications. The reason for that
+this model is faster is because we only need to run a single CNN, instead of
+2000 for each region proposal.
 
-\begin{marginfigure}
+\begin{marginfigure}[3cm]
     \centering
     \incfig{fast-r-cnn}
     \caption{Fast R-CNN architecture.}
@@ -126,7 +126,7 @@ This network has four loss functions that need to be optimized: Region proposal
 loss, Region classification loss, and another bounding box regression loss on
 the eventual classification network.
 
-\begin{marginfigure}
+\begin{marginfigure}[0.5cm]
     \centering
     \incfig{faster-r-cnn}
     \caption{Faster R-CNN architecture.}
@@ -135,13 +135,13 @@ the eventual classification network.
 
 \paragraph{You only look once.}
 
-All R-CNN approaches require a call to a classification network for every region
-proposal. However, this slows down the algorithm. YOLO \citep{redmon2016you}
-predicts bounding boxes and class probabilities in a single pass.
-It works by dividing the input image into an $S\times S$ grid. If the center of
-an object falls into a grid cell, that grid cell is responsible for detecting
-that object. Each grid cell then predicts $B$ bounding boxes ($(x,y,w,h,c)$,
-where $c$ is the confidence score), and $C$ conditional class
+All R-CNN approaches require a call to a classification network for every
+region proposal. However, this slows down the algorithm. YOLO predicts bounding
+boxes and class probabilities in a single pass \citep{redmon2016you}. It works
+by dividing the input image into an $S\times S$ grid. If the center of an
+object falls into a grid cell, that grid cell is responsible for detecting that
+object. Each grid cell then predicts $B$ bounding boxes ($(x,y,w,h,c)$, where
+$c$ is the confidence score), and $C$ conditional class
 probabilities.\sidenote{Thus, the output of the model has dimensionality
 $S\times S \times (5B+C)$.} It then picks the boxes with the greatest
 confidence and removes boxes if their IoU is lower than some threshold.

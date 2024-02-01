@@ -18,7 +18,7 @@ color of the point will remain the same, and optimize the following error
 function (one-dimensional case),
 \begin{align*}
   E(h) &= ( \tens{I}[x,t]) - \tens{I}[x+h,t+1] )^2 \\
-  &\approx ( \tens{I}[x,t] - \tens{I}[x,t+1] - h\tens{I}_x[x,t])^2 \\
+  &\approx ( \tens{I}[x,t] - \tens{I}[x,t+1] - h\tens{I}_x[x,t])^2 \margintag{First-order Taylor approximation} \\
   \pdv*{E(h)}{h} &= -2 \tens{I}_x[x,t] ( \tens{I}[x,t] - \tens{I}[x,t+1] - h\tens{I}_x[x,t]). \\
   \intertext{At the minimum, where the derivative is 0, we get the following,}
   h &= \frac{\tens{I}[x,t+1] - \tens{I}[x,t]}{\tens{I}_x[x,t]}
@@ -54,11 +54,11 @@ previous error function to any transformation family $W$,
   directly solve for $\vec{p}$, thus we iteratively improve it by updating it
   with some $\delta_{\vec{p}}$,}
   &= \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p} + \delta_{\vec{p}})] - \tens{T}[\vec{x}] \rgt)^2 \\
-  &\approx \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{\vec{p}} - \tens{T}[\vec{x}] \rgt)^2 \margintag{Taylor approx} \\
-  &= \sum_{\vec{x}} ( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} - \tens{T}[\vec{x}] )^2 \margintag{chain rule} \\
+  &\approx \sum_{\vec{x}} \lft( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{\vec{p}} - \tens{T}[\vec{x}] \rgt)^2 \margintag{First-order Taylor approximation} \\
+  &= \sum_{\vec{x}} ( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} - \tens{T}[\vec{x}] )^2 \margintag{Chain rule} \\
   \pdv*{E(\vec{p})}{\delta_{\vec{p}}} &= 2 \sum_{\vec{x}} \begin{aligned}[t] &\transpose{\lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)} \\
     &\lft( \tens{I}[W(\vec{x};\vec{p})] + \delta_{\vec{p}} \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} - \tens{T}[\vec{x}] \rgt). 
-  \end{aligned} \margintag{chain rule} \\
+  \end{aligned} \margintag{Chain rule} \\
   \intertext{We can then solve for $\delta_{\vec{p}}$ by setting the gradient to 0,}
   \delta_{\vec{p}} &= \inv{\mat{H}} \sum_{\vec{x}} \transpose{ \lft( \grad{\tens{I}[W(\vec{x};\vec{p})]}{W(\vec{x};\vec{p})} \grad{W(\vec{x};\vec{p})}{\vec{p}} \rgt)} \lft( \tens{T}[\vec{x}] - \tens{I}[W(\vec{x};\vec{p})] \rgt), \\
   \intertext{with Hessian matrix $\mat{H}$ defined as follows,}

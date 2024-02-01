@@ -17,12 +17,12 @@ where each frame is processed by a CNN. Then, each frame's vector
 representation is used to update the hidden state of the RNN to obtain a
 representation of the video.}
 
-A \textit{recurrent neural network} (RNN) \citep{rumelhart1985learning} is a
-neural network that maps from an input space of sequences to an output space of
-sequences in a stateful way. That is, the prediction of the output $\vec{y}_t$
-depends on all inputs $\vec{x}$ that came before $t$. This is done by keeping
-track of a hidden state $\vec{h}_t$, which is a function of all previous inputs
-and the current input, \[
+A \textit{recurrent neural network} (RNN) is a neural network that maps from an
+input space of sequences to an output space of sequences in a stateful way
+\citep{rumelhart1985learning}. That is, the prediction of the output
+$\vec{y}_t$ depends on all inputs $\vec{x}$ that came before $t$. This is done
+by keeping track of a hidden state $\vec{h}_t$, which is a function of all
+previous inputs and the current input, \[
   \vec{h}_t = \sigma(\mat{W}_h\vec{h}_{t-1}+\mat{W}_x\vec{x}_t)
 .\]
 
@@ -116,16 +116,17 @@ So, the probability of a sample is the ``weighted average`` of this sample
 given a latent variable weighted by the probability of this latent variable.
 Generally, the goal is to be able to sample from this probability distribution.
 
-\textit{Variational autoencoders} (VAE) \citep{kingma2013auto} sample $\vec{z}$
-from a simple distributions such as the Gaussian and learn decoders that map
-from this distribution to data points $\vec{x}$. The aim of training is to
-maximize the probability of each $\vec{x}$ in the training set, \ie, maximize the
-likelihood of seeing our data. Since the likelihood (also known as evidence) is
-an intractable integral, we need to derive a tractable lower bound,
+\textit{Variational autoencoders} (VAE) sample $\vec{z}$ from a simple
+distributions such as the Gaussian and learn decoders that map from this
+distribution to data points $\vec{x}$ \citep{kingma2013auto}. The aim of
+training is to maximize the probability of each $\vec{x}$ in the training set,
+\ie, maximize the likelihood of seeing our data. Since the likelihood (also
+known as evidence) is an intractable integral, we need to derive a tractable
+lower bound,
 \begin{align*}
   \log p(\vec{x}) &= \log \int p(\vec{x}\mid\vec{z}) p(\vec{z}) d\vec{z} \\
   &= \log \int p(\vec{x}\mid\vec{z}) \frac{p(\vec{z})}{q(\vec{z})}q(\vec{z}) d\vec{z} \\
-  &\geq \int q(\vec{z})\log \lft( p(\vec{x}\mid\vec{z})\frac{p(\vec{z})}{q(\vec{z})} \rgt) d\vec{z} & \text{\footnotesize Jensen's inequality} \\
+  &\geq \int q(\vec{z})\log \lft( p(\vec{x}\mid\vec{z})\frac{p(\vec{z})}{q(\vec{z})} \rgt) d\vec{z} \margintag{Jensen's inequality} \\
   &= \E_{q(\vec{z})}\lft[ \log \frac{p(\vec{x}\mid\vec{z})p(\vec{z})}{q(\vec{z})} \rgt]
 ,\end{align*}
 which is called the \textit{evidence lower bound} (ELBO). The probability
@@ -143,7 +144,7 @@ The negative log-likelihood is thus upper-bounded by \[
   D_{\mathrm{KL}}(q(\vec{z})\mathrel{\Vert}p(\vec{z})) + \E_{q(\vec{z})} [-\log p(\vec{x}\mid\vec{z})]
 .\]
 VAEs minimize this bound, \[
-  \hat{\vec{\theta}} = \argmin_{\vec{\theta}\in\Theta} \sum_{\vec{x}\in\mathcal{D}} \underbrace{D_{\mathrm{KL}}(q_{\vec{\theta}}(\vec{z}\mid\vec{x})\mathrel{\Vert}p(\vec{z}))}_{\text{Encoder loss}} + \underbrace{\E_{q_{\vec{\theta}}(\vec{z}\mid\vec{x})} [-\log p_{\vec{\theta}}(\vec{x}\mid\vec{z})]}_{\text{Decoder loss}}
+  \hat{\vec{\theta}} = \argmin_{\vec{\theta}\in\Theta} \sum_{\vec{x}\in\mathcal{D}} \underbrace{D_{\mathrm{KL}}(q_{\vec{\theta}}(\vec{z}\mid\vec{x})\mathrel{\Vert}p(\vec{z}))}_{\text{encoder loss}} + \underbrace{\E_{q_{\vec{\theta}}(\vec{z}\mid\vec{x})} [-\log p_{\vec{\theta}}(\vec{x}\mid\vec{z})]}_{\text{decoder loss}}
 ,\]
 where we now learn a latent representation $\vec{z}$ given the datapoint
 $\vec{x}$.
@@ -161,10 +162,10 @@ $\mathcal{N}(\vec{\mu},\mat{\Sigma})$ from $\vec{x}$, which is used to sample
 $\vec{z}$. This splits the model into an encoder and a decoder network that are
 updated separately, as can be seen in \Cref{fig:variational-autoencoder}.
 
-\textit{Generative adversarial networks} (GAN) \citep{goodfellow2014generative}
-do not explicitly model the likelihood. Instead, they use an adversarial
-process in which two models are trained simultaneously; a generator $G:
-\R^Q\to\R^D$ and a discriminator $D:\R^D \to [0,1]$. The generator captures the
+\textit{Generative adversarial networks} (GAN) do not explicitly model the
+likelihood. Instead, they use an adversarial process in which two models are
+trained simultaneously; a generator $G: \R^Q\to\R^D$ and a discriminator
+$D:\R^D \to [0,1]$ \citep{goodfellow2014generative}. The generator captures the
 data distribution, while the discriminator estimates whether a sample comes
 from the data distribution or the generator. At a high level, we train $D$ to
 assign probability 1 to samples from the training data and 0 to samples from

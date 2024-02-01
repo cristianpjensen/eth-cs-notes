@@ -63,8 +63,8 @@ covariance matrices, and weights,
 \begin{align*}
   \alpha_b' &= \frac{1}{n} \sum_{i=1}^n p(b\mid \vec{x}_i,\vec{\mu}_b,\mat{\Sigma}_b) \\
   w^{(b)}_i &= \frac{p(b\mid \vec{x}_i,\vec{\mu}_b,\mat{\Sigma}_b)}{\sum_{j=1}^n p(b\mid \vec{x}_j,\vec{\mu}_b,\mat{\Sigma}_b)} \\
-  \vec{\mu}_b' &= \sum_{i=1}^n w^{(b)}_i\vec{x}_i & \text{\footnotesize weighted mean} \\
-  \mat{\Sigma}_b' &= \sum_{i=1}^n w^{(b)}_i (\vec{x}_i - \vec{\mu}_b) (\vec{x}_i - \vec{\mu}_b)^\top & \text{\footnotesize weighted variance}
+  \vec{\mu}_b' &= \sum_{i=1}^n w^{(b)}_i\vec{x}_i \margintag{Weighted mean} \\
+  \mat{\Sigma}_b' &= \sum_{i=1}^n w^{(b)}_i (\vec{x}_i - \vec{\mu}_b) (\vec{x}_i - \vec{\mu}_b)^\top \margintag{Weighted variance}
 .\end{align*}
 
 Then, after running the EM algorithm, we assign each pixel to the blob with

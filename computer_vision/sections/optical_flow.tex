@@ -27,8 +27,8 @@ optical flow makes the following two assumptions,
 Now, we can derive how to determine the velocity $\vec{v}=[u,v]$ at point
 $\vec{x}=[x,y]$ as follows,
 \begin{align*}
-  \tens{I}[x,y,t] &= \tens{I}[x+\delta_x,y+\delta_y,t+\delta_t] & \text{\footnotesize brightness constancy} \\
-  &= \tens{I}[x,y,t] + \tens{I}_x\delta_x + \tens{I}_y\delta_y + \tens{I}_t\delta_t & \text{\footnotesize Taylor approximation}
+  \tens{I}[x,y,t] &= \tens{I}[x+\delta_x,y+\delta_y,t+\delta_t] \margintag{Brightness constancy} \\
+  &= \tens{I}[x,y,t] + \tens{I}_x\delta_x + \tens{I}_y\delta_y + \tens{I}_t\delta_t \margintag{First-order Taylor approximation}
 ,\end{align*}
 where $\tens{I}_x,\tens{I}_y,\tens{I}_t$ are the derivatives at the implied
 location $[x,y,t]$. From this, we can derive the \textit{brightness constancy
@@ -50,12 +50,12 @@ problem tractable.
 Lucas-Kanade applies a local method that assumes that pixels in the same
 area, \ie, a patch around the pixel, have the same velocity. This gives us an
 additional constraint for every pixel in the area, which we can solve by
-least-squares estimation:
+least-squares estimation,
 \begin{align*}
   \begin{bmatrix}
-    \tens{I}_x[x_1,y_1,t] & \tens{I}_y[x_1,x_2,t] \\
+    \tens{I}_x[x_1,y_1,t] & \tens{I}_y[x_1,y_1,t] \\
     \vdots & \vdots \\
-    \tens{I}_x[x_n,y_n,t] & \tens{I}_y[x_n,x_n,t]
+    \tens{I}_x[x_n,y_n,t] & \tens{I}_y[x_n,y_n,t]
   \end{bmatrix}
   \begin{bmatrix}
     u \\ v
@@ -66,10 +66,8 @@ least-squares estimation:
     \vdots \\
     \tens{I}_t[x_n,y_n,t]
   \end{bmatrix} \\
-  \mat{A}\vec{v} &= -\mat{b}
-.\end{align*}
-This is equivalent to solving:
-\begin{align*}
+  \mat{A}\vec{v} &= -\vec{b} \\
+  \intertext{This is equivalent to solving the following,}
   \transpose{\mat{A}}\mat{A}\vec{v} &= -\transpose{\mat{A}}\vec{b} \\
   \sum_{(x,y)\in P}
   \begin{bmatrix}

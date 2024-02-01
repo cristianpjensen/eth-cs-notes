@@ -28,11 +28,11 @@ images,
 
 \subsection{Harris detector}
 
-The \textit{Harris detector} \citep{harris1988combined} is an algorithm for
-keypoint localization (step 1 of the general keypoint matching framework). We
-are looking for points that have significant change in both the $x$- and
-$y$-direction, \ie corners, such that the point will be localizable at any
-orientation. A good illustration of this is \Cref{fig:patch-uniqueness}.
+The \textit{Harris detector} is an algorithm for keypoint localization
+\citep{harris1988combined}. We are looking for points that have significant
+change in both the $x$- and $y$-direction, \ie corners, such that the point
+will be localizable at any orientation. A good illustration of this is
+\Cref{fig:patch-uniqueness}.
 
 \begin{marginfigure}
     \centering
@@ -55,88 +55,14 @@ rederive $E(u,v)$ with its first-order Taylor expansion to make this easy and
 efficient:
 \begin{align*}
   E(u,v) &\doteq \sum_{(x,y)\in W} (\tens{I}[x+u,y+v]-\tens{I}[x,y])^2 \\
-  &\approx \sum_{(x,y)\in W} \lft( \tens{I}[x,y]+\begin{bmatrix} \tens{I}_x & \tens{I}_y \end{bmatrix}\begin{bmatrix} u \\ v \end{bmatrix} - \tens{I}[x,y] \rgt)^2 \\
+  &\approx \sum_{(x,y)\in W} \lft( \tens{I}[x,y]+\begin{bmatrix} \tens{I}_x & \tens{I}_y \end{bmatrix}\begin{bmatrix} u \\ v \end{bmatrix} - \tens{I}[x,y] \rgt)^2 \margintag{First-order Taylor approximation} \\
   &= \sum_{(x,y)\in W} \lft( \begin{bmatrix} \tens{I}_x & \tens{I}_y \end{bmatrix} \begin{bmatrix} u \\ v \end{bmatrix} \rgt)^2 \\
-  &= \begin{bmatrix} u & v \end{bmatrix} \tens{M} \begin{bmatrix} u \\ v \end{bmatrix}
-,\end{align*}
-where $\tens{I}_x$ and $\tens{I}_y$ are the gradients in the $x$- and
-$y$-direction at the implicit $[x,y]$ point, and $\tens{M}$ is the structure
-tensor,\sidenote{This can be computed using convolutions, which makes it
-efficient.} \[
-  \tens{M} = \sum_{(x,y)\in W} \begin{bmatrix} \tens{I}_x^2 & \tens{I}_x\tens{I}_y \\ \tens{I}_x\tens{I}_y & \tens{I}_y^2 \end{bmatrix}
-.\]
-
-\begin{marginfigure}[2cm]
-  \centering
-  \begin{subfigure}[b]{\textwidth}
-    \centering
-    \begin{tikzpicture}
-      \begin{axis}[
-          colormap name=whiteblack,
-          width=\textwidth,
-          grid=major,
-          domain=-5:5,
-          y domain=-5:5,
-          view={45}{45},
-          zmin=0,
-          zmax=50,
-          samples=12,
-          xlabel=$u$,
-          ylabel=$v$,
-      ]
-        \addplot3 [surf] {0.2*x^2 + 0.2*y^2};
-      \end{axis}
-    \end{tikzpicture}
-    \caption{Error surface of a patch containing a flat area.}
-  \end{subfigure}
-  \vfill
-  \begin{subfigure}[b]{\textwidth}
-    \centering
-    \begin{tikzpicture}
-      \begin{axis}[
-          colormap name=whiteblack,
-          width=\textwidth,
-          grid=major,
-          domain=-5:5,
-          y domain=-5:5,
-          view={45}{45},
-          zmin=0,
-          zmax=50,
-          samples=12,
-          xlabel=$u$,
-          ylabel=$v$,
-      ]
-        \addplot3 [surf] {1.5*x^2 + 0.2*y^2};
-      \end{axis}
-    \end{tikzpicture}
-    \caption{Error surface of a patch containing an edge.}
-  \end{subfigure}
-  \vfill
-  \begin{subfigure}[b]{\textwidth}
-    \centering
-    \begin{tikzpicture}
-      \begin{axis}[
-          colormap name=whiteblack,
-          width=\textwidth,
-          grid=major,
-          domain=-5:5,
-          y domain=-5:5,
-          view={45}{45},
-          zmin=0,
-          zmax=50,
-          samples=12,
-          xlabel=$u$,
-          ylabel=$v$,
-      ]
-        \addplot3 [surf] {1.2*x^2 + 1.2*y^2};
-      \end{axis}
-    \end{tikzpicture}
-    \caption{Error surface of a patch containing a corner.}
-    \label{fig:error-surface-corner}
-  \end{subfigure}
-  \caption{Different types of error surfaces.}
-  \label{fig:error-surfaces}
-\end{marginfigure}
+  &= \begin{bmatrix} u & v \end{bmatrix} \tens{M} \begin{bmatrix} u \\ v \end{bmatrix} \\
+  \intertext{where $\tens{I}_x$ and $\tens{I}_y$ are the gradients in the $x$-
+  and $y$-direction at the implicit $[x,y]$ point, and $\tens{M}$ is the
+  structure tensor,}
+  \tens{M} &= \sum_{(x,y)\in W} \begin{bmatrix} \tens{I}_x^2 & \tens{I}_x\tens{I}_y \\ \tens{I}_x\tens{I}_y & \tens{I}_y^2 \end{bmatrix} \margintag{This can be computed using convolutions, which makes it efficient to compute for all pixels at once.}
+.\end{align*}
 
 We want to find points with an error surface as in
 \Cref{fig:error-surface-corner}. The eigenvalues of a matrix tell us how much
@@ -158,6 +84,78 @@ Lastly, the Harris detector applies non-maximum suppression, which reduces
 clusters of points with $R>0$ to a single point, since they capture the same
 corner.
 
+\begin{marginfigure}[-1cm]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          colormap name=whiteblack,
+          width=\textwidth,
+          grid=major,
+          domain=-5:5,
+          y domain=-5:5,
+          view={45}{45},
+          zmin=0,
+          zmax=50,
+          samples=20,
+          xlabel=$u$,
+          ylabel=$v$,
+      ]
+        \addplot3 [surf] {0.2*x^2 + 0.2*y^2};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Error surface of a patch containing a flat area.}
+  \end{subfigure}
+  \vfill
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          colormap name=whiteblack,
+          width=\textwidth,
+          grid=major,
+          domain=-5:5,
+          y domain=-5:5,
+          view={45}{45},
+          zmin=0,
+          zmax=50,
+          samples=20,
+          xlabel=$u$,
+          ylabel=$v$,
+      ]
+        \addplot3 [surf] {1.5*x^2 + 0.2*y^2};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Error surface of a patch containing an edge.}
+  \end{subfigure}
+  \vfill
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          colormap name=whiteblack,
+          width=\textwidth,
+          grid=major,
+          domain=-5:5,
+          y domain=-5:5,
+          view={45}{45},
+          zmin=0,
+          zmax=50,
+          samples=20,
+          xlabel=$u$,
+          ylabel=$v$,
+      ]
+        \addplot3 [surf] {1.2*x^2 + 1.2*y^2};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Error surface of a patch containing a corner.}
+    \label{fig:error-surface-corner}
+  \end{subfigure}
+  \caption{Different types of error surfaces.}
+  \label{fig:error-surfaces}
+\end{marginfigure}
+
 \subsection{Scale-invariant region selection}
 
 The Harris detector is only able to find keypoints at a fixed scale. However,
@@ -177,12 +175,12 @@ by the difference of Gaussian operator, which is more efficient.
 
 \subsection{Local descriptors}
 
-SIFT \citep{lowe2004distinctive} is an algorithm that uses the orientation of
-gradients within a patch to compute a descriptor (step 4 in the general
-approach). It does so by dividing the found patch into a $4\times 4$ grid and
-computing the 8-bin histogram of gradient orientations, weighted by their
-magnitude, within each grid cell. This results in a $4\times 4\times
-8=128$-dimensional vector representation of a keypoint.
+SIFT is an algorithm that uses the orientation of gradients within a patch to
+compute a keypoint descriptor \citep{lowe2004distinctive}. It does so by
+dividing the found patch into a $4\times 4$ grid and computing the 8-bin
+histogram of gradient orientations, weighted by their magnitude, within each
+grid cell. This results in a $4\times 4\times 8=128$-dimensional vector
+representation of a keypoint.
 
 We can assign an orientation to a keypoint by creating a histogram of local
 gradient orientations, weighted by a Gaussian window, within the patch and

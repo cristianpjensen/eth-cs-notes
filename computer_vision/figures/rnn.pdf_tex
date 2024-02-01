@@ -50,23 +50,26 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.4)%
+  \begin{picture}(1,0.55)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{rnn.pdf}}%
-    \put(0.60929024,0.12223086){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{h}_{t+1}$\end{tabular}}}}%
+    \put(0.60929024,0.30857491){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}_{i+1}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{rnn.pdf}}%
-    \put(0.43945265,0.12223086){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{h}_t$\end{tabular}}}}%
+    \put(0.43945265,0.30857492){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}_i$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{rnn.pdf}}%
-    \put(0.23986681,0.12223086){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{h}_{t-1}$\end{tabular}}}}%
+    \put(0.23986681,0.30857492){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}_{i-1}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{rnn.pdf}}%
-    \put(0.60716652,0.29584778){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_{t+1}$\end{tabular}}}}%
-    \put(0.43791061,0.29573334){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_t$\end{tabular}}}}%
-    \put(0.23685368,0.29591522){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_{t-1}$\end{tabular}}}}%
+    \put(0.62315903,0.48219193){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{x}_i$\end{tabular}}}}%
+    \put(0.4223885,0.48207748){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{x}_{i-1}$\end{tabular}}}}%
+    \put(0.23685368,0.48225937){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{x}_{i-2}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{rnn.pdf}}%
-    \put(0.09048352,0.12132965){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
-    \put(0.76788452,0.12227051){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
-    \put(0.0904223,0.29469238){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
-    \put(0.76782333,0.29563324){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.09048352,0.30767395){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.76788452,0.30861481){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.0904223,0.48103653){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.76782333,0.48197739){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{rnn.pdf}}%
+    \put(0.38260608,0.09976732){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{W}_h,\mat{W}_x,\vec{b}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{rnn.pdf}}%
   \end{picture}%
 \endgroup%
