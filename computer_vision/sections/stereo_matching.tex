@@ -1,10 +1,9 @@
 \section{Stereo matching}
 
 In humans and machines, depth perception is very important to interact with the
-environment. In humans, this is done by two eyes that are slightly different.
-From this difference, depth can be estimated. We can do the same with cameras
-with potentially even more views, which could result in better depth
-estimation.
+environment. In humans, this is done by two eyes that are slightly offset. From
+this difference, depth can be estimated. We can do the same with cameras with
+potentially even more views, which could result in better depth estimation.
 
 \marginnote{If the cameras are not perfectly on the same $x$-axis or do not
 have the same rotation, we can solve it by rectifying them using a homography
@@ -22,11 +21,11 @@ Then, we have the following epipolar lines,
   \vec{\ell}_1 &= \transpose{\vec{x}_2} \mat{F} = \transpose{\begin{bmatrix} 0 & 1 & -y_2 \end{bmatrix}} \\
   \vec{\ell}_2 &= \mat{F} \vec{x}_1 = \transpose{\begin{bmatrix} 0 & 1 & -y_1 \end{bmatrix}}
 ,\end{align*}
-which tells us that all points will have the same $y$-axis, and vary on the
-$x$-axis.
+which tells us that all points will have the same $y$-axis, and are parallel to
+the $x$-axis.
 
-If there is a three-dimensional point at $\vec{X} = [X,Y,Z]$, then we have the
-following relationships with the two-dimensional points on the image planes,
+If there is a 3-dimensional point at $\vec{X} = [X,Y,Z]$, then we have the
+following relationships with the 2-dimensional points on the image planes,
 \begin{align*}
   x_1 &= f \frac{X}{Z} \margintag{Under the assumption that camera 1 is at the origin \wrt camera 2.} \\
   y_1 &= f \frac{Y}{Z} \\
@@ -73,15 +72,15 @@ illustration of this.
     \label{fig:matching-algorithm}
 \end{marginfigure}
 
-Now, we need to figure out how to match the pixels in one image to another. We
-know that they are on the same lines. Note that the search is limited to the
-epipolar line, so we only need to match along the common epipolar line of the
-two image planes. We also need to points to enforce spatial consistency, since
-close points in the environment are also between the image planes. Also, we can
-never turn back, \ie, if $x_1$ is matched to $x_2$, then $x_1' > x_1$ cannot
-match to a point $x_2' < x_1$. We then associate with each matching of pixels a
-cost that is computed from their intensities. We can then use a matching
-algorithm to compute the optimal matching \citep{baker1981depth}.
+Now, we need to figure out how to match the pixels in one image to another.
+Note that the search is limited to the epipolar line, so we only need to match
+along the common epipolar line of the two image planes. We also need the points
+to enforce spatial consistency, since close points in the environment are also
+close between the image planes. Also, we can never turn back, \ie, if $x_1$ is
+matched to $x_2$, then $x_1' > x_1$ cannot match to a point $x_2' < x_2$. We
+then associate with each matching of pixels a cost that is computed from their
+intensities. We can then use a matching algorithm to compute the optimal
+matching \citep{baker1981depth}.
 
 \subsection{Multi-view stereo}
 
@@ -104,8 +103,8 @@ introduction of the right camera made it possible.
 
 \subsection{Volumetric stereo}
 
-In volumetric stereo, we discretize the three-dimensional space into
-voxels.\sidenote{A voxel is a ``three-dimensional pixel``.} We then ``carve``
+In volumetric stereo, we discretize the 3-dimensional space into
+voxels.\sidenote{A voxel is a ``3-dimensional pixel``.} We then ``carve``
 the geometry out of these voxels. This gives us a reconstruction of the scene,
 from which we can create a depth map by taking the first occupied voxel for
 each pixel. We assign a photoconsistency cost to each voxel, and then we make

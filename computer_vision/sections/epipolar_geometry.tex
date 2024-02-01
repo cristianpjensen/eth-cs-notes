@@ -55,8 +55,8 @@ Notice that $\vec{x}_1$ cannot be ``behind`` $\vec{e}_1$, because that would
 imply that $\vec{X}$ is behind $\vec{C}_1$, which is not the case, because
 $\vec{X}$ is visible in image 1. The same holds for camera 2.
 
-In general, we want to be able to reconstruct three-dimensional points from
-two-dimensional point correspondences between $n$ images. This is done in the
+In general, we want to be able to reconstruct 3-dimensional points from
+2-dimensional point correspondences between $n$ images. This is done in the
 following three steps,
 \begin{enumerate}
   \item Compute the fundamental (or essential) matrix that relates the point
@@ -65,13 +65,13 @@ following three steps,
     ,\]
     where $\mat{F}$ transforms $\vec{x}_1$ to the epipolar line of $\vec{x}_2$
     and $\transpose{\mat{F}}$ transforms $\vec{x}_2$ to the epipolar line of
-    $\vec{x}_1$;
+    $\vec{x}_1$. This is done using the direct linear transform;
 
   \item From the fundamental matrix, compute the relative pose
     $(\vec{T},\mat{R})$ between the cameras;
 
   \item Using the point correspondences and the relative pose, backproject the
-    two-dimensional image points into three-dimensional space and find their
+    2-dimensional image points into 3-dimensional space and find their
     intersection to find $\vec{X}$.
 
 \end{enumerate}
@@ -113,7 +113,7 @@ the epipole $\vec{e}_2$ and this point on image plane 2, \[
   \vec{\ell}_2 = \mat{P}_2 \vec{C}_1 \times \mat{P}_2 \mat{P}_1^+ \vec{x}_1
 .\]
 
-\marginnote{The cross product matrix is the conversion of a vector to a matrix
+\marginnote[-1.25cm]{The cross product matrix is the conversion of a vector to a matrix
 that would be equivalent to performing a cross product with that vector, \[
   [\vec{a}]_\times \doteq \begin{bmatrix}
     0 & a_3 & -a_2 \\
@@ -126,10 +126,9 @@ that would be equivalent to performing a cross product with that vector, \[
   \label{def:fundamental-matrix}
 
   The fundamental matrix $\mat{F}$ is defined as satisfying the
-  \textit{epipolar constraint} for all point correspondences in image 1 and
-  2,\sidenote{$\mat{F}$ has 7 degrees of freedom, because it is a $3\times 3$
-  matrix, is defined up to scale, and $\det{\mat{F}}=0$ (rank 2).} \[
-    \transpose{\vec{x}_2} \mat{F} \vec{x}_1 = 0
+  \textit{epipolar constraint} for all point correspondences in image 1 and 2,
+  \[
+    \transpose{\vec{x}_2} \mat{F} \vec{x}_1 = 0 \margintag{$\mat{F}$ has 7 degrees of freedom, because it is a $3\times 3$ matrix, is defined up to scale, and $\det{\mat{F}}=0$ (rank 2).}
   .\]
   The fundamental matrix relates points in one image plane with lines in the
   other. \Ie, $\vec{x}_2$ must be on the line $\mat{F} \vec{x}_1$ and
@@ -138,7 +137,7 @@ that would be equivalent to performing a cross product with that vector, \[
 
   It satisfies the following equations \wrt the camera matrices,
   \begin{align*}
-    \mat{F} &= [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \\
+    \mat{F} &= [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \margintag{Note that these equations are not used for estimating the fundamental matrix, since we do not have access to the camera matrices.} \\
     \transpose{\mat{F}} &= [\mat{P}_1 \vec{C}_2]_\times \mat{P}_1 \mat{P}_2^+
   .\end{align*}
 \end{definition}
@@ -146,10 +145,8 @@ that would be equivalent to performing a cross product with that vector, \[
 \begin{definition}[Essential matrix]
   The essential matrix $\mat{E}$ relates points in one image plane with lines
   in the other by the epipolar constraint in the same way as the fundamental
-  matrix (\cref{def:fundamental-matrix}),\sidenote{$\mat{E}$ has 5 degrees of
-  freedom, because it has the same parameters as the fundamental matrix, minus
-  the intrinsic camera parameters.} \[
-    \transpose{\hat{\vec{x}}_2} \mat{E} \hat{\vec{x}}_1 = 0
+  matrix (\cref{def:fundamental-matrix}), \[
+    \transpose{\hat{\vec{x}}_2} \mat{E} \hat{\vec{x}}_1 = 0 \margintag{$\mat{E}$ has 5 degrees of freedom, because it has the same parameters as the fundamental matrix, minus the intrinsic camera parameters.}
   ,\]
   where $\hat{\vec{x}} = \inv{\mat{K}} \vec{x}$.
 
@@ -292,7 +289,7 @@ backprojections that satisfies the following, \[
   \det{\begin{bmatrix} \transpose{\vec{\ell}_{x_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{y_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{x_2}} \mat{P}_2 \\ \transpose{\vec{\ell}_{y_2}} \mat{P}_2 \end{bmatrix}} = 0
 .\]
 
-\begin{figure}[b]
+\begin{figure}[t]
     \centering
     \incfig{mid-point-reprojection}
     \caption{Mid-point reprojection.}

@@ -21,7 +21,7 @@ The coordinate frame of the pinhole camera is chosen such that the origin is in
 the center of the pinhole. The image plane behind the camera is in the plane
 where $z_c=-f$, where $f$ is the focal distance. The $z$-axis is called the
 principal axis and goes in the direction where the camera is pointing toward. If
-we know a three-dimensional point $\vec{X}_c$, then it is possible to calculate
+we know a 3-dimensional point $\vec{X}_c$, then it is possible to calculate
 the image coordinate $\vec{x}$ of that point projected onto the image plane: \[
   x=-f\frac{x_c}{z_c}, \;\;\; y=-f\frac{y_c}{z_c}
 .\]
@@ -51,16 +51,14 @@ coordinates from the top left.}
     \label{fig:pinhole-in-space}
 \end{figure}
 
-The camera will generally not be in the origin of the three-dimensional world
-space. So, we need the transformation that moved the camera from the origin
-to its point. Let \[
+The camera will generally not be in the origin of the 3-dimensional world
+space. So, we need the transformation that moved the camera from the origin to
+its point. Let \[
   \mat{F}=\begin{bmatrix} \mat{R} & \vec{t} \\ \transpose{\vec{0}} & 1 \end{bmatrix}
 \]
 be this transformation, then the projection of a point $\vec{X}_w$ in
-world space onto the image plane is given by the following,\sidenote{We take the inverse of
-$\mat{F}$, because we want to move the origin of the points to the origin of
-the camera.} \[
-  \tilde{\vec{x}} = \mat{K}\inv{\mat{F}}\overline{\vec{X}}_w
+world space onto the image plane is given by the following, \[
+  \tilde{\vec{x}} = \mat{K}\inv{\mat{F}}\overline{\vec{X}}_w \margintag{We take the inverse of $\mat{F}$, because we want to move the origin of the points to the origin of the camera.}
 .\]
 We denote this matrix by $\mat{P} = \mat{K}\inv{\mat{F}}$,\sidenote{$\mat{P}$
 has 11 degrees of freedom.} and can be estimated by DLT with 6

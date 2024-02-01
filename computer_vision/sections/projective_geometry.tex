@@ -4,9 +4,9 @@
   $\vec{x}$ & two-dimensional vector in real space $\R$ \\
   $\tilde{\vec{x}}$ & two-dimensional vector in projective space $\mathbb{P}$ \\
   $\overline{\vec{x}}$ & two-dimensional vector in projective space $\mathbb{P}$ with $w=1$ \\
-  $\vec{X}$ & three-dimensional vector in real space $\R$ \\
-  $\tilde{\vec{X}}$ & three-dimensional vector in projective space $\mathbb{P}$ \\
-  $\overline{\vec{X}}$ & three-dimensional vector in projective space $\mathbb{P}$ with $w=1$ \\
+  $\vec{X}$ & 3-dimensional vector in real space $\R$ \\
+  $\tilde{\vec{X}}$ & 3-dimensional vector in projective space $\mathbb{P}$ \\
+  $\overline{\vec{X}}$ & 3-dimensional vector in projective space $\mathbb{P}$ with $w=1$ \\
 \end{notation}
 
 Using \textit{projective geometry}, we can model the imaging process of a
@@ -64,23 +64,19 @@ coordinates it becomes a linear operation, \[
 Furthermore, we can make the following transformations,
 \begin{itemize}
   \item Rigid transformations (rotation and translation) with the following
-    matrix,\sidenote{This matrix has 3 degrees of freedom: $t_x,t_y,\theta$.}
-    \[
-      \begin{bmatrix} \cos\theta & -\sin\theta & t_x \\ \sin\theta & \cos\theta  & t_y \\ 0 & 0 & 1 \end{bmatrix}
+    matrix, \[
+      \begin{bmatrix} \cos\theta & -\sin\theta & t_x \\ \sin\theta & \cos\theta  & t_y \\ 0 & 0 & 1 \end{bmatrix} \margintag{This matrix has 3 degrees of freedom: $t_x,t_y,\theta$.}
     .\]
   \item Similarity transformations (rotation, translation, and scaling) with
-    the following matrix,\sidenote{This matrix has 4 degrees of freedom:
-    $t_x,t_y,\theta,s$.} \[
-      \begin{bmatrix} s\cos\theta & -s\sin\theta & t_x \\ s\sin\theta & s\cos\theta & t_y \\ 0 & 0 & 1 \end{bmatrix}
+    the following matrix, \[
+      \begin{bmatrix} s\cos\theta & -s\sin\theta & t_x \\ s\sin\theta & s\cos\theta & t_y \\ 0 & 0 & 1 \end{bmatrix} \margintag{This matrix has 4 degrees of freedom: $t_x,t_y,\theta,s$.}
     .\]
   \item Affine transformations (rotation, translation, scaling, and shearing)
-    with the following matrix,\sidenote{This matrix has 6 degrees of freedom:
-    $a_{1:6}$} \[
-      \begin{bmatrix} a_1 & a_2 & a_3 \\ a_4 & a_5 & a_6 \\ 0 & 0 & 1 \end{bmatrix}
+    with the following matrix, \[
+      \begin{bmatrix} a_1 & a_2 & a_3 \\ a_4 & a_5 & a_6 \\ 0 & 0 & 1 \end{bmatrix} \margintag{This matrix has 6 degrees of freedom: $a_{1:6}$}
     .\]
-  \item Projective transformations with the following matrix,\sidenote{This
-    matrix has 8 degrees of freedom, because it is specified up to scale.} \[
-      \begin{bmatrix} a & b & c \\ d & e & f \\ g & h & i \end{bmatrix}
+  \item Projective transformations with the following matrix, \[
+      \begin{bmatrix} a & b & c \\ d & e & f \\ g & h & i \end{bmatrix} \margintag{This matrix has 8 degrees of freedom, because it is specified up to scale.}
     .\]
 \end{itemize}
 
@@ -89,10 +85,9 @@ Furthermore, we can make the following transformations,
 Suppose that we have point correspondences between two images. Now, we want to
 find the projective transformation $\mat{H}$ that relates the two images. For
 this, we use \textit{direct linear transformation}. We have the following
-equations,\sidenote{The homography is constrained to map $\vec{x}_i$ to
-$\vec{x}_i'$.}
+equations,
 \begin{align*}
-  \lambda_i \bar{\vec{x}}'_i &= \mat{H} \bar{\vec{x}}_i \\
+  \lambda_i \bar{\vec{x}}'_i &= \mat{H} \bar{\vec{x}}_i \margintag{The homography is constrained to map $\vec{x}_i$ to $\vec{x}_i'$.} \\
   \begin{bmatrix} \lambda_i x_i' \\ \lambda_i y_i' \\ \lambda_i \end{bmatrix}
   &=
   \begin{bmatrix}
@@ -129,9 +124,10 @@ following,
 \begin{align*}
   \lambda_i &= h_{31}x_i + h_{32}y_i + h_{33} \\
   \lambda_i x_i' &= h_{11}x_i + h_{12}y_i + h_{13} \\
-                 &\implies h_{11}x_i + h_{12}y_i + h_{13} - h_{31}x_i'x_i - h_{32}x_i'y_i - h_{33}x_i' = 0 \\
   \lambda_i y_i' &= h_{21}x_i + h_{22}y_i + h_{23} \\
-                 &\implies h_{21}x_i + h_{22}y_i + h_{23} - h_{31}y_i'x_i - h_{32}y_i'y_i - h_{33}y_i' = 0
+  \intertext{This gives us the following linear constraints,}
+  h_{21}x_i + h_{22}y_i + h_{23} - h_{31}y_i'x_i - h_{32}y_i'y_i - h_{33}y_i' &= 0 \\
+  h_{11}x_i + h_{12}y_i + h_{13} - h_{31}x_i'x_i - h_{32}x_i'y_i - h_{33}x_i' &= 0
 .\end{align*}
 In matrix form, we can set this up as the following for $n$ points, \[
   \begin{bmatrix}

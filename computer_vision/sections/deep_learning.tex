@@ -127,21 +127,21 @@ lower bound,
   \log p(\vec{x}) &= \log \int p(\vec{x}\mid\vec{z}) p(\vec{z}) d\vec{z} \\
   &= \log \int p(\vec{x}\mid\vec{z}) \frac{p(\vec{z})}{q(\vec{z})}q(\vec{z}) d\vec{z} \\
   &\geq \int q(\vec{z})\log \lft( p(\vec{x}\mid\vec{z})\frac{p(\vec{z})}{q(\vec{z})} \rgt) d\vec{z} \margintag{Jensen's inequality} \\
-  &= \E_{q(\vec{z})}\lft[ \log \frac{p(\vec{x}\mid\vec{z})p(\vec{z})}{q(\vec{z})} \rgt]
+  &= \E_q \lft[ \log \frac{p(\vec{x}\mid\vec{z})p(\vec{z})}{q(\vec{z})} \rgt]
 ,\end{align*}
 which is called the \textit{evidence lower bound} (ELBO). The probability
-distribution $q_{\vec{theta}}$ is the encoder and can be defined to be
+distribution $q_{\vec{\theta}}$ is the encoder and can be defined to be
 anything, \eg, a Gaussian distribution $\mathcal{N}(\vec{0},\mat{I})$ or a
-probabilistic deep learning model $q_{\vec{theta}}$ dependent on $\vec{x}$.
+probabilistic deep learning model $q_{\vec{\theta}}$ dependent on $\vec{x}$.
 
 An objective function can be derived from the ELBO, which maximizes the lower
 bound of the likelihood,
 \begin{align*}
-  \E_{q(\vec{z})}\lft[ \log \frac{p(\vec{x}\mid\vec{z})p(\vec{z})}{q(\vec{z})} \rgt] &= \E_{q(\vec{z})} \lft[ \log p(\vec{x}\mid\vec{z}) \rgt] - \E_{q(\vec{z})} \lft[ -\log \frac{p(\vec{z})}{q(\vec{z})} \rgt] \\
-  &= \E_{q(\vec{z})} \lft[ \log p(\vec{x}\mid\vec{z}) \rgt] - D_{\mathrm{KL}} (q(\vec{z}) \mathrel{\Vert} p(\vec{z}))
+  \E_q \lft[ \log \frac{p(\vec{x}\mid\vec{z})p(\vec{z})}{q(\vec{z})} \rgt] &= \E_q \lft[ \log p(\vec{x}\mid\vec{z}) \rgt] - \E_q \lft[ -\log \frac{p(\vec{z})}{q(\vec{z})} \rgt] \\
+  &= \E_q \lft[ \log p(\vec{x}\mid\vec{z}) \rgt] - D_{\mathrm{KL}} (q \mathrel{\Vert} p)
 .\end{align*}
 The negative log-likelihood is thus upper-bounded by \[
-  D_{\mathrm{KL}}(q(\vec{z})\mathrel{\Vert}p(\vec{z})) + \E_{q(\vec{z})} [-\log p(\vec{x}\mid\vec{z})]
+  D_{\mathrm{KL}}(q \mathrel{\Vert} p) + \E_q [-\log p(\vec{x}\mid\vec{z})]
 .\]
 VAEs minimize this bound, \[
   \hat{\vec{\theta}} = \argmin_{\vec{\theta}\in\Theta} \sum_{\vec{x}\in\mathcal{D}} \underbrace{D_{\mathrm{KL}}(q_{\vec{\theta}}(\vec{z}\mid\vec{x})\mathrel{\Vert}p(\vec{z}))}_{\text{encoder loss}} + \underbrace{\E_{q_{\vec{\theta}}(\vec{z}\mid\vec{x})} [-\log p_{\vec{\theta}}(\vec{x}\mid\vec{z})]}_{\text{decoder loss}}
@@ -164,7 +164,7 @@ updated separately, as can be seen in \Cref{fig:variational-autoencoder}.
 
 \textit{Generative adversarial networks} (GAN) do not explicitly model the
 likelihood. Instead, they use an adversarial process in which two models are
-trained simultaneously; a generator $G: \R^Q\to\R^D$ and a discriminator
+trained simultaneously: a generator $G: \R^Q\to\R^D$ and a discriminator
 $D:\R^D \to [0,1]$ \citep{goodfellow2014generative}. The generator captures the
 data distribution, while the discriminator estimates whether a sample comes
 from the data distribution or the generator. At a high level, we train $D$ to

@@ -1,15 +1,13 @@
 \section{Structure from motion} \label{sec:sfm}
 
-In \textit{Structure from Motion} (SfM), we want to recover the
-three-dimensional structure from $m$ images that depict $n$ three-dimensional
-points. Recovering the structure involves estimating the camera matrices,
-$\mat{P}_1, \ldots, \mat{P}_m$, and the positions of the points $\vec{X}_1,
-\ldots, \vec{X}_n$.
+In \textit{Structure from Motion} (SfM), we want to recover the 3-dimensional
+structure from $m$ images that depict $n$ 3-dimensional points. Recovering the
+structure involves estimating the camera matrices, $\mat{P}_1, \ldots,
+\mat{P}_m$, and the positions of the points $\vec{X}_1, \ldots, \vec{X}_n$. The
+fact that we have more than 2 viewpoints enables us to reveal and remove more
+mismatches.
 
-The fact that we have more than 2 viewpoints enables us to reveal and remove
-more mismatches.
-
-\begin{figure}[t]
+\begin{figure}[b]
     \centering
     \incfig{structure-from-motion}
     \caption{Structure from motion. We iteratively extend and refine the
@@ -17,7 +15,7 @@ more mismatches.
     \label{fig:structure-from-motion}
 \end{figure}
 
-In \textit{sequential SfM}, we initialize the three-dimensional structure from
+In \textit{sequential SfM}, we initialize the 3-dimensional structure from
 two images, using the same technique as in the previous section. Then, for each
 additional view, make a reconstruction with all previous views. In the new
 view, there are old points that we had already reconstructed, but also new
@@ -109,7 +107,7 @@ select a single subset with all inliers. If we let $p$ be the probability that
 RANSAC will return a good model, then we have the following identity, \[
   1-p = (1-w^n)^k
 ,\]
-which means that if we want probability $p$ to get a a good model, then we can
+which means that if we want probability $p$ to get a good model, then we can
 compute the necessary $k$ as follows, \[
   k = \frac{\log(1-p)}{\log(1-w^n)}
 .\]

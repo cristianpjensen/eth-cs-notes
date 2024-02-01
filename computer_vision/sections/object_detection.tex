@@ -7,16 +7,16 @@ their location within the image.
 \subsection{Detection via classification}
 
 The most naive idea is to run a classification model on every patch within the
-image. We can use all previously discussed idea for the representation of the
-patches, such as a gradient histogram or pixel intensities.
+image. We can use all previously discussed concepts for the representation of
+the patches, such as a gradient histogram or pixel intensities.
 
 \subsection{Boosting with weak classifiers}
 
 An example of a weak classifier is the rectangle filter. It is essentially a
-large gradient calculation, where we compute the sum of one patch minus the sum
-of another next to it. We can compute these very quickly using a sliding window
-approach, for which we only need to compute a cumulative sum over the integral
-image in $\bigo{HW}$. Then, we can compute the sum of any patch in
+large gradient calculation, where we compute the sum of one patch, minus the
+sum of another next to it. We can compute these very quickly using a sliding
+window approach, for which we only need to compute a cumulative sum over the
+integral image in $\bigo{HW}$. Then, we can compute the sum of any patch in
 $\bigo{1}$. We then classify the patch based on the difference of sums of the
 patches.
 
