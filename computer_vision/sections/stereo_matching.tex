@@ -29,7 +29,7 @@ following relationships with the 2-dimensional points on the image planes,
 \begin{align*}
   x_1 &= f \frac{X}{Z} \margintag{Under the assumption that camera 1 is at the origin \wrt camera 2.} \\
   y_1 &= f \frac{Y}{Z} \\
-  x_2 &= f \frac{X+b_x}{Z} \margintag{Translating camera to the left is the same as translating the world to the right. $b_x$ is the baseline on the $x$-axis.} \\
+  x_2 &= f \frac{X-b_x}{Z} \margintag{Translating camera to the left is the same as translating the world to the right. $b_x$ is the baseline on the $x$-axis.} \\
   y_2 &= f \frac{Y}{Z} \\
 \end{align*}
 The \textit{stereo disparity} (which is the difference in pixel locations) $d=
@@ -48,12 +48,16 @@ x_1 - x_2$ can then be computed as follows,
 which tells us that the uncertainty in the pixel location grows quadratically
 with depth, causing large depth error. But, this uncertainty is also inversely
 proportional to the baseline, thus we can increase $b_x$ to see depth better at
-deep locations. However, this also comes at the cost that the search problem of
-matching the pixels between images is much harder, because there are more
-occlusions. Furthermore, the disparity becomes smaller as the baseline
-increases, which makes it harder to achieve fine-grained resolution, since
-pixels are not infinitely small. See \Cref{fig:stereo-baseline} for an
-illustration of this.
+deep locations. However, this comes at the cost that the disparity becomes
+larger as the baseline increases, which makes the search problem of matching
+the pixels between images harder. Furthermore, a large baseline results in more
+occlusion problems, where one camera is occluded while the other is not, making
+it impossible to estimate depth.\sidenote{A small baseline makes single-sided
+occlusion less common, because they are more likely to both be occluded, which
+is not a problem, since we then estimate the depth to the oclcusion.} If we
+have a small baseline, the disparity is low, which makes it harder to achieve
+fine-grained resolution, since pixels are not infinitely small. See
+\Cref{fig:stereo-baseline} for an illustration of this.
 
 \begin{figure}[t]
     \centering
