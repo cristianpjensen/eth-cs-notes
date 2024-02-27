@@ -27,9 +27,9 @@
 
 In the Algorithms Lab course, tasks entail the following,
 \begin{enumerate}
-  \item Find an appropriate model for the problem;
-  \item Design a suitable algorithm to solve it \textit{efficiently};
-  \item Implement (in C++) and test the algorithm on the given data.
+    \item Find an appropriate model for the problem;
+    \item Design a suitable algorithm to solve it \textit{efficiently};
+    \item Implement (in C++) and test the algorithm on the given data.
 \end{enumerate}
 In general, problems should take 2 hours to solve.
 
@@ -42,61 +42,61 @@ problem.
 \section{Binary search}
 
 \marginnote{Before implementing binary search, first see whether a simple
-for-loop would suffice. This saves time.}
+    for-loop would suffice. This saves time.}
 
 Whenever there is a monotonic relationship between values, \ie if $x_1 \geq
-x_2$, then always $f(x_1) \geq f(x_2)$ or always $f(x_2) \leq f(x_1)$, binary
+    x_2$, then always $f(x_1) \geq f(x_2)$ or always $f(x_2) \leq f(x_1)$, binary
 search can find a given element in $\bigo{\log n}$.\sidenote{Instead of
-  $\bigo{n}$ if you would iterate over all possible inputs.}
+    $\bigo{n}$ if you would iterate over all possible inputs.}
 
 \begin{algorithm}
-  \caption{Binary search algorithm for finding index containing value $T$ in
-  a sorted array $\vec{a}$ of length $n$.}
-  \begin{algorithmic}[1]
-    \Function{BinarySearch}{$\vec{a},n,T$}
-      \State{$\ell \gets 0$}
-      \State{$r \gets n-1$}
-      \While{$\ell \leq r$}
+    \caption{Binary search algorithm for finding index containing value $T$ in
+        a sorted array $\vec{a}$ of length $n$.}
+    \begin{algorithmic}[1]
+        \Function{BinarySearch}{$\vec{a},n,T$}
+        \State{$\ell \gets 0$}
+        \State{$r \gets n-1$}
+        \While{$\ell \leq r$}
         \State{$m \gets \floor*{\frac{\ell+r}{2}}$}
         \If{$a_m < T$}
-          \State{$\ell \gets m+1$} \Comment{Search right side of $m$}
+        \State{$\ell \gets m+1$} \Comment{Search right side of $m$}
         \ElsIf{$a_m > T$}
-          \State{$r \gets m-1$} \Comment{Search left side of $m$}
+        \State{$r \gets m-1$} \Comment{Search left side of $m$}
         \Else
-          \State{\Return $m$} \Comment{$a_m=T$}
+        \State{\Return $m$} \Comment{$a_m=T$}
         \EndIf
-      \EndWhile
-      \State{\Return $-1$}
-    \EndFunction
-  \end{algorithmic}
+        \EndWhile
+        \State{\Return $-1$}
+        \EndFunction
+    \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}
-  \caption{Binary search can also be used for finding the minimum input value
-  for which a constraint is still satisfied.}
-  \begin{algorithmic}[1]
-    \Function{BinarySearchLeftMost}{$\vec{a},n,T$}
-      \State{$\ell \gets 0$}
-      \State{$r \gets n$}
-      \While{$\ell < r$}
+    \caption{Binary search can also be used for finding the minimum input value
+        for which a constraint is still satisfied.}
+    \begin{algorithmic}[1]
+        \Function{BinarySearchLeftMost}{$\vec{a},n,T$}
+        \State{$\ell \gets 0$}
+        \State{$r \gets n$}
+        \While{$\ell < r$}
         \State{$m \gets \floor*{\frac{\ell+r}{2}}$}
         \If{$a_m < T$}
-          \State{$\ell \gets m+1$} \Comment{Search right side of $m$}
+        \State{$\ell \gets m+1$} \Comment{Search right side of $m$}
         \Else
-          \State{$r \gets m$} \Comment{Search left side of $m$}
+        \State{$r \gets m$} \Comment{Search left side of $m$}
         \EndIf
-      \EndWhile
-      \State{\Return $\ell$}
-    \EndFunction
-  \end{algorithmic}
+        \EndWhile
+        \State{\Return $\ell$}
+        \EndFunction
+    \end{algorithmic}
 \end{algorithm}
 
 \section{Dynamic programming}
 
 \marginnote{At worst, the table must be filled out fully, thus the worst-time
-complexity of a dynamic programming algorithm is $\bigo{st}$, where $s$ is the
-size of the table, and $t$ the time complexity of computing a single
-subsolution.}
+    complexity of a dynamic programming algorithm is $\bigo{st}$, where $s$ is the
+    size of the table, and $t$ the time complexity of computing a single
+    subsolution.}
 
 Dynamic programming solves a problem by reducing it to smaller subproblems of
 the same type. These subproblems are described by a \textit{state} $s \in S$. To
@@ -107,20 +107,20 @@ later.\sidenote{Dynamic programming is essentially recursion with memoization.}
 
 To apply dynamic programming, we need to find three things,
 \begin{itemize}
-  \item A state space $S$ that describes subproblems as succinctly as possible;
-  \item A recurrence relationship $r(s) = f(s, r(s_1), \ldots, r(s_n))$, where
-    $\{ s_1, \ldots, s_n \} \subseteq S$ are the necessary subproblem
-    states to compute $s$;
-  \item Base cases $B \subseteq S$ with constant values that do not need to be
-    computed, \ie $r(b)=c(b)$ for all $b\in B$, where $c(b)$ maps base cases to
-    their solution value.
+    \item A state space $S$ that describes subproblems as succinctly as possible;
+    \item A recurrence relationship $r(s) = f(s, r(s_1), \ldots, r(s_n))$, where
+          $\{ s_1, \ldots, s_n \} \subseteq S$ are the necessary subproblem
+          states to compute $s$;
+    \item Base cases $B \subseteq S$ with constant values that do not need to be
+          computed, \ie $r(b)=c(b)$ for all $b\in B$, where $c(b)$ maps base cases to
+          their solution value.
 \end{itemize}
 Once we have those, we can easily construct a polynomial algorithm.
 
 \marginnote{If possible, always use \texttt{std::vector} if the state space can
-be described by integers, since it has constant insert/access time complexity.
-Remember that \texttt{std::map} has $\bigo{\log n}$ insert/find/access time
-complexity.}
+    be described by integers, since it has constant insert/access time complexity.
+    Remember that \texttt{std::map} has $\bigo{\log n}$ insert/find/access time
+    complexity.}
 
 Dynamic programming differentiates between a top-down and a bottom-up approach.
 In the top-down approach, the values are computed recursively, each time
@@ -137,8 +137,8 @@ The Boost Graph Library (BGL) is a library of common graph algorithms. In BGL,
 graphs are represented as adjacency lists, \ie a vector of vectors.
 
 \begin{listing}
-  \caption{Basic type for a weighted graph.}
-  \begin{lstlisting}
+    \caption{Basic type for a weighted graph.}
+    \begin{lstlisting}
 #include <boost/graph/adjacency_list.hpp>
 
 typedef boost::adjacency_list<
@@ -162,30 +162,30 @@ implemented with proximity structures to find whether two vertices are reachable
 under some constraints.
 
 \Cref{tab:graph-algos} can also be found in the tutorial slides.\sidenote{Also,
-the table contains links to the documentation of the functions, which contains
-good descriptions of the algorithms.} So, in the exam, if there is no way to
+    the table contains links to the documentation of the functions, which contains
+    good descriptions of the algorithms.} So, in the exam, if there is no way to
 solve a graph problem with the other methods, then take a look at this table and
-figure out how to potentially apply these algorithms. 
+figure out how to potentially apply these algorithms.
 
 \begin{table}[h]
-  \centering
-  \caption{Common graph algorithms that appear throughout the course.}
-  \label{tab:graph-algos}
-  \begin{tabular}{ll} \toprule
-    Algorithm & Runtime \\
-    \midrule
-    \texttt{boost::breadth\_first\_search} & $\bigo{n+m}$ \\
-    \texttt{boost::depth\_first\_search} & $\bigo{n+m}$ \\
-    \texttt{boost::dijkstra\_shortest\_path} & $\bigo{n\log n + m}$ \\
-    \texttt{boost::kruskal\_minimum\_spanning\_tree} & $\bigo{m\log m}$ \\
-    \texttt{boost::edmonds\_maximum\_cardinality\_matching} & $\bigo{mn\cdot\alpha(m,n)}$ \\
-    \texttt{boost::strong\_components} & $\bigo{n+m}$ \\
-    \texttt{boost::connected\_components} & $\bigo{n+m}$ \\
-    \texttt{boost::biconnected\_components} & $\bigo{n+m}$ \\
-    \texttt{boost::articulation\_points} & $\bigo{n+m}$ \\
-    \texttt{boost::is\_bipartite} & $\bigo{n+m}$ \\
-    \bottomrule \\
-  \end{tabular}
+    \centering
+    \caption{Common graph algorithms that appear throughout the course.}
+    \label{tab:graph-algos}
+    \begin{tabular}{ll} \toprule
+        Algorithm                                               & Runtime                     \\
+        \midrule
+        \texttt{boost::breadth\_first\_search}                  & $\bigo{n+m}$                \\
+        \texttt{boost::depth\_first\_search}                    & $\bigo{n+m}$                \\
+        \texttt{boost::dijkstra\_shortest\_path}                & $\bigo{n\log n + m}$        \\
+        \texttt{boost::kruskal\_minimum\_spanning\_tree}        & $\bigo{m\log m}$            \\
+        \texttt{boost::edmonds\_maximum\_cardinality\_matching} & $\bigo{mn\cdot\alpha(m,n)}$ \\
+        \texttt{boost::strong\_components}                      & $\bigo{n+m}$                \\
+        \texttt{boost::connected\_components}                   & $\bigo{n+m}$                \\
+        \texttt{boost::biconnected\_components}                 & $\bigo{n+m}$                \\
+        \texttt{boost::articulation\_points}                    & $\bigo{n+m}$                \\
+        \texttt{boost::is\_bipartite}                           & $\bigo{n+m}$                \\
+        \bottomrule                                                                           \\
+    \end{tabular}
 \end{table}
 
 \section{Computational Geometry Algorithms Library}
@@ -193,45 +193,45 @@ figure out how to potentially apply these algorithms.
 \paragraph{Infinite precision and range.}
 
 CGAL is a library that provides infinite precision and range types.\sidenote{As
-opposed to the default C++ types in \Cref{tab:types}.} However, large numbers
+    opposed to the default C++ types in \Cref{tab:types}.} However, large numbers
 also have a higher computational cost in CGAL, so only use exactly as much
 algebra as needed in problems that require infinite precision.
 
 \begin{table}[h]
-  \centering
-  \caption{C++ types with their representational range.}
-  \label{tab:types}
-  \begin{tabular}{lccc} \toprule
-    Type & Bits (specific to this course) & Minimum & Maximum \\
-    \midrule
-    \texttt{int} & $32$ & $-2^{31}$ & $2^{31}-1$ \\
-    \texttt{long} & $64$ & $-2^{63}$ & $2^{63}-1$ \\
-    \texttt{double} & $64$ & $-2^{53}$ & $2^{53}-1$ \\
-    \bottomrule \\
-  \end{tabular}
+    \centering
+    \caption{C++ types with their representational range.}
+    \label{tab:types}
+    \begin{tabular}{lccc} \toprule
+        Type            & Bits (specific to this course) & Minimum   & Maximum    \\
+        \midrule
+        \texttt{int}    & $32$                           & $-2^{31}$ & $2^{31}-1$ \\
+        \texttt{long}   & $64$                           & $-2^{63}$ & $2^{63}-1$ \\
+        \texttt{double} & $64$                           & $-2^{53}$ & $2^{53}-1$ \\
+        \bottomrule                                                               \\
+    \end{tabular}
 \end{table}
 
 In general, the following guidelines should be followed to avoid unnecessary
 computational cost,
 \begin{enumerate}
-  \item Avoid square roots where possible, which is often possible, because the
-    function is monotonic, \ie,\sidenote{This is especially useful when working
-    with distances, \[ d((x_1,y_1), (x_2,y_2)) = \sqrt{(x_1 - x_2)^2 + (y_1 -
-    y_2)^2} ,\] because we only need squared distances if we only need them for
-    comparison.} \[
-      \forall x,y \geq 0 : \sqrt{x} < \sqrt{y} \iff x < y
-    ;\]
-  \item Avoid divisions, which is often possible in comparisons,
-    \ie,\sidenote[][1em]{To keep the code clean, you can also use the
-    \texttt{CGAL::Gmpq} type, which represents divisions by the numerator and
-    denominator, and does this under the hood.} \[
-      \forall x,y > 0 : \frac{a}{b} < \frac{c}{d} \iff ad < bc
-    ;\]
-  \item Estimate to check if loss of precision may occur. \Ie, first check
-    whether the values will fit within one of the default C++ types
-    (\Cref{tab:types}). If we need to multiply two values with $a$ and $b$
-    bits, respectively, we will need a type with $a+b$ bits. If we need to add
-    two values, we need $\max\{a,b\}+1$ bits.
+    \item Avoid square roots where possible, which is often possible, because the
+          function is monotonic, \ie,\sidenote{This is especially useful when working
+              with distances, \[ d((x_1,y_1), (x_2,y_2)) = \sqrt{(x_1 - x_2)^2 + (y_1 -
+                      y_2)^2} ,\] because we only need squared distances if we only need them for
+              comparison.} \[
+              \forall x,y \geq 0 : \sqrt{x} < \sqrt{y} \iff x < y
+              ;\]
+    \item Avoid divisions, which is often possible in comparisons,
+          \ie,\sidenote[][1em]{To keep the code clean, you can also use the
+              \texttt{CGAL::Gmpq} type, which represents divisions by the numerator and
+              denominator, and does this under the hood.} \[
+              \forall x,y > 0 : \frac{a}{b} < \frac{c}{d} \iff ad < bc
+              ;\]
+    \item Estimate to check if loss of precision may occur. \Ie, first check
+          whether the values will fit within one of the default C++ types
+          (\Cref{tab:types}). If we need to multiply two values with $a$ and $b$
+          bits, respectively, we will need a type with $a+b$ bits. If we need to add
+          two values, we need $\max\{a,b\}+1$ bits.
 \end{enumerate}
 
 \paragraph{Geometretic computing.}
@@ -240,24 +240,24 @@ CGAL also provides predicates and constructions for geometry. The library
 provides three kernels, shown in \Cref{tab:cgal-kernels}.
 
 \begin{table*}[h]
-  \centering
-  \caption{CGAL kernels, ordered by increasing computational cost.}
-  \label{tab:cgal-kernels}
-  \begin{tabular}{ll} \toprule
-    Kernel & Feature \\
-    \midrule
-    \texttt{CGAL::Exact\_predicates\_inexact\_constructions\_kernel} & \makecell[l]{Constructions use \texttt{double},\\so not exact} \\
-    \texttt{CGAL::Exact\_predicates\_exact\_constructions\_kernel} & \makecell[l]{Exact constructions,\\supporting $+,\times,\div$.} \\
-    \texttt{CGAL::Exact\_predicates\_inexact\_constructions\_kernel\_with\_sqrt} & \makecell[l]{Exact constructions,\\supporting $+,\times,\div,\sqrt{\cdot}$.} \\
-    \bottomrule \\
-  \end{tabular}
+    \centering
+    \caption{CGAL kernels, ordered by increasing computational cost.}
+    \label{tab:cgal-kernels}
+    \begin{tabular}{ll} \toprule
+        Kernel                                                                       & Feature                                         \\
+        \midrule
+        \texttt{CGAL::Exact\_predicates\_inexact\_constructions\_kernel}             & \makecell[l]{Constructions use \texttt{double}, \\so not exact} \\
+        \texttt{CGAL::Exact\_predicates\_exact\_constructions\_kernel}               & \makecell[l]{Exact constructions,               \\supporting $+,\times,\div$.} \\
+        \texttt{CGAL::Exact\_predicates\_inexact\_constructions\_kernel\_with\_sqrt} & \makecell[l]{Exact constructions,               \\supporting $+,\times,\div,\sqrt{\cdot}$.} \\
+        \bottomrule                                                                                                                    \\
+    \end{tabular}
 \end{table*}
 
 CGAL has many different geometries that it can represent, \eg,
 \texttt{K::Point\_2}, \texttt{K::Line\_2}, \texttt{K::Ray\_2},
 \texttt{K::Segment\_2}. However, they are only necessary if constructions are
 absolutely necessary.\sidenote[][2em]{An edge case is \texttt{K::Point\_2}, which
-does not require constructions and are often useful.} Usually, there is a more
+    does not require constructions and are often useful.} Usually, there is a more
 efficient method that requires no constructions. See the CGAL documentation for
 provided predicates and constructions.
 
@@ -265,10 +265,10 @@ If you need to take the floor of an infinite precision type, such as
 \texttt{K::FT}, use the function in \Cref{lst:floor}.
 
 \begin{listing}
-  \caption{Floor of infinite precision type. If the ceiling must be computed,
-  the following identity can be used, \[ \lceil x \rceil = -\lfloor -x \rfloor .\]}
-  \label{lst:floor}
-  \begin{lstlisting}
+    \caption{Floor of infinite precision type. If the ceiling must be computed,
+        the following identity can be used, \[ \lceil x \rceil = -\lfloor -x \rfloor .\]}
+    \label{lst:floor}
+    \begin{lstlisting}
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
 double floor_to_double(const K::FT& x)
@@ -284,24 +284,24 @@ double floor_to_double(const K::FT& x)
 \section{Greedy algorithms}
 
 \marginnote{The greedy approach rarely yields optimal solutions, but it is easy
-to convince yourself that the greedy approach ``works``. This is why the proof
-step is important, but, in this course, there is no time to construct a proof.
-Thus, first exhaust all other options before resorting to a greedy approach.}
+    to convince yourself that the greedy approach ``works``. This is why the proof
+    step is important, but, in this course, there is no time to construct a proof.
+    Thus, first exhaust all other options before resorting to a greedy approach.}
 
 A greedy algorithm can be applied if \textit{locally optimal choices} result in
 a \textit{globally optimal solution}. Usually, these are tasks that require the
 construction of a set that is in some sense globally optimal. In general, a
 greedy approach has the following steps,
 \begin{enumerate}
-  \item \textit{Greedy choice}: Given already chosen elements $c_1,\ldots,
-    c_{k-1}$, decide how to choose $c_k$, based on some local optimality
-    criterion;
-  \item \textit{Proof}: Prove that the elements obtained in this way result in
-    a globally optimal set;\sidenote{We can prove that a greedy solution works
-    using an \textit{exchange argument} or a \textit{staying ahead} argument.
-    We can disprove one via a counterexample.}
-  \item \textit{Implementation}: Implement the greedy choice to be as efficient
-    as possible.
+    \item \textit{Greedy choice}: Given already chosen elements $c_1,\ldots,
+              c_{k-1}$, decide how to choose $c_k$, based on some local optimality
+          criterion;
+    \item \textit{Proof}: Prove that the elements obtained in this way result in
+          a globally optimal set;\sidenote{We can prove that a greedy solution works
+              using an \textit{exchange argument} or a \textit{staying ahead} argument.
+              We can disprove one via a counterexample.}
+    \item \textit{Implementation}: Implement the greedy choice to be as efficient
+          as possible.
 \end{enumerate}
 The hard part lies in the first step, where we need to figure out how to pick
 the next element of the set, given already chosen elements.
@@ -309,8 +309,8 @@ the next element of the set, given already chosen elements.
 \section{Split and list}
 
 \marginnote{Only use split and list of $n\leq 50$, where $n$ is the amount of
-elements in the set. It is often necessary for $\mathcal{NP}$-hard problems to
-get full points.}
+    elements in the set. It is often necessary for $\mathcal{NP}$-hard problems to
+    get full points.}
 
 For some problems, we need to consider every possible ``configuration`` to
 solve it, resulting in $\bigo{c \cdot 2^n}$ time complexity, which is okay for
@@ -331,54 +331,54 @@ their combination make up the target.
 \section{Maximum flow}
 
 \marginnote{\textit{Tip.} The max flow from $u$ to $v$ is the same as from $v$
-to $u$ in the reversed graph.}
+    to $u$ in the reversed graph.}
 
 In maximum flow problems, we have a graph where the edges are given flow
 capacity, which is how much can flow through an edge. Then, the question
 becomes how much flow can go from a source vertex to a sink vertex in such a
 graph. Using BGL, we compute the maximum flow of a graph with the push-relabel
 algorithm ($\mathcal{O}(V^3)$).\sidenote{You also need to add residual
-connections to all edges, but this is done with the \texttt{edge\_adder} struct
-that is given in the maximum flow example of the course documentation.}
+    connections to all edges, but this is done with the \texttt{edge\_adder} struct
+    that is given in the maximum flow example of the course documentation.}
 
 Common techniques that are very useful in such problems are the following,
 \begin{itemize}
-  \item \textit{Multiple sources/sinks}: If you need multiple sources (or
-    sinks), you can simply add a supernode that has infinite capacity to all
-    the sources (or sinks);
-  \item \textit{Vertex capacities}: If vertices should have a certain capacity
-    that is allowed to flow through it, use two vertices to represent it. The
-    input vertex should take all inputs of the vertex and the output vertex
-    should take all outputs. Then, add an edge from input to output with the
-    vertex capacity;
-  \item \textit{Undirected edges}: If you need an undirected edge between $a$
-    and $b$ with capacity $c$, just add directed edges from $a$ to $b$ and $b$
-    to $a$, both with capacity $c$;\sidenote{This works because if flow goes
-    both ways, they might as well both stay on their original side (which the
-    algorithm will do). So, the maximum flow through this undirected edge is
-    achieved if $c$ goes from $a$ to $b$ and $0$ goes from $b$ to $a$ (or vice
-    versa).}
-  \item \textit{Minimum edge constraint}: If we need the following constraint
-    on an edge $e=(u,v)$, \[
-      c_{\min}(e) \leq f(e) \leq c_{\max}(e)
-    ,\]
-    where $f(e)$ is the flow through edge $e$, we need to adjust the demand,
-    supply, and capacity as follows,
-    \begin{align*}
-      d_u &\gets d_u + c_{\min} \\
-      s_v &\gets s_v + c_{\min} \\
-      c(e) &\gets c_{\max} - c_{\min}
-    ,\end{align*}
-    where $d_u$ is the demand of $u$, \ie, the amount of capacity to the
-    target, $s_v$ is the supply of $v$, \ie, the amount of capacity from the
-    source, and $c(e)$ is the capacity of $e$. 
+    \item \textit{Multiple sources/sinks}: If you need multiple sources (or
+          sinks), you can simply add a supernode that has infinite capacity to all
+          the sources (or sinks);
+    \item \textit{Vertex capacities}: If vertices should have a certain capacity
+          that is allowed to flow through it, use two vertices to represent it. The
+          input vertex should take all inputs of the vertex and the output vertex
+          should take all outputs. Then, add an edge from input to output with the
+          vertex capacity;
+    \item \textit{Undirected edges}: If you need an undirected edge between $a$
+          and $b$ with capacity $c$, just add directed edges from $a$ to $b$ and $b$
+          to $a$, both with capacity $c$;\sidenote{This works because if flow goes
+              both ways, they might as well both stay on their original side (which the
+              algorithm will do). So, the maximum flow through this undirected edge is
+              achieved if $c$ goes from $a$ to $b$ and $0$ goes from $b$ to $a$ (or vice
+              versa).}
+    \item \textit{Minimum edge constraint}: If we need the following constraint
+          on an edge $e=(u,v)$, \[
+              c_{\min}(e) \leq f(e) \leq c_{\max}(e),
+          \]
+          where $f(e)$ is the flow through edge $e$, we need to adjust the demand,
+          supply, and capacity as follows,
+          \begin{align*}
+              d_u  & \gets d_u + c_{\min}       \\
+              s_v  & \gets s_v + c_{\min}       \\
+              c(e) & \gets c_{\max} - c_{\min},
+          \end{align*}
+          where $d_u$ is the demand of $u$, \ie, the amount of capacity to the
+          target, $s_v$ is the supply of $v$, \ie, the amount of capacity from the
+          source, and $c(e)$ is the capacity of $e$.
 \end{itemize}
 
 \subsection{Minimum cut}
 
 The maximum flow between two vertices can also be seen as the bottleneck
 between them. Thus, we can also see this as the minimum cut, where we need to
-cut/block the botlteneck to disconnect the two vertices. The actual vertices
+cut/block the bottleneck to disconnect the two vertices. The actual vertices
 that are on the two sides of the cut can then be found by breadth-first search
 on the edges with non-zero residual capacity (see slides).
 
@@ -392,20 +392,20 @@ side with 1 flow. Then, connect all pairs with 1 flow. The maximum flow is then
 the maximum amount of matchings that can be made.
 
 \begin{theorem}[K\"onig]
-  \label{thm:konig}
+    \label{thm:konig}
 
-  In a bipartite graph, the number of edges in a maximum matching is equal to
-  the number of vertices in a minimum vertex cover.
+    In a bipartite graph, the number of edges in a maximum matching is equal to
+    the number of vertices in a minimum vertex cover.
 \end{theorem}
 
 The maximum independent set $I\subseteq V$ is the largest set of vertices, such
 that none of them are connected by an edge, \[
-  \centernot \exists u,v\in I : (u,v) \in E
-.\]
+    \centernot \exists u,v\in I : (u,v) \in E.
+\]
 The minimum vertex cover $C \subseteq V$ is the smallest set of vertices, such
 that every edge is connected to one of the vertices in this set, \[
-  \forall (u,v) \in E : u \in C \lor v \in C
-.\]
+    \forall (u,v) \in E : u \in C \lor v \in C.
+\]
 Using \Cref{thm:konig}, we can compute the size of the minimum vertex cover
 $|C|$ of a bipartite graph by computing the maximum flow. Then, we can compute
 the size of the maximum independent set by $|I| = |V| - |C|$.
@@ -413,8 +413,8 @@ the size of the maximum independent set by $|I| = |V| - |C|$.
 \subsection{Minimum cost maximum flow}
 
 \marginnote{Only use minimum cost maximum flow if number $n \leq 1000$, where
-$n$ is the amount of vertices. If there are negative costs, only use it if $n
-\leq 600$.}
+    $n$ is the amount of vertices. If there are negative costs, only use it if $n
+        \leq 600$.}
 
 We can also associate cost with flow on the edges. In minimum cost maximum flow
 problems, we then want to first maximize the flow, and then, as a second
@@ -423,7 +423,7 @@ all maximum matchings.
 
 We could also maximize the cost by making them negative. However, the
 non-negative solver is much faster than the one that allows negative costs.
-Thus, if we eed a negative cost, we should compute some upper-bound $U$, and
+Thus, if we need a negative cost, we should compute some upper-bound $U$, and
 give $B-c$ cost, such that the costs become positive. Then, afterward, we need
 to remove the added $B$ in some way. This can usually be done as a function of
 the maximum flow, since that is how many times $B$ was added to the cost.
@@ -445,11 +445,11 @@ the naive version.
 \subsection{Delaunay triangulation}
 
 \begin{listing}
-  \caption{Delaunay triangulation in C++. The exact constructions kernel is
-  necessary if access to the Voronoi diagram is needed.}
-  \label{lst:dt}
+    \caption{Delaunay triangulation in C++. The exact constructions kernel is
+        necessary if access to the Voronoi diagram is needed.}
+    \label{lst:dt}
 
-  \begin{lstlisting}
+    \begin{lstlisting}
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Delaunay_triangulation_2<K> Triangulation;
 
@@ -464,14 +464,14 @@ t.insert(points.begin(), points.end());
 Delaunay triangulation for a set of discrete points is a triangulation such
 that no point is inside the circumcircle of any triangle in the triangulation.
 Let a disk be of maximal radius if it passes through three points, its center
-is inside the conex hull of the points, and the disk does not contain any other
+is inside the convex hull of the points, and the disk does not contain any other
 points. The maximal empty disks of the graph make up a Delaunay triangulation.
 
 Delaunay triangulation has the following properties,
 \begin{itemize}
-  \item It contains the Euclidean minimum spanning tree;
-  \item Each point has an edge to all closest other points;
-  \item It can be constructed efficiently in $\bigo{n \log n}$.
+    \item It contains the Euclidean minimum spanning tree;
+    \item Each point has an edge to all closest other points;
+    \item It can be constructed efficiently in $\bigo{n \log n}$.
 \end{itemize}
 
 Furthermore, Delaunay triangulation is the straight-line dual of the Voronoi
@@ -489,11 +489,11 @@ We can compute this by computing the distance between the dual and any vertex
 of the face, \verb|CGAL::squared_distance(t.dual(f), f.vertex(0))|.
 
 \begin{listing}
-  \caption{If we need the graph where the faces are vertices and the minimum
-  radius that can go between faces as edge weights, we can use this snippet.
-  This is needed when doing motion planning between points, where we want to
-  know how to move a disk without colliding with any points.}
-  \begin{lstlisting}
+    \caption{If we need the graph where the faces are vertices and the minimum
+        radius that can go between faces as edge weights, we can use this snippet.
+        This is needed when doing motion planning between points, where we want to
+        know how to move a disk without colliding with any points.}
+    \begin{lstlisting}
 // Let 0 be the infinite vertex
 auto f = t.incident_faces(t.infinite_vertex());
 do {
@@ -537,51 +537,51 @@ for (
 \section{Linear programming}
 
 \marginnote{Only use linear programming if $\min \{ n,m \} \leq 200$, where $n$
-is the amount of variables, and $m$ the amount of constraints.}
+    is the amount of variables, and $m$ the amount of constraints.}
 
 Linear programming is a linear optimization problem subject to $m$ linear
 constraints on $n$ variables. In general, a linear program looks like the following,
 \begin{align*}
-  \text{minimize} \;\; & \transpose{\vec{c}} \vec{x} + c_0 \\
-  \text{subject to} \;\; & \mat{a}_1 \vec{x} \leq b_1 \\
-   & \vdotswithin{\mat{a}_1 \vec{x} \leq b_1} \\
-  & \mat{a}_m \vec{x} \leq b_m
-.\end{align*}
+    \text{minimize} \;\;   & \transpose{\vec{c}} \vec{x} + c_0        \\
+    \text{subject to} \;\; & \mat{a}_1 \vec{x} \leq b_1               \\
+                           & \vdotswithin{\mat{a}_1 \vec{x} \leq b_1} \\
+                           & \mat{a}_m \vec{x} \leq b_m.
+\end{align*}
 Note that we can also form constraints of the form $\mat{a}_j \vec{x} \geq b_j$
 by adding the following constraint, \[
-  -\mat{a}_j \vec{x} \leq -b_j
-.\]
+    -\mat{a}_j \vec{x} \leq -b_j.
+\]
 Furthermore, we can also specify a maximization objective by minimizing the
 following, \[
-  -(\transpose{\vec{c}} \vec{x} + c_0)
-,\]
+    -(\transpose{\vec{c}} \vec{x} + c_0),
+\]
 and then flipping the sign after solving the problem.
 
 Geometrically, a linear program defines an $n$-dimensional convex polyhedron
 with $m$ faces. The optimum objective value is found at one of the vertices of
 this polyhedron. There are an exponential amount of vertices, thus the
 worst-case time complexity is exponential in $n$ and $m$, but for small $\min
-\{ n,m \}$, the complexity is $\bigo{\max\{ n,m \}}$.
+    \{ n,m \}$, the complexity is $\bigo{\max\{ n,m \}}$.
 
 The following are tips when working with linear programming,
 \begin{itemize}
-  \item If you want to maximize a minimum value that is a function $f(x_i)$ of
-    the linear programming variables $x_i$, you need to add a variable,
-    $f_{\min}$, and the following constraints, \[
-      \forall x_i : f_{\min} \leq f(x_i)
-    .\]
-    Then maximize this variable. Ditto if you want to minimize the maximum
-    value;
+    \item If you want to maximize a minimum value that is a function $f(x_i)$ of
+          the linear programming variables $x_i$, you need to add a variable,
+          $f_{\min}$, and the following constraints, \[
+              \forall x_i : f_{\min} \leq f(x_i).
+          \]
+          Then maximize this variable. Ditto if you want to minimize the maximum
+          value;
 
-  \item If any of the constraints contain fractional coefficients, multiply the
-    constraints such that all coefficients are whole numbers;
+    \item If any of the constraints contain fractional coefficients, multiply the
+          constraints such that all coefficients are whole numbers;
 
-  \item The signed distance from a point $\vec{x}$ to a hyperplane
-    $\transpose{\vec{a}}\vec{x} + b = 0$ is computed as follows, \[
-      \frac{\transpose{\vec{a}}\vec{x} + b}{\lVert \vec{a} \rVert_2^2}
-    .\]
-    This is not specific to linear programming, but often appears in linear
-    programming problems in this course.
+    \item The signed distance from a point $\vec{x}$ to a hyperplane
+          $\transpose{\vec{a}}\vec{x} + b = 0$ is computed as follows, \[
+              \frac{\transpose{\vec{a}}\vec{x} + b}{\lVert \vec{a} \rVert_2^2}.
+          \]
+          This is not specific to linear programming, but often appears in linear
+          programming problems in this course.
 \end{itemize}
 
 \end{document}

@@ -4,8 +4,30 @@
 % Packages
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
 \usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{
+    colormap={diverging}{
+            rgb255=(215,25,28)
+            rgb255=(253,174,97)
+            rgb255=(255,255,191)
+            rgb255=(171,221,164)
+            rgb255=(43,131,186)
+        },
+    colormap={sequential}{
+            rgb255=(255,255,204)
+            rgb255=(161,218,180)
+            rgb255=(65,182,196)
+            rgb255=(44,127,184)
+            rgb255=(37,52,148)
+        },
+    compat=1.16,
+}
+
 \usetikzlibrary{calc,arrows,shapes,positioning}
+\usepgfplotslibrary{fillbetween}
+
 \usepackage{xparse}
 \usepackage{xcolor}
 \usepackage{xspace}
@@ -22,9 +44,11 @@
 \usepackage{graphicx}
 \usepackage{cleveref}
 \usepackage{booktabs}
-\usepackage{mdframed}
 \usepackage{algpseudocode}
 \usepackage{makecell}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{thmtools}
+\usepackage{natbib}
 
 % Figure support as explained in Gilles Castel's blog post
 \usepackage{import}
@@ -36,43 +60,34 @@
     \import{./figures/}{#1.pdf_tex}
 }
 
+\geometry{
+    paperwidth=210mm,
+    paperheight=297mm,
+    left=42pt,
+    top=72pt,
+    textwidth=320pt,
+    marginparsep=20pt,
+    marginparwidth=180pt,
+    textheight=650pt,
+    footskip=40pt,
+}
+
 % Fix some stuff
 % http://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning
 \pdfsuppresswarningpagegroup=1
 
-% Example environment
-\newcounter{example}
-\newcommand\examplename{Example}
-\makeatletter
-\newcommand\listofexamples{%
-    \section*{List of examples}%
-    \@starttoc{loe}%
-}
-\renewcommand\theexample
-     {\@arabic\c@example}
-\def\fps@example{tbp}
-\def\ftype@example{1}
-\def\ext@example{loe}
-\def\fnum@example{\examplename\nobreakspace\theexample}
-\newenvironment{example}[1][htbp]
-  {\begin{@tufte@float}[#1]{example}{}
-    \begin{mdframed}[backgroundcolor=black!5,rightline=false,leftline=false]}
-    {\end{mdframed}
-  \end{@tufte@float}}
-\let\l@example\l@figure
-\makeatother
+% Theorem environments
+\mdfsetup{skipabove=1em,skipbelow=0em, innertopmargin=10pt, innerbottommargin=10pt}
 
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
+\declaretheoremstyle[headfont=\bfseries, bodyfont=\normalfont, mdframed={ nobreak }]{boxstyle}
+\declaretheoremstyle[headfont=\bfseries, bodyfont=\normalfont, numbered=no]{noboxstyle}
 
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
+\declaretheorem[style=boxstyle, name=Theorem]{theorem}
+\declaretheorem[sibling=theorem, style=boxstyle, name=Example]{example}
+\declaretheorem[sibling=theorem, style=boxstyle, name=Definition]{definition}
 
-\theoremstyle{remark}
-\newtheorem{remark}{Remark}
-
-\theoremstyle{definition}
-\newtheorem{properties}{Properties}
+\declaretheorem[style=noboxstyle, name=Remark]{remark}
+\declaretheorem[style=noboxstyle, name=Properties]{properties}
 
 % Listing environment
 \newcounter{listing}
@@ -80,21 +95,21 @@
 \makeatletter
 \newcommand\listoflistings{%
     \section*{List of listings}%
-%  \begin{fullwidth}%
+    %  \begin{fullwidth}%
     \@starttoc{loe}%
-%  \end{fullwidth}%
+    %  \end{fullwidth}%
 }
 \renewcommand\thelisting
-     {\@arabic\c@listing}
+{\@arabic\c@listing}
 \def\fps@listing{tbp}
 \def\ftype@listing{1}
 \def\ext@listing{loe}
 \def\fnum@listing{\listingname\nobreakspace\thelisting}
 \newenvironment{listing}[1][htbp]
-  {\begin{@tufte@float}[#1]{listing}{}
-    \begin{mdframed}[backgroundcolor=black!5,rightline=false,leftline=false]}
-    {\end{mdframed}
-  \end{@tufte@float}}
+{\begin{@tufte@float}[#1]{listing}{}
+        \begin{mdframed}[backgroundcolor=black!5]}
+            {\end{mdframed}
+    \end{@tufte@float}}
 \let\l@listing\l@figure
 \makeatother
 
@@ -107,16 +122,16 @@
     \@starttoc{loe}%
 }
 \renewcommand\thealgorithm
-     {\@arabic\c@algorithm}
+{\@arabic\c@algorithm}
 \def\fps@algorithm{tbp}
 \def\ftype@algorithm{1}
 \def\ext@algorithm{loe}
 \def\fnum@algorithm{\algorithmname\nobreakspace\thealgorithm}
 \newenvironment{algorithm}[1][htbp]
-  {\begin{@tufte@float}[#1]{algorithm}{}
-    \begin{mdframed}[backgroundcolor=white,rightline=false,leftline=false]}
-    {\end{mdframed}
-  \end{@tufte@float}}
+{\begin{@tufte@float}[#1]{algorithm}{}
+        \begin{mdframed}[backgroundcolor=white]}
+            {\end{mdframed}
+    \end{@tufte@float}}
 \let\l@algorithm\l@figure
 \makeatother
 

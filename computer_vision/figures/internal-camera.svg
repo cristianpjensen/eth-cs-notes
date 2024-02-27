@@ -2,22 +2,102 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100mm"
    height="40mm"
    viewBox="0 0 100 40"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="internal-camera.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="internal-camera.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
+    <marker
+       style="overflow:visible"
+       id="marker4"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path3" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker2"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path2" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWide"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path1" />
+    </marker>
     <marker
        markerWidth="0.911"
        markerHeight="1.690"
@@ -417,9 +497,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8.0000002"
-     inkscape:cx="113.56238"
-     inkscape:cy="29.120884"
+     inkscape:zoom="2.8931657"
+     inkscape:cx="178.69699"
+     inkscape:cy="86.583359"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -428,10 +508,13 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="1568"
-     inkscape:window-height="1376"
-     inkscape:window-x="2432"
-     inkscape:window-y="517"
-     inkscape:window-maximized="0">
+     inkscape:window-height="1067"
+     inkscape:window-x="224"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -439,7 +522,10 @@
        spacingx="10"
        spacingy="10"
        empspacing="4"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       visible="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -459,7 +545,7 @@
      id="layer1"
      transform="translate(0,-257)">
     <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker-arrow-0.5308)"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker2)"
        d="M 21.258,283.4571 H 87.941419"
        id="path25"
        inkscape:connector-curvature="0"
@@ -471,13 +557,13 @@
        cy="283.4462"
        r="0.37723145" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker-arrow-0.5308)"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#ArrowWide)"
        d="M 21.258,283.4571 V 261.34348"
        id="path108"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker-arrow-0.5308)"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker2)"
        d="m 21.258,283.4571 -9.20536,9.20536"
        id="path199"
        inkscape:connector-curvature="0" />
@@ -503,14 +589,14 @@
     <text
        id="text348"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="267.76581"
        x="77.391991"><tspan
          id="tspan346"
          sodipodi:role="line"
          x="77.391991"
          y="267.76581"
-         style="stroke-width:0.26458332">$\vec{X}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{X}$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="m 21.258,283.4571 12.956255,-3.80188"
@@ -533,47 +619,47 @@
     <text
        id="text416"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="286.5712"
        x="54.330544"><tspan
          id="tspan414"
          sodipodi:role="line"
          x="54.330544"
          y="286.5712"
-         style="stroke-width:0.26458332">\textit{\footnotesize optical axis}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize optical axis}</tspan></text>
     <text
        id="text430"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="295.54337"
        x="9.5647907"><tspan
          id="tspan428"
          sodipodi:role="line"
          x="9.5647907"
          y="295.54337"
-         style="stroke-width:0.26458332">$x_c$</tspan></text>
+         style="stroke-width:0.264583">$x_c$</tspan></text>
     <text
        id="text444"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="259.46561"
        x="19.695284"><tspan
          id="tspan442"
          sodipodi:role="line"
          x="19.695284"
          y="259.46561"
-         style="stroke-width:0.26458332">$y_c$</tspan></text>
+         style="stroke-width:0.264583">$y_c$</tspan></text>
     <text
        id="text458"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="284.19937"
        x="89.072083"><tspan
          id="tspan456"
          sodipodi:role="line"
          x="89.072083"
          y="284.19937"
-         style="stroke-width:0.26458332">$z_c$</tspan></text>
+         style="stroke-width:0.264583">$z_c$</tspan></text>
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.1107139;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
        id="rect317-6-1"
@@ -584,36 +670,36 @@
     <text
        id="text487"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="292.95721"
        x="37.542717"><tspan
          id="tspan485"
          sodipodi:role="line"
          x="37.542717"
          y="292.95721"
-         style="stroke-width:0.26458332">\textit{\footnotesize image plane}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize image plane}</tspan></text>
     <text
        id="text501"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="282.35455"
        x="34.039021"><tspan
          id="tspan499"
          sodipodi:role="line"
          x="34.039021"
          y="282.35455"
-         style="stroke-width:0.26458332">$\vec{x}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{x}$</tspan></text>
     <text
        id="text515"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="283.38339"
        x="8.2528563"><tspan
          id="tspan513"
          sodipodi:role="line"
          x="8.2528563"
          y="283.38339"
-         style="stroke-width:0.26458332">\textit{\footnotesize focal point}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize focal point}</tspan></text>
     <path
        style="fill:none;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;marker-end:none;marker-start:none;stroke-dasharray:none"
        d="M 34.908463,279.46309 76.249608,266.96152"
@@ -632,16 +718,16 @@
     <text
        id="text722"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="289.36285"
        x="27.446743"><tspan
          id="tspan720"
          sodipodi:role="line"
          x="27.446743"
          y="289.36285"
-         style="stroke-width:0.26458332">$f$</tspan></text>
+         style="stroke-width:0.264583">$f$</tspan></text>
     <path
-       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker-arrow-1.0616);marker-end:url(#marker-arrow-1.0616)"
+       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker3);marker-end:url(#marker4)"
        d="M 21.542212,285.77233 H 36.060437"
        id="path734"
        inkscape:connector-curvature="0" />

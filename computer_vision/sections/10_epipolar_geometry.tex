@@ -1,0 +1,306 @@
+\section{Epipolar geometry}
+
+\begin{remark}
+    In this section, all points are in projective space. They are not denoted by
+    $\tilde{\vec{x}}$ and $\tilde{\vec{X}}$, but rather by $\vec{x}$ and
+    $\vec{X}$.
+\end{remark}
+
+Epipolar geometry is the geometry of stereo vision, where two cameras view a
+scene. When two cameras view a scene from distinct positions, there are
+geometric relations between the 3-dimensional points and their 2-dimensional
+projections on the image planes. These geometric relations lead to constraints
+between the image points that we can make use of. These relations are derived
+based on the assumption that the two cameras are approximated by the pinhole
+camera model (\cref{sec:camera-model}).
+
+\begin{figure}[h!]
+    \centering
+    \incfig{epipolar-geometry}
+    \caption{Epipolar geometry.}
+    \label{fig:epipolar-geometry}
+\end{figure}
+
+\Cref{fig:epipolar-geometry} shows the geometric relationships between the
+3-dimensional points and its projections onto the images. $\vec{X}$ is the
+3-dimensional point that is projected onto camera 1 as $\vec{x}_1$ and camera 2
+as $\vec{x}_2$ (as seen in the pinhole camera model). Together, $\vec{C}_1$,
+$\vec{C}_2$, and $\vec{X}$ form the \textit{epipolar plane} $\vec{\pi}$.
+$\vec{x}_1$ and $\vec{x}_2$ must also be on this plane. More specifically, the
+intersections between the epipolar plane and image planes are lines called the
+\textit{epipolar lines} $\vec{\ell}_1$ and $\vec{\ell}_2$. $\vec{x}_1$ must be
+on $\vec{\ell}_1$ and $\vec{x}_2$ must be on $\vec{\ell}_2$.
+
+We can also see this from a different perspective. The projections of
+$\vec{C}_2$ onto image 1, and $\vec{C}_1$ onto image 2, are called the
+\textit{epipoles} $\vec{e}_1$ and $\vec{e}_2$. These are computed as follows,
+\begin{align*}
+    \vec{e}_1 & = \mat{P}_1 \vec{C}_2  \\
+    \vec{e}_2 & = \mat{P}_2 \vec{C}_1,
+\end{align*}
+where $\mat{P}_1$ and $\mat{P}_2$ are the camera matrices of cameras 1 and 2,
+respectively. The line formed between $\vec{x}_1$ and $\vec{e}_1$ is the
+epipolar line (same for $\vec{x}_2$ and $\vec{e}_2$). This gives us the
+following constraint,
+\begin{align*}
+    \vec{\ell}_1 & = \vec{e}_1 \times \vec{x}_1  \\
+    \vec{\ell}_2 & = \vec{e}_2 \times \vec{x}_2.
+\end{align*}
+Intuitively, this is because both $\vec{C}_1$ and $\vec{C}_2$ are on the
+epipolar plane, thus so must be $\vec{e}_1$ and $\vec{e}_2$. The epipolar lines
+are the intersection of the epipolar plane with the image planes, and we know
+two points that are on both, $\vec{x}$ and $\vec{e}$, which form a line.
+
+Notice that $\vec{x}_1$ cannot be ``behind`` $\vec{e}_1$, because that would
+imply that $\vec{X}$ is behind $\vec{C}_1$, which is not the case, because
+$\vec{X}$ is visible in image 1. The same holds for camera 2.
+
+In general, we want to be able to reconstruct 3-dimensional points from
+2-dimensional point correspondences between $n$ images. This is done in the
+following three steps,
+\begin{enumerate}
+    \item Compute the fundamental (or essential) matrix that relates the point
+          correspondences, \[
+              \transpose{\vec{x}_2} \mat{F} \vec{x}_1 = 0
+              ,\]
+          where $\mat{F}$ transforms $\vec{x}_1$ to the epipolar line of $\vec{x}_2$
+          and $\transpose{\mat{F}}$ transforms $\vec{x}_2$ to the epipolar line of
+          $\vec{x}_1$. This is done using the direct linear transform;
+
+    \item From the fundamental matrix, compute the relative pose
+          $(\vec{T},\mat{R})$ between the cameras;
+
+    \item Using the point correspondences and the relative pose, backproject the
+          2-dimensional image points into 3-dimensional space and find their
+          intersection to find $\vec{X}$.
+
+\end{enumerate}
+
+\subsection{Correspondence geometry}
+
+We need to find out in what way $\vec{x}_1$ constrains the location of
+$\vec{x}_2$ in image 2, without knowing $\vec{X}$. $\vec{x}_1$ constrains the
+point $\vec{X}$ to be on the projection line from $\vec{C}_1$ to $\vec{x}_1$,
+as can be seen in \Cref{fig:image-1-constraint,fig:internal-camera}.
+
+\begin{figure}[ht]
+    \centering
+    \incfig{image-1-constraint}
+    \caption{Knowing $\vec{x}_1$ constrains its corresponding point $\vec{x}_2$
+        to be on the epipolar line $\vec{\ell}_2$, and not behind $\vec{e}_2$,
+        because then $\vec{X}$ would be behind camera 1, which is not the case.}
+    \label{fig:image-1-constraint}
+\end{figure}
+
+The key insight into constraining $\vec{x}_2$ is that we do not need to know
+the exact location of $\vec{X}$. We only need to find a second point on
+$\vec{\ell}_2$ to compute it with the cross product (we already know
+$\vec{e}_2$). Furthermore, the projection line emanating from $\vec{x}_1$ is on
+the epipolar plane, thus any point on this projection line is also on the
+epipolar plane. If we project that point onto image plane 2, we get a second
+point on $\vec{\ell}_2$. We can compute a point on the projection line by using
+the pseudo-inverse $\mat{P}_1^+$.\sidenote{The pseudo-inverse can be computed
+    with SVD as $\mat{M}^+=\mat{V}\frac{1}{\mat{\Sigma}}\transpose{\mat{U}}$.
+    $\mat{M}^+ \vec{x}$ maps $\vec{x}$ to some point $\vec{y}$ that mapped to
+    $\vec{x}=\mat{M}\vec{y}$. However, this is not necessarily $\vec{y}$, since we
+    lose one dimension of information in the $3\times 4$ matrix $\mat{P}$.} A
+3-dimensional point $\vec{X}'$ on the projection line between $\vec{C}_1$ and
+$\vec{x}_1$ can be computed as follows, \[
+    \vec{X}' = \mat{P}_1^+ \vec{x}_1.
+\]
+The epipolar line $\vec{\ell}_2$ can be computed by the cross product between
+the epipole $\vec{e}_2$ and this point on image plane 2, \[
+    \vec{\ell}_2 = \mat{P}_2 \vec{C}_1 \times \mat{P}_2 \mat{P}_1^+ \vec{x}_1.
+\]
+
+\marginnote[-1.25cm]{The cross product matrix is the conversion of a vector to a matrix
+    that would be equivalent to performing a cross product with that vector, \[
+        [\vec{a}]_\times \doteq \begin{bmatrix}
+            0    & -a_3 & a_2  \\
+            a_3  & 0    & -a_1 \\
+            -a_2 & a_1  & 0
+        \end{bmatrix}.
+    \]}
+
+\begin{definition}[Fundamental matrix]
+    \label{def:fundamental-matrix}
+
+    The fundamental matrix $\mat{F}$ is defined as satisfying the
+    \textit{epipolar constraint} for all point correspondences in image 1 and 2,
+    \[
+        \transpose{\vec{x}_2} \mat{F} \vec{x}_1 = 0. \margintag{$\mat{F}$ has 7 degrees of freedom, because it is a $3\times 3$ matrix, is defined up to scale, and $\det{\mat{F}}=0$ (rank 2).}
+    \]
+    The fundamental matrix relates points in one image plane with lines in the
+    other. \Ie, $\vec{x}_2$ must be on the line $\mat{F} \vec{x}_1$ and
+    $\vec{x}_1$ must be on the line $\transpose{\vec{x}_2} \mat{F} =
+        \transpose{\mat{F}} \vec{x}_2$.
+
+    It satisfies the following equations \wrt the camera matrices,
+    \begin{align*}
+        \mat{F}             & = [\mat{P}_2 \vec{C}_1]_\times \mat{P}_2 \mat{P}_1^+ \margintag{Note that these equations are not used for estimating the fundamental matrix, since we do not have access to the camera matrices.} \\
+        \transpose{\mat{F}} & = [\mat{P}_1 \vec{C}_2]_\times \mat{P}_1 \mat{P}_2^+.
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Essential matrix]
+    The essential matrix $\mat{E}$ relates points in one image plane with lines
+    in the other by the epipolar constraint in the same way as the fundamental
+    matrix (\cref{def:fundamental-matrix}), \[
+        \transpose{\hat{\vec{x}}_2} \mat{E} \hat{\vec{x}}_1 = 0, \margintag{$\mat{E}$ has 5 degrees of freedom, because it has the same parameters as the fundamental matrix, minus the intrinsic camera parameters.}
+    \]
+    where $\hat{\vec{x}} = \inv{\mat{K}} \vec{x}$.
+
+    The difference is that the essential matrix assumes that the cameras are
+    calibrated. This means that the intrinsic camera parameters are known. We have
+    the following relation between the two matrices, \[
+        \mat{E} = \transpose{\mat{K}} \mat{F} \mat{K}.
+    \]
+\end{definition}
+
+\paragraph{8-point algorithm.}
+
+Given that we know 8 point correspondences,\sidenote{We assume that all our
+    point correspondences are correct, \ie, they satisfy
+    $\transpose{\vec{x}_1}\mat{F}\vec{x}_2=0$.} we can compute $\mat{F}$ using
+direct linear transformation (DLT) derived from
+$\transpose{\vec{x}'}\mat{F}\vec{x}=0$, \[
+    \begin{bmatrix}
+        x_1'x_1 & x'_1y_1 & x_1'   & y_1'x_1 & y_1'y_1 & y_1'   & x_1    & y_1    & 1      \\
+        \vdots  & \vdots  & \vdots & \vdots  & \vdots  & \vdots & \vdots & \vdots & \vdots \\
+        x_n'x_n & x'_ny_n & x_n'   & y_n'x_n & y_n'y_n & y_n'   & x_n    & y_n    & 1
+    \end{bmatrix}
+    \begin{bmatrix}
+        f_{11} \\
+        f_{12} \\
+        f_{13} \\
+        f_{21} \\
+        f_{22} \\
+        f_{23} \\
+        f_{31} \\
+        f_{32} \\
+        f_{33}
+    \end{bmatrix}
+    = \vec{0}, \margintag{Let $\mat{A}$ denote the matrix, and $\vec{f}$ the vector of fundamental matrix entries.}
+\]
+after which we use the SVD trick to find the best algebraic solution.
+
+However, the problem with this is that the values of the matrix grow very large,
+because of the multiplications, while the last column vector remains 1. Using
+DLT, this will always result in the best matrix being very similar to the
+following, \[
+    \begin{bmatrix}
+        0 & 0 & 0 \\
+        0 & 0 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix}.
+\]
+Thus, importantly, we need to first normalize the coordinates of the images to
+be in $[-1, 1]\times[-1, 1]$ before computing $\mat{F}$.
+
+Now, we also need to enforce the \textit{singularity constraint} (rank 2,
+$\det{\mat{F}}=0$) of $\mat{F}$, since DLT will give a rank 3 matrix. One
+possible solution is to set the smallest singular value to equal 0 using
+SVD. However, this does not necessarily yield the best results, because we are
+adjusting it a posteriori.
+
+\paragraph{7-point algorithm.}
+
+We would like our algorithm to only be able to give rank-2 matrices. We could
+use 7 point-correspondences, making $\mat{A}$ a $7\times 9$ matrix.\sidenote{We
+    could also use more and then use the space corresponding to the two smallest
+    singular values} Thus, this matrix has a 2-dimensional null space, which we
+denote by $\vec{f}_1$ and $\vec{f}_2$ (with corresponding fundamental matrices
+$\mat{F}_1$ and $\mat{F}_2$). This means that we have a family of solutions to
+the problem such that $\mat{A} (\vec{f}_1 + \lambda \vec{f}_2) = \vec{0}$, \[
+    \mat{F}_1 + \lambda \mat{F}_2.
+\]
+However, this does not necessarily give a rank-2 matrix. The solution to this
+problem satisfies the following, \[
+    \det{\mat{F}_1 + \lambda \mat{F}_2} = 0,
+\]
+which results in a cubic equation with 1 or 3 solutions for $\lambda$.
+
+\paragraph{5-point algorithm.}
+
+The essential matrix only has 5 degrees of freedom, thus we only need 5 point
+correspondences to compute it. However, as in the 7-point algorithm, this
+results in a 4-dimensional null space. Furthermore, we additionally have the
+constraint that $\mat{E}$ has two equal non-zero singular values. This results
+in 10 cubic polynomials that need to be solved for.
+
+\subsection{Camera geometry}
+
+From the essential matrix,\sidenote{Or the fundamental matrix, since they are
+    closely related by \[ \mat{E} = \transpose{\mat{K}} \mat{F} \mat{K} ,\] as we
+    have already seen.} we can compute the relative pose between the 2 cameras
+\citep{longuet1981computer}. This is done by first decomposing $\mat{E} =
+    \mat{U} \mat{\Sigma} \transpose{\mat{V}}$.\sidenote{We know the following, \[
+        \mat{\Sigma} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix},
+    \]
+    because of the constraints on the essential matrix.} Then, we
+can compute the four possible relative poses as the following,
+\begin{align*}
+    \vec{T} = \mat{U}_3,  & \hspace{0.2cm} \mat{R} = \mat{U}\mat{W}\transpose{\mat{V}}              \\
+    \vec{T} = -\mat{U}_3, & \hspace{0.2cm} \mat{R} = \mat{U}\mat{W}\transpose{\mat{V}}              \\
+    \vec{T} = \mat{U}_3,  & \hspace{0.2cm} \mat{R} = \mat{U}\transpose{\mat{W}}\transpose{\mat{V}}  \\
+    \vec{T} = -\mat{U}_3, & \hspace{0.2cm} \mat{R} = \mat{U}\transpose{\mat{W}}\transpose{\mat{V}},
+\end{align*}
+where $\mat{W}$ is the following matrix, \[
+    \mat{W} = \begin{bmatrix}
+        0 & -1 & 0 \\
+        1 & 0  & 0 \\
+        0 & 0  & 1
+    \end{bmatrix}.
+\]
+
+For each configuration, we then check for the \textit{Cheirality condition},
+\ie, the reconstructed points must be in front of the cameras.
+
+\subsection{Scene geometry}
+
+From the relative camera pose and point correspondences, we can triangulate the
+points to find them in three dimensions. A possible solution would be to
+backproject the $\vec{x}_1$ and $\vec{x}_2$ and find their intersection.
+
+We can do this by first finding the $x$ and $y$ lines that the points
+$\vec{x}_1$ and $\vec{x}_2$ are within their respective image. Let $\vec{x}$ be
+the point in the image, then we have the following relations,
+\begin{align*}
+    \vec{x}      & = \vec{\ell}_x \times \vec{\ell}_y                      \\
+    \vec{\ell}_x & = \transpose{\begin{bmatrix} -1 & 0 & x \end{bmatrix}}  \\
+    \vec{\ell}_y & = \transpose{\begin{bmatrix} 0 & -1 & y \end{bmatrix}}.
+\end{align*}
+Then, we can find the planes on which these lines are within the 3-dimensional
+space,
+\begin{align*}
+    \vec{\Pi}_x & = \transpose{\mat{P}} \vec{\ell}_x \\
+    \vec{\Pi}_y & = \transpose{\mat{P}} \vec{\ell}_y
+    .\end{align*}
+Lastly, to get $\vec{x}$'s backprojection, we have to find the intersection
+between these planes, which is defined by the points $\vec{X}$ that satisfy the
+following, \[
+    \begin{bmatrix} \transpose{\vec{\Pi}_x} \\ \transpose{\vec{\Pi}_y} \end{bmatrix} \vec{X} = \vec{0}.
+\]
+
+We want to find the intersection of the two backprojections of $\vec{x}_1$ and
+$\vec{x}_2$.\sidenote{We could also use $n > 2$ cameras, which relies on the
+    same idea: finding the intersection of $n$ backprojections. However, more than
+    4 cameras does not help.} We can find this by finding a solution for the two
+backprojections that satisfies the following, \[
+    \det{\begin{bmatrix} \transpose{\vec{\ell}_{x_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{y_1}} \mat{P}_1 \\ \transpose{\vec{\ell}_{x_2}} \mat{P}_2 \\ \transpose{\vec{\ell}_{y_2}} \mat{P}_2 \end{bmatrix}} = 0.
+\]
+
+\begin{figure}[t]
+    \centering
+    \incfig{mid-point-reprojection}
+    \caption{Mid-point reprojection.}
+    \label{fig:mid-point-reprojection}
+\end{figure}
+
+However, due to noise, the two backprojections will never truly intersect.
+Thus, we need to find a best intersection. A natural best estimate is the
+mid-point of the shortest line between the two backprojection lines. This
+minimizes the 3-dimensional error, but not the reprojection error. We could
+further optimize this estimate to minimize the reprojection error, \[
+    d(\vec{x}_1, \mat{P}_1 \hat{\vec{X}})^2 + d(\vec{x}_2, \mat{P}_2 \hat{\vec{X}})^2.
+\]

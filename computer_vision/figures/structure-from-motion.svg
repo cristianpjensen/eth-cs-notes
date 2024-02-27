@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100mm"
    height="45mm"
    viewBox="0 0 100 45"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="structure-from-motion.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="structure-from-motion.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
     <marker
@@ -128,9 +128,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="199.44864"
-     inkscape:cy="94.906171"
+     inkscape:zoom="3.3024668"
+     inkscape:cx="191.3721"
+     inkscape:cy="83.725293"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -143,7 +143,10 @@
      inkscape:window-x="1512"
      inkscape:window-y="517"
      inkscape:window-maximized="1"
-     inkscape:snap-grids="false">
+     inkscape:snap-grids="false"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -151,7 +154,10 @@
        spacingx="10"
        spacingy="10"
        empspacing="4"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       visible="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -201,25 +207,25 @@
     <text
        id="text330"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="290.29965"
        x="9.3738213"><tspan
          id="tspan328"
          sodipodi:role="line"
          x="9.3738213"
          y="290.29965"
-         style="stroke-width:0.26458332">$\vec{C}_{k-1}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{C}_{k-1}$</tspan></text>
     <text
        id="text330-9"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="290.27472"
        x="81.287926"><tspan
          id="tspan328-3"
          sodipodi:role="line"
          x="81.287926"
          y="290.27472"
-         style="stroke-width:0.26458332">$\vec{C}_{k+1}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{C}_{k+1}$</tspan></text>
     <g
        transform="matrix(-1.001248,0,0,1,99.928182,5.5258712)"
        id="g368-6">
@@ -249,7 +255,7 @@
          style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28088167;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
     </g>
     <path
-       style="fill:none;fill-opacity:1;stroke:black;stroke-width:0.4213225;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       style="fill:#ddcc77;fill-opacity:1;stroke:black;stroke-width:0.4213225;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="m 66.014343,252.00517 v 1.73545 l -5.066377,3.94267 -24.577164,-0.12914 0,-5.5425"
        id="path76"
        inkscape:connector-curvature="0"
@@ -275,14 +281,14 @@
     <text
        id="text147"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="255.14917"
        x="43.200813"><tspan
          id="tspan145"
          sodipodi:role="line"
          x="43.200813"
          y="255.14917"
-         style="stroke-width:0.26458332">\textit{\footnotesize 3D structure}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize 3D structure}</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28806442;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="M 37.596569,290.9762 H 59.350228 V 276.00498 H 37.560904 Z"
@@ -392,13 +398,13 @@
     <text
        id="text330-6"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="296.89932"
        x="46.953979"><tspan
          id="tspan328-0"
          sodipodi:role="line"
          x="46.953979"
          y="296.89932"
-         style="stroke-width:0.26458332">$\vec{C}_k$</tspan></text>
+         style="stroke-width:0.264583">$\vec{C}_k$</tspan></text>
   </g>
 </svg>

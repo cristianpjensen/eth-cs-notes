@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'transformer.pdf' (pdf, eps, ps)
 %%
@@ -54,23 +54,23 @@
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{transformer.pdf}}%
-    \put(0.37220716,0.39487671){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MHSA\end{tabular}}}}%
+    \put(0.40132658,0.39487671){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MHSA\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{transformer.pdf}}%
-    \put(0.32428023,0.64369877){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
-    \put(0.44539253,0.52521729){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.35186705,0.64369877){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}LayerNorm\end{tabular}}}}%
+    \put(0.44950478,0.52795898){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{transformer.pdf}}%
-    \put(0.44566116,0.95453857){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.44977341,0.95727997){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{transformer.pdf}}%
-    \put(0.44286354,0.07746277){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{X}$\end{tabular}}}}%
+    \put(0.45023972,0.07746277){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{X}$\end{tabular}}}}%
     \put(0.07462638,0.41515137){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\textit{\footnotesize residual connections}\end{tabular}}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{transformer.pdf}}%
-    \put(0.44048717,1.29417755){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\R^d$\end{tabular}}}}%
-    \put(0.44523342,0.19846985){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
+    \put(0.45102455,1.29417755){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\R^d$\end{tabular}}}}%
+    \put(0.44950478,0.19999084){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=6]{transformer.pdf}}%
-    \put(0.38349599,0.82291159){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MLPs\end{tabular}}}}%
+    \put(0.414148,0.82291159){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}MLPs\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=7]{transformer.pdf}}%
-    \put(0.32428023,1.07189995){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}layer norm\end{tabular}}}}%
-    \put(0.67014145,0.19089966){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{P}$\end{tabular}}}}%
+    \put(0.35186707,1.07190002){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}LayerNorm\end{tabular}}}}%
+    \put(0.67014145,0.19932983){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{P}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=8]{transformer.pdf}}%
   \end{picture}%
 \endgroup%

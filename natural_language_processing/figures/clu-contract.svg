@@ -2,22 +2,45 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100mm"
    height="50mm"
    viewBox="0 0 100 50"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="clu-contract.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="clu-contract.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
+    <linearGradient
+       id="swatch2"
+       inkscape:swatch="solid"
+       inkscape:label="main"
+       inkscape:pinned="true">
+      <stop
+         style="stop-color:#e69f00;stop-opacity:0.2;"
+         offset="0"
+         id="stop2" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
     <marker
        markerWidth="0.91100001"
        markerHeight="1.6900001"
@@ -358,6 +381,15 @@
            d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722" />
       </g>
     </marker>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#swatch2"
+       id="linearGradient2"
+       x1="2.8605703"
+       y1="311.61409"
+       x2="56.502549"
+       y2="311.61409"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -366,22 +398,25 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9549912"
-     inkscape:cx="140.42497"
-     inkscape:cy="104.67806"
+     inkscape:zoom="1.7794559"
+     inkscape:cx="185.73093"
+     inkscape:cy="134.02973"
      inkscape:document-units="mm"
-     inkscape:current-layer="g112-0"
+     inkscape:current-layer="layer1"
      showgrid="true"
      showborder="true"
      width="200mm"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="2488"
-     inkscape:window-height="1376"
-     inkscape:window-x="1512"
-     inkscape:window-y="517"
-     inkscape:window-maximized="1"
-     inkscape:snap-grids="false">
+     inkscape:window-width="896"
+     inkscape:window-height="1067"
+     inkscape:window-x="896"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:snap-grids="false"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -390,10 +425,18 @@
        spacingy="10"
        empspacing="4"
        dotted="false"
-       visible="false" />
+       visible="true"
+       originx="0"
+       originy="0" />
     <inkscape:grid
        type="xygrid"
-       id="grid342" />
+       id="grid342"
+       originx="0"
+       originy="0"
+       spacingy="1"
+       spacingx="1"
+       units="mm"
+       visible="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -403,7 +446,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -412,22 +454,31 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-247)">
+    <path
+       style="font-variation-settings:normal;opacity:1;fill:url(#linearGradient2);fill-opacity:0.76;stroke:none;stroke-width:0.14;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;stop-opacity:1"
+       d="m 9.4899487,302.1634 c -4.5956554,1.55734 -6.2943914,4.59355 -6.5868071,8.26296 -0.2924156,3.66941 0.843422,7.93245 5.8540817,10.06409 5.0106597,2.13165 13.8955377,2.13165 22.0225307,2.13165 8.126993,0 15.495123,0 19.903744,-2.13165 4.40862,-2.13164 5.857199,-6.39468 5.818291,-10.06409 -0.03891,-3.66941 -1.565293,-6.74475 -6.446662,-8.28252 -4.881369,-1.53777 -12.969566,-1.53777 -20.904902,-1.53777 -7.935335,0 -15.064621,0 -19.6602763,1.55733 z"
+       id="path1"
+       inkscape:path-effect="#path-effect1"
+       inkscape:original-d="m 6.6369266,300.60607 c -1.7426317,3.11467 -3.441368,6.15088 -5.162105,9.22641 1.1359052,4.26329 2.2717412,8.52633 3.4076464,12.78962 8.885415,0 17.770293,0 26.655705,0 7.368574,0 14.736704,0 22.105281,0 1.448665,-4.26329 2.897242,-8.52633 4.345907,-12.78962 -1.52648,-3.07553 -3.052865,-6.15087 -4.579349,-9.22641 -8.236254,0 -16.324451,0 -24.708262,0 -7.48686,0 -14.616146,0 -22.0648234,0 z"
+       sodipodi:nodetypes="ccccccccc"
+       transform="translate(30.094687,-26.893121)" />
     <g
        id="g112"
        transform="translate(-0.67613464,12.351553)">
       <circle
          r="3.8195403"
-         cy="269.62936"
-         cx="20.03756"
+         cy="265.54282"
+         cx="-50.877457"
          id="path8-3"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.140441;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
+         transform="rotate(-15.096441)" />
       <text
          x="19.383333"
          y="270.77026"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text72"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="270.77026"
            x="19.383333"
            sodipodi:role="line"
@@ -445,10 +496,10 @@
       <text
          x="19.383333"
          y="270.77026"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text72-6"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="270.77026"
            x="19.383333"
            sodipodi:role="line"
@@ -466,10 +517,10 @@
       <text
          x="19.383333"
          y="270.77026"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text72-6-2"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="270.77026"
            x="19.383333"
            sodipodi:role="line"
@@ -487,10 +538,10 @@
       <text
          x="19.383333"
          y="270.77026"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text72-6-2-3"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="270.77026"
            x="19.383333"
            sodipodi:role="line"
@@ -508,10 +559,10 @@
       <text
          x="18.593309"
          y="281.48727"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text72-2"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="281.48727"
            x="18.593309"
            sodipodi:role="line"
@@ -561,98 +612,91 @@
       <text
          id="text429"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="-7.291729"
          y="304.43439"><tspan
            id="tspan427"
            sodipodi:role="line"
            x="-7.291729"
            y="304.43439"
-           style="stroke-width:0.26458332">\footnotesize{$20+40+60$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$20+40+60$}</tspan></text>
       <text
          id="text429-8"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="-2.0706451"
          y="315.14413"><tspan
            id="tspan427-9"
            sodipodi:role="line"
            x="-2.0706451"
            y="315.14413"
-           style="stroke-width:0.26458332">\footnotesize{$10$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$10$}</tspan></text>
       <text
          id="text429-7"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="-7.2667766"
          y="289.66693"><tspan
            id="tspan427-3"
            sodipodi:role="line"
            x="-7.2667766"
            y="289.66693"
-           style="stroke-width:0.26458332">\footnotesize{$90$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$90$}</tspan></text>
       <text
          id="text429-7-6"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="26.045033"
          y="294.15704"><tspan
            id="tspan427-3-1"
            sodipodi:role="line"
            x="26.045033"
            y="294.15704"
-           style="stroke-width:0.26458332">\footnotesize{$30+50+60$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$30+50+60$}</tspan></text>
       <text
          id="text429-2"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="18.336128"
          y="307.83591"><tspan
            id="tspan427-93"
            sodipodi:role="line"
            x="18.336128"
            y="307.83591"
-           style="stroke-width:0.26458332">\footnotesize{$50$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$50$}</tspan></text>
       <text
          id="text429-2-1"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="37.435726"
          y="307.81241"><tspan
            id="tspan427-93-9"
            sodipodi:role="line"
            x="37.435726"
            y="307.81241"
-           style="stroke-width:0.26458332">\footnotesize{$40$}</tspan></text>
+           style="stroke-width:0.264583">\footnotesize{$40$}</tspan></text>
       <text
          id="text429-8-4"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="27.098412"
          y="320.89813"><tspan
            id="tspan427-9-7"
            sodipodi:role="line"
            x="27.098412"
            y="320.89813"
-           style="stroke-width:0.26458332">\footnotesize{$60$}</tspan></text>
-      <rect
-         style="opacity:1;fill:black;fill-opacity:0.12;stroke:none;stroke-width:0.16239856;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
-         id="rect74"
-         width="49.061443"
-         height="18.577324"
-         x="4.6081133"
-         y="303.70016" />
+           style="stroke-width:0.264583">\footnotesize{$60$}</tspan></text>
       <text
          id="text307"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         x="51.019279"
-         y="320.97864"><tspan
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="53.647976"
+         y="321.21964"><tspan
            id="tspan305"
            sodipodi:role="line"
-           x="51.019279"
-           y="320.97864"
-           style="stroke-width:0.26458332">$c$</tspan></text>
+           x="53.647976"
+           y="321.21964"
+           style="stroke-width:0.264583">$c$</tspan></text>
     </g>
   </g>
 </svg>

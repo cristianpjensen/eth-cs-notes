@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'mapping-wfst.pdf' (pdf, eps, ps)
 %%
@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{283.46456693bp}%
+    \setlength{\unitlength}{180bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,58 +50,58 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.8)%
+  \begin{picture}(1,1.25984251)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{mapping-wfst.pdf}}%
-    \put(0.29563298,0.5450727){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\alpha$\end{tabular}}}}%
-    \put(0.66549832,0.54400837){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\beta$\end{tabular}}}}%
+    \put(0.18248929,0.8583822){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\alpha$\end{tabular}}}}%
+    \put(0.76495438,0.85670608){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\beta$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{mapping-wfst.pdf}}%
-    \put(0.47889089,0.22381687){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\gamma$\end{tabular}}}}%
-    \put(0.46722313,0.7075348){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
-    \put(0.46251946,0.67800264){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
-    \put(0.46607575,0.64847047){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
-    \put(0.46433304,0.61893831){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
-    \put(0.65941129,0.41241726){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
-    \put(0.65470761,0.38288509){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
-    \put(0.6582639,0.35335293){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
-    \put(0.6565212,0.32382076){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
-    \put(0.250295,0.41308246){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
-    \put(0.24559132,0.3835503){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
-    \put(0.24914761,0.35401813){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
-    \put(0.24740491,0.32448596){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
-    \put(0.41291354,0.11750763){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
-    \put(0.40820986,0.08797547){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
-    \put(0.41176615,0.0584433){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
-    \put(0.41002345,0.02891113){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
-    \put(0.49718872,0.11757691){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
-    \put(0.500745,0.08804475){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
-    \put(0.4990023,0.05851258){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
-    \put(0.5665522,0.22550307){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0.47108443,0.3524675){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\gamma$\end{tabular}}}}%
+    \put(0.45271,1.11422803){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
+    \put(0.44530264,1.06772068){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
+    \put(0.45090309,1.02121334){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
+    \put(0.44815867,0.97470599){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
+    \put(0.75536851,0.64947599){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
+    \put(0.74796115,0.60296865){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
+    \put(0.7535616,0.5564613){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
+    \put(0.75081718,0.50995395){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
+    \put(0.11109089,0.65052355){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
+    \put(0.10368353,0.60401621){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
+    \put(0.10928398,0.55750886){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
+    \put(0.10653956,0.51100151){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
+    \put(0.36718308,0.18505138){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \gamma$\end{tabular}}}}%
+    \put(0.35977572,0.13854403){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\gamma$\end{tabular}}}}%
+    \put(0.36537617,0.09203669){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\gamma$\end{tabular}}}}%
+    \put(0.36263175,0.04552934){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\gamma$\end{tabular}}}}%
+    \put(0.49989989,0.18516048){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.50550035,0.13865314){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.50275593,0.09214579){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.60913373,0.35512294){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.72805448\unitlength}\raggedright \end{minipage}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{mapping-wfst.pdf}}%
-    \put(0.18029369,0.73087106){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
-    \put(0.17559001,0.7013389){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
-    \put(0.1791463,0.67180673){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
-    \put(0.1774036,0.64227456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
-    \put(0.26456887,0.73094034){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
-    \put(0.26812515,0.70140818){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
-    \put(0.26638245,0.67187601){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
-    \put(0.33393235,0.8388665){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0.0008526,1.15097804){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \alpha$\end{tabular}}}}%
+    \put(-0.00655476,1.1044707){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\alpha$\end{tabular}}}}%
+    \put(-0.0009543,1.05796335){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\alpha$\end{tabular}}}}%
+    \put(-0.00369872,1.011456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\alpha$\end{tabular}}}}%
+    \put(0.13356942,1.15108714){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.13916987,1.1045798){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.13642545,1.05807245){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.24280326,1.3210496){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.72805448\unitlength}\raggedright \end{minipage}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{mapping-wfst.pdf}}%
-    \put(0.64327347,0.73087106){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
-    \put(0.63856979,0.7013389){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
-    \put(0.64212608,0.67180673){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
-    \put(0.64038338,0.64227456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
-    \put(0.72754865,0.73094034){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
-    \put(0.73110493,0.70140818){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
-    \put(0.72936223,0.67187601){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
-    \put(0.79691213,0.8388665){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.4623146\unitlength}\raggedright \end{minipage}}}%
+    \put(0.72995462,1.15097804){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\epsilon : \beta$\end{tabular}}}}%
+    \put(0.72254726,1.1044707){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\beta$\end{tabular}}}}%
+    \put(0.72814771,1.05796335){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\beta$\end{tabular}}}}%
+    \put(0.7254033,1.011456){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\beta$\end{tabular}}}}%
+    \put(0.86267143,1.15108714){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{a}:\epsilon$\end{tabular}}}}%
+    \put(0.86827189,1.1045798){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{b}:\epsilon$\end{tabular}}}}%
+    \put(0.86552747,1.05807245){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\smallcaps{c}:\epsilon$\end{tabular}}}}%
+    \put(0.97190527,1.3210496){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.72805448\unitlength}\raggedright \end{minipage}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{mapping-wfst.pdf}}%
-    \put(0.4682948,0.43225193){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.45439768,0.68071169){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=6]{mapping-wfst.pdf}}%
-    \put(0.26729951,0.11355594){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{insertion}}\end{tabular}}}}%
-    \put(0.23211677,0.05664158){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{substitution}}\end{tabular}}}}%
+    \put(0.13786965,0.17882825){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{insertion}}\end{tabular}}}}%
+    \put(0.08246375,0.08919933){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{substitution}}\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=7]{mapping-wfst.pdf}}%
-    \put(0.61116679,0.0898199){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{deletion}}\end{tabular}}}}%
+    \put(0.67939294,0.14144866){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{\textit{deletion}}\end{tabular}}}}%
   \end{picture}%
 \endgroup%

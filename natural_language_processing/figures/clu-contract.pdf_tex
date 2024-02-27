@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'clu-contract.pdf' (pdf, eps, ps)
 %%
@@ -71,7 +71,6 @@
     \put(0.48430816,0.16057215){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{$50$}\end{tabular}}}}%
     \put(0.67530414,0.16080714){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{$40$}\end{tabular}}}}%
     \put(0.571931,0.0299499){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\footnotesize{$60$}\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=7]{clu-contract.pdf}}%
-    \put(0.81113967,0.02914484){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$c$\end{tabular}}}}%
+    \put(0.83742664,0.02673487){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$c$\end{tabular}}}}%
   \end{picture}%
 \endgroup%

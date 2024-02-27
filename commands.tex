@@ -52,19 +52,9 @@
 \newcommand{\grad}[2]{\vec{\nabla}_{\!\! #2} #1}
 \newcommand{\hess}[2]{\mat{H}_{#2} #1}
 
-% Notation environment if necessary
-\newenvironment{notation}
-  {\begin{fullwidth}
-   \begin{longtable}{ll} \toprule
-    \multicolumn{2}{c}{\centering \smallcaps{Summary of notation}} \\
-    \midrule
-    \vspace{0.5ex} \\
-  }
-  {\vspace{0.5ex} \\
-   \bottomrule
-   \end{longtable}
-   \end{fullwidth}
-  }
+% List of symbols
+\newlist{abbrv}{itemize}{1}
+\setlist[abbrv,1]{label=,labelwidth=1in,align=parleft,itemsep=0.1\baselineskip,leftmargin=!}
 
 % Add a period to the end of an abbreviation unless there's one
 % already, then \xspace
@@ -91,12 +81,12 @@
 \let\marginnotepkg\marginnote
 
 \NewDocumentCommand{\margintag}{O{0\baselineskip}m}{%
-  \checkoddpage%
-  \ifoddpage%
-    {\marginnotepkg{\footnotesize #2}[#1]}%
-  \else%
-    {\reversemarginpar\marginnotepkg{\footnotesize #2}[#1]}%
-  \fi}%
+    \checkoddpage%
+    \ifoddpage%
+        {\marginnotepkg{\footnotesize #2}[#1]}%
+    \else%
+        {\reversemarginpar\marginnotepkg{\footnotesize #2}[#1]}%
+    \fi}%
 % \NewDocumentCommand{\margintagt}{O{0\baselineskip}m}{\marginpar{\vspace{#1}\footnotesize #2}}
 % \NewDocumentCommand{\safefootnote}{om}{\footnotemark\margintag[#1]{\textsuperscript{\tiny\arabic{footnote}} \normalfont\justifying #2}}
 

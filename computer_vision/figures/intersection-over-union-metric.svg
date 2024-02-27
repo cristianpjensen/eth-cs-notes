@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="50mm"
    height="35mm"
    viewBox="0 0 50 35"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="intersection-over-union-metric.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="intersection-over-union-metric.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="10.842625"
-     inkscape:cx="114.51803"
-     inkscape:cy="71.775341"
+     inkscape:zoom="5.1021334"
+     inkscape:cx="111.32598"
+     inkscape:cy="55.956985"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -39,7 +39,10 @@
      inkscape:window-height="1376"
      inkscape:window-x="1512"
      inkscape:window-y="517"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -47,7 +50,10 @@
        spacingx="10"
        spacingy="10"
        empspacing="4"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       visible="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -66,6 +72,21 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-262)">
+    <rect
+       y="265.73663"
+       x="24.438267"
+       height="8.7255249"
+       width="8.725564"
+       id="rect68"
+       style="opacity:1;fill:#ddcc77;fill-opacity:1;stroke:none;stroke-width:0.14044082;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
+       inkscape:label="rect68"
+       transform="translate(0.55473433)" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path142"
+       d="m 23.058674,281.89196 v 11.3714 h 2.664691 l -0.01886,2.64588 h 11.371401 v -11.3714 h -2.644482 l -0.0013,-2.64588 h -11.37145"
+       style="fill:#ddcc77;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
+       transform="translate(-0.71150988)" />
     <g
        id="g23"
        transform="translate(0.55473433)">
@@ -87,13 +108,6 @@
            x="19.580925"
            y="260.74884" />
       </g>
-      <rect
-         y="265.73663"
-         x="24.438267"
-         height="8.7255249"
-         width="8.725564"
-         id="rect68"
-         style="opacity:1;fill:#000000;fill-opacity:0.12000002;stroke:none;stroke-width:0.14044082;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
     </g>
     <g
        id="g29"
@@ -117,11 +131,6 @@
            x="19.580925"
            y="260.74884" />
       </g>
-      <path
-         inkscape:connector-curvature="0"
-         id="path142"
-         d="m 23.058674,281.89196 v 11.3714 h 2.664691 l -0.01886,2.64588 h 11.371401 v -11.3714 h -2.644482 l -0.0013,-2.64588 h -11.37145"
-         style="fill:#000000;fill-opacity:0.12000002;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none" />
     </g>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
@@ -131,35 +140,35 @@
     <text
        id="text180"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="280.31122"
        x="5.3107457"><tspan
          id="tspan178"
          sodipodi:role="line"
          x="5.3107457"
          y="280.31122"
-         style="stroke-width:0.26458332">$\mathrm{IoU}=$</tspan></text>
+         style="stroke-width:0.264583">$\mathrm{IoU}=$</tspan></text>
     <text
        id="text23"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="271.18039"
        x="25.981699"><tspan
          id="tspan21"
          sodipodi:role="line"
          x="25.981699"
          y="271.18039"
-         style="stroke-width:0.26458332">$A \cap B$</tspan></text>
+         style="stroke-width:0.264583">$A \cap B$</tspan></text>
     <text
        id="text23-3"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="289.94562"
        x="26.0061"><tspan
          id="tspan21-6"
          sodipodi:role="line"
          x="26.0061"
          y="289.94562"
-         style="stroke-width:0.26458332">$A \cup B$</tspan></text>
+         style="stroke-width:0.264583">$A \cup B$</tspan></text>
   </g>
 </svg>

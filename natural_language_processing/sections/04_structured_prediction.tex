@@ -1,0 +1,22 @@
+\section{Structured prediction}
+
+In NLP, we often have the case that the input and output of a model has some
+structure. \Eg, in context-free parsing, we have a sentence as input and want
+to output a parse tree. To be able to train a model and perform inference, we
+need to be able to compute the log-likelihood,
+\begin{align*}
+    p_{\vec{\theta}}(y \mid x) & \doteq \frac{1}{Z_{\vec{\theta}}(x)} \exp(\score_{\vec{\theta}}(y,x)) \\
+    Z_{\vec{\theta}}(x)        & \doteq \sum_{y' \in \mathcal{Y}} \exp(\score_{\vec{\theta}}(y',x)).
+\end{align*}
+
+However, often there are an exponential, or even infinite, amount of possible
+structures $y\in\mathcal{Y}$ for an input $x\in\mathcal{X}$. For training, this
+has the result that the normalizer $Z_{\vec{\theta}}$ is very inefficient to
+compute, since it is a sum over a very large amount of values. For inference,
+this has the result that we would need to search a very large space for the
+best output $y$.
+
+The solution to this problem is that we need to make use of the structure to
+design algorithms for computing the normalizer and finding the most probable
+output. The next sections will include NLP problems, where we need to design
+algorithms to compute the normalizer efficiently.

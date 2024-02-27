@@ -1,0 +1,277 @@
+\section{Probability review} \label{sec:prob-review}
+
+Probability is formalized by a probability space $(\Omega, \mathcal{F}, P)$,
+where $\Omega$ is a set of atomic events, $\mathcal{F} \subseteq 2^\Omega$ is
+the set of non-atomic events, and $P: \mathcal{F}\to [0,1]$ is the
+probability measure that assigns probabilities to events.
+
+The following axioms hold:
+\begin{align*}
+    P(\Omega)                                                          & = 1                                                              & \text{(Normalization)}        \\
+    P(A)                                                               & \geq 0 \;\forall A\in\mathcal{F}                                 & \text{(Non-negativity)}       \\
+    A_1,\ldots,A_n\in\mathcal{F} \land \bigcap_{i=1}^n A_i = \emptyset & \implies P\left(\bigcup_{i=1}^n A_i\right) = \sum_{i=1}^n P(A_i) & \text{($\sigma$-additivity)}.
+\end{align*}
+
+\subsection{Random variables}
+
+Events are cumbersome to work with, so we can define random variables
+$X:\Omega\to D$ for some set $D$. Then, we can give a probability to $X$
+assuming state $x$, \[
+    P(X=x) = P(\{ \omega\in\Omega : X(\omega) = x \}).
+\]
+
+Instead of random variables $X$, we can also define random vectors
+$\vec{X}=[X_1(\omega), \ldots, X_n(\omega)]$.  Then, we can specify the joint
+distribution $P(X_1=x_1,\ldots,X_n=x_n)=P(\vec{X}=\vec{x})$ succinctly.
+
+For random variables, we have the following rules,
+\begin{itemize}
+    \item \textit{Product rule}, \[
+              P(X_{1:n}) = P(X_1)\prod_{i=2}^nP(X_i\mid X_{1:i-1});
+          \]
+    \item \textit{Sum rule}, \[
+              P(X_{1:i-1}, X_{i+1:n}) = \sum_{x_i} P(X_{1:i-1}, X_i=x_i, X_{i+1:n});
+          \]
+    \item \textit{Bayes rule}, where we compute the \textit{posterior} $P(X\mid
+              Y)$ from the \textit{likelihood} $P(Y\mid X)$, \textit{prior} $P(X)$, and
+          \textit{marginal} $P(Y)$, \[
+              P(X\mid Y) = \frac{P(Y\mid X)P(X)}{P(Y)};
+          \]
+    \item A random variable $X$ is \textit{independent} from $Y$ if the following
+          holds for all values, \[
+              P_{X_1\cdots X_n}(x_1,\ldots,x_n) = P_{X_1}(x_1)\cdots P_{X_n}(x_n);
+          \]
+    \item Random variables $X$ and $Y$ are \textit{conditionally independent}
+          given $Z$ if the following holds for all $x,y,z$, \[
+              P_{XY\mid Z}(x,y\mid z) = P_{X\mid Z}(x\mid z)P_{Y\mid Z}(y\mid z).
+          \]
+\end{itemize}
+
+\subsection{Multivariate Gaussians}
+
+Suppose we have $n$ binary variables, then we need $2^n-1$
+parameters.\sidenote{$-1$, because we do not need to specify the last parameter,
+    since it will be whatever is remaining of the total probability.}\sidenote{In
+    other words, the parametrization of the distribution grows exponentially.} Also,
+if we want to compute the joint distribution over all $n$
+variables,\sidenote{\Ie, do inference.} we would have to sum up $2^{n-1}$ terms
+according to the sum rule. In conclusion, binary random variables scale poorly.
+Furthermore, we would need a lot of data to estimate the distribution.
+
+The solution to these problems are multivariate Gaussians, \[
+    \mathcal{N}(\vec{x};\vec{\mu},\mat{\Sigma}) =
+    \frac{1}{2\pi\sqrt{\det{\mat{\Sigma}}}}\exp\lft( -\frac{1}{2}
+    \transpose{(\vec{x}-\vec{\mu})}\inv{\mat{\Sigma}}(\vec{x}-\vec{\mu}) \rgt),
+\]
+where $\vec{\mu}\in\R^n$ and
+$\mat{\Sigma}\in\mathbb{S}_{++}^n$.\sidenote{$\mat{\Sigma}$ is an $n\times n$
+    positive semi-definite matrix.} Thus, the joint distribution over $n$ Gaussian
+variables requires only $n^2+n$ parameters.
+
+\begin{marginfigure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                width=\textwidth,
+                view={0}{90},
+                scale only axis,
+                colormap name=sequential,
+            ]
+            \addplot3 [surf, mesh/rows=50, shader=interp] table[col sep=comma, x=x, y=y, z=identity_sigma] {data/probability_review/gaussian_2d.csv};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Bivariate Gaussian distribution with $\mat{\Sigma}=\mat{I}$.}
+\end{marginfigure}
+
+\begin{marginfigure}[0.5cm]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                width=\textwidth,
+                view={0}{90},
+                scale only axis,
+                colormap name=sequential,
+            ]
+            \addplot3 [surf, mesh/rows=50, shader=interp] table[col sep=comma, x=x, y=y,
+                    z=uneven_sigma] {data/probability_review/gaussian_2d.csv};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Bivariate Gaussian distribution with \[
+            \mat{\Sigma}=\begin{bmatrix}1 & \nicefrac{1}{2} \\ \nicefrac{1}{2} & 1\end{bmatrix}.
+        \]
+        If $x_1$ increases, the probability of a higher $x_2$ increases as well.}
+\end{marginfigure}
+
+Let $\vec{X} \sim \mathcal{N}(\vec{\mu},\mat{\Sigma})$ be a $d$-dimensional
+Gaussian random vector, then the following properties hold,
+\begin{itemize}
+    \item Let $A$ be an index set, then the marginal distribution of variables
+          indexed by $A$ is the following, \[
+              \vec{X}_A \sim \mathcal{N}(\vec{\mu}_A,\mat{\Sigma}_{AA}).
+          \]
+          Thus, it is simply a look-up to get a subset marginal distribution;
+
+    \item Let $A$ and $B$ be index sets, then the marginal distribution of
+          variables indexed by $A$, conditioned on $B$, is the following, \[
+              \vec{X}_A\mid \vec{X}_B \sim \mathcal{N}(\vec{\mu}_{A\mid B},\mat{\Sigma}_{A\mid B}),
+          \]
+          where
+          \begin{align*}
+              \vec{\mu}_{A\mid B}    & = \vec{\mu}_A + \mat{\Sigma}_{AB}\inv{\mat{\Sigma}_{BB}} (\vec{x}_B - \vec{\mu}_B) \\
+              \mat{\Sigma}_{A\mid B} & = \mat{\Sigma}_{AA} - \mat{\Sigma}_{AB}\inv{\mat{\Sigma}_{BB}}\mat{\Sigma}_{BA}.
+          \end{align*}
+          Notice that $\mat{\Sigma}_{AB}\inv{\mat{\Sigma}_{BB}}$ removes the interdependencies
+          of $B$ and adds the dependencies of $B$ with $A$. Further notice that the
+          dependency of $A$ and $B$ added scales linearly with the mean difference
+          $\vec{x}_B - \vec{\mu}_B$.
+
+          Further, notice that $\mat{\Sigma}_{A\mid B}$ only depends on which random
+          variables are observed, not what values those random variables are, because
+          it does not depend on $\vec{x}_B$;
+
+    \item Let $\mat{M}\in\R^{m\times d}$ be a matrix, then $\vec{Y} =
+              \mat{M}\vec{X}$ is a also a Gaussian, \[
+              \vec{Y} \sim \mathcal{N}\lft( \mat{M}\vec{\mu}, \mat{M}\mat{\Sigma}\transpose{\mat{M}} \rgt).
+          \]
+          Notice that $m$ is not necessarily equal to $d$, so we can transform a
+          $d$-dimensional random vector to any dimensionality $m$;
+
+    \item Let $\vec{X}'$ be another $d$-dimensional Gaussian, then
+          $\vec{Y}=\vec{X}+\vec{X}'$ is also a Gaussian, \[
+              \vec{Y} \sim \mathcal{N} \lft( \vec{\mu} + \vec{\mu}', \mat{\Sigma} + \mat{\Sigma}' \rgt).
+          \]
+\end{itemize}
+
+\subsection{Kalman filters}
+
+\begin{marginfigure}
+    \centering
+    \incfig{kalman-graphical-model}
+    \caption{Directed graphical model of a Kalman filter with hidden states
+        $\vec{X}_t$ and observables $\vec{Y}_t$.}
+    \label{fig:kalman-graphical-model}
+\end{marginfigure}
+
+\begin{definition}[Kalman filter]
+    A Kalman filter is specified by a Gaussian prior over the states, \[
+        X_0 \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma})
+        ,\]
+    and a conditional linear Gaussian \textit{motion model} and \textit{sensor
+        model},
+    \begin{align*}
+        X_{t+1} & \doteq \mat{F}X_t + \vec{\epsilon}_t & \mat{F} \in \R^{d\times d}, \hspace{0.5cm} \vec{\epsilon}_t \sim \mathcal{N}(\vec{0},\mat{\Sigma}_x) \margintag{$\mat{F}$ is assumed to be known.} \\
+        Y_t     & \doteq \mat{H}X_t + \vec{\eta}_t     & \mat{H} \in \R^{m\times d}, \hspace{0.5cm} \vec{\eta}_t \sim \mathcal{N}(\vec{0},\mat{\Sigma}_y) \margintag{$\mat{H}$ is assumed to be known.}
+        ,\end{align*}
+    respectively.
+\end{definition}
+
+From the directed graphical model in \Cref{fig:kalman-graphical-model}, we can
+observe the following conditional independences,
+\begin{gather*}
+    X_{t+1} \bot \vec{X}_{1:t-1}, \vec{Y}_{1:t-1} \mid X_t \\
+    Y_t \bot \vec{X}_{1:t-1} \mid X_t \\
+    Y_t \bot \vec{Y}_{1:t-1} \mid X_{t-1}.
+\end{gather*}
+
+These lead to the following factorization of the joint distribution,
+\begin{align*}
+    p(\vec{x}_{1:t},\vec{y}_{1:t}) & = \prod_{i=1}^t p(x_i \mid \vec{x}_{1:i-1}) p(y_i \mid \vec{x}_{1:t}, \vec{y}_{1:i-1}) \\
+                                   & = p(x_1) p(y_1\mid x_1) \prod_{i=2}^t p(x_i\mid x_{i-1}) p(y_i \mid x_i).
+\end{align*}
+
+We now want to do \textit{Bayesian filtering} on a Kalman filter, which involves
+keeping tack of an agent's state using noisy observations $Y$. It is described
+by the recursive scheme in \Cref{fig:bayesian-filtering}.
+
+\begin{figure}[h!]
+    \centering
+    \incfig{bayesian-filtering}
+    \caption{The recursive scheme of Bayesian filtering.}
+    \label{fig:bayesian-filtering}
+\end{figure}
+
+We can do the update by the following,
+\begin{align*}
+    p(x_t \mid \vec{y}_{1:t}) & = \frac{1}{Z} p(x_t \mid \vec{y}_{1:t-1}) p(y_t\mid x_t, \vec{y}_{1:t-1}) \\
+                              & = \frac{1}{Z} p(x_t \mid \vec{y}_{1:t-1}) p(y_t\mid x_t)
+    .\end{align*}
+Furthermore, we can do the prediction by the following,
+\begin{align*}
+    p(x_{t+1}\mid \vec{y}_{1:t}) & = \int p(x_{t+1}, x_t \mid y_{1:t}) dx_t                                \\
+                                 & = \int p(x_{t+1} \mid x_t, \vec{y}_{1:t}) p(x_t\mid \vec{y}_{1:t}) dx_t \\
+                                 & = \int p(x_{t+1} \mid x_t) p(x_t\mid \vec{y}_{1:t}) dx_t.
+\end{align*}
+In general, these distributions are very complicated, but for Gaussians (as in
+the Kalman filter), they can be expressed in closed form. The general formula
+for the \textit{Kalman update} is as follows, given the prior belief $X_t \mid
+    \vec{y}_{1:t} \sim \mathcal{N}(\vec{\mu}_t, \mat{\Sigma}_t)$,
+\begin{align*}
+    X_{t+1} \mid \vec{y}_{1:t+1} & \sim \mathcal{N}(\vec{\mu}_{t+1}, \mat{\Sigma}_{t+1})                                                                                                                                                    \\
+    \vec{\mu}_{t+1}              & \doteq \mat{F} \vec{\mu}_t + \mat{K}_{t+1}(\vec{y}_{t+1} - \mat{H}\mat{F} \vec{\mu}_t)                                                                                                                   \\
+    \mat{\Sigma}_{t+1}           & \doteq (\mat{I} - \mat{K}_{t+1} \mat{H}) (\mat{F}\mat{\Sigma}_t\transpose{\mat{F}} + \mat{\Sigma}_x),                                                                                                    \\
+    \intertext{where $\mat{K}_{t+1}$ is the \textit{Kalman gain},}
+    \mat{K}_{t+1}                & \doteq (\mat{F}\mat{\Sigma}_t \transpose{\mat{F}} + \mat{\Sigma}_x) \transpose{\mat{H}} \inv{(\mat{H}(\mat{F}\mat{\Sigma}_t\transpose{\mat{F}} + \mat{\Sigma}_x) \transpose{\mat{H}} + \mat{\Sigma}_y)}.
+\end{align*}
+The term $(\vec{y}_{t+1} - \mat{H}\mat{F}\vec{\mu}_t)$ measures the error in the
+predicted observation and the Kalman gain $\mat{K}_{t+1}$ measures the relevance
+of the new observation compared to the prediction.
+
+\subsection{Entropy}
+
+\begin{definition}[Entropy]
+    \textit{Entropy} measures the expected surprisal of a distribution $p$, \[
+        H[p] \doteq \E_{x\sim p}[-\log p(x)].
+    \]
+    $-\log p(x)$ is also called the surprisal value of $x$, because it decreases
+    as the probability grows, and is exactly 0 if the probability is 1.
+\end{definition}
+
+\begin{definition}[Kullback-Leibler divergence]
+    \textit{Kullback-Leibler divergence} (KL divergence) is a common metric that
+    measures dissimilarity between two distributions $p$ and $q$, \[
+        KL(p \| q) \doteq \mathbb{E}_{\theta\sim p} \left[ \log \frac{p(\theta)}{q(\theta)} \right].
+    \]
+    Intuitively, $KL(p \| q)$ measures the information loss when approximating
+    $p$ with $q$.
+\end{definition}
+
+\begin{definition}[Mutual information]
+    Given random variables $X$ and $Y$, the mutual information $I(X;Y)$
+    quantifies how much observing $Y$ reduces uncertainty about $X$, as
+    measured by its entropy, in expectation over $Y$. \[
+        I(X;Y) \doteq H[X] - H[X \mid Y],
+    \]
+    where $H[X]$ and $H[X\mid Y]$ quantify the uncertainty about $X$ before and
+    after observing $Y$.
+\end{definition}
+
+\begin{properties}[Mutual information]
+    Mutual information is symmetric, \[
+        I(X;Y) = I(Y;X).
+    \]
+    Mutual information is positive (\textit{information never hurts}), \[
+        I(X;Y) \geq 0.
+    \]
+\end{properties}
+
+\begin{example}[Mutual information of noisy Gaussian observations]
+    Let
+    \begin{align*}
+        \vec{X} & \sim \mathcal{N}(\vec{\mu},\mat{\Sigma})                                                            \\
+        \vec{Y} & = \vec{X}+\vec{\epsilon}, \hspace{1cm} \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \sigma_n^2 \mat{I})
+        .\end{align*}
+    Then,
+    \begin{align*}
+        I(\vec{X};\vec{Y}) & = H[\vec{Y}] - H[\vec{Y}\mid \vec{X}]                                                                               \\
+                           & = H[\vec{Y}] - H[\vec{\epsilon}]                                                                                    \\
+                           & = \frac{1}{2}\log(2\pi e)^d \det{\mat{\Sigma} + \sigma_n^2 \mat{I}} - \frac{1}{2}\log(2\pi e)^d(\sigma_n^2 \mat{I}) \\
+                           & = \frac{1}{2} \log \det{\mat{I} + \sigma_n^{-2}\mat{\Sigma}}.
+    \end{align*}
+\end{example}
+
+\begin{definition}[Conditional mutual information]
+    \begin{align*}
+        I(X;Y\mid Z) & \doteq H[X\mid Z] - H[X\mid Y,Z] \\
+                     & = I(X;Y,Z) - I(X;Z).
+    \end{align*}
+\end{definition}

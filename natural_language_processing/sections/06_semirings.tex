@@ -1,0 +1,69 @@
+\section{Semirings} \label{sec:semirings}
+
+\begin{definition}[Monoid]
+    A monoid is a 3-tuple $\langle \mathbb{K},\odot,\bm{e} \rangle$, such that
+    \begin{enumerate}
+        \item $\odot$ is associative for all values in $\mathbb{K}$. $\forall x,y,z
+                  \in \mathbb{K}$, \[
+                  (x\odot y)\odot z = x\odot (y\odot z);
+              \]
+        \item $\bm{e}\in \mathbb{K}$ is the identity element. $\forall x \in
+                  \mathbb{K}$, \[
+                  x \odot \bm{e} = x.
+              \]
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Semiring]
+    A semiring is a 5-tuple $\langle \mathbb{K},\oplus,\otimes,\bm{0},\bm{1}
+        \rangle$, such that
+    \begin{enumerate}
+        \item $\langle \mathbb{K},\oplus,\bm{0} \rangle$ is a commutative monoid;
+        \item $\langle \mathbb{K},\otimes,\bm{1} \rangle$ is a monoid;
+        \item $\otimes$ distributes over $\oplus$. $\forall x,y,z\in \mathbb{K}$,
+              \begin{align*}
+                  (x\oplus y) \otimes z & = (x\otimes z) \oplus (y \otimes z) \\
+                  z\otimes (x \oplus y) & = (z\otimes x) \oplus (z\otimes y);
+              \end{align*}
+        \item $\bm{0}$ is an annihilator for $\otimes$. $\forall x \in \mathbb{K}$,
+              \begin{align*}
+                  \bm{0} \otimes x & = \bm{0}  \\
+                  x \otimes \bm{0} & = \bm{0}.
+              \end{align*}
+    \end{enumerate}
+\end{definition}
+
+
+\textit{Semirings} are very useful for generalizing algorithms that only make use of
+associativity, commutativity, and distributivity. For example, if we have an
+efficient algorithm for computing the normalizer, \[
+    Z = \sum_{\vec{y}\in\mathcal{Y}} \prod_{n=1}^N \exp \score(y_n).
+\]
+We can ``semiringify`` it to compute the following, \[
+    \bigoplus_{\vec{y}\in\mathcal{Y}} \bigotimes_{n=1}^N \exp \score(y_n).
+\]
+
+Then, we can use any semiring with this algorithm. For inference, we would then
+want to use for example the Viterbi semiring $\langle \R, \max, \times, 0, 1
+    \rangle$ to compute the following, \[
+    \max_{\vec{y}\in\mathcal{Y}} \prod_{n=1}^N \exp \score(y_n).
+\]
+
+\begin{definition}[Closed semiring]
+    A closed semiring is a semiring with an additional unary operation: the
+    Kleene star, \[
+        x^* = \bigoplus_{n=0}^\infty x^{\otimes n}.
+    \]
+    The Kleene star must obey the following two axioms,
+    \begin{align*}
+        x^* & = \bm{1} \oplus x \otimes x^*  \\
+        x^* & = \bm{1} \oplus x^* \otimes x.
+    \end{align*}
+\end{definition}
+
+Closedness allows us to compute infinite sums within a semiring. For example,
+the real semiring is closed if we let its set be $(-1,1)$, because then we can
+compute the Kline star to be the following using the closed form of the
+geometric series, \[
+    x^* = \sum_{n=0}^\infty x^n = \frac{1}{1-x}.
+\]

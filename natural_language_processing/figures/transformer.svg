@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="50mm"
    height="70mm"
    viewBox="0 0 50 70"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="transformer.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="transformer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
     <marker
@@ -196,21 +196,24 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.909982"
-     inkscape:cx="110.57197"
-     inkscape:cy="37.452859"
+     inkscape:zoom="1.7888446"
+     inkscape:cx="141.43207"
+     inkscape:cy="127.17706"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g176"
      showgrid="false"
      showborder="true"
      width="200mm"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="2488"
-     inkscape:window-height="1376"
-     inkscape:window-x="1512"
-     inkscape:window-y="517"
-     inkscape:window-maximized="1">
+     inkscape:window-width="896"
+     inkscape:window-height="1067"
+     inkscape:window-x="896"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -218,7 +221,10 @@
        spacingx="10"
        spacingy="10"
        empspacing="4"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       visible="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -228,7 +234,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -246,56 +251,52 @@
          height="5.5876851"
          width="26.194586"
          id="rect8"
-         style="opacity:1;fill:#000000;fill-opacity:0.12000002;stroke:#000000;stroke-width:0.14044084;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
+         style="opacity:1;fill:#ddcc77;fill-opacity:1;stroke:#000000;stroke-width:0.140441;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none;font-variation-settings:normal;vector-effect:none;stroke-linecap:butt;stroke-linejoin:miter;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1" />
       <text
-         x="46.282711"
+         x="47.738682"
          y="277.25616"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text82"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="277.25616"
-           x="46.282711"
+           x="47.738682"
            sodipodi:role="line"
            id="tspan80">MHSA</tspan></text>
     </g>
+    <rect
+       y="261.06534"
+       x="10.339622"
+       height="5.5876851"
+       width="26.194586"
+       id="rect8-36"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.140441;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
     <g
-       id="g182"
-       transform="translate(-27.672353)">
-      <rect
-         y="261.06534"
-         x="38.011974"
-         height="5.5876851"
-         width="26.194586"
-         id="rect8-36"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
-      <g
-         transform="translate(-1.6744151,2.5312482)"
-         id="g127">
-        <text
-           id="text54"
-           xml:space="preserve"
-           style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       transform="translate(-29.346768,2.5312482)"
+       id="g127">
+      <text
+         id="text54"
+         xml:space="preserve"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         y="262.28381"
+         x="46.940121"><tspan
+           id="tspan52"
+           sodipodi:role="line"
+           x="46.940121"
            y="262.28381"
-           x="45.56078"><tspan
-             id="tspan52"
-             sodipodi:role="line"
-             x="45.56078"
-             y="262.28381"
-             style="stroke-width:0.26458332">layer norm</tspan></text>
-      </g>
+           style="stroke-width:0.264583">LayerNorm</tspan></text>
     </g>
     <text
        id="text210"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="270.73914"
-       x="22.269627"><tspan
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="270.60205"
+       x="22.475239"><tspan
          id="tspan208"
          sodipodi:role="line"
-         x="22.269627"
-         y="270.73914"
-         style="stroke-width:0.26458332">$\oplus$</tspan></text>
+         x="22.475239"
+         y="270.60205"
+         style="stroke-width:0.264583">$\oplus$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="M 23.382616,282.35087 H 7.5300819 l -0.0024,-12.35195 H 22.128921"
@@ -323,14 +324,14 @@
     <text
        id="text210-2"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="249.27307"
-       x="22.283058"><tspan
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="249.136"
+       x="22.48867"><tspan
          id="tspan208-8"
          sodipodi:role="line"
-         x="22.283058"
-         y="249.27307"
-         style="stroke-width:0.26458332">$\oplus$</tspan></text>
+         x="22.48867"
+         y="249.136"
+         style="stroke-width:0.264583">$\oplus$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="M 23.396935,259.41587 H 7.5455309 l 0.0013,-10.86147 H 22.027993"
@@ -352,18 +353,18 @@
     <text
        id="text466"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="293.12686"
-       x="22.143177"><tspan
+       x="22.511986"><tspan
          id="tspan464"
          sodipodi:role="line"
-         x="22.143177"
+         x="22.511986"
          y="293.12686"
-         style="stroke-width:0.26458332">$\mat{X}$</tspan></text>
+         style="stroke-width:0.264583">$\mat{X}$</tspan></text>
     <text
        id="text480"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="3.731319"
        x="-276.24243"
        transform="rotate(-90)"><tspan
@@ -371,7 +372,7 @@
          sodipodi:role="line"
          x="-276.24243"
          y="3.731319"
-         style="stroke-width:0.26458332">\textit{\footnotesize residual connections}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize residual connections}</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#marker-arrow-0.5308-61)"
        d="m 23.452365,239.70148 v -5.31656"
@@ -380,25 +381,25 @@
     <text
        id="text518"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="232.29112"
-       x="22.024359"><tspan
+       x="22.551228"><tspan
          id="tspan516"
          sodipodi:role="line"
-         x="22.024359"
+         x="22.551228"
          y="232.29112"
-         style="stroke-width:0.26458332">$\R^d$</tspan></text>
+         style="stroke-width:0.264583">$\R^d$</tspan></text>
     <text
        id="text210-1"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="287.07651"
-       x="22.261671"><tspan
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="287.00046"
+       x="22.475239"><tspan
          id="tspan208-9"
          sodipodi:role="line"
-         x="22.261671"
-         y="287.07651"
-         style="stroke-width:0.26458332">$\oplus$</tspan></text>
+         x="22.475239"
+         y="287.00046"
+         style="stroke-width:0.264583">$\oplus$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="m 23.436915,289.86369 v -2.15626"
@@ -420,56 +421,48 @@
          height="5.5876851"
          width="26.194586"
          id="rect8-3"
-         style="opacity:1;fill:#000000;fill-opacity:0.12000002;stroke:#000000;stroke-width:0.14044084;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
+         style="opacity:1;fill:#ddcc77;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
       <text
-         x="46.847153"
+         x="48.379753"
          y="277.25616"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"
          id="text82-5"><tspan
-           style="stroke-width:0.26458332"
+           style="stroke-width:0.264583"
            y="277.25616"
-           x="46.847153"
+           x="48.379753"
            sodipodi:role="line"
            id="tspan80-6">MLPs</tspan></text>
     </g>
-    <g
-       id="g182-2"
-       transform="translate(-27.672353,-21.410059)">
-      <rect
-         y="261.06534"
-         x="38.011974"
-         height="5.5876851"
-         width="26.194586"
-         id="rect8-36-9"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
-      <g
-         transform="translate(-1.6744151,2.5312482)"
-         id="g127-1">
-        <text
-           id="text54-2"
-           xml:space="preserve"
-           style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-           y="262.28381"
-           x="45.56078"><tspan
-             id="tspan52-7"
-             sodipodi:role="line"
-             x="45.56078"
-             y="262.28381"
-             style="stroke-width:0.26458332">layer norm</tspan></text>
-      </g>
-    </g>
+    <rect
+       y="239.65527"
+       x="10.339622"
+       height="5.5876851"
+       width="26.194586"
+       id="rect8-36-9"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.140441;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
+    <text
+       id="text54-2"
+       xml:space="preserve"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="243.405"
+       x="17.593353"><tspan
+         id="tspan52-7"
+         sodipodi:role="line"
+         x="17.593353"
+         y="243.405"
+         style="stroke-width:0.264583">LayerNorm</tspan></text>
     <text
        id="text239"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       y="287.45502"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="287.03351"
        x="33.507072"><tspan
          id="tspan237"
          sodipodi:role="line"
          x="33.507072"
-         y="287.45502"
-         style="stroke-width:0.26458332">$\mat{P}$</tspan></text>
+         y="287.03351"
+         style="stroke-width:0.264583">$\mat{P}$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
        d="M 32.501281,286.36467 H 24.830416"

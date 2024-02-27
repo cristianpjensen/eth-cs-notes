@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'sentiment-analysis.pdf' (pdf, eps, ps)
 %%
@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{283.46456693bp}%
+    \setlength{\unitlength}{180bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,23 +50,25 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.4)%
+  \begin{picture}(1,0.6299213)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0.18269464,0.27240817){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_1$\end{tabular}}}}%
-    \put(0.18269464,0.18444919){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_2$\end{tabular}}}}%
-    \put(0.18269464,0.09649051){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_3$\end{tabular}}}}%
-    \put(0.19539457,0.00735626){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vdots$\end{tabular}}}}%
-    \put(0.33486555,0.27240817){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_1)$\end{tabular}}}}%
-    \put(0.33486555,0.18444919){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_2)$\end{tabular}}}}%
-    \put(0.33486555,0.09649051){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_3)$\end{tabular}}}}%
-    \put(0.5020882,0.18401031){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{sentiment-analysis.pdf}}%
-    \put(0.3661475,0.00723877){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vdots$\end{tabular}}}}%
-    \put(0.38133179,0.31574219){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\in \R^d$\end{tabular}}}}}%
-    \put(0.52508911,0.22548981){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\in \R^d$\end{tabular}}}}}%
+    \put(0.0364308,0.42898929){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_1$\end{tabular}}}}%
+    \put(0.0364308,0.2904712){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_2$\end{tabular}}}}%
+    \put(0.0364308,0.1519536){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$w_3$\end{tabular}}}}%
+    \put(0.0564307,0.0115847){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vdots$\end{tabular}}}}%
+    \put(0.27607004,0.42898929){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_1)$\end{tabular}}}}%
+    \put(0.27607004,0.2904712){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_2)$\end{tabular}}}}%
+    \put(0.27607004,0.1519536){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{e}(w_3)$\end{tabular}}}}%
+    \put(0.53941279,0.28978006){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\oplus$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{sentiment-analysis.pdf}}%
-    \put(0.7902227,0.18475983){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y$\end{tabular}}}}%
-    \put(0.64399178,0.18470306){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$f_{\vec{\theta}}$\end{tabular}}}}%
+    \put(0.68197872,0.29087101){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$f_{\vec{\theta}}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{sentiment-analysis.pdf}}%
+    \put(0.32533294,0.01139968){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vdots$\end{tabular}}}}%
+    \put(0.34924521,0.49723183){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\in \R^d$\end{tabular}}}}}%
+    \put(0.57563469,0.3551021){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\in \R^d$\end{tabular}}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{sentiment-analysis.pdf}}%
+    \put(0.81531032,0.2909604){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y$\end{tabular}}}}%
   \end{picture}%
 \endgroup%

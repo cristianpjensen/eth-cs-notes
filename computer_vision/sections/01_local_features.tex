@@ -1,0 +1,240 @@
+\section{Local features}
+
+For many computer vision tasks, we need to be able to identify distinctive
+points that can be matched to points of other images.\sidenote{Local features
+    are used in tasks such as object recognition (\cref{sec:recognition}), object
+    tracking (\cref{sec:tracking}), and structure reconstruction (\cref{sec:sfm}).}
+These tasks require that points that depict the same object must be detected
+independently in different images, and it must be possible to match such
+corresponding points between images. This leads to the following requirements,
+\begin{itemize}
+    \item Translation, rotation, and scale invariance;
+    \item Robustness to affine transformations, noise, and occlusion;
+    \item A sufficient amount of points have to be detected over an object;
+    \item Regions must contain distinctive structure;
+    \item Real-time performance.
+\end{itemize}
+
+The following is a general approach for finding and matching keypoints between
+images,
+\begin{enumerate}
+    \item Find a set of distinctive keypoints;
+    \item Define a region around each keypoint, dependent on scale;
+    \item Extract and normalize the region content to make it invariant to
+          affine transformations and noise;
+    \item Compute a local descriptor from the normalized region;
+    \item Match local descriptors between images.
+\end{enumerate}
+
+\subsection{Harris detector}
+
+The \textit{Harris detector} is an algorithm for keypoint localization
+\citep{harris1988combined}. We are looking for points that have significant
+change in both the $x$- and $y$-direction, \ie corners, such that the point
+will be localizable at any orientation. A good illustration of this is
+\Cref{fig:patch-uniqueness}.
+
+\begin{marginfigure}
+    \centering
+    \incfig{patch-uniqueness}
+    \caption{The Harris detector seeks to find corner points, which have a
+        significant change in both the $x$- and $y$-direction. Edges are not
+        localizable, because if we rotate the patch, we will not be able to match
+        the two rotated patches together.}
+    \label{fig:patch-uniqueness}
+\end{marginfigure}
+
+To find corners, we want to find points such that if we shift the window in any
+direction, it should give a large change in intensity. Let's define an error
+function as the following, \[
+    E(u,v) \doteq \sum_{(x,y)\in W} (\tens{I}[x+u,y+v]-\tens{I}[x,y])^2,
+\]
+where $W$ is the set of all points in the window that is a potential corner.
+We want to find $W$s such that $E(u,v)$ is large for any $(u,v)$. We can
+rederive $E(u,v)$ with its first-order Taylor expansion to make this easy and
+efficient:
+\begin{align*}
+    E(u,v)   & \doteq \sum_{(x,y)\in W} (\tens{I}[x+u,y+v]-\tens{I}[x,y])^2                                                                                                                                                                                   \\
+             & \approx \sum_{(x,y)\in W} \lft( \tens{I}[x,y]+\begin{bmatrix} \tens{I}_x & \tens{I}_y \end{bmatrix}\begin{bmatrix} u \\ v \end{bmatrix} - \tens{I}[x,y] \rgt)^2 \margintag{First-order Taylor approximation}                                   \\
+             & = \sum_{(x,y)\in W} \lft( \begin{bmatrix} \tens{I}_x & \tens{I}_y \end{bmatrix} \begin{bmatrix} u \\ v \end{bmatrix} \rgt)^2                                                                                                                   \\
+             & = \begin{bmatrix} u & v \end{bmatrix} \tens{M} \begin{bmatrix} u \\ v \end{bmatrix}                                                                                                                                                            \\
+    \intertext{where $\tens{I}_x$ and $\tens{I}_y$ are the gradients in the $x$-
+        and $y$-direction at the implicit $[x,y]$ point, and $\tens{M}$ is the
+        structure tensor,}
+    \tens{M} & = \sum_{(x,y)\in W} \begin{bmatrix} \tens{I}_x^2 & \tens{I}_x\tens{I}_y \\ \tens{I}_x\tens{I}_y & \tens{I}_y^2 \end{bmatrix} \margintag{This can be computed using convolutions, which makes it efficient to compute for all pixels at once.}.
+\end{align*}
+
+We want to find points with an error surface as in
+\Cref{fig:error-surface-corner}. The eigenvalues of a matrix tell us how much
+it changes in the direction of their eigenvectors. Since we found that $E(u,v)$
+is approximately equal to a matrix multiplication with $\tens{M}$, the
+eigenvalues of $\tens{M}$ tell us how much the error function changes as we
+shift the window in the direction of the eigenvectors. Thus, we want to find
+points where both eigenvalues are large. The Harris detector uses the following
+response function, because it can be rederived to not need the (computationally
+inefficient) eigendecomposition,
+\begin{align*}
+    R & = \lambda_1\lambda_2 - \kappa (\lambda_1+\lambda_2)^2 \\
+      & = \det{\tens{M}}-\kappa \tr{\tens{M}}^2.
+\end{align*}
+The response function $R$ is a measure of a window's ``cornerness``. If
+$R>0$, its window is considered to be a corner for the Harris detector.
+
+Lastly, the Harris detector applies non-maximum suppression, which reduces
+clusters of points with $R>0$ to a single point, since they capture the same
+corner.
+
+\begin{marginfigure}[-1cm]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                    colormap name=sequential,
+                    width=\textwidth,
+                    grid=major,
+                    domain=-5:5,
+                    y domain=-5:5,
+                    view={45}{45},
+                    zmin=0,
+                    zmax=50,
+                    samples=20,
+                    xlabel=$u$,
+                    ylabel=$v$,
+                ]
+                \addplot3 [surf] {0.2*x^2 + 0.2*y^2};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Error surface of a patch containing a flat area.}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                    colormap name=sequential,
+                    width=\textwidth,
+                    grid=major,
+                    domain=-5:5,
+                    y domain=-5:5,
+                    view={45}{45},
+                    zmin=0,
+                    zmax=50,
+                    samples=20,
+                    xlabel=$u$,
+                    ylabel=$v$,
+                ]
+                \addplot3 [surf] {1.5*x^2 + 0.2*y^2};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Error surface of a patch containing an edge.}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                    colormap name=sequential,
+                    width=\textwidth,
+                    grid=major,
+                    domain=-5:5,
+                    y domain=-5:5,
+                    view={45}{45},
+                    zmin=0,
+                    zmax=50,
+                    samples=20,
+                    xlabel=$u$,
+                    ylabel=$v$,
+                ]
+                \addplot3 [surf] {1.2*x^2 + 1.2*y^2};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Error surface of a patch containing a corner.}
+        \label{fig:error-surface-corner}
+    \end{subfigure}
+    \caption{Different types of error surfaces.}
+    \label{fig:error-surfaces}
+\end{marginfigure}
+
+\subsection{Scale-invariant region selection}
+
+The Harris detector is only able to find keypoints at a fixed scale. However,
+we would like to be able to detect keypoints at any scale and use this scale to
+match keypoints of different scales. In other words, we want to be able to
+match keypoints in a zoomed in version of an image to points in a zoomed out
+one. The naive approach would be to compare descriptors while varying the patch
+size, but this results in a combinatorial search problem.
+
+A better idea is to do detection over a scale space, which has three dimensions
+$x,y,\sigma$, where the $\sigma$ parametrizes the convolution with a Laplacian
+of Gaussian (second derivative of the Gaussian). This ``blurs`` the image so only
+large structures remain. Then, we compute the response function for all points
+$(x,y,\sigma)$, and call points that are a maximum in a $3\times 3\times 3$
+grid around them a feature point. The Laplacian of Gaussian can be approximated
+by the difference of Gaussian operator, which is more efficient.
+
+\begin{marginfigure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                width=\textwidth,
+                domain=0:10,
+                y domain=0:10,
+                view={0}{90},
+                samples=50,
+                % xlabel=$\lambda_1$,
+                % ylabel=$\lambda_2$,
+                zmin=-10,
+                zmax=10,
+                scale only axis,
+                colormap name=diverging,
+                colorbar,
+                colorbar horizontal,
+                colorbar style={
+                        at={(0,-0.3)},
+                        anchor=south west,
+                    }
+            ]
+            \addplot3 [
+                surf,
+                shader=interp,
+                point meta=z,
+                point meta max=25,
+                point meta min=-25,
+            ] {x*y - 0.06 * (x + y)^2};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Harris detector response function for $\kappa=0.06$. $\lambda_1$ is
+        shown on the $x$-axis, and $\lambda_2$ is shown on the $y$-axis.}
+    \label{fig:response}
+\end{marginfigure}
+
+\subsection{Local descriptors}
+
+SIFT is an algorithm that uses the orientation of gradients within a patch to
+compute a keypoint descriptor \citep{lowe2004distinctive}. It does so by
+dividing the found patch into a $4\times 4$ grid and computing the 8-bin
+histogram of gradient orientations, weighted by their magnitude, within each
+grid cell. This results in a $4\times 4\times 8=128$-dimensional vector
+representation of a keypoint.
+
+We can assign an orientation to a keypoint by creating a histogram of local
+gradient orientations, weighted by a Gaussian window, within the patch and
+assigning the orientation to be the maximum gradient orientation. We can then
+align the descriptor to this orientation, such that we can directly compare two
+descriptors.
+
+\subsection{Matching}
+
+There are three main ways of matching keypoints between two images,
+\begin{itemize}
+    \item \textit{One-way matching}: for each keypoint in image 1, match it to the
+          keypoint in image 2 with the smallest descriptor difference;
+    \item \textit{Mutual matching}: for each keypoint in image 1, match it to the
+          keypoint in image 2 with the smallest descriptor difference only if this condition
+          also holds the other way;
+    \item \textit{Ratio-threshold matching}: for each keypoint in image 1, match
+          it to the keypoint in image 2 with the smallest descriptor difference only
+          if the ratio between the smallest and second smallest difference is less
+          than some threshold.
+\end{itemize}

@@ -3,18 +3,6 @@
 \input{../settings}
 \input{../commands}
 
-\usepackage{natbib}
-
-\usepackage{pgfplots}
-\usepackage{filecontents}
-\pgfplotsset{
-colormap={whiteblack}{color(0cm)=(white); color(1cm)=(black)},
-compat=1.16,
-}
-
-\usepgfplotslibrary{fillbetween}
-
-\usepackage{tikz}
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz/]
 
@@ -26,31 +14,43 @@ compat=1.16,
 \pagenumbering{roman}
 \maketitle
 \newpage
+\microtypesetup{protrusion=false}
 \tableofcontents
+\microtypesetup{protrusion=true}
 \newpage
-\input{sections/notation}
+\input{sections/symbols}
 \newpage\pagenumbering{arabic}
 
-\input{sections/probability_review}
+\input{sections/01_probability_review}
 
-\input{sections/bayesian_linear_regression}
+\newpage
+\input{sections/02_bayesian_linear_regression}
 
-\input{sections/gaussian_processes}
+\newpage
+\input{sections/03_gaussian_processes}
 
-\input{sections/variational_inference}
+\newpage
+\input{sections/04_variational_inference}
 
-\input{sections/markov_chain_monte_carlo}
+\newpage
+\input{sections/05_markov_chain_monte_carlo}
 
-\input{sections/bayesian_neural_networks}
+\newpage
+\input{sections/06_bayesian_neural_networks}
 
-\input{sections/active_learning}
+\newpage
+\input{sections/07_active_learning}
 
-\input{sections/bayesian_optimization}
+\newpage
+\input{sections/08_bayesian_optimization}
 
-\input{sections/markov_decision_processes}
+\newpage
+\input{sections/09_markov_decision_processes}
 
-\input{sections/reinforcement_learning}
+\newpage
+\input{sections/10_reinforcement_learning}
 
+\newpage
 \bibliography{main}
 \bibliographystyle{plainnat}
 

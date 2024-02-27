@@ -1,0 +1,55 @@
+\section{Bayesian linear regression} \label{sec:blr}
+
+\textit{Bayesian linear regression} (BLR) is a model that is able to provide an
+uncertainty measure about its predictions due to a lack of data.\sidenote{This
+    is called epistemic uncertainty.} It does so by outputting a probability
+distribution over possible outputs $y^\star$ given input $\vec{x}^\star$. The
+variance of this distribution measures the uncertainty of the model at this
+point and the mode corresponds to its best estimate. It does this by not
+considering a single set of weights, but rather all possible weights, assigning
+each a probability via Bayes rule. Recall the posterior, \[
+    p(\vec{w}\mid \mat{X}, \vec{y}) \propto p(\vec{y}\mid \vec{w}, \mat{X})\cdot p(\vec{w}, \mat{X}),
+\]
+where we can compute the maximum a posteriori (MAP) estimate and use that as our
+weights, multiplying it with the input $\vec{x}^\star$. However, by considering
+every plausible function and giving it a probability according to how well it
+models the data, we can compute the uncertainty of the model. Instead of using
+only the mode of the posterior, we will use the full posterior of $\vec{w}$ by
+taking the integral over all of them. This allows us to assign a probability
+distribution to any point $(\vec{x}^\star, y^\star)$,
+\begin{align*}
+    p(y^\star\mid\vec{x}^\star,\mat{X},\vec{y}) & = \int p(\vec{w},y^\star\mid \vec{x}^\star,\mat{X},\vec{y})d\vec{w}                                                   \margintag{Sum rule}     \\
+                                                & = \int p(\vec{w}\mid \vec{x}^\star,\mat{X},\vec{y})\cdot p(y^\star\mid \vec{w},\vec{x}^\star,\mat{X},\vec{y})d\vec{w} \margintag{Product rule} \\
+                                                & = \int p(\vec{w}\mid \mat{X},\vec{y})\cdot p(y^\star\mid \vec{w},\vec{x}^\star)d\vec{w}.
+\end{align*}
+Notice that each model $\vec{w}$'s prediction
+$p(y^\star\mid\vec{w},\vec{x}^\star)$ is weighted by its probability
+$p(\vec{w}\mid\mat{X},\vec{y})$. In general, this integral is
+intractable, but by assuming that the prior and likelihood are independently
+Gaussian,
+\begin{align*}
+    \vec{w}                   & \sim \mathcal{N}(\vec{0},\sigma_p^2\mat{I})         \\
+    y_i\mid \vec{w},\vec{x}_i & \sim \mathcal{N}(\vec{w}^\top\vec{x}_i,\sigma_n^2),
+\end{align*}
+it becomes tractable. Firstly, the posterior is given by the
+following,\sidenote{Notice that $\bar{\mat{\Sigma}}$ does not depend on
+    $\vec{y}$. Since the covariance matrix measures the uncertainty, this tells us
+    that the uncertainty only depends on where we observed data, not what we
+    observed. Intuitively, this makes a lot of sense.}
+\begin{align*}
+    \vec{w}\mid \mat{X},\vec{y} & \sim \mathcal{N}(\bar{\vec{\mu}},\bar{\vec{\Sigma}})                                   \\
+    \bar{\vec{\mu}}             & = \inv{(\transpose{\mat{X}} \mat{X} + \sigma_n^2 \mat{I})} \transpose{\mat{X}} \vec{y} \\
+    \bar{\mat{\Sigma}}          & = \inv{(\sigma_n^{-2} \transpose{\mat{X}} \mat{X} + \mat{I})}.
+\end{align*}
+
+By taking advantage of the Gaussian distribution properties, we can compute
+the distribution of $y^\star$ given a point $\vec{x}^\star$. Let's say
+$f^\star = \transpose{\vec{w}} \vec{x}^\star = \vec{x}^{\star\top} \vec{w}$, then \[
+    f^\star\mid \vec{x}^\star,\mat{X},\vec{y} \sim \mathcal{N}(\vec{x}^{\star\top} \bar{\bm{\mu}}, \vec{x}^{\star\top} \bar{\bm{\Sigma}} \vec{x}^\star).
+\]
+Adding aleatoric noise $y^\star=f^\star + \epsilon_n$ results in the following, \[
+    y^\star\mid \vec{x}^\star,\mat{X},\vec{y} \sim \mathcal{N}(\vec{x}^{\star\top} \bar{\vec{\mu}}, \vec{x}^{\star\top} \bar{\mat{\Sigma}} \vec{x}^\star + \sigma_n^2).
+\]
+The epistemic uncertainty $\bar{\bm{\Sigma}}$ is uncertainty about the model due
+to a lack of data, while the aleatoric uncertainty $\sigma_n^2$ is
+irreducible noise that is always present in data.

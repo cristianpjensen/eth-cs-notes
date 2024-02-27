@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'markov-random-field.pdf' (pdf, eps, ps)
 %%
@@ -72,22 +72,22 @@
     \put(0,0){\includegraphics[width=\unitlength,page=9]{markov-random-field.pdf}}%
     \put(0.55152209,0.05578095){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$x_{33}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=10]{markov-random-field.pdf}}%
-    \put(0.22124497,0.75504844){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{21}$\end{tabular}}}}%
+    \put(0.73055289,0.75414461){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{23}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=11]{markov-random-field.pdf}}%
-    \put(0.47533478,0.75504854){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{22}$\end{tabular}}}}%
+    \put(0.55896637,0.56995771){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{33}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=12]{markov-random-field.pdf}}%
-    \put(0.7241627,0.75769441){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{23}$\end{tabular}}}}%
+    \put(0.31058694,0.56982417){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{32}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=13]{markov-random-field.pdf}}%
-    \put(0.04958744,0.56967132){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{31}$\end{tabular}}}}%
+    \put(0.05747651,0.5699559){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{31}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=14]{markov-random-field.pdf}}%
-    \put(0.30367726,0.56967142){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{32}$\end{tabular}}}}%
+    \put(0.22954106,0.75423782){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{21}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=15]{markov-random-field.pdf}}%
-    \put(0.55250518,0.57231729){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{33}$\end{tabular}}}}%
+    \put(0.39265631,0.91751846){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{11}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=16]{markov-random-field.pdf}}%
-    \put(0.38418385,0.91790698){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{11}$\end{tabular}}}}%
+    \put(0.64529095,0.91741464){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{12}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=17]{markov-random-field.pdf}}%
-    \put(0.63827366,0.91790708){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{12}$\end{tabular}}}}%
+    \put(0.89611417,0.91645348){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{13}$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=18]{markov-random-field.pdf}}%
-    \put(0.88710158,0.92055295){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{13}$\end{tabular}}}}%
+    \put(0.48040359,0.75360753){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$y_{22}$\end{tabular}}}}%
   \end{picture}%
 \endgroup%

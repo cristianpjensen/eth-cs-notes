@@ -1,0 +1,110 @@
+\section{Part-of-speech tagging} \label{sec:pos-tagging}
+
+\begin{figure}[h!]
+    \centering
+    \incfig{pos-graph}
+    \caption{Example POS graph with $\mathcal{T} = \{ \cat{N}, \cat{V},
+            \cat{Det} \}$. For inference, we want to find the best $N$-length path
+        within this graph. For training, we want to compute the sum over all
+        $N$-length paths within this graph. The dashed edges are the backpointers to
+        the argmaxes, and the thick line is the best path.}
+    \label{fig:pos-graph}
+\end{figure}
+
+In \textit{part-of-speech tagging} (POS tagging), we want to predict a POS tag
+$t\in\mathcal{T}$ for every word of the input sentence $\vec{w}$ of length $N$.
+In other words, given an $N$-dimensional input sequence of words $\vec{w} \in
+    \Sigma^N$, we want to output an $N$-dimensional sequence of tags $\vec{t} \in
+    \mathcal{T}^N$. This can be seen as searching through a POS graph as in
+\Cref{fig:pos-graph}. The output space $\mathcal{T}^N$ is exponential, so we
+need to design an algorithm to efficiently compute the normalizer $Z(\vec{w})$,
+and find the maximum scoring tagging.
+
+\subsection{Conditional random fields}
+
+\textit{Conditional random fields} (CRF) are a conditional probabilistic model
+for structured labeling. Whereas a classifier predicts a label for a single
+sample without considering neighboring samples in the structure, a CRF does
+take context into account. In other words, CRFs are a model for computing the
+normalizer $Z$ in a structured labeling case.
+
+\marginnote{Note that the bigram assumption does not
+    mean that the current tag only depends on the previous and current word,
+    because the word representations can be anything. \Eg, if we use a
+    bidirectional RNN for the word representations, the tags will still depend on
+    the entire input sentence. However, a problem that this can cause is that it
+    cannot correctly tag garden-path sentences, since we cannot change the start of
+    the tagging after seeing the end of the tagging. An example garden-path
+    sentence is ``The horse raced past the barn fell.``}
+
+In the sequence labeling case of POS tagging, we will assume that tags only
+depend on their immediate neighbors, \[
+    \score(\vec{t},\vec{w}) = \sum_{n=1}^N \score(\langle t_{n-1},t_n \rangle, \vec{w}, n),
+\]
+which can be further decomposed into transition and emission scores, \[
+    \score(\langle t_{n-1},t_n \rangle, \vec{w}, n) = \mathrm{transition}(\langle t_{n-1},t_n \rangle) + \mathrm{emission}(w_n, t_n).
+\]
+This balances how likely $t_n$ is to follow $t_{n-1}$ and how likely word $w_n$
+is to be assigned tag $t_n$.
+
+We can use the new decomposed scoring function to find an efficient algorithm
+for computing the normalizer under a semiring,
+\begin{align*}
+     & \bigoplus_{\vec{t}\in\mathcal{T}^N} \bigotimes_{n=1}^N \exp \score(\langle t_{n-1},t_n \rangle, \vec{w}, n)                                                                                                         \\
+     & = \bigoplus_{t_1\in\mathcal{T}} \cdots \bigoplus_{t_n\in\mathcal{T}} \exp \score(\langle t_0,t_1 \rangle, \vec{w}, 1) \otimes \cdots \otimes \exp \score(\langle t_{N-1},t_N \rangle, \vec{w}, N)                   \\
+     & = \bigoplus_{t_1\in\mathcal{T}} \exp \score(\langle t_0,t_1 \rangle, \vec{w}, 1) \otimes \lft( \cdots \otimes \lft( \bigoplus_{t_n\in\mathcal{T}} \exp \score(\langle t_{N-1},t_N \rangle, \vec{w}, N) \rgt) \rgt),
+\end{align*}
+where distributivity is used in the last step. The backward and forward
+algorithms (\Cref{alg:backward-algorithm,alg:forward-algorithm}) are direct results of
+this rederivation, which compute the normalizer in $\bigo{N \cdot
+        |\mathcal{T}|^2}$.
+
+\begin{algorithm}
+    \caption{Backward algorithm that computes the semiring-sum over all taggings
+        of a sentence $\vec{w}$. It can be seen as iteratively computing the larger
+        semiring-sum from the derived equation.}
+    \label{alg:backward-algorithm}
+
+    \begin{algorithmic}[1]
+        \Function{BackwardAlgorithm}{$\vec{w}, \score, \langle A,\oplus,\otimes,\vec{0},\vec{1} \rangle$}
+        \State $\beta[N] \gets \bm{1}$
+
+        \For {$n=N-1, \ldots, 0$}
+        \For {$t_{n}\in\mathcal{T}$}
+        \State $\beta[n,t_n] \gets \bigoplus_{t_{n+1}\in\mathcal{T}}
+            \exp(\text{score}(\langle t_n,t_{n+1} \rangle), \vec{w}, n+1) \otimes
+            \beta[n+1,t_{n+1}]$
+        \EndFor
+        \EndFor
+
+        \State \Return $\beta[0, \smallcaps{BOT}]$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{Forward algorithm that computes the same thing as
+        \Cref{alg:backward-algorithm}, but then in a different fashion. This version
+        is more intuitive, because it starts at the beginning and ends at the end.}
+    \label{alg:forward-algorithm}
+
+    \begin{algorithmic}[1]
+        \Function{ForwardAlgorithm}{$\vec{w}, \score, \langle A,\oplus,\otimes,\vec{0},\vec{1} \rangle$}
+        \State $\alpha[0] \gets \bm{1}$
+
+        \For {$n=1,\ldots N$}
+        \For {$t_n\in\mathcal{T}$}
+        \State $\alpha[n,t_n] \gets \bigoplus_{t_{n-1}\in\mathcal{T}} \exp(\text{score}(\langle t_{n-1},t_n \rangle), \vec{w}, n) \otimes \alpha[n-1,t_{n-1}]$
+        \EndFor
+        \EndFor
+
+        \State \Return $\alpha[N, \smallcaps{EOT}]$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+We can thus use these algorithms to compute the normalizer $Z(\vec{w})$ during
+training. For inference, the Viterbi algorithm is a version of the backward
+algorithm under the Viterbi semiring, where backpointers to the argmax are kept
+such that the maximally scoring tagging can be constructed by backtracking the
+backpointer.

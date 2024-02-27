@@ -1,0 +1,189 @@
+\section{Markov decision processes} \label{sec:mdp}
+
+\marginnote[4cm]{For now, we will assume that $p$ and $r$ are known, but, as we will
+    see in \cref{sec:rl}, in reinforcement learning, these are unknown.}
+
+\begin{definition}[Markov decision process]
+    A Markov decision process $\langle \mathcal{X},\mathcal{A},p,r \rangle$ is
+    specified by the following,
+    \begin{itemize}
+        \item Set of states $\mathcal{X}$ (not necessarily finite);
+        \item Set of actions $\mathcal{A}$ (not necessarily finite);
+        \item Initial state distribution $p(x_0)$;
+        \item Transition probabilities $p(x'\mid x, a)$;
+        \item Reward function $r(x, a)$ (or $r(x,a,x')$).
+    \end{itemize}
+    As can be seen by the form of the transition probabilities, we make the
+    Markov assumption, where the future state only depends on the current state
+    and action.
+\end{definition}
+
+In general, we want to maximize the long-term reward, either over a finite
+horizon $T$, \[
+    \max \E \lft[ \sum_{t=0}^T r(x_t,a_t) \rgt],
+\]
+or over an infinite horizon where future rewards are discounted by a decaying
+factor $\gamma\in(0,1)$,\sidenote{We cannot maximize the summed future reward
+    (without decaying factor), because this could be $\infty$ for all possible
+    strategies.} \[
+    \max \E \lft[ \sum_{t=0}^{\infty} \gamma^t r(x_t,a_t) \rgt].
+\]
+
+A \textit{policy} $\pi : \mathcal{X} \to \mathcal{A}$ is a function that maps
+states to their action. A policy $\pi$ induces a Markov chain with
+$P(X_{t+1}=x' \mid X_t = x) = p(x' \mid x, \pi(x))$ as transition
+probabilities. In general, we want to find the policy that maximizes the
+expected value, \[
+    J(\pi) \doteq \E \lft[ \sum_{t=0}^\infty \gamma^t r(X_t, \pi(X_t)) \rgt].
+\]
+
+\subsection{Bellman expectation equation}
+
+\marginnote[-4.5cm]{We can solve for the value function of a policy using a bit of
+    linear algebra. Let $\mathcal{X}=\{ 1, \ldots, n \}$, then we can define the
+    following vectors and matrix,
+    \begin{align*}
+        \vec{v}^\pi & = \begin{bmatrix}
+                            V^\pi(1) \\
+                            \vdots   \\
+                            V^\pi(n)
+                        \end{bmatrix}                                  \\
+        \vec{r}^\pi & = \begin{bmatrix}
+                            r(1,\pi(1)) \\
+                            \vdots      \\
+                            r(n,\pi(n)) \\
+                        \end{bmatrix}                                  \\
+        \mat{T}^\pi & = \begin{bmatrix}
+                            p(1\mid 1,\pi(1)) & \cdots & p(n \mid 1,\pi(1)) \\
+                            \vdots            & \ddots & \vdots             \\
+                            p(1\mid n,\pi(n)) & \cdots & p(n \mid n,\pi(n))
+                        \end{bmatrix}.
+    \end{align*}
+    Using the Bellman expectation equation, we have the following equality,
+    \begin{align*}
+             &  & \vec{v}^\pi                               & = \vec{r}^\pi + \gamma \mat{T}^\pi \vec{v}^\pi      \\
+        \iff &  & (\mat{I} - \gamma \mat{T}^\pi)\vec{v}^\pi & = \vec{r}^\pi                                       \\
+        \iff &  & \vec{v}^\pi                               & = \inv{(\mat{I} - \gamma \mat{T}^\pi)} \vec{r}^\pi.
+    \end{align*}
+
+    However, this is computationally expensive. We could also use fixed-point
+    iteration to obtain an (approximate) solution. This involves iteratively
+    computing the value function of each node, given the last value function, \[
+        \vec{v}_t^\pi = \vec{r}^\pi + \gamma \mat{T}^\pi \vec{v}_{t-1}^\pi.
+    \]
+    This is faster, because $\mat{T}^\pi$ is sparse.}
+
+The \textit{value function} of a state $x$ is the expected sum of discounted
+future rewards, obtained from subsequent states. This is defined as the
+following, \[
+    V^\pi(x) \doteq \E \lft[ \sum_{t=0}^\infty \gamma^t r(X_t,\pi(X_t)) \;\middle|\; X_0=x \rgt],
+\]
+which contains a recursive relationship,
+\begin{align*}
+    V^\pi(x) & \doteq \E_x \lft[ \sum_{t=0}^\infty \gamma^t r(X_t, \pi(X_t)) \;\middle|\; X_0=x \rgt]                                                                                                                 \\
+             & = \E_x \lft[ r(X_0, \pi(X_0)) + \sum_{t=1}^\infty \gamma^t r(X_t, \pi(X_t)) \;\middle|\; X_0=x \rgt]                                                                                                   \\
+             & = \E_x \lft[ r(X_0, \pi(X_0)) \;\middle|\; X_0=x \rgt] + \E_x \lft[ \sum_{t=0}^\infty \gamma^{t+1} r(X_{t+1}, \pi(X_{t+1})) \;\middle|\; X_0=x \rgt]                                                   \\
+             & = r(x, \pi(x)) + \gamma \E_{x'} \lft[ \E_x \lft[ \sum_{t=0}^\infty \gamma^t r(X_{t+1}, \pi(X_{t+1})) \;\middle|\; X_1=x' \rgt] \rgt] \margintag{Condition on realization of $X_1$}                     \\
+             & = r(x, \pi(x)) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,\pi(x)) \cdot \E_{x'} \lft[ \sum_{t=0}^\infty \gamma^t r(X_{t+1}, \pi(X_{t+1})) \;\middle|\; X_1=x' \rgt]                                   \\
+             & = r(x, \pi(x)) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,\pi(x)) \cdot \E_{x'} \lft[ \sum_{t=0}^\infty \gamma^t r(X_t, \pi(X_t)) \;\middle|\; X_0=x' \rgt] \margintag{Stationarity of Markov chains} \\
+             & = r(x, \pi(x)) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,\pi(x)) \cdot V^\pi(x').
+\end{align*}
+This equation is known as the \textit{Bellman expectation equation}.
+Intuitively, this means that the value of the current state corresponds to the
+reward from the next action, plus the discounted sum of expected future rewards
+obtained from the subsequent states (which are their values).
+
+\begin{marginfigure}
+    \centering
+    \incfig{cyclic-dependency}
+    \caption{Cyclic dependency between value function and greedy policy.}
+    \label{fig:cyclic-dependency}
+\end{marginfigure}
+
+\begin{theorem}[Bellman's theorem] \label{thm:bellman}
+    A policy $\pi^\star$ is optimal iff it is greedy \wrt its own value function
+    $V^\star$.
+\end{theorem}
+
+\subsection{Policy iteration}
+
+Every value function induces a policy where we greedily choose the action that
+maximizes the expected value,
+\begin{equation}
+    \pi_V(x) = \argmax_{a\in\mathcal{A}} r(x,a) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,a) V(x')
+    \label{eq:greedy-policy}
+    ,\end{equation}
+while the policy induces a value function as we have seen. This leads us to
+\textit{policy iteration}, where we find an optimal policy by alternating
+between computing the value function \wrt $\pi$ (using fixed-point iteration)
+and computing the next greedy policy \wrt $V^\pi$ (using
+\Cref{eq:greedy-policy}), until convergence.
+
+\begin{algorithm}[h]
+    \caption{Policy iteration algorithm that finds an exact solution in a
+        polynomial number of iterations.}
+    \label{alg:policy-iteration}
+    \begin{algorithmic}
+        \Function {PolicyIteration}{$\langle \mathcal{X},\mathcal{A},p,r \rangle$}
+        \State {randomly initialize $\pi$}
+        \While {not converged}
+        \State {$V \gets \Call{ValueFunction}{\pi}$}
+        \State {$\pi \gets \Call{GreedyPolicy}{V}$}
+        \EndWhile
+        \State {\Return $\pi$}
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Policy iteration is expensive, because every iteration requires computing a
+value function, but it is guaranteed to converge monotonically.
+
+\subsection{Value iteration}
+
+\textit{Value iteration} can be seen as a dynamic program that computes the
+optimal value function, where the state is how many timesteps $t$ we look
+ahead, and $V_t(x)$ is the value function of that. The recurrence relationship
+is then the following,
+\begin{align*}
+    V_0(x) & = \max_{a\in\mathcal{A}} r(x,a)                                                              \\
+    V_t(x) & = \max_{a\in\mathcal{A}} r(x, a) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,a) V_{t-1}(x').
+\end{align*}
+Since $V_{t-1}$ looks $t-1$ steps into the future, $V_t$ looks $t$ steps ahead.
+We keep iterating until $\epsilon$-optimal
+convergence.\sidenote{$\epsilon$-optimal in the sense that the largest
+    difference between $V^\star(x)$ and $V_t(x)$ for any $x$ is at most
+    $\epsilon$.}
+
+\begin{algorithm}[h]
+    \caption{Value iteration algorithm that finds an $\epsilon$-optimal solution
+    in a polynomial number of iterations. $\vec{v}_t$ is the vector containing
+    all values of $V_t$. $\|\vec{x}\|_{\infty}$ is the largest value of
+    $\vec{x}$.}
+    \label{alg:value-iteration}
+    \begin{algorithmic}
+        \Function {ValueIteration}{$\langle \mathcal{X},\mathcal{A},p,r \rangle$}
+        \For {$x \in \mathcal{X}$} \Comment{Initialize $V_0$}
+        \State {$V_0(x) \gets \max_{a\in\mathcal{A}} r(x,a)$}
+        \EndFor
+
+        \State {$t \gets 0$}
+        \While {$\|\vec{v}_t - \vec{v}_{t-1}\|_{\infty} > \epsilon$}
+        \State {$t \gets t + 1$}
+        \Comment{Look one more step into the future}
+        \For {$x\in\mathcal{X}$}
+        \State {$V_t(x) \gets \max_{a\in\mathcal{A}} r(x,a) + \gamma \sum_{x'\in\mathcal{X}} p(x'\mid x,a) V_{t-1}(x')$}
+        \EndFor
+        \EndWhile
+        \State {\Return $\Call{GreedyPolicy}{V_t}$}
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Recall \Cref{thm:bellman} that states that if a policy is greedy \wrt its own
+value function, it is optimal. Thus, after finding an $\epsilon$-optimal value
+function, we can simply choose the policy that greedily picks according to this
+value function.
+
+Value iteration is not guaranteed to converge monotonically, but it is
+guaranteed to converge to an $\epsilon$-optimal policy in polynomial time.
+Furthermore, value iteration is inexpensive, compared to policy iteration.

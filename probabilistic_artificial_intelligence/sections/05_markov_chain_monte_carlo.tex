@@ -1,0 +1,223 @@
+\section{Markov chain Monte Carlo} \label{sec:mcmc}
+
+\textit{Markov chain Monte Carlo} (MCMC) methods seek to approximate the
+intractable distribution $p$ by drawing $m$ approximate samples from $p$,
+\begin{align*}
+    p(y^\star\mid\bm{x}^\star, \vec{y}) & = \int p(y^\star\mid\bm{x}^\star,\theta) p(\theta\mid \vec{y}) d\theta                                                 \\
+                                        & = \E_{\theta\sim p(\cdot\mid \vec{y})} [p(y^\star\mid\bm{x}^\star,\theta)]                                             \\
+                                        & \approx \frac{1}{m} \sum_{i=1}^m p \lft( y^\star\mid\vec{x}^\star,\theta^{(i)} \rgt). \margintag{Law of large numbers}
+\end{align*}
+
+Using \textit{Hoeffding's inequality}, we can compute a bound on the error, \[
+    p\lft( \lft|\E_{\theta\sim p(\cdot\mid\vec{y})}[p(y^\star\mid\bm{x}^\star,\theta)] - \frac{1}{m}\sum_{i=1}^m p \lft( y^\star\mid\bm{x}^\star,\theta^{(i)} \rgt)\rgt| > \epsilon \rgt) \leq 2\exp \lft( -2m\epsilon^2 \rgt).
+\]
+Thus, the probability of error decreases exponentially in $m$. To get a
+probability $\leq \delta$ of error $> \epsilon$, we need
+\begin{align*}
+    2\exp(-2m\epsilon^2) & \leq \delta                                   \\
+    -2m\epsilon^2        & \leq \log \frac{\delta}{2}                    \\
+    m                    & \geq \frac{\log 2 - \log \delta}{2\epsilon^2}
+\end{align*}
+samples. Intuitively, if we want a lower error or lower probability, we need
+more samples.
+
+However, we cannot sample directly from the posterior $p(\theta\mid\vec{y})$,
+because it is intractable. The key idea of MCMC is to construct a Markov
+chain with stationary distribution $p(\theta\mid\vec{y})$ and sample from
+that.
+
+\subsection{Markov chains}
+
+\begin{definition}[Markov chain]
+    A Markov chain is a sequence of random variables $(X_t)_{t\in\N_0}$ with
+    prior $P(X_1)$ and transition probabilities $P(X_{t+1}\mid X_t)$ independent
+    of $t$. The Markov assumption is thus the following, \[
+        X_{t+1} \bot X_{1:t-1} \mid X_t.
+    \]
+    Intuitively, this states that future behavior is independent of past states
+    given the present state. In other words, all past information is encapsulated
+    by the current state.
+\end{definition}
+
+\begin{definition}[Stationary distribution]
+    A distribution $\pi$ is stationary with respect to the transition function
+    $P$ iff $P(X_n) = P(X_{n+1})$. In other words, the probability distribution
+    over states remains the same between timesteps. The following must hold for
+    all $x$, \[
+        \pi(x) = \sum_{x'} P(x\mid x')\pi(x').
+    \]
+\end{definition}
+
+\begin{definition}[Ergodicity]
+    A Markov chain is ergodic iff there exists a $t\in\N_0$ such that for any
+    $x,x'$, the following holds, \[
+        P^{(t)} (x'\mid x) > 0,
+    \]
+    where $P^{(t)}(x'\mid x)$ is the probability to reach $x'$ from $x$ in
+    \textit{exactly} $t$ steps. Intuitively, this means that any state is
+    reachable from another within the same amount of steps.
+\end{definition}
+
+\begin{remark}
+    An easy way of ensuring that a Markov chain is ergodic is to add
+    ``self-loops`` to every vertex.
+\end{remark}
+
+\begin{theorem}[Fundamental theorem of ergodic Markov chains]
+    An ergodic Markov chain has a unique and positive stationary distribution
+    $\pi(X)>0$ such that for all $x$, the following holds, \[
+        \lim_{n\to\infty} P(X_n = x) = \pi(x),
+    \]
+    independent of the initial distribution $P(X_1)$. \Ie, ergodic Markov chains
+    always converge to a stationary distribution.
+\end{theorem}
+
+Thus, making use of the fundamental theorem of ergodic Markov chains, we can
+construct an ergodic Markov chain such that its stationary distribution
+coincides with the posterior distribution, $\pi(x) = p(\theta\mid\vec{y})$. If
+we then sample ``sufficiently long`` from this Markov chain, $X_t$ is drawn
+from a distribution that is ``very close`` to the stationary distribution
+$\pi$, which is equal to the posterior distribution.
+
+\begin{definition}[Detailed balance equation]
+    A Markov chain satisfies the detailed balance equation for an unnormalized
+    distribution $q$ iff the following holds for any $x,x'$, \[
+        q(x)P(x'\mid x) = q(x')P(x\mid x').
+    \]
+\end{definition}
+
+\begin{theorem}
+    If a finite Markov chain satisfies the detailed balance equation with
+    respect to $q$, then $\frac{1}{Z}q$ is a stationary distribution.
+\end{theorem}
+
+\begin{proof}
+    Let $p_t = q$. Then for any $x$, the following holds,
+    \begin{align*}
+        p_{t+1}(x) & = \sum_{x'} P(x\mid x')p_t(x') \margintag{Markov assumption}         \\
+                   & = \sum_{x'} P(x\mid x') q(x')                                        \\
+                   & = \sum_{x'} P(x'\mid x) q(x)   \margintag{Detailed balance equation} \\
+                   & = q(x) \sum_{x'} P(x' \mid x)                                        \\
+                   & = q(x).
+    \end{align*}
+    Thus, $q$ is the stationary distribution.
+\end{proof}
+
+\subsection{Sampling}
+
+If we can show that the detailed balance equation holds for the
+\textit{unnormalized} posterior distribution, then we know that the posterior
+distribution is the stationary distribution of the Markov chain.\sidenote{The
+    only problem is that we do not know the rate of convergence to the stationary
+    distribution.} Thus, we do not need to know the true posterior. It suffices
+to know its unnormalized version.\sidenote{Recall that the normalizer was the
+    intractable part of $p(\theta\mid\vec{y})$.}
+
+The \textit{Metropolis-Hastings algorithm} constructs a Markov chain with the
+posterior as stationary distribution. It uses an arbitrary proposal transition
+distribution $R(x'\mid x)$ which, given we are in state $x$, proposes a new
+state $x'$.\sidenote{The rate of convergence of this algorithm strongly depends
+    on the choice of $R$.} Following the proposal with probability \[
+    \alpha(x'\mid x) \doteq \min \lft\{  1, \frac{q(x')R(x\mid x')}{q(x)R(x'\mid x)} \rgt\},
+\]
+yields a Markov chain with the desired stationary distribution
+$\frac{1}{Z}q(x)$, because it makes it satisfy the detailed balance equation.
+
+\begin{algorithm}
+    \caption{The Metropolis-Hastings algorithm. Each iteration, with a random
+        probability, follow the proposal distribution.}
+
+    \begin{algorithmic}[1]
+        \Function {MetropolisHastings}{R}
+        \State {initialize $x$}
+        \For {$t=1,\ldots,T$}
+        \State {$x' \sim R(x' \mid x)$}
+        \State {$u \sim \mathrm{Unif}([0,1])$}
+        \If {$u \leq \alpha(x' \mid x)$}
+        \State {$x \gets x'$}
+        \EndIf
+        \EndFor
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Proposal distributions}
+
+We want to converge to the stationary distribution as fast as possible. The
+proposal distribution has a big influence on this.
+
+\paragraph{Gibbs sampling.}
+
+A popular example algorithm for specifying a proposal distribution $R$ is
+Gibbs sampling. Gibbs sampling works by iteratively improving the variables.
+It starts with an initial assignment $x$ to all variables, fixing the
+observed variables to their observed value. Then, iteratively uniformly pick
+a variable $X_i$ to update given the rest of the set values by sampling
+$p(X_i \mid x_{1:i-1}, x_{i+1:n})$.\sidenote{Sampling from this distribution
+    is typically efficient.}
+
+\begin{algorithm}
+    \caption{Gibbs sampling.}
+
+    \begin{algorithmic}[1]
+        \Function{GibbsSampling}{}
+        \State {initialize $\vec{x} = [x_1,\ldots,x_n]\in\R^n$}
+        \For {$t=1,\ldots,T$}
+        \State {uniformly sample $i$ from $\{ 1,\ldots,n \}$}
+        \State {$\vec{x}_{-i} \gets [x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_n]$}
+        \State {update $x_i$ by sampling from $p(x_i \mid \vec{x}_{-i})$}
+        \EndFor
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Then, Gibbs sampling is a Metropolis-Hastings algorithm with the following
+proposal distribution, \[
+    R(x'\mid x) \doteq
+    \begin{cases}
+        p(x'_i \mid x'_{1:i-1}, x'_{i+1:n}) & \text{\footnotesize $x'$ differs from $x$} \\
+        0                                   & \text{\footnotesize otherwise}
+    \end{cases}
+\]
+and acceptance distribution $\alpha(x'\mid x) = 1$ for all $x,x'$.
+
+\paragraph{Gaussian.}
+
+Generally, we focus on positive distributions written as the following, \[
+    p(x) = \frac{1}{Z} \exp (-f(x)),
+\]
+where $f$ is called an energy function (high energy $\equiv$ low probability,
+low energy $\equiv$ high probability). Then, the acceptance distribution
+becomes the following, \[
+    \alpha(x'\mid x) = \min \lft\{ 1, \frac{R(x\mid x')}{R(x'\mid x)}\exp(f(x) - f(x')) \rgt\}.
+\]
+
+One option for the proposal distribution is \[
+    R(x'\mid x) = \mathcal{N}(x'; x,\tau\mat{I}).
+\]
+Since this $R$ is symmetric, \[
+    \frac{R(x\mid x')}{R(x'\mid x)} = 1.
+\]
+Thus, if $R$ proposes to move to a region with lower energy, the acceptance
+probability will always be 1. If $R$ proposes to move to a region with higher
+energy, the probability moves toward 0 dependent on how much higher the
+region is.
+
+However, we want to move as quickly as possible through the function, going
+through all high-density areas. But, this $R$ is ``uninformed`` and thus
+proposes to go in any direction. We would like to propose areas with lower
+energy, which are high-density areas for $p(x)$. Then, we will have less
+iterations where the proposal simply gets rejected.
+
+\paragraph{Metropolis adjusted Langevin algorithm.}
+
+An improvement to the Gaussian proposal distribution is the Metropolis
+adjusted Langevin algorithm (MALA), \[
+    R(x'\mid x) = \mathcal{N}(x'; x-\tau\nabla f(x),2\tau\mat{I}).
+\]
+This proposes moving to high-density areas, thus it much more efficiently
+converges to the stationary distribution.
+
+The problem with this is that it requires access to the full energy function to
+compute the gradient, which can be expensive for large datasets. This is solved
+by stochastically estimating the gradient $\nabla f(x)$.

@@ -1,4 +1,4 @@
-%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
 %% Accompanies image file 'cky-chart.pdf' (pdf, eps, ps)
 %%
@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{283.46456693bp}%
+    \setlength{\unitlength}{320bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,32 +50,32 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.65)%
+  \begin{picture}(1,0.65625)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0.07457958,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{I}\end{tabular}}}}%
-    \put(0.18251614,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{shot}\end{tabular}}}}%
-    \put(0.33516533,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{an}\end{tabular}}}}%
-    \put(0.42654293,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{elephant}\end{tabular}}}}%
-    \put(0.61801308,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{in}\end{tabular}}}}%
-    \put(0.75429192,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{my}\end{tabular}}}}%
-    \put(0.85689491,0.02232025){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{pajamas}\end{tabular}}}}%
-    \put(0.06409678,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
+    \put(0.07072715,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{I}\end{tabular}}}}%
+    \put(0.17981755,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{shot}\end{tabular}}}}%
+    \put(0.3340986,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{an}\end{tabular}}}}%
+    \put(0.42645303,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{elephant}\end{tabular}}}}%
+    \put(0.61997,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{in}\end{tabular}}}}%
+    \put(0.7577057,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{my}\end{tabular}}}}%
+    \put(0.86140549,0.0227418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\smallcaps{pajamas}\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{cky-chart.pdf}}%
-    \put(0.2117445,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
-    \put(0.3359309,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
-    \put(0.49052567,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
-    \put(0.63052784,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{P}\end{tabular}}}}%
-    \put(0.7565049,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
-    \put(0.90764565,0.13516296){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
-    \put(0.49076641,0.57022141){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{S}\end{tabular}}}}%
-    \put(0.55286934,0.49646759){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
-    \put(0.41194546,0.20328522){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
-    \put(0.34381527,0.27351318){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
-    \put(0.83134331,0.20328522){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
-    \put(0.76122871,0.27351318){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{PP}\end{tabular}}}}%
-    \put(0.62295071,0.41346832){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
-    \put(0.49073055,0.53197418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{S}\end{tabular}}}}%
-    \put(0.55270397,0.46471832){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
+    \put(0.55396275,0.46991024){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
+    \put(0.49132683,0.53789132){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{S}\end{tabular}}}}%
+    \put(0.06013229,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
+    \put(0.20935837,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{V}\end{tabular}}}}%
+    \put(0.33487236,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0.49111973,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0.63261856,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{P}\end{tabular}}}}%
+    \put(0.75994233,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{Det}\end{tabular}}}}%
+    \put(0.91269879,0.13680129){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{N}\end{tabular}}}}%
+    \put(0.49136306,0.57655098){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{S}\end{tabular}}}}%
+    \put(0.55412987,0.50200188){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
+    \put(0.41169952,0.2056581){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
+    \put(0.342841,0.27664335){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{VP}\end{tabular}}}}%
+    \put(0.83558076,0.2056581){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
+    \put(0.76471666,0.27664335){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{PP}\end{tabular}}}}%
+    \put(0.62496045,0.41810761){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\cat{NP}\end{tabular}}}}%
   \end{picture}%
 \endgroup%

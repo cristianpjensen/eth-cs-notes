@@ -2,29 +2,139 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="100mm"
    height="45mm"
    viewBox="0 0 100 45"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="epipolar-geometry.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="epipolar-geometry.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect9"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect8"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect7"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect6"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect5"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect4"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect3"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect2"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
     <marker
-       markerWidth="0.91100001"
-       markerHeight="1.6900001"
+       markerWidth="5.47557478"
+       markerHeight="10.21720446"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
-       id="marker-arrow-0.5308">
+       id="marker-arrow-0.5308"
+       viewBox="0 0 5.47557478 10.21720446"
+       preserveAspectRatio="xMidYMid">
       <g
          id="g690"
          transform="scale(2.1535293)">
@@ -36,12 +146,14 @@
       </g>
     </marker>
     <marker
-       markerWidth="0.91100001"
-       markerHeight="1.6900001"
+       markerWidth="5.47557478"
+       markerHeight="10.21720446"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
-       id="marker-arrow-0.5308-7">
+       id="marker-arrow-0.5308-7"
+       viewBox="0 0 5.47557478 10.21720446"
+       preserveAspectRatio="xMidYMid">
       <g
          id="g988"
          transform="scale(2.1535293)">
@@ -53,12 +165,14 @@
       </g>
     </marker>
     <marker
-       markerWidth="0.91100001"
-       markerHeight="1.6900001"
+       markerWidth="5.47557478"
+       markerHeight="10.21720446"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
-       id="marker-arrow-0.5308-3">
+       id="marker-arrow-0.5308-3"
+       viewBox="0 0 5.47557478 10.21720446"
+       preserveAspectRatio="xMidYMid">
       <g
          id="g1011"
          transform="scale(2.1535293)">
@@ -70,12 +184,14 @@
       </g>
     </marker>
     <marker
-       markerWidth="0.91100001"
-       markerHeight="1.6900001"
+       markerWidth="5.47557478"
+       markerHeight="10.21720446"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
-       id="marker-arrow-0.5308-6">
+       id="marker-arrow-0.5308-6"
+       viewBox="0 0 5.47557478 10.21720446"
+       preserveAspectRatio="xMidYMid">
       <g
          id="g1034"
          transform="scale(2.1535293)">
@@ -120,17 +236,1215 @@
            d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722" />
       </g>
     </marker>
+    <marker
+       id="ArrowWide-1"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-4" />
+    </marker>
+    <marker
+       id="ArrowWide-14"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-6" />
+    </marker>
+    <marker
+       id="ArrowWide-10"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-2" />
+    </marker>
+    <marker
+       id="ArrowWide"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         id="path1"
+         transform="rotate(180,0.125,0)" />
+    </marker>
+    <marker
+       id="ArrowWide-2"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-24" />
+    </marker>
+    <marker
+       id="ArrowWide-16"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-0" />
+    </marker>
+    <marker
+       id="ArrowWide-9"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         id="path1-29" />
+    </marker>
+    <marker
+       id="ArrowWide-4"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         id="path1-8" />
+    </marker>
+    <marker
+       id="ArrowWide-11"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-5" />
+    </marker>
+    <marker
+       id="ArrowWide-3"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-7" />
+    </marker>
+    <marker
+       id="ArrowWide-96"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-3" />
+    </marker>
+    <marker
+       id="ArrowWide-15"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-80" />
+    </marker>
+    <marker
+       id="ArrowWide-39"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-05" />
+    </marker>
+    <marker
+       id="ArrowWide-5"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-44" />
+    </marker>
+    <marker
+       id="ArrowWide-0"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-81" />
+    </marker>
+    <marker
+       id="ArrowWide-7"
+       style="overflow:visible"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-67" />
+    </marker>
+    <marker
+       id="ArrowWide-29"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-09" />
+    </marker>
+    <marker
+       id="ArrowWide-51"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         inkscape:connector-curvature="0"
+         id="path1-1" />
+    </marker>
+    <marker
+       id="ArrowWide-07"
+       style="overflow:visible"
+       refX="0.46000001"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         id="path1-68"
+         transform="rotate(180,0.125,0)" />
+    </marker>
+    <marker
+       id="ArrowWide-390"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-38" />
+    </marker>
+    <marker
+       id="ArrowWide-8"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-39" />
+    </marker>
+    <marker
+       id="ArrowWide-98"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-65" />
+    </marker>
+    <marker
+       id="ArrowWide-99"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-9" />
+    </marker>
+    <marker
+       id="ArrowWide-17"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-23" />
+    </marker>
+    <marker
+       id="ArrowWide-6"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-55" />
+    </marker>
+    <marker
+       id="ArrowWide-80"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-46" />
+    </marker>
+    <marker
+       id="ArrowWide-03"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-26" />
+    </marker>
+    <marker
+       id="ArrowWide-83"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-815" />
+    </marker>
+    <marker
+       id="ArrowWide-35"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-43" />
+    </marker>
+    <marker
+       id="ArrowWide-65"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-95" />
+    </marker>
+    <marker
+       id="ArrowWide-91"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-555" />
+    </marker>
+    <marker
+       id="ArrowWide-82"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-98" />
+    </marker>
+    <marker
+       id="ArrowWide-20"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-74" />
+    </marker>
+    <marker
+       id="ArrowWide-85"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-83" />
+    </marker>
+    <marker
+       id="ArrowWide-95"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-62" />
+    </marker>
+    <marker
+       id="ArrowWide-62"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-25" />
+    </marker>
+    <marker
+       id="ArrowWide-55"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-54" />
+    </marker>
+    <marker
+       id="ArrowWide-21"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-92" />
+    </marker>
+    <marker
+       id="ArrowWide-45"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-86" />
+    </marker>
+    <marker
+       id="ArrowWide-25"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-13" />
+    </marker>
+    <marker
+       id="ArrowWide-97"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-37" />
+    </marker>
+    <marker
+       id="ArrowWide-50"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-21" />
+    </marker>
+    <marker
+       id="ArrowWide-87"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-15" />
+    </marker>
+    <marker
+       id="ArrowWide-58"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-56" />
+    </marker>
+    <marker
+       id="ArrowWide-79"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-41" />
+    </marker>
+    <marker
+       id="ArrowWide-61"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-20" />
+    </marker>
+    <marker
+       id="ArrowWide-44"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-59" />
+    </marker>
+    <marker
+       id="ArrowWide-75"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-390" />
+    </marker>
+    <marker
+       id="ArrowWide-114"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-959" />
+    </marker>
+    <marker
+       id="ArrowWide-09"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-34" />
+    </marker>
+    <marker
+       id="ArrowWide-075"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-75" />
+    </marker>
+    <marker
+       id="ArrowWide-06"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-47" />
+    </marker>
+    <marker
+       id="ArrowWide-93"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-377" />
+    </marker>
+    <marker
+       id="ArrowWide-32"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-563" />
+    </marker>
+    <marker
+       id="ArrowWide-40"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-60" />
+    </marker>
+    <marker
+       id="ArrowWide-405"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-685" />
+    </marker>
+    <marker
+       id="ArrowWide-18"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-49" />
+    </marker>
+    <marker
+       id="ArrowWide-73"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-10" />
+    </marker>
+    <marker
+       id="ArrowWide-23"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-71" />
+    </marker>
+    <marker
+       id="ArrowWide-89"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-374" />
+    </marker>
+    <marker
+       id="ArrowWide-04"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-87" />
+    </marker>
+    <marker
+       id="ArrowWide-59"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-53" />
+    </marker>
+    <marker
+       id="ArrowWide-896"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-04" />
+    </marker>
+    <marker
+       id="ArrowWide-233"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-70" />
+    </marker>
+    <marker
+       id="ArrowWide-01"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-03" />
+    </marker>
+    <marker
+       id="ArrowWide-00"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-383" />
+    </marker>
+    <marker
+       id="ArrowWide-60"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-40" />
+    </marker>
+    <marker
+       id="ArrowWide-92"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-492" />
+    </marker>
+    <marker
+       id="ArrowWide-910"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-93" />
+    </marker>
+    <marker
+       id="ArrowWide-003"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-01" />
+    </marker>
+    <marker
+       id="ArrowWide-986"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-90" />
+    </marker>
+    <marker
+       id="ArrowWide-164"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-48" />
+    </marker>
+    <marker
+       id="ArrowWide-614"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-08" />
+    </marker>
+    <marker
+       id="ArrowWide-103"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-11" />
+    </marker>
+    <marker
+       id="ArrowWide-508"
+       style="overflow:visible"
+       refX="0.46"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:inherit;stroke-linecap:butt;"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         id="path1-493" />
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1.0"
+     borderopacity="1"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="195.59176"
-     inkscape:cy="71.060782"
+     inkscape:zoom="2.4506401"
+     inkscape:cx="211.7814"
+     inkscape:cy="78.142849"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -138,12 +1452,15 @@
      width="200mm"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="2488"
-     inkscape:window-height="1376"
-     inkscape:window-x="1512"
-     inkscape:window-y="517"
-     inkscape:window-maximized="1"
-     inkscape:snap-grids="false">
+     inkscape:window-width="1792"
+     inkscape:window-height="1120"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:snap-grids="false"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="false"
+     inkscape:deskcolor="#cccccc">
     <inkscape:grid
        type="xygrid"
        id="grid815"
@@ -151,7 +1468,10 @@
        spacingx="10"
        spacingy="10"
        empspacing="4"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       visible="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -161,7 +1481,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -170,20 +1489,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-252)">
-    <circle
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28088164;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
-       id="path277"
-       cx="58.869839"
-       cy="258.50452"
-       r="0.66520083" />
     <g
        id="g368"
        transform="translate(-2.9879084,5.5258712)">
       <g
          transform="translate(-2.0476129,2.703237)"
-         id="g242">
+         id="g242"
+         style="fill:none;fill-opacity:1">
         <g
-           id="g86">
+           id="g86"
+           style="fill:none;fill-opacity:1">
           <path
              sodipodi:nodetypes="ccccc"
              inkscape:connector-curvature="0"
@@ -194,7 +1509,7 @@
              inkscape:connector-curvature="0"
              id="path18"
              d="m 17.200168,261.24488 16.868087,4.51979 v 15.046"
-             style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none" />
+             style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none;fill-rule:nonzero" />
         </g>
       </g>
       <circle
@@ -206,14 +1521,14 @@
       <text
          id="text972"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          y="288.01126"
          x="28.306757"><tspan
            id="tspan970"
            sodipodi:role="line"
            x="28.306757"
            y="288.01126"
-           style="stroke-width:0.26458332">$\vec{e}_1$</tspan></text>
+           style="stroke-width:0.264583">$\vec{e}_1$</tspan></text>
       <path
          style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.14044083, 0.70220417;stroke-opacity:1;marker-start:none;marker-end:none"
          d="m 29.308284,280.51269 v 5.29129"
@@ -229,14 +1544,14 @@
       <text
          id="text972-2"
          xml:space="preserve"
-         style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          y="287.97452"
          x="72.917114"><tspan
            id="tspan970-9"
            sodipodi:role="line"
            x="72.917114"
            y="287.97452"
-           style="stroke-width:0.26458332">$\vec{e}_2$</tspan></text>
+           style="stroke-width:0.264583">$\vec{e}_2$</tspan></text>
       <path
          style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044085;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.14044083, 0.70220418;stroke-opacity:1;marker-start:none;marker-end:none"
          d="m 73.918646,280.47594 v 5.29129"
@@ -247,55 +1562,53 @@
     <text
        id="text302"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="256.84909"
        x="57.755707"><tspan
          id="tspan300"
          sodipodi:role="line"
          x="57.755707"
          y="256.84909"
-         style="stroke-width:0.26458332">$\vec{X}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{X}$</tspan></text>
     <text
        id="text330"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="290.29965"
        x="10.630592"><tspan
          id="tspan328"
          sodipodi:role="line"
          x="10.630592"
          y="290.29965"
-         style="stroke-width:0.26458332">$\vec{C}_1$</tspan></text>
+         style="stroke-width:0.264583">$\vec{C}_1$</tspan></text>
     <text
        id="text330-9"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="290.27472"
        x="82.842354"><tspan
          id="tspan328-3"
          sodipodi:role="line"
          x="82.842354"
          y="290.27472"
-         style="stroke-width:0.26458332">$\vec{C}_2$</tspan></text>
+         style="stroke-width:0.264583">$\vec{C}_2$</tspan></text>
     <g
        transform="matrix(-1.001248,0,0,1,99.928182,5.5258712)"
-       id="g368-6">
+       id="g368-6"
+       style="fill:#8dd3c7;fill-opacity:1">
       <g
          transform="translate(-2.0476129,1.6274772)"
-         id="g242-0">
+         id="g242-0"
+         style="fill:#8dd3c7;fill-opacity:1">
         <g
-           id="g86-6">
+           id="g86-6"
+           style="fill:#8dd3c7;fill-opacity:1">
           <path
              sodipodi:nodetypes="ccccc"
              inkscape:connector-curvature="0"
              id="path8-2"
              d="m 17.215469,277.37957 16.846349,4.51396 v -15.05021 l -16.86165,-4.52268 z"
              style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none" />
-          <path
-             inkscape:connector-curvature="0"
-             id="path18-6"
-             d="m 17.200168,262.32064 16.868087,4.51979 v 15.046"
-             style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none" />
         </g>
       </g>
       <circle
@@ -306,17 +1619,7 @@
          style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28088167;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
     </g>
     <path
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
-       d="m 14.278221,285.2308 0.3514,-0.22531 3.491334,0.98349 -1.17515,0.0263 z"
-       id="path626"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
-       d="m 78.656719,285.99768 1.558562,0.0165 2.964159,-0.8847 -0.330729,-0.37207 z"
-       id="path636"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:black;fill-opacity:0.12;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.05330625,1.05330625;stroke-opacity:1;marker-start:none;marker-end:none"
+       style="fill:#ddcc77;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.05330625, 1.05330625;stroke-opacity:1;marker-start:none;marker-end:none;strike-linecap:butt"
        d="M 12.985403,286.00191 H 83.934935 L 58.893628,258.48036 22.758608,280.14297 Z"
        id="path436-2-3"
        inkscape:connector-curvature="0"
@@ -334,7 +1637,7 @@
        cy="280.79388"
        r="0.66520083" />
     <path
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none;font-variation-settings:normal;opacity:1;vector-effect:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
        d="m 79.666454,280.72977 -6.734473,-7.94578 -4.923599,1.31603 -0.0049,12.45225 2.930317,-0.57213 z"
        id="path737"
        inkscape:connector-curvature="0"
@@ -360,47 +1663,54 @@
     <text
        id="text882"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="289.52786"
        x="44.676277"><tspan
          id="tspan880"
          sodipodi:role="line"
          x="44.676277"
          y="289.52786"
-         style="stroke-width:0.26458332">\textit{\footnotesize baseline}</tspan></text>
+         style="stroke-width:0.264583">\textit{\footnotesize baseline}</tspan></text>
     <text
        id="text910"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="274.30273"
        x="4.2035985"><tspan
          id="tspan908"
          sodipodi:role="line"
          x="4.2035985"
          y="274.30273"
-         style="stroke-width:0.26458332">$\vec{\ell}_1$</tspan></text>
+         style="stroke-width:0.264583">$\vec{\ell}_1$</tspan></text>
     <text
        id="text910-8"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="279.9993"
        x="88.271507"><tspan
          id="tspan908-9"
          sodipodi:role="line"
          x="88.271507"
          y="279.9993"
-         style="stroke-width:0.26458332">$\vec{\ell}_2$</tspan></text>
+         style="stroke-width:0.264583">$\vec{\ell}_2$</tspan></text>
+    <circle
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28088164;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none"
+       id="path277"
+       cx="58.869839"
+       cy="258.50452"
+       r="0.66520083"
+       transform="translate(0)" />
     <text
        id="text942"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="272.43182"
        x="53.292637"><tspan
          id="tspan940"
          sodipodi:role="line"
          x="53.292637"
          y="272.43182"
-         style="stroke-width:0.26458332">$\vec{\pi}$</tspan></text>
+         style="stroke-width:0.264583">$\vec{\pi}$</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.14044083, 0.70220417;stroke-opacity:1;marker-start:none;marker-end:none"
        d="m 82.26697,279.21265 h 5.677787"
@@ -410,14 +1720,19 @@
     <text
        id="text1160"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="279.35669"
        x="75.205658"><tspan
          id="tspan1158"
          sodipodi:role="line"
          x="75.205658"
          y="279.35669"
-         style="stroke-width:0.26458332">$\vec{x}_2$</tspan></text>
+         style="stroke-width:0.264583">$\vec{x}_2$</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;strike-linecap:butt"
+       d="m 32.020642,283.51391 -0.0064,-15.04311 -16.86165,-4.52268"
+       id="path2"
+       transform="translate(-2.9879084,5.5258718)" />
     <path
        style="fill:none;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;marker-end:none;marker-start:none;stroke-dasharray:none"
        d="M 26.320376,286.03856 12.170833,270.48379"
@@ -426,14 +1741,14 @@
     <text
        id="text1146"
        xml:space="preserve"
-       style="font-size:2.64583325px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       style="font-size:2.64583px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        y="279.15466"
        x="22.044798"><tspan
          id="tspan1144"
          sodipodi:role="line"
          x="22.044798"
          y="279.15466"
-         style="stroke-width:0.26458332">$\vec{x}_1$</tspan></text>
+         style="stroke-width:0.264583">$\vec{x}_1$</tspan></text>
     <path
        style="fill:none;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;marker-end:none;marker-start:none;stroke-dasharray:none"
        d="m 70.930737,286.00181 13.802074,-8.28332"
@@ -444,5 +1759,16 @@
        d="M 12.985403,286.00191 H 83.934934"
        id="path76"
        inkscape:connector-curvature="0" />
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect2"
+       width="0"
+       height="0"
+       x="23.883446"
+       y="262.32251" />
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.28088167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;strike-linecap:butt"
+       d="m 67.874022,289.04688 0.134358,-14.94686 16.748337,-4.62603"
+       id="path3" />
   </g>
 </svg>

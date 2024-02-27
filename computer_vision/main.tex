@@ -7,12 +7,6 @@
 
 \newcommand{\approxtext}{\raisebox{0.5ex}{\texttildelow}}
 
-\usepackage{pgfplots}
-\pgfplotsset{
-colormap={whiteblack}{color(0cm)=(white); color(1cm)=(black)},
-compat=1.16,
-}
-
 \title{Computer Vision}
 \author{Cristian Perez Jensen}
 
@@ -23,33 +17,45 @@ compat=1.16,
 \newpage
 \tableofcontents
 \newpage
-\input{sections/notation}
+\input{sections/symbols}
 \newpage\pagenumbering{arabic}
 
-\input{sections/local_features}
+\input{sections/01_local_features}
 
-\input{sections/deep_learning}
+\newpage
+\input{sections/02_deep_learning}
 
-\input{sections/optical_flow}
+\newpage
+\input{sections/03_optical_flow}
 
-\input{sections/recognition}
+\newpage
+\input{sections/04_recognition}
 
-\input{sections/segmentation}
+\newpage
+\input{sections/05_segmentation}
 
-\input{sections/object_detection}
+\newpage
+\input{sections/06_object_detection}
 
-\input{sections/tracking}
+\newpage
+\input{sections/07_tracking}
 
-\input{sections/projective_geometry}
+\newpage
+\input{sections/08_projective_geometry}
 
-\input{sections/camera_model}
+\newpage
+\input{sections/09_camera_model}
 
-\input{sections/epipolar_geometry}
+\newpage
+\input{sections/10_epipolar_geometry}
 
-\input{sections/structure_from_motion}
+\newpage
+\input{sections/11_structure_from_motion}
 
-\input{sections/stereo_matching}
+\newpage
+\input{sections/12_stereo_matching}
 
+\newpage
 \bibliography{main}
 \bibliographystyle{plainnat}
 
