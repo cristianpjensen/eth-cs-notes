@@ -175,7 +175,7 @@ function. Then, the following functions are valid covariance functions,
   k(\vec{x},\vec{x}') &= f(k_1(\vec{x},\vec{x}')).
 \end{align*}
 
-\begin{marginfigure}
+\begin{marginfigure}[-8cm]
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -232,7 +232,15 @@ function. Then, the following functions are valid covariance functions,
   \label{fig:gp-posterior-periodic}
 \end{marginfigure}
 
-\begin{marginfigure}[.5cm]
+\begin{definition}[Stationary and isotropic kernels]
+  A kernel function $k$ is \textit{stationary} if its function only depends on
+  the difference between its arguments, \ie,
+  $k(\vec{x},\vec{x}')=k(\vec{x}-\vec{x}')$. It is \textit{isotropic} if it only
+  depends on the $\ell_2$-distance between its arguments, \ie,
+  $k(\vec{x},\vec{x}')=k(\lVert \vec{x}-\vec{x}' \rVert_2)$
+\end{definition}
+
+\begin{marginfigure}
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -292,14 +300,6 @@ function. Then, the following functions are valid covariance functions,
   \label{fig:gp-posterior-linear}
 \end{marginfigure}
 
-\begin{definition}[Stationary and isotropic kernels]
-  A kernel function $k$ is \textit{stationary} if its function only depends on
-  the difference between its arguments, \ie,
-  $k(\vec{x},\vec{x}')=k(\vec{x}-\vec{x}')$. It is \textit{isotropic} if it only
-  depends on the $\ell_2$-distance between its arguments, \ie,
-  $k(\vec{x},\vec{x}')=k(\lVert \vec{x}-\vec{x}' \rVert_2)$
-\end{definition}
-
 The following is a list of popular kernels,
 \begin{itemize}
   \item \textit{Linear kernel}, \[
@@ -351,6 +351,65 @@ The problem with this is that it encourages low epistemic uncertainty which
 will cause the loss function to favor models that have low epistemic
 uncertainty without it necessarily being true. Furthermore, it still ignores
 the aleatoric uncertainty.
+
+The Bayesian perspective provides an alternative approach: maximizing the
+likelihood of the data,
+\begin{align*}
+  \ell \ell_{\theta}(y^\star,\vec{x}^\star) &= \mathcal{N}(y^\star; f_{\theta}^\star(\vec{x}^\star), \sigma_n^2) \\
+  &= \mathcal{N}(y^\star; \mu_{\theta}^\star, k_{\theta}^\star(\vec{x}^\star,\vec{x}^\star) + \sigma_n^2).
+\end{align*}
+
+We can optimize $\theta$ as follows,
+\begin{align*}
+  \hat{\theta} &= \argmax_\theta p(\bm{y}^\star\mid \mat{X}^\star, \theta) \\
+  &= \argmax_\theta \int p(\bm{y}^\star\mid f,\mat{X}^\star, \theta) p(f\mid \theta) df \\
+  &= \argmax_\theta \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
+  &= \argmin_\theta -\log \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
+  &= \argmin_\theta \frac{n}{2} \log 2\pi + \frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}+ \frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star \\
+  &= \argmin_\theta \underbrace{\frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}}_{\text{complexity penalty}} + \underbrace{\frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star}_{\text{``goodness`` of fit}}.
+\end{align*}
+As can be seen, the loss function seeks a balance between the ``goodness`` of
+the fit and complexity. If we increase the aleatoric uncertainty
+$\sigma_n^2$, we increase the goodness of the fit, but increase the
+complexity. This is how it prevents over- and underfitting and is the reason
+why we do not need a validation dataset.
+
+\subsection{Efficiency}
+
+The time complexity of computing the posterior is $\Theta(n^3)$\sidenote{For
+BLR, this is $\bigo{dn^2}$.} and the space complexity of storing
+$k(\mat{X},\mat{X})$ is $\Theta(n^2)$. The main approaches for accelerating GP
+posterior computation are exploiting parallelism (GPU),\sidenote{This yields a
+significant speedup, but does not address the cubic scaling in $n$.} local GP
+methods, kernel function approximations, and inducing point methods.
+
+\paragraph{Local GP methods.}
+
+The basic idea is that, for covariance functions that decay with
+distance,\sidenote{Think of stationary kernels such as the Gaussian and
+exponential kernels.} we only need to condition on close points to $\vec{x}$.
+\Ie, to make a prediction at point $\vec{x}$, we only need to condition on
+points $\vec{x}'$ where $|k(\vec{x},\vec{x}')|\geq \tau$ for some threshold
+$\tau$. The problem with this method is that it is still expensive if there
+are many close points.
+
+\paragraph{Kernel function approximation.}
+
+The key idea of approximating kernel functions is that we can construct an
+$m$-dimensional feature map with $m \ll n$ that approximates the true kernel
+function, \[
+  k(\vec{x},\vec{x}')\approx \transpose{\vec{\phi}(\vec{x})} \vec{\phi}(\vec{x}') \hspace{1em} \vec{\phi}(\vec{x})\in\R^m.
+\]
+Then, apply BLR. The computational cost becomes $\bigo{nm^2 + m^3}$ instead of
+$\bigo{n^3}$.
+
+An example is Random Fourier Features (RFF) that reduces stationary kernels to
+their Fourier transform. Then, samples from this $m$ times and defines it as
+the feature map $\vec{\phi}$. The problem with RFFs is that they approximate
+the kernel function globally, however this might not be necessary, since we
+only need accurate representation for the training and test points.
+
+\paragraph{Inducing point methods.}
 
 \begin{marginfigure}
   \centering
@@ -472,66 +531,6 @@ the aleatoric uncertainty.
   points.}
   \label{fig:gp-posterior-exponential}
 \end{marginfigure}
-
-The Bayesian perspective provides an alternative approach: maximizing the
-likelihood of the data,
-\begin{align*}
-  \ell \ell_{\theta}(y^\star,\vec{x}^\star) &= \mathcal{N}(y^\star; f_{\theta}^\star(\vec{x}^\star), \sigma_n^2) \\
-  &= \mathcal{N}(y^\star; \mu_{\theta}^\star, k_{\theta}^\star(\vec{x}^\star,\vec{x}^\star) + \sigma_n^2).
-\end{align*}
-
-We can optimize $\theta$ as follows,
-\begin{align*}
-  \hat{\theta} &= \argmax_\theta p(\bm{y}^\star\mid \mat{X}^\star, \theta) \\
-  &= \argmax_\theta \int p(\bm{y}^\star\mid f,\mat{X}^\star, \theta) p(f\mid \theta) df \\
-  &= \argmax_\theta \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
-  &= \argmin_\theta -\log \mathcal{N}(\bm{y}^\star; \bm{0}, k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I}) \\
-  &= \argmin_\theta \frac{n}{2} \log 2\pi + \frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}+ \frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star \\
-  &= \argmin_\theta \underbrace{\frac{1}{2}\log \det{k(\mat{X}^\star,\mat{X}^\star)+\sigma_n^2\bm{I}}}_{\text{complexity penalty}} + \underbrace{\frac{1}{2}\bm{y}^{\star\top} (k(\mat{X}^\star,\mat{X}^\star) + \sigma_n^2\bm{I})^{-1}\bm{y}^\star}_{\text{``goodness`` of fit}}.
-\end{align*}
-As can be seen, the loss function seeks a balance between the ``goodness`` of
-the fit and complexity. If we increase the aleatoric uncertainty
-$\sigma_n^2$, we increase the goodness of the fit, but increase the
-complexity. This is how it prevents over- and underfitting and is the reason
-why we do not need a validation dataset.
-
-
-\subsection{Efficiency}
-
-The time complexity of computing the posterior is $\Theta(n^3)$\sidenote{For
-BLR, this is $\bigo{dn^2}$.} and the space complexity of storing
-$k(\mat{X},\mat{X})$ is $\Theta(n^2)$. The main approaches for accelerating GP
-posterior computation are exploiting parallelism (GPU),\sidenote{This yields a
-significant speedup, but does not address the cubic scaling in $n$.} local GP
-methods, kernel function approximations, and inducing point methods.
-
-\paragraph{Local GP methods.}
-
-The basic idea is that, for covariance functions that decay with
-distance,\sidenote{Think of stationary kernels such as the Gaussian and
-exponential kernels.} we only need to condition on close points to $\vec{x}$.
-\Ie, to make a prediction at point $\vec{x}$, we only need to condition on
-points $\vec{x}'$ where $|k(\vec{x},\vec{x}')|\geq \tau$ for some threshold
-$\tau$. The problem with this method is that it is still expensive if there
-are many close points.
-
-\paragraph{Kernel function approximation.}
-
-The key idea of approximating kernel functions is that we can construct an
-$m$-dimensional feature map with $m \ll n$ that approximates the true kernel
-function, \[
-  k(\vec{x},\vec{x}')\approx \transpose{\vec{\phi}(\vec{x})} \vec{\phi}(\vec{x}') \hspace{1em} \vec{\phi}(\vec{x})\in\R^m.
-\]
-Then, apply BLR. The computational cost becomes $\bigo{nm^2 + m^3}$ instead of
-$\bigo{n^3}$.
-
-An example is Random Fourier Features (RFF) that reduces stationary kernels to
-their Fourier transform. Then, samples from this $m$ times and defines it as
-the feature map $\vec{\phi}$. The problem with RFFs is that they approximate
-the kernel function globally, however this might not be necessary, since we
-only need accurate representation for the training and test points.
-
-\paragraph{Inducing point methods.}
 
 The idea behind inducing point methods is that we won't need all data. In areas
 where there are a lot of data points, we can safely throw some away. This
