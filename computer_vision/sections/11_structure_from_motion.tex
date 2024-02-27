@@ -43,7 +43,7 @@ outliers less influence over the fit, \[
 Choosing the correct scale $\sigma$ is critical. A popular choice is $1.4826$,
 which is plotted in \Cref{fig:robust-norm}.
 
-\begin{marginfigure}
+\begin{marginfigure}[-5cm]
     \begin{tikzpicture}
         \begin{axis}[
                 width=\textwidth,
@@ -72,19 +72,14 @@ the model with the lowest error on its inliers.
 
 \begin{algorithm}
     \begin{algorithmic}
-        \Function{RANSAC}{$\mathcal{P}$,$n$,$k$,$t$,$d$}
+        \Function{RANSAC}{$\mathcal{X}$,$n$,$k$,$t$,$d$}
         \State {$\epsilon_{\min} \gets \infty$}
         \State {initialize $\mathcal{M}_{\mathrm{best}}$}
         \RepeatN {$k$}
-        \State {$\mathcal{Q} \gets \text{$n$ points randomly sampled from $\mathcal{P}$}$}
-        \State {$\mathcal{M}_{\mathrm{random}} \gets \Call{FitModel}{\mathcal{Q}}$}
-        \State {$\mathcal{I} \gets \emptyset$}
-
-        \For {$p \in \mathcal{P}$} \Comment{Compute inliers}
-        \If {$\Call{Error}{\mathcal{M}_{\mathrm{random}}, p} \leq t$}
-        \State {$\mathcal{I} \gets \mathcal{I} \cup \{ p \}$}
-        \EndIf
-        \EndFor
+        \State {$\mathcal{Q} \gets \text{$n$ points randomly sampled from $\mathcal{X}$}$}
+        \State {$\mathcal{M} \gets \Call{FitModel}{\mathcal{Q}}$}
+        \State {$\mathcal{R} \gets \Call{Residual}{\mathcal{X}, \mathcal{M}, \textsc{Error}}$}
+        \State {$\mathcal{I} \gets \{ x \in \mathcal{X} \mid \mathcal{R}(x) \leq t \}$}
 
         \If {$|\mathcal{I}| \geq d$}
         \State {$\mathcal{M}_{\mathrm{inliers}} \gets \Call{FitModel}{\mathcal{I}}$}
@@ -94,9 +89,10 @@ the model with the lowest error on its inliers.
         \EndIf
         \EndIf
         \End
+        \Return $\mathcal{M}_{\mathrm{best}}$
         \EndFunction
     \end{algorithmic}
-    \caption{Random sample consensus algorithm.}
+    \caption{Random sample consensus algorithm. $\mathcal{X}$ are the data points, $n$ is the minimum number of data points needed to fit a model, $k$ is the amount of iterations to run, $t$ is the upper bound on the error for considering a point as an inlier, and $d$ is the minimum amount of inliers to consider a model ``good``.}
 \end{algorithm}
 
 Let $w$ be the probability of a point being an in inlier. Then, $w^n$ is the

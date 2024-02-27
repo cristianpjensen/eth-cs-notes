@@ -17,7 +17,7 @@ camera model (\cref{sec:camera-model}).
 \begin{figure}[h!]
     \centering
     \incfig{epipolar-geometry}
-    \caption{Epipolar geometry.}
+    \caption{Epipolar geometry. The points $\vec{x}_1,\vec{x}_2$ on the two image planes that correspond to the same 3-dimensional point $\vec{X}$ are connected by a common plane. The intersection of the plane with the image planes form the epipolar lines.}
     \label{fig:epipolar-geometry}
 \end{figure}
 
@@ -293,7 +293,7 @@ backprojections that satisfies the following, \[
 \begin{figure}[t]
     \centering
     \incfig{mid-point-reprojection}
-    \caption{Mid-point reprojection.}
+    \caption{Mid-point reprojection. Since the rays will likely never intersect, we find the segment with the smallest length between the two rays. Then, we take the mid-point of this segment as the point. By reprojection the mid-point onto the images, we can compute the reprojection error.}
     \label{fig:mid-point-reprojection}
 \end{figure}
 

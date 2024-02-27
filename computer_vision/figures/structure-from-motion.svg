@@ -128,9 +128,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.3024668"
-     inkscape:cx="191.3721"
-     inkscape:cy="83.725293"
+     inkscape:zoom="2.3683113"
+     inkscape:cx="208.1652"
+     inkscape:cy="79.381455"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -255,7 +255,7 @@
          style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28088167;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:none;marker-end:none" />
     </g>
     <path
-       style="fill:#ddcc77;fill-opacity:1;stroke:black;stroke-width:0.4213225;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:none"
+       style="fill:#ddcc77;fill-opacity:1;stroke:black;stroke-width:0.14044083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.05330625,1.05330625;stroke-opacity:1;marker-start:none;marker-end:none;strike-linecap:butt"
        d="m 66.014343,252.00517 v 1.73545 l -5.066377,3.94267 -24.577164,-0.12914 0,-5.5425"
        id="path76"
        inkscape:connector-curvature="0"
