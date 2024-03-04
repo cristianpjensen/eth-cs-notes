@@ -1,0 +1,31 @@
+\documentclass[justified,nobib]{tufte-handout}
+
+\input{../settings}
+\input{../commands}
+
+\newcommand{\dom}[1]{\mathrm{dom}(#1)}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+\title{Optimization for Data Science}
+\author{Cristian Perez Jensen}
+
+\begin{document}
+
+\pagenumbering{roman}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+\input{sections/symbols}
+\newpage\pagenumbering{arabic}
+
+\input{sections/01_risk}
+
+\newpage
+\input{sections/02_theory_of_convex_functions}
+
+\newpage
+\bibliography{main}
+\bibliographystyle{plainnat}
+
+\end{document}
