@@ -57,5 +57,6 @@
     \put(0.27818637,0.04991694){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$c$\end{tabular}}}}%
     \put(0.05925264,0.04991694){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$a$\end{tabular}}}}%
     \put(0.87815446,0.04991694){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$b$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{mean-value-theorem.pdf}}%
   \end{picture}%
 \endgroup%

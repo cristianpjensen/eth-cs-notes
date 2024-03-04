@@ -1,0 +1,73 @@
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'map-of-learning.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{180bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,1)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{map-of-learning.pdf}}%
+    \put(0.26414815,0.56666358){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}overfitting\end{tabular}}}}%
+    \put(0.70171264,0.56666358){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}underfitting\end{tabular}}}}%
+    \put(0.74078528,0.1161606){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}bad model\end{tabular}}}}%
+    \put(0.33916028,0.11565198){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}learning\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{map-of-learning.pdf}}%
+    \put(0.67127186,0.65159018){\color[rgb]{0,0,0}\rotatebox{45}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}generalization\end{tabular}}}}}%
+    \put(0.21289222,0.18977024){\color[rgb]{0,0,0}\rotatebox{45}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}generalization\end{tabular}}}}}%
+    \put(0.24166703,0.83319231){\color[rgb]{0,0,0}\rotatebox{45}{\makebox(0,0)[t]{\lineheight{0}\smash{\begin{tabular}[t]{c}empirical risk\\minimization\end{tabular}}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{map-of-learning.pdf}}%
+    \put(0.19617189,0.47624047){\color[rgb]{0,0,0}\rotatebox{-14.99999908}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\scalebox{.5}{regularization}\end{tabular}}}}}%
+    \put(0.31739777,0.49060905){\color[rgb]{0,0,0}\rotatebox{12.37672298}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\scalebox{.5}{early stopping}\end{tabular}}}}}%
+    \put(0.9204101,0.01621855){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\ell_n$\end{tabular}}}}%
+    \put(0.0421827,0.92478442){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\ell$\end{tabular}}}}}%
+    \put(0.04450202,0.41949788){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}validation\end{tabular}}}}}%
+    \put(0.4351536,0.01688993){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}algorithm\end{tabular}}}}%
+  \end{picture}%
+\endgroup%

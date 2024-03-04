@@ -38,6 +38,13 @@ jobs:
         root_file: main.tex
         working_directory: algorithms_lab
 
+    - name: Compile optimization for data science
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: optimization_for_data_science
+
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
@@ -45,6 +52,7 @@ jobs:
         file computer_vision/main.pdf | grep -q ' PDF '
         file probabilistic_artificial_intelligence/main.pdf | grep -q ' PDF '
         file algorithms_lab/main.pdf | grep -q ' PDF '
+        file optimization_for_data_science/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
@@ -64,6 +72,7 @@ jobs:
         cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
         cp -f probabilistic_artificial_intelligence/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence-summary.pdf"
         cp -f algorithms_lab/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab-summary.pdf"
+        cp -f optimization_for_data_science/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
@@ -72,6 +81,7 @@ jobs:
         git add computer_vision-summary.pdf
         git add probabilistic_artificial_intelligence-summary.pdf
         git add algorithms_lab-summary.pdf
+        git add optimization_for_data_science-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push
