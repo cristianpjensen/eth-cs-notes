@@ -1,0 +1,115 @@
+\section{Deep learning basics}
+
+\subsection{Multi-layer perceptron}
+
+\begin{marginfigure}
+    \centering
+    \incfig{perceptron}
+    \caption{Computation graph of a perceptron \citep{rosenblatt1958perceptron}, where $\sigma(x) = \mathbb{1}\{ x > 0 \}$.}
+    \label{fig:perceptron}
+\end{marginfigure}
+
+The original perceptron \citep{rosenblatt1958perceptron} was a single layer perceptron with the
+following non-linearity, \[
+    \sigma(x) \doteq \mathbb{1}\{ x > 0 \}.
+\]
+The classification of a single point can then be written as \[
+    \hat{y} = \mathbb{1}\{\transpose{\vec{w}}\vec{x} > 0\}.
+\]
+The learning algorithm then iteratively updates the weights for a data point that was classified
+incorrectly, \[
+    \vec{\theta} \gets \vec{\theta} + \eta \underbrace{(y_i - \hat{y}_i)}_{\text{residual}} \vec{x}_i,
+\]
+where $\eta$ is the learning rate. If the data is linearly separable, the perceptron converges in
+finite time.
+
+\begin{marginfigure}
+    \centering
+    \incfig{xor-problem}
+    \caption{XOR problem. As can be seen, the data is not linearly separable, and thus not solvable by the perceptron.}
+    \label{fig:xor-problem}
+\end{marginfigure}
+
+\begin{marginfigure}
+    \centering
+    \incfig{mlp}
+    \caption{Example multi-layer perceptron architecture.}
+    \label{fig:mlp}
+\end{marginfigure}
+
+The problem with the single-layer perceptron was that it could not solve the XOR problem; see
+\Cref{fig:xor-problem}. This can be solved by introducing hidden layers, \[
+    \hat{y} = \sigma(\mat{W}_k \sigma(\mat{W}_{k-1} \cdots \sigma(\mat{W}_1 \vec{x}))).
+\]
+We call this architecture a multi-layer perceptron (MLP); see \Cref{fig:mlp}. We then want to estimate
+the parameters $\vec{\theta} = \{ \mat{W}_1,\ldots,\mat{W}_k,\vec{b}_1,\ldots,\vec{b}_k \}$, using
+an optimization algorithm such as gradient descent, which we call ``learning``.
+
+\subsection{Loss functions}
+
+We need an objective to optimize for. We typically call this objective function the loss function,
+which we minimize. In classification, we typically optimize the maximum likelihood estimate (MLE),
+\begin{align*}
+    \argmax_{\vec{\theta}} p(\mathcal{D}\mid \vec{\theta}) &\overset{\mathrm{iid}}{=} \argmax_{\vec{\theta}} \prod_{i=1}^n p(y_i \mid \vec{\theta}) \\
+                                                                    &= \argmin_{\vec{\theta}} -\log \prod_{i=1}^n p(y_i\mid\vec{\theta}) \\
+                                                                    &= \argmin_{\vec{\theta}} -\sum_{i=1}^n \log p(y_i\mid\vec{\theta}).
+\end{align*}
+If the model predicts the parameters of a Bernoulli distribution, MLE is equivalent to binary cross-entropy,
+\begin{align*}
+    \ell(\vec{\theta}) &= -\log \mathrm{Ber}(y_i \mid \hat{y}_i \doteq f(\vec{x}_i\mid\vec{\theta})) \margintag{$f$ is a model that outputs the Bernoulli parameter.} \\
+                       &= -\log \hat{y}_i^{y_i} (1-\hat{y}_i)^{1-y_i} \\
+                       &= -y_i \log \hat{y}_i - (1-y_i) \log (1-\hat{y}_i).
+\end{align*}
+If we the choose the model to be Gaussian, we end up minimizing the mean-squared error. Furthermore,
+the Laplacian distribution yields minimizing the $\ell_1$ norm.
+
+If we have prior information about the weights, we could also optimize for the maximum a posteriori
+(MAP),
+\begin{align*}
+    \argmax_{\vec{\theta}} p(\vec{\theta}\mid \mathcal{D}) &= \argmax_{\vec{\theta}} p(\vec{\theta}) p(\mathcal{D}\mid\vec{\theta}) \\
+                                                           &\overset{\mathrm{iid}}{=} \argmax_{\vec{\theta}} p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) p(\vec{\theta}) \\
+                                                           &= \argmin_{\vec{\theta}} -\log \lft( p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) \rgt) \\
+                                                           &= \argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i\mid \vec{\theta}) \\
+\end{align*}
+Note that MAP and MLE are equivalent if $p(\vec{\theta})$ is uniform over the domain of weights.
+Assuming a Gaussian prior distribution over $\vec{\theta}$, MAP yields Ridge regression.
+
+\subsection{Backpropagation}
+
+Typically, we cannot find the optimal parameters $\vec{\theta}^\star$ in closed form, so we must
+use an optimization algorithm. Optimization algorithms, such as gradient descent, typically require
+computing the gradient \wrt the parameters. Backpropagation is an algorithm for computing the
+gradient of any function, given that we have access to the derivatives of the primitive functions
+that make up the function.\sidenote{For example, to compute the gradient of
+$f(\vec{x},\vec{y}) = \sigma(\transpose{\vec{x}}\vec{y})$, we would need access to
+$\odv*{\sigma(x)}{x}$, $\pdv*{\transpose{\vec{x}}\vec{y}}{\vec{x}}$, and
+$\pdv*{\transpose{\vec{x}}\vec{y}}{\vec{y}}$.} It then computes the gradient by making use of
+dynamic programming, the chain rule, and sum rule.
+
+Gradient descent iteratively updates the parameters by the following, \[
+    \vec{\theta} \gets \vec{\theta} - \eta \grad{\mathcal{L}(\hat{\vec{y}},\vec{y})}{\vec{\theta}},
+\]
+until the gradient is small.
+
+\subsection{Activation functions}
+
+In MLPs, the activation function should be non-linear, or the resulting MLP is just an affine mapping
+with extra steps. This is because the product of affine mappings are themselves affine mappings.
+
+\subsection{Universal approximation theorem}
+
+\begin{theorem}[Universal approximation theorem]
+    Let $\sigma: \R\to \R$ be a non-constant, bounded, and continuous activation function.
+    Let $I_m$ denote the $m$-dimensional unit hypercube $[0,1]^m$ and the space of real-valued
+    function on $I_m$ is denoted by $\mathcal{C}(I_m)$.
+
+    Let $f \in \mathcal{C}(I_m)$ be any function in the hypercube. Let
+    $\epsilon > 0, N\in \mathbb{N}, v_i,b_i \in \R, \vec{w}_i \in \R^m$ for $i=1,\ldots,N$, then \[
+        f(\vec{x}) \approx g(\vec{x}) = \sum_{i=1}^{N} v_i \sigma(\transpose{\vec{w}_i} \vec{x} + b_i),
+    \]
+    where $|f(\vec{x}) - g(\vec{x})| < \epsilon$ for all $\vec{x}\in I_m$.
+\end{theorem}
+
+The universal approximation theorem holds for any single hidden layer network. However, this hidden layer
+may need to have infinite width to approximate $f$. In practice, deeper networks work better than wider
+networks.
