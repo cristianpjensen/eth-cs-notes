@@ -23,21 +23,21 @@
     defined on a vector space $\mathcal{V}$ that satisfies the following properties $\forall \vec{x},\vec{y},\vec{z},a,b\in \R$,
     \begin{itemize}
         \item Commutativity, \[
-                \ang{\vec{x},\vec{y}} = \ang{\vec{y},\vec{x}};
-            \]
+                  \ang{\vec{x},\vec{y}} = \ang{\vec{y},\vec{x}};
+              \]
         \item Linearity, \[
-                \ang{\vec{x},a \vec{y} + b \vec{z}} = a \ang{\vec{x},\vec{y}} + b\ang{\vec{x},\vec{z}};
-            \]
+                  \ang{\vec{x},a \vec{y} + b \vec{z}} = a \ang{\vec{x},\vec{y}} + b\ang{\vec{x},\vec{z}};
+              \]
         \item Positive definiteness,
-            \begin{align*}
-                \vec{x} \neq \vec{0} &\implies \ang{\vec{x},\vec{x}} > 0 \\
-                \vec{x} = 0 &\iff \ang{\vec{x},\vec{x}} = 0;
-            \end{align*}
+              \begin{align*}
+                  \vec{x} \neq \vec{0} & \implies \ang{\vec{x},\vec{x}} > 0 \\
+                  \vec{x} = 0          & \iff \ang{\vec{x},\vec{x}} = 0;
+              \end{align*}
         \item Bilinearity (follows from commutativity and linearity),
-            \begin{align*}
-                \ang{\vec{x} + \vec{y}, \vec{z}} &= \ang{\vec{x},\vec{z}} + \ang{\vec{y},\vec{z}} \\
-                \ang{\vec{x},\vec{y} + \vec{z}} &= \ang{\vec{x},\vec{y}} + \ang{\vec{x},\vec{z}}.
-            \end{align*}
+              \begin{align*}
+                  \ang{\vec{x} + \vec{y}, \vec{z}} & = \ang{\vec{x},\vec{z}} + \ang{\vec{y},\vec{z}}  \\
+                  \ang{\vec{x},\vec{y} + \vec{z}}  & = \ang{\vec{x},\vec{y}} + \ang{\vec{x},\vec{z}}.
+              \end{align*}
     \end{itemize}
 \end{definition}
 
@@ -45,9 +45,10 @@
     $\ang{\vec{x}+\vec{y},\vec{x}+\vec{y}} = \ang{\vec{x},\vec{x}} + 2\ang{\vec{x},\vec{y}} + \ang{\vec{y},\vec{y}}$.
 \end{corollary}
 
-The vector space $\mathcal{V}$, along with an inner product, defines an inner vector space. During this course,
-we will assume that we always work with real vectors in Rn. An example of an inner product is the dot
-product,\sidenote{Usually, this operation is what is meant by the inner product.} \[
+The vector space $\mathcal{V}$, along with an inner product, defines an inner vector space. During
+this course, we will assume that we always work with real vectors in Rn. An example of an inner
+product is the dot product,\sidenote{Usually, this operation is what is meant by the inner
+    product.} \[
     \vec{x}\cdot \vec{y} = \transpose{\vec{x}} \vec{y} \in \mathbb{R}.
 \]
 
@@ -68,8 +69,8 @@ product,\sidenote{Usually, this operation is what is meant by the inner product.
     where $\theta$ is the angle between $x$ and $y$.
 \end{corollary}
 
-Each inner product defines a canonical norm $\|\vec{x}\| \doteq \sqrt{\ang{\vec{x},\vec{x}}}$. For example, the Euclidean
-norm is defined by the dot product, \[
+Each inner product defines a canonical norm $\|\vec{x}\| \doteq \sqrt{\ang{\vec{x},\vec{x}}}$. For
+example, the Euclidean norm is defined by the dot product, \[
     \|\vec{x}\|_2 = \sqrt{\transpose{\vec{x}}\vec{x}} = \sqrt{\sum_{i=1}^{n} x_i^2}.
 \]
 The $p$-norm is a generalization of the Euclidean norm, \[
@@ -78,15 +79,16 @@ The $p$-norm is a generalization of the Euclidean norm, \[
 
 \section{Vector spaces}
 
-The \textit{vector space} $\R^m$ consists of all column vectors with $m$ elements. For a set of vectors 
-$\mathcal{C} = \{ \vec{c}_1,\ldots,\vec{c}_n \mid \vec{c}_i \in \R^m \}$, we can define a subspace spanned
-by this set, denoted by $\mathrm{span}(\mathcal{C})$. It is the set of all possible linear combinations of
-elements of $\mathcal{C}$. If a set of vectors that span a subspace are independent, they are called a 
-\textit{basis}, $\vec{b}_1,\ldots,\vec{b}_k \in \R^m$. The number of basis vectors defines the \textit{dimensionality}
-of the subspace.\sidenote{We know that the amount of basis vectors must be smaller than the amount of vectors
-that span the subspace, which must be smaller than the dimensionality of the space, \[
-    k \leq m \leq n.
-\]}
+The \textit{vector space} $\R^m$ consists of all column vectors with $m$ elements. For a set of
+vectors $\mathcal{C} = \{ \vec{c}_1,\ldots,\vec{c}_n \mid \vec{c}_i \in \R^m \}$, we can define a
+subspace spanned by this set, denoted by $\mathrm{span}(\mathcal{C})$. It is the set of all
+possible linear combinations of elements of $\mathcal{C}$. If a set of vectors that span a subspace
+are independent, they are called a \textit{basis}, $\vec{b}_1,\ldots,\vec{b}_k \in \R^m$. The
+number of basis vectors defines the \textit{dimensionality} of the subspace.\sidenote{We know that
+    the amount of basis vectors must be smaller than the amount of vectors that span the subspace,
+    which must be smaller than the dimensionality of the space, \[
+        k \leq m \leq n.
+    \]}
 
 \begin{observation}
     The following facts hold about subspaces,
@@ -104,8 +106,8 @@ that span the subspace, which must be smaller than the dimensionality of the spa
 
 \section{Matrices}
 
-The rank $r$ of a matrix $\mat{A}\in \R^{m\times n}$ is the dimensionality of its \textit{column space}.
-It is bounded by \[
+The rank $r$ of a matrix $\mat{A}\in \R^{m\times n}$ is the dimensionality of its \textit{column
+    space}. It is bounded by \[
     r \leq \min \{ m,n \}. \margintag{The matrix is full-rank if $r=\min \{ m,n \}$.}
 \]
 
@@ -113,12 +115,14 @@ A matrix $\mat{A} \in \R^{m\times n}$ defines 4 fundamental subspaces,
 \begin{itemize}
     \item Column space $\subseteq \R^m$ ($r$ dimensional), $\{ \vec{b} \mid \mat{A}\vec{x} = \vec{b} \}$;
     \item Null space $\subseteq \R^n$ ($n-r$ dimensional), $\{ \vec{x} \mid \mat{A}\vec{x} = \vec{0} \}$;
-    \item Row space $\subseteq \R^n$ ($r$ dimensional), $\{ \vec{b} \mid \transpose{\mat{A}}\vec{x} = \vec{b} \}$;
-    \item Left null space $\subseteq \R^m$ ($m-r$ dimensional), $\{ \vec{x} \mid \transpose{\mat{A}} \vec{x} = \vec{0} \}$.
+    \item Row space $\subseteq \R^n$ ($r$ dimensional), $\{ \vec{b} \mid \transpose{\mat{A}}\vec{x} = \vec{b}
+              \}$;
+    \item Left null space $\subseteq \R^m$ ($m-r$ dimensional), $\{ \vec{x} \mid \transpose{\mat{A}} \vec{x}
+              = \vec{0} \}$.
 \end{itemize}
 
-The row space $\mathrm{row}(\mat{A})$ is the \textit{orthogonal complement} of the null space $\mathrm{null}(\mat{A})$,
-thus $\mathrm{row}(\mat{A}) + \mathrm{null}(\mat{A}) = \R^n$. Similarly,
+The row space $\mathrm{row}(\mat{A})$ is the \textit{orthogonal complement} of the null space
+$\mathrm{null}(\mat{A})$, thus $\mathrm{row}(\mat{A}) + \mathrm{null}(\mat{A}) = \R^n$. Similarly,
 $\mathrm{col}(\mat{A}) + \mathrm{null}(\transpose{\mat{A}}) = \R^m$.
 
 \begin{marginfigure}
@@ -138,15 +142,15 @@ A matrix is only invertible if it is a square full-rank matrix, \ie, $r=m=n$.
 \begin{properties}
     Let $\mat{A} \in \R^{n\times n}$ be a full-rank matrix and $k\in \R$, then
     \begin{align*}
-        \inv{\mat{A}} \mat{A} &= \mat{A} \inv{\mat{A}} = \mat{I} \\
-        \inv{(k \mat{A})} &= \frac{1}{k} \inv{\mat{A}} \\
-        \det{\inv{\mat{A}}} &= \frac{1}{\det{\mat{A}}} \\
-        \inv{(\mat{A} \mat{B})} &= \inv{\mat{B}} \inv{\mat{A}}.
+        \inv{\mat{A}} \mat{A}   & = \mat{A} \inv{\mat{A}} = \mat{I} \\
+        \inv{(k \mat{A})}       & = \frac{1}{k} \inv{\mat{A}}       \\
+        \det{\inv{\mat{A}}}     & = \frac{1}{\det{\mat{A}}}         \\
+        \inv{(\mat{A} \mat{B})} & = \inv{\mat{B}} \inv{\mat{A}}.
     \end{align*}
 \end{properties}
 
-The Moore-Penrose inverse (pseudo-inverse) is a generalization of the inverse. It is the solution to
-the general least squares problem $\min_{\vec{x}} \|\mat{A}\vec{x} - \vec{b}\|_2$. For full-rank
+The Moore-Penrose inverse (pseudo-inverse) is a generalization of the inverse. It is the solution
+to the general least squares problem $\min_{\vec{x}} \|\mat{A}\vec{x} - \vec{b}\|_2$. For full-rank
 matrices, the left pseudo-inverse can be computed by \[
     \mat{A}^+ = \inv{(\transpose{\mat{A}} \mat{A})} \transpose{\mat{A}}. \margintag{The left pseudo-inverse can be computed if $r=n$ and has the property $\mat{A}^+ \mat{A} = \mat{I}_{n\times n}$.}
 \]
@@ -165,12 +169,12 @@ The right pseudo-inverse can be computed as \[
 \begin{properties}
     Let $\mat{A},\mat{B},\mat{C}\in \R^{n\times n}, \vec{x},\vec{y}\in \R^n, c,d \in \R$, then
     \begin{align*}
-        \tr{c \mat{A} + d \mat{B}} &= c\cdot \tr{\mat{A}} + d\cdot \tr{\mat{B}} \margintag{Linearity.} \\
-        \tr{\mat{A}} &= \tr{\transpose{\mat{A}}} \\
-        \tr{\mat{A}\mat{B}} &= \tr{\mat{B}\mat{A}} \\
-        \tr{\mat{A}\mat{B}\mat{C}} &= \tr{\mat{C}\mat{A}\mat{B}} \tr{\mat{B}\mat{C}\mat{A}} \margintag{Cyclic property.} \\
-        \tr{\transpose{\mat{A}} \mat{B}} &= \tr{\transpose{\mat{B}}\mat{A}} = \tr{\mat{A}\transpose{\mat{B}}} = \tr{\mat{B}\transpose{\mat{A}}} \\
-        \transpose{\vec{x}}\vec{y} &= \tr{\transpose{\vec{x}}\vec{y}} = \tr{\vec{x}\transpose{\vec{y}}}. \margintag{$\vec{x}\transpose{\vec{y}}$ is a rank-1 matrix.}
+        \tr{c \mat{A} + d \mat{B}}       & = c\cdot \tr{\mat{A}} + d\cdot \tr{\mat{B}} \margintag{Linearity.}                                                                \\
+        \tr{\mat{A}}                     & = \tr{\transpose{\mat{A}}}                                                                                                        \\
+        \tr{\mat{A}\mat{B}}              & = \tr{\mat{B}\mat{A}}                                                                                                             \\
+        \tr{\mat{A}\mat{B}\mat{C}}       & = \tr{\mat{C}\mat{A}\mat{B}} \tr{\mat{B}\mat{C}\mat{A}} \margintag{Cyclic property.}                                              \\
+        \tr{\transpose{\mat{A}} \mat{B}} & = \tr{\transpose{\mat{B}}\mat{A}} = \tr{\mat{A}\transpose{\mat{B}}} = \tr{\mat{B}\transpose{\mat{A}}}                             \\
+        \transpose{\vec{x}}\vec{y}       & = \tr{\transpose{\vec{x}}\vec{y}} = \tr{\vec{x}\transpose{\vec{y}}}. \margintag{$\vec{x}\transpose{\vec{y}}$ is a rank-1 matrix.}
     \end{align*}
     Furthermore, the trace of a matrix is equal to the sum of the eigenvalues of the matrix.
 \end{properties}
@@ -191,8 +195,8 @@ The rejection can then be computed as \[
     \vec{a}_2 = \vec{a} - \vec{a}_1.
 \]
 
-We can also project a vector $\vec{a}$ onto the column space of a matrix $\mat{B} \in \R^{m\times n}$,
-denoted $\vec{a}_{\mat{B}}$. This can be computed by a matrix multiplication, \[
+We can also project a vector $\vec{a}$ onto the column space of a matrix $\mat{B} \in \R^{m\times
+        n}$, denoted $\vec{a}_{\mat{B}}$. This can be computed by a matrix multiplication, \[
     \mat{P} = \mat{B}\inv{(\transpose{\mat{B}}\mat{B})} \transpose{\mat{B}},
 \]
 which is equivalent to the left Moore-Penrose inverse.
@@ -210,19 +214,19 @@ which is equivalent to the left Moore-Penrose inverse.
 \subsection{Special matrices}
 
 \begin{definition}[Orthogonal matrix]
-    An orthogonal matrix is an invertible matrix whose columns $\vec{q}_1,\ldots,\vec{q}_n$ are all orthogonal
-    to each other and of unit length, \ie,
+    An orthogonal matrix is an invertible matrix whose columns $\vec{q}_1,\ldots,\vec{q}_n$ are all
+    orthogonal to each other and of unit length, \ie,
     \begin{align*}
-        \transpose{\vec{q}_i} \vec{q}_j &= 0 \quad \forall i \neq j \in [n] \\
-        \transpose{\vec{q}_i} \vec{q}_i &= 1 \quad \forall i \in [n].
+        \transpose{\vec{q}_i} \vec{q}_j & = 0 \quad \forall i \neq j \in [n] \\
+        \transpose{\vec{q}_i} \vec{q}_i & = 1 \quad \forall i \in [n].
     \end{align*}
 \end{definition}
 
 \begin{properties}
     Let $\mat{Q}\in \R^{n\times n}$ be an orthogonal matrix,
     \begin{align*}
-        \transpose{\mat{Q}} &= \inv{\mat{Q}} \\
-        \ang{\vec{x},\vec{y}} &= \ang{\mat{Q}\vec{x}, \mat{Q}\vec{y}}.
+        \transpose{\mat{Q}}   & = \inv{\mat{Q}}                         \\
+        \ang{\vec{x},\vec{y}} & = \ang{\mat{Q}\vec{x}, \mat{Q}\vec{y}}.
     \end{align*}
 \end{properties}
 

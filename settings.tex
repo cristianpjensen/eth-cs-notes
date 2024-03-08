@@ -55,7 +55,7 @@
 \usepackage{xifthen}
 \usepackage{pdfpages}
 \usepackage{transparent}
-\newcommand{\incfig}[1]{%
+\newcommand{\incfig}[1]{
     \def\svgwidth{\columnwidth}
     \import{./figures/}{#1.pdf_tex}
 }
@@ -76,7 +76,7 @@
 % http://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning
 \pdfsuppresswarningpagegroup=1
 
-% Theorem environments
+% Theorem environments 
 \mdfsetup{skipabove=1em,skipbelow=0em, innertopmargin=10pt, innerbottommargin=10pt}
 
 \declaretheoremstyle[headfont=\bfseries, bodyfont=\normalfont, mdframed={ nobreak }]{box_style}
@@ -97,10 +97,10 @@
 \newcounter{listing}
 \newcommand\listingname{Listing}
 \makeatletter
-\newcommand\listoflistings{%
-    \section*{List of listings}%
+\newcommand\listoflistings{
+    \section*{List of listings}
     %  \begin{fullwidth}%
-    \@starttoc{loe}%
+    \@starttoc{loe}
     %  \end{fullwidth}%
 }
 \renewcommand\thelisting
@@ -121,9 +121,9 @@
 \newcounter{algorithm}
 \newcommand\algorithmname{Algorithm}
 \makeatletter
-\newcommand\listofalgorithms{%
-    \section*{List of algorithms}%
-    \@starttoc{loe}%
+\newcommand\listofalgorithms{
+    \section*{List of algorithms}
+    \@starttoc{loe}
 }
 \renewcommand\thealgorithm
 {\@arabic\c@algorithm}

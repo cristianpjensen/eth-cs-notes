@@ -91,8 +91,8 @@ the same slope; see \Cref{fig:mean-value-theorem}.
 \end{definition}
 
 Geometrically, this condition means that the line segment connecting the two points
-$(\vec{x},f(\vec{x}))$ and $(\vec{y},f(\vec{y})) \in \R^{d+1}$ lies pointwise above the graph of $f$;
-see \Cref{fig:convexity}.
+$(\vec{x},f(\vec{x}))$ and $(\vec{y},f(\vec{y})) \in \R^{d+1}$ lies pointwise above the graph of
+$f$; see \Cref{fig:convexity}.
 
 \begin{marginfigure}
     \centering
@@ -121,11 +121,11 @@ see \Cref{fig:convexity}.
     We will prove Jensen's inequality by induction. The base case ($m=2$) is true by definition of
     convexity. Let Jensen's inequality hold for $m=k$. Consider $m=k+1$, then
     \begin{align*}
-        f \lft( \sum_{i=1}^{k+1} \lambda_i \vec{x}_i \rgt) &= f \lft( \sum_{i=1}^k \lambda_i \vec{x}_i + \lambda_{k+1} \vec{x}_{k+1} \rgt) \\
-                                                           &= f \lft( (1-\lambda_{k+1}) \sum_{i=1}^{k} \frac{\lambda_i}{1-\lambda_{k+1}} \vec{x}_i + \lambda_{k+1} \vec{x}_{k+1} \rgt) \\
-                                                           &\leq (1-\lambda_{k+1}) f \lft( \sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} \vec{x}_i \rgt) + \lambda_{k+1} f(\vec{x}_{k+1}) \margintag{By definition of convexity.} \\
-                                                           &\leq (1-\lambda_{k+1}) \sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} f(\vec{x}_i) + \lambda_{k+1} f(\vec{x}_{k+1}) \margintag{Induction assumption, $\sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} = 1$.} \\
-                                                           &= \sum_{i=1}^{k+1} \lambda_i f(\vec{x}_i).
+        f \lft( \sum_{i=1}^{k+1} \lambda_i \vec{x}_i \rgt) & = f \lft( \sum_{i=1}^k \lambda_i \vec{x}_i + \lambda_{k+1} \vec{x}_{k+1} \rgt)                                                                                                                              \\
+                                                           & = f \lft( (1-\lambda_{k+1}) \sum_{i=1}^{k} \frac{\lambda_i}{1-\lambda_{k+1}} \vec{x}_i + \lambda_{k+1} \vec{x}_{k+1} \rgt)                                                                                  \\
+                                                           & \leq (1-\lambda_{k+1}) f \lft( \sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} \vec{x}_i \rgt) + \lambda_{k+1} f(\vec{x}_{k+1}) \margintag{By definition of convexity.}                                      \\
+                                                           & \leq (1-\lambda_{k+1}) \sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} f(\vec{x}_i) + \lambda_{k+1} f(\vec{x}_{k+1}) \margintag{Induction assumption, $\sum_{i=1}^k \frac{\lambda_i}{1-\lambda_{k+1}} = 1$.} \\
+                                                           & = \sum_{i=1}^{k+1} \lambda_i f(\vec{x}_i).
     \end{align*}
     Since it holds for the base case and the induction step, Jensen's inequality must hold for all $m$.
 \end{proof}
@@ -140,8 +140,9 @@ see \Cref{fig:convexity}.
     Let $f: \dom{f}\to \R^m$ where $\dom{f}\subseteq \R^d$ is open. $f$ is called differentiable at $\vec{x}\in\dom{f}$ if there exists an $m \times d$ matrix $\mat{A}$ and an error function $r: \R^d \to \R^m$ defined around $\vec{0}\in \R^d$ such that for all $\vec{y}$ in some neighborhood of $\vec{x}$, \[
         f(\vec{y}) = f(\vec{x}) + \mat{A} (\vec{y} - \vec{x}) + r(\vec{y} - \vec{x}),
     \]
-    where $\lim_{\vec{v}\to\vec{0}} \frac{\| r(\vec{v}) \|}{\| \vec{v} \|} = \vec{0}$ (error function $r$ is sublinear around $\vec{0}$).
-    $\mat{A}$ is unique and called the Jacobian matrix of $f$ at $\vec{x}$.
+    where $\lim_{\vec{v}\to\vec{0}} \frac{\| r(\vec{v}) \|}{\| \vec{v} \|} = \vec{0}$ (error function
+    $r$ is sublinear around $\vec{0}$). $\mat{A}$ is unique and called the Jacobian matrix of $f$ at
+    $\vec{x}$.
 \end{definition}
 
 \begin{marginfigure}[-6cm]
@@ -179,37 +180,38 @@ Geometrically, this means that the graph is above all tangent hyperplanes; see
 
     \begin{enumerate}
         \item[$\Rightarrow$:] Suppose $f$ is convex. Then, for all $t\in(0,1)$,
-            \begin{align*}
-                && f((1-t)\vec{x} + t \vec{y}) &\leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity} \\
-                \iff && f(\vec{x} + t(\vec{y}-\vec{x})) &\leq f(\vec{x}) + t(f(\vec{y}) - f(\vec{x})) \\
-                \iff && f(\vec{y}) &\geq f(\vec{x}) + \frac{f(\vec{x} + t(\vec{y}-\vec{x}))-f(\vec{x})}{t} \\
-                     &&            &= f(\vec{x}) + \frac{\transpose{\grad{f(\vec{x})}{}} t(\vec{y} - \vec{x}) + r(t(\vec{y}-\vec{x}))}{t}\\
-                     &&            &= f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}}(\vec{y}-\vec{x}) + \underbrace{\frac{r(t(\vec{y}-\vec{x}))}{t}}_{\to 0 \text{ for } t\to 0}.
-            \end{align*}
+              \begin{align*}
+                       &  & f((1-t)\vec{x} + t \vec{y})     & \leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity}                                                                    \\
+                  \iff &  & f(\vec{x} + t(\vec{y}-\vec{x})) & \leq f(\vec{x}) + t(f(\vec{y}) - f(\vec{x}))                                                                                                \\
+                  \iff &  & f(\vec{y})                      & \geq f(\vec{x}) + \frac{f(\vec{x} + t(\vec{y}-\vec{x}))-f(\vec{x})}{t}                                                                      \\
+                       &  &                                 & = f(\vec{x}) + \frac{\transpose{\grad{f(\vec{x})}{}} t(\vec{y} - \vec{x}) + r(t(\vec{y}-\vec{x}))}{t}                                       \\
+                       &  &                                 & = f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}}(\vec{y}-\vec{x}) + \underbrace{\frac{r(t(\vec{y}-\vec{x}))}{t}}_{\to 0 \text{ for } t\to 0}.
+              \end{align*}
 
         \item[$\Leftarrow$:] Define $\vec{z} \doteq \lambda \vec{x} + (1-\lambda) \vec{y} \in \dom{f}$ for $\lambda \in[0,1]$ by convexity of $\dom{f}$. Then, we have the following inequalities,
-            \begin{align*}
-                f(\vec{x}) &\geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \\
-                \lambda f(\vec{x}) &\geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt) \\
-                f(\vec{y}) &\geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \\
-                (1-\lambda) f(\vec{y}) &\geq (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt).
-            \end{align*}
-            This implies the following,
-            \begin{align*}
-                \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) &\geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt) + (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt) \\
-                                                            &= f(\vec{z}) + \lambda \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) + (1-\lambda) \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \\
-                                                            &= f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda (\vec{x}-\vec{z}) + (1-\lambda) (\vec{y}-\vec{z}) \rgt) \\
-                                                            &= f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda \vec{x} + (1-\lambda) \vec{y} - (\lambda \vec{z} + (1-\lambda) \vec{z}) \rgt) \\
-                                                            &= f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \vec{z} - \vec{z} \rgt) \\
-                                                            &= f(\lambda \vec{x} + (1-\lambda) \vec{y}).
-            \end{align*}
+              \begin{align*}
+                  f(\vec{x})             & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z})                          \\
+                  \lambda f(\vec{x})     & \geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt)      \\
+                  f(\vec{y})             & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z})                          \\
+                  (1-\lambda) f(\vec{y}) & \geq (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt).
+              \end{align*}
+              This implies the following,
+              \begin{align*}
+                  \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) & \geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt) + (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt) \\
+                                                              & = f(\vec{z}) + \lambda \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) + (1-\lambda) \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z})                                         \\
+                                                              & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda (\vec{x}-\vec{z}) + (1-\lambda) (\vec{y}-\vec{z}) \rgt)                                                             \\
+                                                              & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda \vec{x} + (1-\lambda) \vec{y} - (\lambda \vec{z} + (1-\lambda) \vec{z}) \rgt)                                       \\
+                                                              & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \vec{z} - \vec{z} \rgt)                                                                                                     \\
+                                                              & = f(\lambda \vec{x} + (1-\lambda) \vec{y}).
+              \end{align*}
     \end{enumerate}
 \end{proof}
 
 \begin{lemma}[First-order convexity alternative]
     \label{lem:first-order-convexity-alt}
 
-    Suppose that $\dom{f}$ is open and that $f$ is differentiable. Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) \[
+    Suppose that $\dom{f}$ is open and that $f$ is differentiable. Then, $f$ is convex if and only if
+    (i) $\dom{f}$ is convex and (ii) \[
         \forall \vec{x},\vec{y}\in\dom{f} : \transpose{(\grad{f(\vec{y})}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}) \geq 0.
     \]
 \end{lemma}
@@ -221,40 +223,40 @@ Geometrically, this means that the gradient is monotonic.
 
     \begin{enumerate}
         \item[$\Rightarrow$:] If $f$ is convex, the first-order characterization of convexity (\Cref{lem:first-order-convexity}) yields the following,
-            \begin{align*}
-                f(\vec{x}) &\geq f(\vec{y}) + \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y}) \\
-                f(\vec{y}) &\geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}),
-            \end{align*}
-            for all $\vec{x},\vec{y}\in\dom{f}$. Adding up these two inequalities yields
-            \begin{align*}
-                && f(\vec{x}) + f(\vec{y}) &\geq f(\vec{y}) + \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y}) + f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) \\
-                \iff && 0 &\geq \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) \\
-                    &&   &= \transpose{(\grad{f(\vec{y})}{} - \grad{f(\vec{x})}{})} (\vec{x} - \vec{y}) \\
-                \iff && 0 &\leq \transpose{(\grad{f(\vec{y})}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}).
-            \end{align*}
+              \begin{align*}
+                  f(\vec{x}) & \geq f(\vec{y}) + \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y})  \\
+                  f(\vec{y}) & \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}),
+              \end{align*}
+              for all $\vec{x},\vec{y}\in\dom{f}$. Adding up these two inequalities yields
+              \begin{align*}
+                       &  & f(\vec{x}) + f(\vec{y}) & \geq f(\vec{y}) + \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y}) + f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) \\
+                  \iff &  & 0                       & \geq \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x})                           \\
+                       &  &                         & = \transpose{(\grad{f(\vec{y})}{} - \grad{f(\vec{x})}{})} (\vec{x} - \vec{y})                                                        \\
+                  \iff &  & 0                       & \leq \transpose{(\grad{f(\vec{y})}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}).
+              \end{align*}
         \item[$\Leftarrow$:] Define $\vec{z} \doteq (1-t) \vec{x} + t\vec{y} \in \dom{f}$ for
-            $\vec{x},\vec{y}\in\dom{f}, t \in (0,1)$ by convexity of $\dom{f}$. Observe that
-            $\vec{z} = \vec{x} + t(\vec{y}-\vec{x})$. Then, we have the following inequality, according
-            to the monotonicity of the gradient,
-            \begin{align*}
-                \transpose{(\grad{f(\vec{z})}{} - \grad{f(\vec{x})}{})} (\vec{z} - \vec{x}) &\geq 0 \\
-                \transpose{(\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{x} + t(\vec{y}-\vec{x}) - \vec{x}) &\geq 0 \\
-                \transpose{(\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{y}-\vec{x}) &\geq 0. \margintag{Divide by $t$}
-            \end{align*}
-            Let $h(t) = f(\vec{x} + t(\vec{y}-\vec{x}))$, then
-            $h'(t) = \transpose{\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{}} (\vec{y}-\vec{x})$. Hence,
-            we can rewrite the inequality as the following, \[
-                h'(t) \geq \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}).
-            \]
-            By the mean value theorem, there exists $c\in (0,1)$ such that $h'(c) = h(1) - h(0)$. \Ie, \[
-                h'(c) = f(\vec{y}) - f(\vec{x}).
-            \]
-            Thus, we can rewrite the inequality to the following,
-            \begin{align*}
-                f(\vec{y}) &= f(\vec{x}) + h'(c) \\
-                           &\geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}),
-            \end{align*}
-            which is the first-order characterization of convexity (\Cref{lem:first-order-convexity}).
+              $\vec{x},\vec{y}\in\dom{f}, t \in (0,1)$ by convexity of $\dom{f}$. Observe that
+              $\vec{z} = \vec{x} + t(\vec{y}-\vec{x})$. Then, we have the following inequality, according
+              to the monotonicity of the gradient,
+              \begin{align*}
+                  \transpose{(\grad{f(\vec{z})}{} - \grad{f(\vec{x})}{})} (\vec{z} - \vec{x})                                           & \geq 0                            \\
+                  \transpose{(\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{x} + t(\vec{y}-\vec{x}) - \vec{x}) & \geq 0                            \\
+                  \transpose{(\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{y}-\vec{x})                        & \geq 0. \margintag{Divide by $t$}
+              \end{align*}
+              Let $h(t) = f(\vec{x} + t(\vec{y}-\vec{x}))$, then
+              $h'(t) = \transpose{\grad{f(\vec{x} + t(\vec{y}-\vec{x}))}{}} (\vec{y}-\vec{x})$. Hence,
+              we can rewrite the inequality as the following, \[
+                  h'(t) \geq \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}).
+              \]
+              By the mean value theorem, there exists $c\in (0,1)$ such that $h'(c) = h(1) - h(0)$. \Ie, \[
+                  h'(c) = f(\vec{y}) - f(\vec{x}).
+              \]
+              Thus, we can rewrite the inequality to the following,
+              \begin{align*}
+                  f(\vec{y}) & = f(\vec{x}) + h'(c)                                                   \\
+                             & \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}),
+              \end{align*}
+              which is the first-order characterization of convexity (\Cref{lem:first-order-convexity}).
     \end{enumerate}
 \end{proof}
 
@@ -262,21 +264,22 @@ Geometrically, this means that the gradient is monotonic.
     \label{lem:second-order-convexity}
 
     Suppose that $\dom{f}$ is open and that $f$ is twice differentiable. In particular, the Hessian \[
-        \hess{f(\vec{x})}{} = \begin{bmatrix} 
-            \pdv[order=2]{f(\vec{x})}{x_1} & \cdots & \pdv[order={1,1}]{f(\vec{x})}{x_1,x_d} \\
-            \vdots & \ddots & \vdots \\
+        \hess{f(\vec{x})}{} = \begin{bmatrix}
+            \pdv[order=2]{f(\vec{x})}{x_1}         & \cdots & \pdv[order={1,1}]{f(\vec{x})}{x_1,x_d} \\
+            \vdots                                 & \ddots & \vdots                                 \\
             \pdv[order={1,1}]{f(\vec{x})}{x_d,x_1} & \cdots & \pdv[order=2]{f(\vec{x})}{x_d}
         \end{bmatrix}
     \]
     exists at every point $\vec{x}\in\dom{f}$ and is symmetric.
 
-    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) for all $\vec{x}\in\dom{f}$, we have \[
+    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) for all $\vec{x}\in\dom{f}$, we
+    have \[
         \hess{f(\vec{x})}{} \succeq 0. \margintag{\Ie, $\hess{f(\vec{x})}{}$ is positive semidefinite ($\mat{M}$ is positive semidefinite if $\transpose{\vec{x}}\mat{M}\vec{x} \geq 0$ for all $\vec{x}$ and $\transpose{\vec{x}}\mat{M}\vec{x} > 0$ for all $\vec{x} \neq \vec{0}$).}
     \]
 \end{lemma}
 
-Geometrically, this means that $f$ has non-negative curvature everywhere. \Ie, the growth rate should
-be growing.
+Geometrically, this means that $f$ has non-negative curvature everywhere. \Ie, the growth rate
+should be growing.
 
 \begin{observation}[Operations that preserve convexity]
     Let $f_1,\ldots,f_m$ be convex functions, $\lambda_1,\ldots,\lambda_m\in \R_+$, then \[
@@ -288,9 +291,9 @@ be growing.
     are convex on $\dom{f} \doteq \bigcap_{i=1}^m \dom{f_i}$.
 
     Let $f$ be a convex function with $\dom{f} \subseteq \R^d, g: \R^m \to \R^d$ an affine function,
-    \ie $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$ for some $\mat{A}\in \R^{d\times m},\vec{b}\in \R^d$. Then,
-    the function $f \circ g$ is convex on
-    $\dom{f \circ g} \doteq \{ \vec{x}\in R^m \mid g(\vec{x}) \in \dom{f} \}$.
+    \ie $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$ for some $\mat{A}\in \R^{d\times m},\vec{b}\in \R^d$.
+    Then, the function $f \circ g$ is convex on $\dom{f \circ g} \doteq \{ \vec{x}\in R^m \mid
+        g(\vec{x}) \in \dom{f} \}$.
 \end{observation}
 
 \begin{marginfigure}
@@ -345,7 +348,8 @@ be growing.
     \]
 \end{definition}
 
-An example of a strictly convex function can be found in \Cref{fig:convexity}, while an example of a function that is not strictly convex can be found in \Cref{fig:non-strict-convexity}.
+An example of a strictly convex function can be found in \Cref{fig:convexity}, while an example of
+a function that is not strictly convex can be found in \Cref{fig:non-strict-convexity}.
 
 \begin{marginfigure}
     \centering
@@ -392,20 +396,23 @@ to find any non-empty and bounded sublevel set of this function.
 
 In standard form, optimization problems look like the following, \[
     \begin{aligned}
-    &\text{minimize}   && f_0(\vec{x}) \\
-    &\text{subject to} && f_i(\vec{x}) \leq 0, \quad i = 1,\ldots,m \\
-    &                  && h_j(\vec{x}) = 0,    \quad j = 1, \ldots, p.
+         & \text{minimize}   &  & f_0(\vec{x})                                 \\
+         & \text{subject to} &  & f_i(\vec{x}) \leq 0, \quad i = 1,\ldots,m    \\
+         &                   &  & h_j(\vec{x}) = 0,    \quad j = 1, \ldots, p.
     \end{aligned}
 \]
-The problem domain is then $\mathcal{D} = \bigcap_{i=0}^m \dom{f_i} \cap \bigcap_{j=1}^p \dom{h_j}$.
+The problem domain is then $\mathcal{D} = \bigcap_{i=0}^m \dom{f_i} \cap \bigcap_{j=1}^p
+    \dom{h_j}$.
 
-In a convex program, all $f_i$ are convex functions, and all $h_j$ are affine functions with domain $\R^d$.
+In a convex program, all $f_i$ are convex functions, and all $h_j$ are affine functions with domain
+$\R^d$.
 
 \begin{definition}[Lagrange dual function]
     Given an optimization problem in standard form, its Lagrangian is the function $L: \mathcal{D} \times \R^m \times \R^p \to \R$ is given by \[
         L(\vec{x},\vec{\lambda},\vec{\nu}) = f_0(\vec{x}) + \sum_{i=1}^{m} \lambda_i f_i(\vec{x}) + \sum_{j=1}^{p} \nu_j h_j(\vec{x}).
     \]
-    The $\lambda_i,\nu_j$ are called Lagrange multipliers. The Lagrange dual function is the function $g: \R^m \times \R^p \to \R \cup \{ -\infty \}$ defined by \[
+    The $\lambda_i,\nu_j$ are called Lagrange multipliers. The Lagrange dual function is the function
+    $g: \R^m \times \R^p \to \R \cup \{ -\infty \}$ defined by \[
         g(\vec{\lambda},\vec{\nu}) = \inf_{\vec{x}\in \mathcal{D}} L(\vec{x},\vec{\lambda},\vec{\nu}).
     \]
 \end{definition}
@@ -424,12 +431,12 @@ Only the $(\vec{\lambda},\vec{\nu})$ pairs with $g(\vec{\lambda},\vec{\nu}) > -\
     \]
 \end{proof}
 
-However, we want to know what the best lower bound is that we can get in this way. For this, we must
-choose $\vec{\lambda} \geq \vec{0}, \vec{\nu}$ such that $g(\vec{\lambda},\vec{\nu})$ is maximized.
-This can be phrased as another optimization problem, called the Lagrange dual, \[
+However, we want to know what the best lower bound is that we can get in this way. For this, we
+must choose $\vec{\lambda} \geq \vec{0}, \vec{\nu}$ such that $g(\vec{\lambda},\vec{\nu})$ is
+maximized. This can be phrased as another optimization problem, called the Lagrange dual, \[
     \begin{aligned}
-    &\text{maximize}   && g(\vec{\lambda},\vec{\nu}) \\
-    &\text{subject to} && \vec{\lambda} \geq \vec{0}.
+         & \text{maximize}   &  & g(\vec{\lambda},\vec{\nu})  \\
+         & \text{subject to} &  & \vec{\lambda} \geq \vec{0}.
     \end{aligned}
 \]
 
@@ -447,9 +454,9 @@ This can be phrased as another optimization problem, called the Lagrange dual, \
 \end{theorem}
 
 A case of particular interest is that strong duality holds and the joint value is attained in both
-the primal and dual problem.\sidenote{This would mean that
-$\min f_0(\vec{x}) = \max g(\vec{\lambda},\vec{\nu})$.} If all $f_i$ and $h_j$ are differentiable,
-then the Karush-Kuhn-Tucker (KKT) conditions provide necessary and, under convexity, also sufficient
+the primal and dual problem.\sidenote{This would mean that $\min f_0(\vec{x}) = \max
+        g(\vec{\lambda},\vec{\nu})$.} If all $f_i$ and $h_j$ are differentiable, then the
+Karush-Kuhn-Tucker (KKT) conditions provide necessary and, under convexity, also sufficient
 conditions for this case to occur.
 
 \marginnote[1cm]{If the primal and dual have zero duality gap, then $\min f_0(\vec{x}) = \max g(\vec{\lambda}, \vec{\nu})$.}
@@ -463,16 +470,17 @@ conditions for this case to occur.
 
 The consequence of zero duality gap is the \textit{master equation},
 \begin{align*}
-    f_0(\tilde{\vec{x}}) &= g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}}) \\
-                         &= \inf_{\vec{x}\in \mathcal{D}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \\
-                         &\leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \underbrace{\tilde{\lambda}_i f_i(\tilde{\vec{x}})}_{\leq 0} + \sum_{j=1}^{p} \underbrace{\tilde{\nu}_j h_j(\tilde{\vec{x}})}_{=0} \\
-                         &\leq f_0(\tilde{\vec{x}}),
+    f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}})                                                                                                                                  \\
+                         & = \inf_{\vec{x}\in \mathcal{D}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt)                          \\
+                         & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \underbrace{\tilde{\lambda}_i f_i(\tilde{\vec{x}})}_{\leq 0} + \sum_{j=1}^{p} \underbrace{\tilde{\nu}_j h_j(\tilde{\vec{x}})}_{=0} \\
+                         & \leq f_0(\tilde{\vec{x}}),
 \end{align*}
 which means that all inequalities turn into equalities. Thus, \[
     \tilde{\lambda}_i f_i(\tilde{\vec{x}}) = 0, \quad i = 1,\ldots,m,
 \]
 which is called complementary slackness, because if $\tilde{\lambda}_i \neq 0$, then
-$f_i(\tilde{\vec{x}}) = 0$, and vice versa. Furthermore, if all $f_i$ and $h_j$ are differentiable, then \[
+$f_i(\tilde{\vec{x}}) = 0$, and vice versa. Furthermore, if all $f_i$ and $h_j$ are differentiable,
+then \[
     \grad{f_0(\tilde{\vec{x}})}{} + \sum_{i=1}^{m} \tilde{\lambda}_i \grad{f_i(\tilde{\vec{x}})}{} + \sum_{j=1}^{p} \tilde{\nu}_j \grad{h_j(\tilde{\vec{x}})}{} = \vec{0},
 \]
 which is called the vanishing Lagrangian gradient condition.
@@ -491,7 +499,7 @@ In summary, we get the following result.
 
 If we have a convex program, then the KKT conditions are sufficient for zero duality gap. The
 motivation behind this is that they may be easier to solve for than solving the primal optimization
-problem. However, we cannot always count on the KTT conditions to be solvable, because they are only
-guaranteed if there are primal and dual solutions of zero duality gap. But, if the primal has a Slater
-point\sidenote{A point $\tilde{\vec{x}}$ such that $f_i(\tilde{\vec{x}}) < 0$ for all $i=1,\ldots,m$.},
-then the KTT conditions are equivalent to the existence of a primal minimizer.
+problem. However, we cannot always count on the KTT conditions to be solvable, because they are
+only guaranteed if there are primal and dual solutions of zero duality gap. But, if the primal has
+a Slater point\sidenote{A point $\tilde{\vec{x}}$ such that $f_i(\tilde{\vec{x}}) < 0$ for all
+    $i=1,\ldots,m$.}, then the KTT conditions are equivalent to the existence of a primal minimizer.

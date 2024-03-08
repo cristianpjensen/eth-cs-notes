@@ -13,8 +13,8 @@ algorithm itself.
 
 Typically, we have a data source $\mathcal{X}$, equipped with an unknown probability distribution.
 However, we do have access to independent samples $X_1,\ldots,X_n \sim \mathcal{X}$. The goal is to
-``explain`` $\mathcal{X}$ through these samples. More specifically, we have a class $\mathcal{H}$ of
-hypotheses (possible explanations of $\mathcal{X}$). The goal is then to select the hypothesis
+``explain`` $\mathcal{X}$ through these samples. More specifically, we have a class $\mathcal{H}$
+of hypotheses (possible explanations of $\mathcal{X}$). The goal is then to select the hypothesis
 $H\in \mathcal{H}$ that best explains $\mathcal{X}$, which we measure by a \textit{risk} (or loss)
 function $\ell: \mathcal{H}\times \mathcal{X}\to \R$.
 
@@ -34,9 +34,9 @@ $1-\delta$, a hypothesis $\tilde{H}\in \mathcal{H}$ such that \[
 meaning that with high probability, we approximately solve the expected risk minimization problem.
 
 However, we can still not compute this, thus we must use our training data to compute the
-\textit{empirical risk},\sidenote{This is a random variable, because it depends on the training data,
-which are all random variables, distributed according to the probability distribution of
-$\mathcal{X}$.} \[
+\textit{empirical risk},\sidenote{This is a random variable, because it depends on the training
+    data, which are all random variables, distributed according to the probability distribution of
+    $\mathcal{X}$.} \[
     \ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H,X_i).
 \]
 
@@ -48,11 +48,12 @@ $\mathcal{X}$.} \[
     with probability at least $1-\delta$.
 \end{lemma}
 
-Given $n\in \mathbb{N}$ and training data $X_1,\ldots,X_n$ from $\mathcal{X}$, we want to produce
-a hypothesis $\tilde{H}_n$ such that \[
+Given $n\in \mathbb{N}$ and training data $X_1,\ldots,X_n$ from $\mathcal{X}$, we want to produce a
+hypothesis $\tilde{H}_n$ such that \[
     \ell_n(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}} \ell_n(H) + \epsilon.
 \]
-In an ideal world, $\tilde{H}_n$ is also almost the best explanation for the data source $\mathcal{X}$, \[
+In an ideal world, $\tilde{H}_n$ is also almost the best explanation for the data source
+$\mathcal{X}$, \[
     \ell(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}} \ell(H) + \epsilon.
 \]
 
@@ -67,11 +68,12 @@ holds for all hypotheses with high probability. This leads us to the following t
 \begin{theorem}
     \label{thm:weaker-llm}
 
-    Assume that for any $\delta,\epsilon > 0$, there exists $n_0 \in \mathbb{N}$ such that for $n \geq n_0$, \[
+    Assume that for any $\delta,\epsilon > 0$, there exists $n_0 \in \mathbb{N}$ such that for $n \geq
+        n_0$, \[
         \sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon,
     \]
-    with probability at least $1-\delta$. Then, for $n \geq n_0$, an approximate empirical risk minimizer
-    $\tilde{H}_n$ is PAC for expected risk minimization, meaning that it satisfies \[
+    with probability at least $1-\delta$. Then, for $n \geq n_0$, an approximate empirical risk
+    minimizer $\tilde{H}_n$ is PAC for expected risk minimization, meaning that it satisfies \[
         \ell(\tilde{H}_n) \leq \inf_{H\in \mathcal{H}} \ell(H) + 3\epsilon,
     \]
     with probability at least $1-\delta$.
@@ -79,9 +81,9 @@ holds for all hypotheses with high probability. This leads us to the following t
 
 \begin{proof}
     \begin{align*}
-        \ell(\tilde{H}_n) &\leq \ell_n(\tilde{H}_n) + \epsilon \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.} \\
-                          &\leq \inf_{H \in \mathcal{H}} \ell_n(H) + 2 \epsilon \margintag{$\tilde{H}_n$ is an almost best explanation of the training data.} \\
-                          &\leq \inf_{H \in \mathcal{H}} \ell(H) + 3 \epsilon, \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}
+        \ell(\tilde{H}_n) & \leq \ell_n(\tilde{H}_n) + \epsilon \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}                 \\
+                          & \leq \inf_{H \in \mathcal{H}} \ell_n(H) + 2 \epsilon \margintag{$\tilde{H}_n$ is an almost best explanation of the training data.}          \\
+                          & \leq \inf_{H \in \mathcal{H}} \ell(H) + 3 \epsilon, \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}
     \end{align*}
     with probability at least $1-\delta$.
 \end{proof}
@@ -89,8 +91,9 @@ holds for all hypotheses with high probability. This leads us to the following t
 It turns out that the assumption made by \Cref{thm:weaker-llm} holds in many relevant cases, but it
 is not always true.
 
-In this course, we will not learn how to pick the theory ($\mathcal{H}$ and $\ell$), but rather how to solve the
-optimization problems that arise in empirical risk minimization after the theory has been chosen.
+In this course, we will not learn how to pick the theory ($\mathcal{H}$ and $\ell$), but rather how
+to solve the optimization problems that arise in empirical risk minimization after the theory has
+been chosen.
 
 \subsection{The map of learning}
 
@@ -102,25 +105,26 @@ optimization problems that arise in empirical risk minimization after the theory
 \end{marginfigure}
 
 The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empirical risk
-($\ell_n(H_n)$, training data) against the expected risk ($\ell(H_n)$, estimated by a validation set).
-We can only be in the area denoted by ``empirical risk minimization``, because
+($\ell_n(H_n)$, training data) against the expected risk ($\ell(H_n)$, estimated by a validation
+set). We can only be in the area denoted by ``empirical risk minimization``, because
 \begin{align*}
-    \ell_n(\tilde{H}_n) &\leq \inf_{H\in \mathcal{H}} \ell_n + \epsilon \\
-                        &\leq \ell_n(\tilde{H}) + \epsilon \\
-                        &\leq \ell(\tilde{H}) + 2 \epsilon \\
-                        &\leq \ell(\tilde{H}_n) + e \epsilon.
+    \ell_n(\tilde{H}_n) & \leq \inf_{H\in \mathcal{H}} \ell_n + \epsilon \\
+                        & \leq \ell_n(\tilde{H}) + \epsilon              \\
+                        & \leq \ell(\tilde{H}) + 2 \epsilon              \\
+                        & \leq \ell(\tilde{H}_n) + e \epsilon.
 \end{align*}
 
-A model is overfit when we have low empirical risk, while having high expected risk. This means that
-the explanation quality on the data source is much worse than on the training data. The main reason
-for this is that the theory ($\mathcal{H}$ and $\ell$) is so complex that it can explain almost
-anything.
+A model is overfit when we have low empirical risk, while having high expected risk. This means
+that the explanation quality on the data source is much worse than on the training data. The main
+reason for this is that the theory ($\mathcal{H}$ and $\ell$) is so complex that it can explain
+almost anything.
 
 A model is underfit when we have high empirical risk, while having high expected risk. This means
 that we neither explain the training data nor the data source. The main reason for this is that the
 theory is too simple to capture the nature of the data.
 
-The model is learning when we have low empirical risk and low expected risk. This means that the training
-was successful. Generalization occurs when the expected risk is close to the empirical risk. Note that 
-this does not mean that the explanation is good, since any ``blind explanation`` will generalize well due
-to the weak law of large numbers. Ideally, we want generalization and learning.
+The model is learning when we have low empirical risk and low expected risk. This means that the
+training was successful. Generalization occurs when the expected risk is close to the empirical
+risk. Note that this does not mean that the explanation is good, since any ``blind explanation``
+will generalize well due to the weak law of large numbers. Ideally, we want generalization and
+learning.
