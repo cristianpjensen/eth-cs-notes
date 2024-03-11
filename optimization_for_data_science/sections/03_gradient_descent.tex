@@ -27,23 +27,23 @@ convexity, \[
 \]
 
 Using the gradient descent update rule, we get \[
-    \vec{g}_t \doteq \grad{f(\vec{x}_t)}{} = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma},
+    \grad{f(\vec{x}_t)}{} = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma},
 \]
 which gives the following bound
 \begin{align*}
-    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                                     \\
-                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                     \\
-                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{Cosine theorem, $2\transpose{\vec{v}} \vec{w} = \|\vec{v}\|^2 + \|\vec{w}\|^2 - \|\vec{v}-\vec{w}\|^2$.} \\
-                                    & = \frac{\gamma}{2} \|\vec{g}_t\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt).
+    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                          \\
+                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                      \\
+                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{$2\transpose{\vec{v}} \vec{w} = \|\vec{v}\|^2 + \|\vec{w}\|^2 - \|\vec{v}-\vec{w}\|^2$ (cosine theorem).} \\
+                                    & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt). \margintag{$\vec{x}_t - \vec{x}_{t+1} = \gamma \grad{f(\vec{x}_t)}{}$.}
 \end{align*}
 Summing this up over the first $T$ iterations, we get an upper bound on the summed error,
 \begin{align*}
-    \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \sum_{t=0}^{T-1} \transpose{\vec{g}_t}(\vec{x}_t - \vec{x}^\star)                                                                            \\
-                                                       & = \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\vec{g}_t\|^2 + \frac{1}{2\gamma} \lft( \|\vec{x}_0-\vec{x}^\star\|^2 - \|\vec{x}_T-\vec{x}^\star\|^2 \rgt) \\
-                                                       & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\vec{g}_t\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2.
+    \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \sum_{t=0}^{T-1} \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x}_t - \vec{x}^\star)                                                                                                         \\
+                                                       & = \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \lft( \|\vec{x}_0-\vec{x}^\star\|^2 - \|\vec{x}_T-\vec{x}^\star\|^2 \rgt) \margintag{Telescoping sum.} \\
+                                                       & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2. \margintag{$\|\vec{x}_T - \vec{x}^\star\|^2 \geq 0$.}
 \end{align*}
 We can also use this to get a bound on the average error, \[
-    \frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{1}{T} \lft( \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\vec{g}_t\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \rgt).
+    \frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{1}{T} \lft( \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \rgt).
 \]
 
 \subsection{Lipschitz convex functions}
@@ -70,8 +70,8 @@ We can also use this to get a bound on the average error, \[
 \begin{proof}
     We can plug our bounds into the vanilla analysis,
     \begin{align*}
-        \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\vec{g}_t\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \\
-                                                           & \leq \frac{\gamma}{2} B^2 T + \frac{1}{2\gamma} R^2                                                      \\
+        \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \\
+                                                           & \leq \frac{\gamma}{2} B^2 T + \frac{1}{2\gamma} R^2                                                                  \\
                                                            & \doteq q(\gamma).
     \end{align*}
     Now, we want to choose $\gamma$ such that the bound $q(\gamma)$ is minimized. We can compute the
@@ -146,16 +146,16 @@ This means that we need at most $10000 \cdot R^2 B^2$ iterations to achieve an e
             \addplot[black, mark=*, only marks] coordinates {(-6,-6) (4,4)};
         \end{axis}
     \end{tikzpicture}
-    \label{fig:smooth}
     \caption{Plot of $f(x)=x$ with the tangent paraboloids at $x=-8,5$, showing smoothness with
         parameter $L=1$. Furthermore, it shows that $g(x) = \frac{1}{2}x^2 - f(x)$ is convex.}
+    \label{fig:smooth}
 \end{marginfigure}
 
 \begin{definition}[Smooth functions]
     Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, $L\in \R_+$.
     $f$ is smooth (with parameter $L$) over $\mathcal{X}$ if
     $\forall \vec{x},\vec{y}\in \mathcal{X}:$ \[
-        f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) + \frac{L}{2} \|\vec{x}-\vec{y}\|^2.
+        \underbrace{f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x})}_{\text{first-order convexity}} + \frac{L}{2} \|\vec{x}-\vec{y}\|^2.
     \]
 \end{definition}
 
@@ -200,9 +200,9 @@ Sufficient decrease implies that, every step, we get closer to the minimum.
 
 \begin{proof}
     \begin{align*}
-        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \|\vec{x}_t-\vec{x}_{t+1}\|^2 \margintag{Smoothness.}                                                                             \\
-                         & = f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \lft( - \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt) + \frac{L}{2} \lft\| \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt\|^2 \margintag{$\vec{x}_{t+1} - \vec{x}_t = -\grad{}f(\vec{x}_t){L}$.} \\
-                         & = f(\vec{x}_t) - \frac{1}{L} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2                                                                                                                             \\
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \|\vec{x}_t-\vec{x}_{t+1}\|^2 \margintag{Smoothness.}                                                                                           \\
+                         & = f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \lft( - \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt) + \frac{L}{2} \lft\| \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt\|^2 \margintag{GD: $\vec{x}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{}$.} \\
+                         & = f(\vec{x}_t) - \frac{1}{L} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2                                                                                                                                           \\
                          & = f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2.
     \end{align*}
 \end{proof}
@@ -218,10 +218,12 @@ Sufficient decrease implies that, every step, we get closer to the minimum.
 \end{theorem}
 
 \begin{proof}
-    Due to sufficient decrease, we can bound the squared gradients (which will be useful when bounding
-    the vanilla analysis), \[
-        \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) = f(\vec{x}_0) - f(\vec{x}_T).
-    \]
+    Due to sufficient decrease, we can bound the sum of squared gradients (which will be useful when bounding
+    the vanilla analysis),
+    \begin{align*}
+        \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 & \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) \margintag{SD: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \|\grad{f(\vec{x}_t)}{}\|^2$.} \\
+                                                                    & = f(\vec{x}_0) - f(\vec{x}_T). \margintag{Telescoping sum.}
+    \end{align*}
     Using the vanilla analysis, we can derive a bound on the average error,
     \begin{align*}
         \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star))           & \leq \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \|\vec{x}_0-\vec{x}^\star\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.} \\
@@ -230,12 +232,12 @@ Sufficient decrease implies that, every step, we get closer to the minimum.
         \frac{1}{T} \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2.
     \end{align*}
     From sufficient decrease, we know that the last iterate must be the best, thus \[
-        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2.
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{1}{T} \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2.
     \]
 \end{proof}
 
-Using this result, we can compute a bound on $T$ to achieve an error of $\epsilon$, \[
-    f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2 \leq \frac{R^2L}{2T}.
+Using this result, we can compute a bound on $T$ to achieve an error smaller than $\epsilon$, \[
+    f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2 \leq \frac{R^2L}{2T} \leq \epsilon.
 \]
 The error then becomes, \[
     T \geq \frac{R^2 L}{2 \epsilon},
@@ -295,9 +297,9 @@ case).
             \addplot[black, mark=*, only marks] coordinates {(-8,64) (5,25)};
         \end{axis}
     \end{tikzpicture}
-    \label{fig:strong-convexity}
     \caption{Plot of $f(x)=x^2$ with the tangent paraboloids at $x=-6,4$, showing strong convexity with
         parameter $\mu=1$. Furthermore, it shows $g(x) = f(x) - \frac{1}{2}x^2$, which is convex.}
+    \label{fig:strong-convexity}
 \end{marginfigure}
 
 \begin{definition}[Strong convexity]
@@ -333,11 +335,41 @@ derive a bound on the error from the vanilla analysis, TODO
 \end{theorem}
 
 \begin{proof}[Proof of 1]
-    TODO
+    Using the vanilla analysis, we know the following,
+    \begin{align*}
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                       \\
+                                        & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt).
+    \end{align*}
+    But, using strong convexity, we have a stronger lower bound on the left hand side,
+    \begin{align*}
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2 \margintag{Strong convexity.}                                                         \\
+                                        & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2.
+    \end{align*}
+    This can be rewritten to the following bound, \[
+        \|\vec{x}_{t+1} - \vec{x}^\star\|^2 \leq \underbrace{2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2}_{\text{``noise``}} + (1-\mu \gamma) \|\vec{x}_t - \vec{x}^\star\|^2.
+    \]
+    Now we need to show that the noise is non-positive,
+    \begin{align*}
+        2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2 & = \frac{2}{L} (f(\vec{x}^\star) - f(\vec{x}_t)) + \frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.}                                                         \\
+                                                                                       & \leq \frac{2}{L} (f(\vec{x}_{t+1}) - f(\vec{x}_t)) + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{Sufficient decrease.}                                                             \\
+                                                                                       & \leq -\frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{SD: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \|\grad{f(\vec{x}_t)}{}\|^2$.} \\
+                                                                                       & = 0.
+    \end{align*}
+    Hence, the noise is non-positive, and we get the following, \[
+        \|\vec{x}_{t+1} - \vec{x}^\star\|^2 \leq \lft( 1-\frac{\mu}{L} \rgt) \|\vec{x}_t - \vec{x}^\star\|^2.
+    \]
 \end{proof}
 
 \begin{proof}[Proof of 2]
-    TODO
+    From (1), we know the following, \[
+        \|\vec{x}_T - \vec{x}^\star\|^2 \leq \lft( 1-\frac{\mu}{L} \rgt)^T \|\vec{x}_0-\vec{x}^\star\|^2.
+    \]
+    Using smoothness, we can derive a bound on the final iterate error,
+    \begin{align*}
+        f(\vec{x}_T) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{x}_T - \vec{x}^\star) + \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2          \\
+                                        & = \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2 \margintag{$\grad{f(\vec{x}^\star)}{} = 0$, because it is a stationary point.} \\
+                                        & \leq \frac{L}{2} \lft( 1-\frac{\mu}{L} \rgt)^T \|\vec{x}_0-\vec{x}^\star\|^2. \margintag{Using (1).}
+    \end{align*}
 \end{proof}
 
 From there, we can derive a lower bound on the number of iterations $T$ to get an error of at most
@@ -345,4 +377,5 @@ $\epsilon$, \[
     T \geq \frac{L}{\mu} \log \lft( \frac{R^2L}{2 \epsilon} \rgt),
 \]
 This means that we need $\frac{L}{\mu} \log (50 \cdot R^2 L)$ iterations for an error of at most
-$0.01$, as opposed to $50\cdot R^2 L$ in the smooth case.
+$0.01$, as opposed to $50\cdot R^2 L$ in the smooth case. This bound only depends linearly on
+$\frac{\mu}{L}$, which might be very high.

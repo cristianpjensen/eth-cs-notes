@@ -34,10 +34,8 @@ $1-\delta$, a hypothesis $\tilde{H}\in \mathcal{H}$ such that \[
 meaning that with high probability, we approximately solve the expected risk minimization problem.
 
 However, we can still not compute this, thus we must use our training data to compute the
-\textit{empirical risk},\sidenote{This is a random variable, because it depends on the training
-    data, which are all random variables, distributed according to the probability distribution of
-    $\mathcal{X}$.} \[
-    \ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H,X_i).
+\textit{empirical risk}, \[
+    \ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H,X_i). \margintag{This is a random variable, because it depends on the training data, which are all random variables, distributed according to the probability distribution of $\mathcal{X}$.}
 \]
 
 \begin{lemma}[Weak law of large numbers]

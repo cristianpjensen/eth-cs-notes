@@ -140,9 +140,9 @@ $f$; see \Cref{fig:convexity}.
     Let $f: \dom{f}\to \R^m$ where $\dom{f}\subseteq \R^d$ is open. $f$ is called differentiable at $\vec{x}\in\dom{f}$ if there exists an $m \times d$ matrix $\mat{A}$ and an error function $r: \R^d \to \R^m$ defined around $\vec{0}\in \R^d$ such that for all $\vec{y}$ in some neighborhood of $\vec{x}$, \[
         f(\vec{y}) = f(\vec{x}) + \mat{A} (\vec{y} - \vec{x}) + r(\vec{y} - \vec{x}),
     \]
-    where $\lim_{\vec{v}\to\vec{0}} \frac{\| r(\vec{v}) \|}{\| \vec{v} \|} = \vec{0}$ (error function
-    $r$ is sublinear around $\vec{0}$). $\mat{A}$ is unique and called the Jacobian matrix of $f$ at
-    $\vec{x}$.
+    where $\lim_{\vec{v}\to\vec{0}} \nicefrac{\| r(\vec{v}) \|}{\| \vec{v} \|} = \vec{0}$ (error
+    function $r$ is sublinear around $\vec{0}$). $\mat{A}$ is unique and called the Jacobian matrix of
+    $f$ at $\vec{x}$.
 \end{definition}
 
 \begin{marginfigure}[-6cm]
@@ -337,7 +337,7 @@ should be growing.
 
 \begin{proof}
     Suppose that $\grad{f(\vec{x})}{} = \vec{0}$. According to the first-order characterization of convexity, we have \[
-        f(\vec{y}) \geq f(\vec{x}) \underbrace{\transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x})}_{=0} = f(\vec{x})
+        f(\vec{y}) \geq f(\vec{x}) + \underbrace{\transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x})}_{=0} = f(\vec{x})
     \]
     for all $\vec{y} \in \dom{f}$, so $\vec{x}$ is a global minimum.
 \end{proof}
@@ -408,7 +408,7 @@ In a convex program, all $f_i$ are convex functions, and all $h_j$ are affine fu
 $\R^d$.
 
 \begin{definition}[Lagrange dual function]
-    Given an optimization problem in standard form, its Lagrangian is the function $L: \mathcal{D} \times \R^m \times \R^p \to \R$ is given by \[
+    Given an optimization problem in standard form, its Lagrangian is the function $L: \mathcal{D} \times \R^m \times \R^p \to \R$ given by \[
         L(\vec{x},\vec{\lambda},\vec{\nu}) = f_0(\vec{x}) + \sum_{i=1}^{m} \lambda_i f_i(\vec{x}) + \sum_{j=1}^{p} \nu_j h_j(\vec{x}).
     \]
     The $\lambda_i,\nu_j$ are called Lagrange multipliers. The Lagrange dual function is the function
@@ -417,7 +417,8 @@ $\R^d$.
     \]
 \end{definition}
 
-Only the $(\vec{\lambda},\vec{\nu})$ pairs with $g(\vec{\lambda},\vec{\nu}) > -\infty$.
+Only the $(\vec{\lambda},\vec{\nu})$ pairs with $g(\vec{\lambda},\vec{\nu}) > -\infty$ are
+interesting.
 
 \begin{lemma}[Weak Lagrange duality]
     Let $\vec{x}$ be a feasible solution ($f_i(\vec{x}) \leq 0$ for $i=1,\ldots m$ and $h_j(\vec{x}) = 0$ for $j=1,\ldots,p$). Let $g$ be the Lagrange dual function and $\vec{\lambda}\in \R^m, \vec{\nu}\in \R^p$ such that $\vec{\lambda} \geq \vec{0}$. Then \[
