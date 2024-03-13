@@ -93,6 +93,7 @@
 \declaretheorem[style=nobox_style, name=Properties]{properties}
 \declaretheorem[style=nobox_style, name=Observation]{observation}
 \declaretheorem[style=box_nonumber_style, name=Corollary]{corollary}
+\newmdenv[nobreak]{important}
 
 % Listing environment
 \newcounter{listing}
@@ -141,3 +142,5 @@
 \makeatother
 
 \algdef{SE}[REPEATN]{RepeatN}{End}[1]{\algorithmicrepeat\ #1 \textbf{times}}{\algorithmicend}
+
+\renewcommand{\qedsymbol}{$\blacksquare$}
