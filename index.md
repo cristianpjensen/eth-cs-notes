@@ -1,5 +1,18 @@
 # Cristian Perez Jensen's ETH Computer Science MSc Notes
 
+## Optimization for Data Science, S24
+
+- [Summary](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-summary.pdf)
+
+## Computational Intelligence Lab, S24
+
+- [Recap](https://cristianpjensen.github.io/eth-cs-notes/computational_intelligence_lab-recap.pdf)
+- [Summary](https://cristianpjensen.github.io/eth-cs-notes/computational_intelligence_lab-summary.pdf)
+
+## Machine Perception, S24
+
+- [Summary](https://cristianpjensen.github.io/eth-cs-notes/machine_perception-summary.pdf)
+
 ## Natural Language Processing, F23
 
 This course comprises fundamental NLP algorithms for efficiently computing probability distributions over structures. It covers backpropagation, log-linear modelling, multi-layer perceptrons, recurrent neural networks, language modelling, semirings for generalizing algorithms, part-of-speech tagging with conditional random fields and the backward/forward algorithm, transliteration with finite-state automata and Lehmann's algorithm, constituency parsing with the CKY algorithm, dependency parsing with the Chu-Liu-Edmonds algorithm, semantic parsing with linear-indexed grammars and combinatory categorial grammars, transformers in the context of translation.
