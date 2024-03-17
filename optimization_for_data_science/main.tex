@@ -4,7 +4,6 @@
 \input{../commands}
 
 \newcommand{\dom}[1]{\mathrm{dom}(#1)}
-\renewcommand{\qedsymbol}{$\blacksquare$}
 
 \title{Optimization for Data Science}
 \author{Cristian Perez Jensen}
@@ -14,7 +13,9 @@
 \pagenumbering{roman}
 \maketitle
 \newpage
+\microtypesetup{protrusion=false}
 \tableofcontents
+\microtypesetup{protrusion=true}
 \newpage
 \input{sections/symbols}
 \newpage\cleardoublepage\pagenumbering{arabic}
@@ -26,6 +27,9 @@
 
 \newpage
 \input{sections/03_gradient_descent}
+
+\newpage
+\input{sections/04_projected_gradient_descent}
 
 \newpage
 \bibliography{main}

@@ -48,11 +48,11 @@ We can also use this to get a bound on the average error, \[
 
 \subsection{Lipschitz convex functions}
 
-\marginnote{A function $f: \R\to \R$ is Lipschitz continuous if there exists an $M$, such that
-    $\forall x,y\in\R:$ \[
-        \frac{|f(x) - f(y)|}{|x - y|} \leq M.
+\marginnote{A function $f: \R^m \to \R^n$ is Lipschitz continuous if there exists an $M$, such that
+    $\forall \vec{x},\vec{y}\in\R:$ \[
+        \|f(\vec{x})-f(\vec{y})\| \leq M \|\vec{x} - \vec{y}\|.
     \]
-    This holds if the gradient is bounded.}
+    This holds if and only if the gradient is bounded.}
 
 \begin{theorem}
     \label{thm:lipschitz}
@@ -181,7 +181,7 @@ over $\dom{g} \doteq \dom{f}$.
 \end{observation}
 
 \begin{lemma}
-    Let $f: \R^d \to \R$ be convex and differentiable, then $f$ is smooth with parameter $L$ if \[
+    Let $f: \R^d \to \R$ be convex and differentiable, then $f$ is smooth with parameter $L$ if and only if $\forall \vec{x},\vec{y}\in \R^d:$ \[
         \|\grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}\| \leq L\|\vec{x}-\vec{y}\|.
     \]
     \Ie, $\grad{f}{}$ is Lipschitz continuous.
@@ -246,7 +246,7 @@ which is on the order of $\bigo{\nicefrac{1}{\epsilon}}$. This means that we nee
     R^2 L$ iterations for an error of $0.01$ (as opposed to $10000 \cdot R^2 B^2$ in the Lipschitz
 case).
 
-\subsection{Strongly convex functions}
+\subsection{Smooth and strongly convex functions}
 
 \marginnote{``Not too flat.``}
 
@@ -317,12 +317,12 @@ check if $f$ is strongly convex if and only if the following function is convex,
 \]
 
 By assuming that a function $f$ is smooth and strongly convex, we can use a stronger lower bound to
-derive a bound on the error from the vanilla analysis, TODO
+derive a bound on the error from the vanilla analysis.
 
 \begin{theorem}
     Let $f: \R^d \to \R$ be convex and differentiable with a global minimum $\vec{x}^\star$.
     Furthermore, suppose that $f$ is smooth with parameter $L$ and strongly convex with parameter
-    $\mu > 0$. Choosing $\gamma \doteq \frac{1}{L}$, gradient descent with arbitrary $\vec{x}_0$
+    $\mu > 0$. Choosing $\gamma \doteq \nicefrac{1}{L}$, gradient descent with arbitrary $\vec{x}_0$
     satisfies the following two properties,
     \begin{enumerate}
         \item Squared distances to $\vec{x}^\star$ are geometrically decreasing, \[
@@ -342,8 +342,9 @@ derive a bound on the error from the vanilla analysis, TODO
     \end{align*}
     But, using strong convexity, we have a stronger lower bound on the left hand side,
     \begin{align*}
-        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2 \margintag{Strong convexity.}                                                         \\
-                                        & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2.
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2 \margintag{Strong convexity.}          \\
+                                        & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt) \\
+                                        & \quad - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2.
     \end{align*}
     This can be rewritten to the following bound, \[
         \|\vec{x}_{t+1} - \vec{x}^\star\|^2 \leq \underbrace{2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2}_{\text{``noise``}} + (1-\mu \gamma) \|\vec{x}_t - \vec{x}^\star\|^2.
