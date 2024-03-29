@@ -5,6 +5,9 @@
 
 \newcommand{\dom}[1]{\mathrm{dom}(#1)}
 
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz/]
+
 \title{Optimization for Data Science}
 \author{Cristian Perez Jensen}
 
@@ -30,6 +33,9 @@
 
 \newpage
 \input{sections/04_projected_gradient_descent}
+
+\newpage
+\input{sections/05_coordinate_gradient_descent}
 
 \newpage
 \bibliography{main}

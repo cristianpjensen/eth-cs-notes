@@ -1,0 +1,274 @@
+\section{Coordinate descent}
+
+A problem with gradient descent in large-scale learning is that we need to compute the full
+gradient $\grad{f(\vec{x}_t)}{}$ in every iteration. The idea of \textit{coordinate descent} is to
+update only one coordinate of the iterate at a time. To do this, we only need to compute one
+coordinate of $\grad{f(\vec{x}_t)}{}$ at a time, which we assume to be a factor of $d$ faster to
+compute.
+
+However, we also expect to pay a price for this in terms of the number of iterations required. It
+turns out that, in the worst case, the number of iterations will increase by a factor of $d$, so we
+only stand to gain. Under additional assumptions about $f$, coordinate descent can lead to provable
+speedups.
+
+\begin{definition}[Polyak-Łojasiewicz (PL) inequality]
+    Let $f: \R^d \to \R$ be a differentiable function with a global minimum $\vec{x}^\star$. We say
+    that $f$ satisfies the PL inequality if the following holds for some $\mu > 0$, \[
+        \frac{1}{2} \| \grad{f(\vec{x})}{} \|^2 \geq \mu (f(\vec{x}) - f(\vec{x}^\star)), \quad \forall \vec{x} \in \R^d.
+    \]
+\end{definition}
+
+\begin{observation}
+    The PL inequality directly implies that every critical point is a minimizer of $f$.
+\end{observation}
+
+There are non-convex functions that satisfy the PL inequality.
+
+\begin{lemma}
+    Let $f: \R^d \to \R$ be differentiable and strongly convex with parameter $\mu > 0$. Then $f$
+    satisfies the PL inequality for the same $\mu$.
+\end{lemma}
+
+To analyze coordinate descent, we need the notion of \textit{coordinate-wise smoothness}.
+
+\begin{definition}[Coordinate-wise smoothness]
+    Let $f: \R^d \to \R$ be differentiable, and $\mathcal{L} = [L_1, \ldots, L_d] \in \R^d_+$.
+    Function $f$ is called coordinate-wise smooth (with parameter $\mathcal{L}$) if for every
+    coordinate $i=1,\ldots,d$, the following holds, \[
+        f(\vec{x} + \lambda \vec{e}_i) \leq f(\vec{x}) + \lambda \grad{f(\vec{x})}{i} + \frac{L_i}{2} \lambda^2, \quad \forall \vec{x}\in \R^d, \lambda \in \R.
+    \]
+\end{definition}
+
+Compare this to the definition of smoothness; \Cref{def:smoothness}. In our new coordinate-wise
+definition, we define $\vec{y}$ as $\vec{x} + \lambda \vec{e}_i$, since we only want to change
+coordinate $i$. Hence, $\vec{y}-\vec{x}$ becomes $\lambda \vec{e}_i$. From there, it is easy to
+that $\transpose{\grad{f(\vec{x})}{}}(\vec{y} - \vec{x})$ becomes $\lambda \grad{f(\vec{x})}{i}$,
+and $\| \vec{x}-\vec{y} \|$ becomes $\lambda$. Thus, smoothness with parameter $L$ implies
+coordinate-wise smoothness with parameter $\mathcal{L} = [L, \ldots, L]$.
+
+\begin{example}
+    $f(x_1, x_2) = x_1^2 + 10x_2^2$ is smooth with parameter $L = 20$, but $f$ is coordinate-wise
+    smooth with parameter $\mathcal{L} = [2, 20]$. Such differences will become important later when
+    showing faster convergence of coordinate descent.
+\end{example}
+
+In general, coordinate (gradient) descent algorithms perform the following actions,
+\begin{align*}
+     & \text{choose an active coordinate $i \in [d]$} \margintag{We call the coordinate that is currently being update \textit{active}.} \\
+     & \vec{x}_{t+1} \doteq \vec{x}_t - \gamma_i \grad{f(\vec{x}_t)}{i} \vec{e}_i.
+\end{align*}
+
+\begin{lemma}[Coordinate-wise sufficient decrease]
+    Let $f: \R^d \to \R$ be differentiable and coordinate-wise smooth with parameter $\mathcal{L} = [L_1, \ldots, L_2]$. With active coordinate $i$ in iteration $t$ and stepsize \[
+        \gamma_i \doteq \frac{1}{L_i},
+    \]
+    coordinate descent satisfies \[
+        f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2 L_i} | \grad{f(\vec{x}_t)}{i} |^2.
+    \]
+\end{lemma}
+
+\begin{proof}
+    Let $\lambda = -\nicefrac{\grad{f(\vec{x}_t)}{i}}{L_i}$, then $\vec{x}_{t+1} = \vec{x}_t +
+        \lambda \vec{e}_i$. Then, we can apply coordinate-wise smoothness,
+    \begin{align*}
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \lambda \grad{f(\vec{x}_t)}{i} + \frac{L_i}{2} \lambda^2 \margintag{Coordinate-wise smoothness.} \\
+                         & = f(\vec{x}_t) - \frac{1}{L_i} | \grad{f(\vec{x}_t)}{i} |^2 + \frac{1}{2L_i} | \grad{f(\vec{x}_t)}{i} |^2            \\
+                         & =  f(\vec{x}_t) - \frac{1}{2 L_i} | \grad{f(\vec{x}_t)}{i} |^2.
+    \end{align*}
+\end{proof}
+
+\subsection{Randomized coordinate descent}
+
+In \textit{randomized gradient descent}, the active coordinate is chosen uniformly at random,
+\begin{align*}
+     & \text{sample $i \in [d]$ uniformly at random}                               \\
+     & \vec{x}_{t+1} \doteq \vec{x}_t - \gamma_i \grad{f(\vec{x}_t)}{i} \vec{e}_i.
+\end{align*}
+
+Randomized coordinate descent is at least as fast as gradient descent on smooth functions if we
+assume that it is $d$ times cheaper to update one coordinate than the full iterate
+\citep{nesterov2012efficiency}. If we additionally assume the PL inequality, we can obtain faster
+convergence.
+
+\begin{theorem}
+    Let $f: \R^d \to \R$ be differentiable with global minimum $\vec{x}^\star$. Suppose that $f$ is coordinate-wise smooth with parameter $L$ and satisfies the PL inequality with parameter $\mu > 0$. Choosing stepsize \[
+        \gamma_i \doteq \frac{1}{L},
+    \]
+    randomized gradient descent with arbitrary $\vec{x}_0$ yields \[
+        \E[f(\vec{x}_T) - f(\vec{x}^\star)] \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f(\vec{x}^\star)).
+    \]
+\end{theorem}
+
+\begin{proof}
+    Sufficient decrease yields \[
+        f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} | \grad{f(\vec{x}_t)}{i} |^2.
+    \]
+    By taking the expectation of both sides with respect to $i$, we have
+    \begin{align*}
+        \E_i [f(\vec{x}_{t+1}) \mid \vec{x}_t] & \leq \E_i \lft[ f(\vec{x}_t) - \frac{1}{2L} | \grad{f(\vec{x}_t)}{i} |^2 \;\middle|\; \vec{x}_t \rgt] \\
+                                               & = f(\vec{x}_t) - \frac{1}{2L} \sum_{i=1}^{d} \frac{1}{d} | \grad{f(\vec{x}_t)}{i} |^2                 \\
+                                               & = f(\vec{x}_t) - \frac{1}{2dL} \| \grad{f(\vec{x}_t)}{} \|^2                                          \\
+                                               & \leq f(\vec{x}_t) - \frac{\mu}{dL} (f(\vec{x}_t) - f(\vec{x}^\star)). \margintag{PL inequality.}
+    \end{align*}
+    Subtracting $f(\vec{x}^\star)$ from both sides and taking the expectation over $\vec{x}_t$, we obtain \[
+        \E[f(\vec{x}_{t+1}) - f(\vec{x}^\star)] \leq \lft( 1 - \frac{\mu}{dL} \rgt) (f(\vec{x}_t) - f(\vec{x}^\star)). \margintag{$\E_i[f(\vec{x}_{t+1}) \mid \vec{x}_t]$ is a random variable whose expectation is $\E_{\vec{x}_t}[f(\vec{x}_{t+1})]$.}
+    \]
+    The statement follows.
+\end{proof}
+
+\subsection{Importance sampling}
+
+As seen, uniformly random selection of the active coordinate does not yield a better bound than
+gradient descent. However, we have not made use of the fact that the coordinate-wise smoothness
+parameters can differ. Intuitively, we would want to sample coordinates with high smoothness more
+frequently than coordinates with low smoothness, since they change more rapidly, leading to faster
+convergence to the optimum. This leads us to \textit{importance sampling}
+\citep{nesterov2012efficiency},
+\begin{align*}
+     & \text{sample $i \in [d]$ with probability $\frac{L_i}{\sum_{j=1}^{d} L_j}$} \\
+     & \vec{x}_{t+1} \doteq \vec{x}_t - \gamma_i \grad{f(\vec{x}_t)}{i} \vec{e}_i.
+\end{align*}
+
+\begin{theorem}
+    Let $f: \R^d \to \R$ be differentiable with a global minimum $\vec{x}^\star$. Suppose that $f$ is coordinate-wise smooth with parameter $\mathcal{L}=[L_1, \ldots, L_d]$ and satisfies the PL inequality with parameter $\mu > 0$. Let \[
+        \overline{L} = \frac{1}{d} \sum_{i=1}^{d} L_i
+    \]
+    be the average of coordinate-wise smoothness constants. Then, coordinate descent with importance
+    sampling and arbitrary $\vec{x}_0$ yields \[
+        \E[f(\vec{x}_T - f(\vec{x}^\star)] \leq \lft( 1 - \frac{\mu}{d\overline{L}} \rgt)^T (f(\vec{x}_0) - f(\vec{x}^\star)).
+    \]
+\end{theorem}
+
+\begin{proof}
+    The proof is nearly identical to the proof of randomized coordinate descent. The difference lies
+    in the expectation over $i$. Importance sampling yields
+    \begin{align*}
+        \E_i \lft[ f(\vec{x}_t) - \frac{1}{2L_i} | \grad{f(\vec{x}_t)}{i} |^2 \;\middle|\; \vec{x}_t \rgt] & = f(\vec{x}_t) - \sum_{i=1}^{d} \frac{L_i}{\sum_{j=1}^{d} L_j} \frac{1}{2L_i} | \grad{f(\vec{x}_t)}{i} |^2                                 \\
+                                                                                                           & =  f(\vec{x}_t) - \frac{1}{2d\overline{L}} \sum_{i=1}^{d} | \grad{f(\vec{x}_t)}{i} |^2. \margintag{$d \overline{L} = \sum_{i=1}^{d} L_i$.}
+    \end{align*}
+    The rest follows identically.
+\end{proof}
+
+Note that $\overline{L}$ can be much smaller than $L = \max_{i=1}^d L_i$, so coordinate descent
+with important sampling is potentially faster than randomized gradient descent. In the worst-case,
+both algorithms are the same.
+
+\subsection{Steepest coordinate descent}
+
+In contrast to random coordinate descent, \textit{steepest coordinate descent} chooses the active
+coordinate according to the coordinate with the largest gradient (\textit{Gauss-Southwell} rule),
+\begin{align*}
+     & \text{choose $i = \argmax_{i \in [d]} | \grad{f(\vec{x}_t)}{i} |$}          \\
+     & \vec{x}_{t+1} \doteq \vec{x}_t - \gamma_i \grad{f(\vec{x}_t)}{i} \vec{e}_i.
+\end{align*}
+The main difference from the previous algorithms is that this algorithm is deterministic, thus we do
+not need to take the expectation.
+
+\begin{corollary}
+    Let $f: \R^d \to \R$ be differentiable with a global minimum $\vec{x}^\star$. Suppose that $f$ is coordinate-wise smooth with parameter $L$ and satisfies the PL inequality with parameter $\mu > 0$. Choosing stepsize \[
+        \gamma_i \doteq \frac{1}{L},
+    \]
+    steepest coordinate descent with arbitrary $\vec{x}_0$ yields \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f(\vec{x}^\star)).
+    \]
+\end{corollary}
+
+This is not good. It needs the same amount of iterations as randomized coordinate descent, but each
+iteration takes as long as in gradient descent.\sidenote{Note that a function may be
+    coordinate-wise smooth with an $L$ for all coordinates that is smaller than smoothness, so it is
+    not completely fair to compare this to gradient descent.} However, this algorithm allows for a
+speedup in certain cases. Furthermore, it may be possible to efficiently maintain the maximum
+absolute gradient value throughout the iterations, so that the full evaluation of the gradient can
+be avoided.
+
+\cite{nutini2015coordinate} showed that a better convergence result can be obtained for strongly convex functions, when strong convexity is measured \wrt the $\ell_1$ norm instead of the standard Euclidean norm, \ie, \[
+    f(\vec{y}) \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) + \frac{\mu_1}{2} \|\vec{y} - \vec{x}\|_1^2.
+\]
+Due to $\| \vec{y} - \vec{x} \|_1 \geq \| \vec{y} - \vec{x} \|$, $f$ is then also strongly convex
+with $\mu = \mu_1$. On the other hand, if $f$ is $\mu$-strongly convex \wrt the $\ell_2$ norm, then
+$f$ is $\nicefrac{\mu}{d}$-strongly convex \wrt the $\ell_1$ norm, due to $\|\vec{y}-\vec{x}\| \geq
+    \nicefrac{\|\vec{y}-\vec{x}\|_1}{\sqrt{d}}$.
+
+\begin{lemma}
+    Let $f: \R^d \to \R$ be differentiable and strongly convex with parameter $\mu_1 > 0$ \wrt the
+    $\ell_1$ norm. Then, $f$ is $\mu_1$-strongly convex \wrt the Euclidean norm, so a global minimum
+    $\vec{x}^\star$ exists. Then, $f$ satisfies the PL inequality \wrt the $\ell_{\infty}$ norm with the same $\mu_1$, \[
+        \frac{1}{2} \| \grad{f(\vec{x})}{} \|_{\infty}^2 \geq \mu_1 (f(\vec{x}) - f(\vec{x}^\star)).
+    \]
+\end{lemma}
+
+\begin{theorem}
+    Let $f: \R^d \to \R$ be differentiable with a global minimum $\vec{x}^\star$. Suppose that $f$ is coordinate-wise smooth with parameter $L$ and satisfies the PL inequality with parameter $\mu_1 > 0$. Choosing stepsize \[
+        \gamma_i \doteq \frac{1}{L},
+    \]
+    steepest coordinate descent with arbitrary $\vec{x}_0$ yields \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \lft( 1 - \frac{\mu_1}{L} \rgt)^T (f(\vec{x}_0) - f(\vec{x}^\star)).
+    \]
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) - \frac{1}{2L} | \grad{f(\vec{x}_t)}{i} |^2 \margintag{Sufficient decrease.}                                                             \\
+                         & = f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|_{\infty}^2 \margintag{Active coordinate of steepest coordinate descent is the maximum gradient.} \\
+                         & \leq f(\vec{x}_t) - \frac{\mu_1}{L} (f(\vec{x}_t) - f(\vec{x}^\star)). \margintag{PL inequality.}
+    \end{align*}
+    Subtracting $f(\vec{x}^\star)$ from both sides yields \[
+        f(\vec{x}_{t+1}) - f(\vec{x}^\star) \leq \lft( 1 - \frac{\mu_1}{L} \rgt) (f(\vec{x}_t) - f(\vec{x}^\star)).
+    \]
+    The statement follows.
+\end{proof}
+
+We see that if $\mu_1 = \nicefrac{\mu}{d}$, we do not gain anything. However, this is not the case
+in general. If, for the worst case $\vec{x},\vec{y}$, which satisfy $\| \vec{y} - \vec{x} \| =
+    \nicefrac{\| \vec{y} - \vec{x} \|_1}{\sqrt{d}}$, strong convexity holds with $\mu' > \mu$, then we
+can achieve $\mu_1 = \nicefrac{\mu'}{d} > \nicefrac{\mu}{d}$, resulting in better convergence.
+
+\subsection{Greedy coordinate descent}
+
+\begin{marginfigure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                width=\textwidth,
+                height=\textwidth,
+                domain=-1:1,
+                y domain=-1:1,
+                zmin=0,
+                zmax=4,
+                view={0}{90},
+                samples=150,
+                colormap={black}{gray(0cm)=(0),gray(1cm)=(0)},
+            ] \addplot3[contour gnuplot={number=10, label distance=10000pt}]{x^2 + y^2 + abs(x - y)};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Level set plot of $f(\vec{x}) = \| \vec{x} \|^2 + \abs{x_1 - x_2}$. The global minimum is $[0,0]$, but greedy coordinate descent cannot escape any point $[x, x]$, s.t. $|x| \leq \nicefrac{1}{2}$.}
+    \label{fig:greedy-fail}
+\end{marginfigure}
+
+\textit{Greedy coordinate descent} is a variant that does not even require $f$ to be differentiable.
+In each iteration, we make the step that maximizes the progress in the chosen coordinate. This
+requires performing a \textit{line search} by solving a one-dimensional optimization problem,
+\begin{align*}
+     & \text{choose $i \in [d]$}                                                       \\
+     & \vec{x}_{t+1} \doteq \argmin_{\lambda \in \R} f(\vec{x}_t + \lambda \vec{e}_i).
+\end{align*}
+
+However, greedy coordinate descent can get stuck in non-optimal points; see \Cref{fig:greedy-fail}.
+Thus, we need some additional conditions to make sure this does not occur.
+
+\begin{theorem} \label{thm:separable}
+    Let $f: \R^d \to \R$ be of the form \[
+        f(\vec{x}) \doteq g(\vec{x}) + h(\vec{x}), \quad h(\vec{x}) = \sum_{i=1}^{d} h_i(x_i), \quad \vec{x} \in \R^d,
+    \]
+    with $g$ convex and differentiable, and the $h_i$ convex.
+
+    Let $\vec{x}$ be a point such that greedy coordinate descent cannot make progress in any
+    coordinate. Then $\vec{x}$ is a global minimum of $f$.
+\end{theorem}
+
+In the context of machine learning, an important class of functions that satisfies the conditions
+of \Cref{thm:separable} is the following form, \[
+    f(\vec{x}) + \lambda \| \vec{x} \|_1,
+\]
+where $\lambda \| \vec{x} \|_1$ is a separable $\ell_1$-regularization term used in for example
+LASSO \citep{tibshirani1996regression}.

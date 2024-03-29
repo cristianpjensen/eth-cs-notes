@@ -54,9 +54,7 @@ We can also use this to get a bound on the average error, \[
     \]
     This holds if and only if the gradient is bounded.}
 
-\begin{theorem}
-    \label{thm:lipschitz}
-
+\begin{theorem} \label{thm:lipschitz}
     Let $f: \R^d \to \R$ be convex and differentiable with a global minimum $\vec{x}^\star$.
     Furthermore, suppose that $\|\vec{x}_0-\vec{x}^\star\| \leq R$ and $\|\grad{f(\vec{x})}{}\| \leq B$
     for all $\vec{x}$. Choosing the stepsize, \[
@@ -151,7 +149,7 @@ This means that we need at most $10000 \cdot R^2 B^2$ iterations to achieve an e
     \label{fig:smooth}
 \end{marginfigure}
 
-\begin{definition}[Smooth functions]
+\begin{definition}[Smoothness] \label{def:smoothness}
     Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, $L\in \R_+$.
     $f$ is smooth (with parameter $L$) over $\mathcal{X}$ if
     $\forall \vec{x},\vec{y}\in \mathcal{X}:$ \[
