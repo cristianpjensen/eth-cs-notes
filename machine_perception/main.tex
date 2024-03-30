@@ -11,12 +11,20 @@
 \pagenumbering{roman}
 \maketitle
 \newpage
+\microtypesetup{protrusion=false}
 \tableofcontents
+\microtypesetup{protrusion=true}
 \newpage
 \input{sections/symbols}
-\newpage\pagenumbering{arabic}
+\newpage\cleardoublepage\pagenumbering{arabic}
 
-\input{sections/01_multi-layer_perceptron}
+\input{sections/01_neural_networks}
+
+\newpage
+\input{sections/02_convolutional_neural_networks}
+
+\newpage
+\input{sections/03_recurrent_neural_networks}
 
 \newpage
 \bibliography{main}

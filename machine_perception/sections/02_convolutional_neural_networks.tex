@@ -1,0 +1,220 @@
+\section{Convolutional neural networks}
+
+When dealing with high-dimensional data, such as images, it is not practical to work with MLPs,
+because the amount of parameters would explode in size.\sidenote{Mapping a $256 \times 256 \times
+        3$ input image to a $1$-dimensional output would already require nearly 2 million parameters.} By
+making use of the locality of images, we can drastically decrease the number of parameters.
+
+\subsection{Convolution}
+
+\begin{marginfigure}
+    \centering
+    \incfig{correlation}
+    \caption{Illustration of applying a correlation to a pixel.}
+    \label{fig:correlation}
+\end{marginfigure}
+
+The \textit{correlation} operator takes a filter $\tens{K}$, moves it along the entire image, and
+outputs the patch-wise multiplication, for each patch of the same size as the filter. It is defined
+as follows, \[
+    (\tens{K} \star \tens{I})[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} \tens{K}[m, n] \tens{I}[i+m, j+n].
+\]
+The \textit{convolution} operator is very similar. The only difference is that the kernel is
+mirrored in a convolution, \[
+    (\tens{K} * \tens{I})[i,j] = \sum_{m=-k}^k \sum_{n=-k}^{k} \tens{K}[m,n] \tens{I}[i-m, i-n].
+\]
+
+Theoretically, the convolution operator is more useful, because it is
+commutative.\sidenote{$\tens{I} * \tens{K} = \tens{K} * \tens{I}$, but $\tens{I} \star \tens{K}
+        \neq \tens{K} \star \tens{I}$.} In practice with neural networks, it does not matter, since the
+weights will just be updated to be the same, except that they are mirrored. Thus, we will only be
+referring to the convolution from now on.
+
+A convolution operator $C$ is a linear, shift-equivariant transformation, \ie,
+\begin{align*}
+    C(\alpha \vec{x} + \beta) & = \alpha C(\vec{x}) + \beta \margintag{Linearity.}              \\
+    T_{\vec{t}}(C(\vec{x}))   & = C(T_{\vec{t}}(\vec{x})). \margintag{Translation equivariant.}
+\end{align*}
+Since convolutions are linear, discrete convolutions can be implemented using matrix multiplication, \[
+    \tens{K} * \tens{I} = \begin{bmatrix}
+        k_1    & 0      & 0      & \cdots & 0      \\
+        k_2    & k_1    & 0      & \cdots & 0      \\
+        k_3    & k_2    & k_1    & \cdots & 0      \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        0      & 0      & 0      & \cdots & k_m
+    \end{bmatrix}
+    \begin{bmatrix}
+        I_1 \\ I_2 \\ I_3 \\ \vdots \\ I_n
+    \end{bmatrix}
+    .
+\]
+
+\subsection{Convolutional neural network}
+
+\begin{marginfigure}
+    \centering
+    \incfig{cnn}
+    \caption{Example schematic of a CNN architecture.}
+    \label{fig:cnn}
+\end{marginfigure}
+
+A convolutional neural network (CNN) is composed of a sequence of \textit{convolutional layers} and
+\textit{pooling layers}, followed by a final \textit{dense layer} (MLP).
+
+\paragraph{Convolutional layer.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{convolutional-layer}
+    \caption{Schematic of a convolutional layer. Each input-output channel pair has its own kernel,
+        so $\vec{\theta}$ has $K\times K \times C_{\mathrm{in}} \times C_{\mathrm{out}}$ parameters.}
+    \label{fig:convolutional-layer}
+\end{marginfigure}
+
+A convolutional layer applies a filter $\mat{W}$ to an input image $\mat{Z}$ by convolution. This
+filter is learned. Hence, we need to derive its derivative. We will focus on the single filter case
+for simplicity, whose forward pass is computed by \[
+    z^{(\ell)}[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} w^{(\ell)}[m,n] z^{(\ell-1)}[i-m,j-n] + b.
+\]
+
+We can express the derivative of the cost function $\mathcal{L}$ \wrt the output of the
+$(\ell-1)$-th layer as the following,
+\begin{align*}
+    \delta^{(\ell-1)}[i,j] & = \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]}                                                                                                   \\
+                           & = \sum_{i'} \sum_{j'} \pdv{\mathcal{L}}{z^{(\ell)}[i'{,}j']} \pdv{z^{(\ell)}[i'{,}j']}{z^{(\ell-1)}[i{,}j]}                                \\
+                           & = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] \pdv*{\sum_{m} \sum_{n} w^{(\ell)}[m{,}n] z^{(\ell-1)}[i'-m{,}j'-n] + b}{z^{(\ell-1)}[i{,}j]} \\
+                           & = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j].
+\end{align*}
+From this, we can see that we can compute all values of $\delta^{(\ell-1)}$ by a single convolution, \[
+    \delta^{(\ell-1)} = \delta^{(\ell)} * \mathrm{Rot}_{180} \lft( \mat{W}^{(\ell)} \rgt) = \delta^{(\ell)} \star \mat{W}^{(\ell)}.
+\]
+
+Using this value, we can compute the derivative \wrt the weights, which we need for the parameter
+update in algorithms such as gradient descent,
+\begin{align*}
+    \pdv{\mathcal{L}}{w^{(\ell)}[m{,}n]} & = \sum_{i} \sum_{j} \pdv{\mathcal{L}}{z^{(\ell)}[i{,}j]} \pdv{z^{(\ell)}[i{,}j]}{w^{\ell}[m{,}n]}                                        \\
+                                         & = \sum_{i} \sum_{j} \delta^{(\ell)}[i,j] \pdv*{\sum_{m'} \sum_{n'} w^{(\ell)}[m'{,}n'] z^{(\ell-1)}[i-m'{,}j-n'] + b}{w^{(\ell)}[m{,}n]} \\
+                                         & = \sum_{i} \sum_{j} \delta^{(\ell)}[i,j] z^{(\ell-1)}[i-m,j-n].
+\end{align*}
+Again, this has the form of a convolution, thus we can compute all derivatives of $\mat{W}^{(\ell)}$ by convolution, \[
+    \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} = \delta^{(\ell)} * \mat{Z}^{(\ell-1)}.
+\]
+
+As shown, we can use convolutions for both computing the forward pass, as well as the backward
+pass. Thus, we first do the forward pass, then compute all $\delta^{(\ell)}$ for all layers $\ell$
+by convolution, and finally we can compute the derivative by convolution as well.
+
+\paragraph{Pooling layers.}
+
+Pooling layers makes the data more manageable. The most common pooling layer is \textit{max
+    pooling}, which outputs the maximum value for each patch. It can be seen as a non-linear
+convolutional filter, where it simply outputs the maximum value. Usually, pooling is done with a
+stride, such that the output becomes exponentially smaller; see \Cref{fig:max-pooling}. Because of
+this, the \textit{receptive field} becomes exponentially larger.
+
+\begin{marginfigure}
+    \centering
+    \incfig{max-pooling}
+    \caption{Toy example of max pooling.}
+    \label{fig:max-pooling}
+\end{marginfigure}
+
+The forward pass is computed as follows,
+\[
+    z^{(\ell)}[i,j] = \max \lft\{ z^{(\ell)}[i',j'] \;\middle|\; i' \in [si:si+k], j' \in [sj:sj+k] \rgt\},
+\]
+where $s$ is the stride and $k$ is the kernel size. Let $[i^\star,j^\star]$ be the indices which
+corresponded to the maximum value in the forward pass, then we can compute the error propagation in
+the backward pass by \[
+    \pdv{z^{(\ell)}[i{,}j]}{z^{(\ell-1)}[i'{,}j']} = \mathbb{1}\{ [i',j'] = [i^\star,j^\star] \}.
+\]
+
+Note that the max pooling layer has no learnable parameters. Hence, the backward pass is only a
+propagation of the error, and not used for a weight update.
+
+\paragraph{Dense layer.}
+
+The dense layer is simply a linear layer that maps the final convolutional layer to the network's
+output. All previous convolutional and pooling layers can be seen as extracting features from the
+image, while the final dense layer makes the actual prediction.
+
+\section{Fully convolutional neural network}
+
+\textit{Semantic segmentation} is a computer vision task that involves assigning a semantic class to
+each pixel in an image. While in image classification, the model must output a single class for the
+entire image, semantic segmentation requires classifying a class for each pixel individually.
+
+A naive approach would be to apply a single convolutional layer to an image, and then running a
+classifier on each individual pixel. However, this method is inefficient, because we have to run
+the classifier $H\times W$ times. Instead, we use the output of convolutional neural networks. A
+naive approach of using CNNs would be to simply apply $n$ convolutional layers with no
+downsampling, and then considering the last output as the predicted segmentation map. However, this
+method is expensive.
+
+In practice, the most common approach is to downsample the features obtained using convolution and
+pooling layers and then upsample them again. By downsampling, this method is more computationally
+efficient, has larger receptive field, and suffers less from ``The curse of dimensionality''. By
+upsampling, the model produces an output of the same resolution as the input.
+
+\subsection{Upsampling methods}
+
+\paragraph{Nearest neighbor.}
+
+Nearest neighbor upsampling copies the same value into all corresponding pixels at a higher
+resolution; see \Cref{fig:nearest-neighbor-upsampling}.
+
+\begin{marginfigure}
+    \centering
+    \incfig{nearest-neighbor-upsampling}
+    \caption{Nearest neighbor upsampling.}
+    \label{fig:nearest-neighbor-upsampling}
+\end{marginfigure}
+
+\paragraph{Bed of nails.}
+
+Bed of nails upsampling only copies each value once into the output in the top left value, and pads
+the rest with zero; see \Cref{fig:bed-of-nails-upsampling}.
+
+\begin{marginfigure}
+    \centering
+    \incfig{bed-of-nails-upsampling}
+    \caption{Bed of nails upsampling.}
+    \label{fig:bed-of-nails-upsampling}
+\end{marginfigure}
+
+\paragraph{Max unpooling.}
+
+Max unpooling also uses zero padding, like bed of nails. However, it also remembers the original
+position of the maximum value before the corresponding max pooling in the downsampling phase. This
+information is then used to place each element back in the correct position; see
+\Cref{fig:max-pooling,fig:max-unpooling}.
+
+\begin{marginfigure}
+    \centering
+    \incfig{max-unpooling}
+    \caption{Max unpooling the output of \Cref{fig:max-pooling}.}
+    \label{fig:max-unpooling}
+\end{marginfigure}
+
+\paragraph{Transposed convolutions.}
+
+Transposed convolution is a learned upsampling technique. This layer learns a kernel that is used
+to produce the terms whose sum will be the final output. Each term is obtained by multiplying all
+the element of the kernel by the same value of one single input pixel and then inserting the result
+in the correct position of a matrix of the same size as the output.
+
+\subsection{U-net}
+
+The \textit{U-net} is a FCNN architecture, whose main idea is to combine global and local feature
+maps by copying corresponding tensors from earlier stages in each upsampling stage; see
+\Cref{fig:u-net}. This allows the network to capture both local and global context. In each
+upsampling, the corresponding output from the downsampling phase is appended to the output. The
+copied tensor can be seen as the ``global'' information, while the input of the upsampling layer is
+the ``local'' information. Combining these allows for more fine-grained outputs.
+
+\begin{marginfigure}
+    \centering
+    \incfig{u-net}
+    \caption{U-net architecture. Down arrows are downsampling layers, up arrows are upsampling layers, and right arrows copy.}
+    \label{fig:u-net}
+\end{marginfigure}

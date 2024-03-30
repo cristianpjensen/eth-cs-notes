@@ -1,0 +1,86 @@
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'lstm.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{320bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.46875)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{lstm.pdf}}%
+    \put(0.28429589,0.01912098){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}^{(t)}$\end{tabular}}}}%
+    \put(0.67546663,0.43596479){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{h}^{(t)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{lstm.pdf}}%
+    \put(0.31793667,0.32511778){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\times$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{lstm.pdf}}%
+    \put(0.47472786,0.25726892){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\times$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{lstm.pdf}}%
+    \put(0.61872552,0.2345767){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\times$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{lstm.pdf}}%
+    \put(0.47472786,0.32511778){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{lstm.pdf}}%
+    \put(0.32175218,0.19037897){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\sigma$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{lstm.pdf}}%
+    \put(0.38598525,0.19037897){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\sigma$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{lstm.pdf}}%
+    \put(0.57110151,0.19037897){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\sigma$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{lstm.pdf}}%
+    \put(0.45731594,0.18889275){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\tanh$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{lstm.pdf}}%
+    \put(0.60131366,0.28795694){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\tanh$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{lstm.pdf}}%
+    \put(0.3221625,0.12506934){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{f}$\end{tabular}}}}%
+    \put(0.38689169,0.12197294){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{i}$\end{tabular}}}}%
+    \put(0.4787884,0.12546989){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{g}$\end{tabular}}}}%
+    \put(0.5672408,0.12506934){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{o}$\end{tabular}}}}%
+    \put(0.73096449,0.34945936){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{c}^{(t)}$\end{tabular}}}}%
+    \put(0.73096449,0.16941143){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{h}^{(t)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{lstm.pdf}}%
+  \end{picture}%
+\endgroup%

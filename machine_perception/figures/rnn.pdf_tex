@@ -1,0 +1,74 @@
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'rnn.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{180bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,1.08333333)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{rnn.pdf}}%
+    \put(0.69554012,0.43590123){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}^{(t+1)}$\end{tabular}}}}%
+    \put(0.48974838,0.43590123){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}^{(t)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{rnn.pdf}}%
+    \put(0.23214708,0.43590123){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\vec{h}^{(t-1)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{rnn.pdf}}%
+    \put(0.00364141,0.43448252){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0.95393582,0.43596419){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\cdots$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{rnn.pdf}}%
+    \put(0.69554018,0.70937766){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\ell^{(t+1)}$\end{tabular}}}}%
+    \put(0.48974838,0.70937766){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\ell^{(t)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{rnn.pdf}}%
+    \put(0.23214708,0.70937766){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\ell^{(t-1)}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{rnn.pdf}}%
+    \put(0.44500708,0.10939631){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\mat{W}_h,\mat{W}_x$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{rnn.pdf}}%
+    \put(0.49871936,0.99432619){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{L}$\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
