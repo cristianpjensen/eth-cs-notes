@@ -1,0 +1,130 @@
+\section{Autoencoders}
+
+\textit{Autoencoders} are \textit{generative models}. This means that their objective is to learn
+the underlying hidden structure of the data. They aim to model the distribution
+$p_{\mathrm{model}}(\vec{x})$ that resembles $p_{\mathrm{data}}(\vec{x})$ to generate new samples.
+Autoencoders are an \textit{explicit} generative model, which means that they explicitly define the
+probability distribution $p_{\mathrm{model}}(\vec{x})$ and then sample from it to generate new data
+points.
+
+In machine learning, we often have high-dimensional data $\vec{x} \in \R^n$, such as images, audio,
+or time-series. Hence, it is crucial to find a low-dimensional representation that can effectively
+compress the data while preserving its essential information.
+
+\begin{marginfigure}
+    \centering
+    \incfig{autoencoder}
+    \caption{Autoencoder architecture.}
+    \label{fig:autoencoder}
+\end{marginfigure}
+
+Autoencoders offer a solution by making use of the \textit{encoder-decoder structure}; see
+\Cref{fig:autoencoder}. The \textit{encoder} $f$ projects the input space $\mathcal{X}$ into a
+latent space $\mathcal{Z}$, while the \textit{decoder} $g$ maps the latent space $\mathcal{Z}$ back
+to the input space $\mathcal{X}$. The assumption made by the autoencoder architecture is that if
+the decoder is capable of reconstructing the original input solely from the compressed
+representation, then this compressed representation must be meaningful. Consequently, the
+composition $g \circ f$ aims to approximate the identity function on the data for a low
+reconstruction error.
+
+Furthermore, to enable the generation of new samples from the latent space, the latent space must
+be well structured, characterized by \textit{continuity} and \textit{interpolation}. Continuity
+means that the entire space must be covered by the data points, while interpolation means that if
+we interpolate between two points, then the interpolation must also be a well behaved data point.
+
+\subsection{Linear autoencoders}
+
+If we restrict $f$ and $g$ to be linear, the encoder $f$ becomes equivalent to the projection
+performed by \textit{principal component analysis}. The advantage of such a reconstruction is that
+it can be found in a closed form. However, it is not very powerful.
+
+\subsection{Non-linear autoencoders}
+
+We can gain a lot of performance by allowing $f$ and $g$ to be non-linear. In this case, the
+encoder and decoder are implemented as neural networks. To train these networks, we optimize for
+the reconstruction error, \[
+    \vec{\phi}^\star, \vec{\psi}^\star \in \argmin_{\vec{\phi}, \vec{\psi}} \sum_{n=1}^{N} \| \vec{x}_n - g_{\vec{\psi}} (f_{\vec{\phi}}(\vec{x}_n)) \|^2
+\]
+
+We can distinguish between \textit{undercomplete} and \textit{overcomplete} latent spaces. A latent
+space is undercomplete if $\mathrm{dim}(\mathcal{Z}) < \mathrm{dim}(\mathcal{X})$, while it is
+overcomplete if $\mathrm{dim}(\mathcal{Z}) > \mathrm{dim}(\mathcal{X})$. The idea of an
+undercomplete hidden representation is to enable the network to learn the important features of the
+data by reducing the dimensionality of the hidden space. This prevents the autoencoder from simply
+copying the input and forces it to extract meaningful and discriminative features. An overcomplete
+latent spaces are useful for denoising and inpainting autoencoders, where we have an imperfect
+input and want a perfect output. The overcompleteness allows the model to extract more features
+from the transformed input, leading to improved performance.
+
+\subsection{Variational autoencoders}
+
+While autoencoders are good at reconstruction, they struggle at generating new high quality
+samples, which is due to the lack of continuity in the latent space. There are large regions in the
+latent space where there are no observations, thus the model does not know what to output when it
+get an input from those regions.
+
+\textit{Variational autoencoders} (VAE) are designed to have a continuous latent space. It achieves
+this by making the encoder output a probability distribution over latent vectors, rather than a
+single latent vector. Generally, it outputs a mean vector $\vec{\mu}$ and standard deviation vector
+$\vec{\sigma}$. The idea is that even for the same input, the latent vector can be different, but in
+the same area. This means that data points cover areas in the latent space, rather than single
+points, ensuring continuity.
+
+However, since there are no limits on the values taken by $\vec{\mu}$ and $\vec{\sigma}$, the
+encoder may learn to generate very different $\vec{\mu}$ for each class while minimizing
+$\vec{\sigma}$. This would mean that the encoder essentially outputs points again to decrease the
+reconstruction error. We can avoid this by minimizing the KL-divergence\sidenote{The KL-divergence
+    is defined as \[
+        D_{\mathrm{KL}}(p \lVert q) \doteq \E \lft[ \log \lft( \frac{p(x)}{q(x)} \rgt) \rgt].
+    \]
+    It is not symmetric and non-negative.} between the output distribution and a standard normal
+distribution. Intuitively, this encourages the encoder to distribute the encodings evenly around
+the center of the latent space.
+
+To train the model, we want to maximize the likelihood of the training data, \[
+    p(\vec{x}) = \int_{\vec{z}} p(\vec{x}\mid \vec{z}) p(\vec{z}) \mathrm{d}\vec{z}.
+\]
+However, this is intractable. Thus, we define an approximation of the posterior,
+$q_{\vec{\phi}}(\vec{z}\mid \vec{x})$, which is computed by the encoder. We can now derive the
+\textit{evidence lower bound} (ELBO),
+\begin{align*}
+    \log p(\vec{x}) & = \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} [\log p(\vec{x})] \margintag{$\vec{x}$ does not depend on $\vec{z}$.}                                                                                                                                                                                                    \\
+                    & = \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} \lft[ \log \frac{p_{\vec{\psi}}(\vec{x}\mid \vec{z}) p(\vec{z})}{p(\vec{z} \mid \vec{x})} \rgt] \margintag{Bayes' rule.}                                                                                                                                                 \\
+                    & = \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} \lft[ \log \lft( \frac{p_{\vec{\psi}}(\vec{x} \mid \vec{z}) p(\vec{z})}{p(\vec{z}\mid \vec{x})} \frac{q_{\vec{\phi}}(\vec{z}\mid \vec{x})}{q_{\vec{\phi}}(\vec{z}\mid \vec{x})} \rgt) \rgt] \margintag{$\nicefrac{q(\vec{z}\mid \vec{x})}{q(\vec{z}\mid \vec{x})} = 1$.} \\
+                    & = \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - \E_{\vec{z}\mid \vec{x}} \lft[ \log \frac{q_{\vec{\phi}}(\vec{z}\mid \vec{x})}{p(\vec{z})} \rgt] + \E_{\vec{z}\mid \vec{x}} \lft[ \log \frac{q_{\vec{\phi}}(\vec{z}\mid \vec{x})}{p(\vec{z}\mid \vec{x})} \rgt]                                          \\
+                    & = \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - D_{\mathrm{KL}}(q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z})) + D_{\mathrm{KL}} (q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z} \mid \vec{x}))                                                                                            \\
+                    & \geq \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - D_{\mathrm{KL}}(q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z})). \margintag{KL-divergence is non-negative.}
+\end{align*}
+The first term of the ELBO encourages low reconstruction error, while the second term makes sure that
+the approximate posterior $q_{\vec{\phi}}$ does not deviate too far from the prior $p$.
+
+A minor problem is that, during training, we cannot compute the derivative of expectations \wrt the
+parameters that we wish to optimize. Thus, we must use the \textit{reparametrization trick}, which
+involves treating the random sampling as a single noise term. In particular, instead of sampling
+$\vec{z} \sim \mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}))$, we sample $\vec{\epsilon} \sim
+    \mathcal{N}(\vec{0},\mat{I})$ and compute $\vec{z} = \vec{\mu} + \vec{\sigma} \odot
+    \vec{\epsilon}$. Using this trick, we can remove the mean and variance from the sampling operation,
+meaning that we can differentiate \wrt the model parameters.
+
+\subsection{$\beta$-VAE}
+
+VAEs still have problems with their latent space; the representations are still \textit{entangled}.
+This means that we do not have an explicit way of controlling the output. For example, in the MNIST
+dataset, we have no way of explicitly sampling a specific number. The $\beta$-VAE solves this
+problem by giving more weight to the KL term with an adjustable hyperparameter $\beta$ that
+balances latent channel capacity and independence constraints with reconstruction accuracy. The
+intuition behind this is that if factors are in practice independent from each other, the model
+should benefit from disentangling them.
+
+In practice, we want to force the KL loss to be under a threshold $\delta$,
+\begin{align*}
+    \underset{\vec{\phi},\vec{\psi}}{\text{maximize}} & \quad \E_{\vec{x} \sim \mathcal{D}} \lft[ \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} \lft[ \log p_{\vec{\psi}}(\vec{x} \mid \vec{z}) \rgt] \rgt] \\
+    \text{subject to}                                 & \quad D_{\mathrm{KL}} \lft( q_{\vec{\phi}}(\vec{z} \mid \vec{x}) \lVert p(\vec{z}) \rgt) \leq \delta.
+\end{align*}
+Rewriting this as a Lagrangian, we get
+\begin{align*}
+    \mathcal{L}(\vec{\phi},\vec{\psi},\beta) & = \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} [\log p_{\vec{\psi}}(\vec{x} \mid \vec{z})] - \beta(D_{\mathrm{KL}}(q_{\vec{\phi}} \lVert p(\vec{z})) - \delta)      \\
+                                             & = \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} [\log p_{\vec{\psi}}(\vec{x} \mid \vec{z})] - \beta D_{\mathrm{KL}}(q_{\vec{\phi}} \lVert p(\vec{z})) + \beta \delta \\
+                                             & \geq \E_{\vec{z} \sim q_{\vec{\phi}}(\cdot \mid \vec{x})} [\log p_{\vec{\psi}}(\vec{x} \mid \vec{z})] - \beta D_{\mathrm{KL}}(q_{\vec{\phi}} \lVert p(\vec{z})).
+\end{align*}
+Thus, this becomes our new objective function that we wish to maximize.
