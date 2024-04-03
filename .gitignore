@@ -306,6 +306,9 @@ TSWLatexianTemp*
 
 *.dep
 indent.log
-tikz/
+*.md5
+*.log
+*.dpth
 *.dat
 *.script
+*.table
