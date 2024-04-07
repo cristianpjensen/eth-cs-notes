@@ -1,0 +1,247 @@
+\section{Autoregressive models}
+
+We saw that VAEs are approximate models, since they cannot exactly compute the likelihood
+$p(\vec{x})$ to maximize it. \textit{Autoregressive models} solve this by computing the likelihood
+with the chain rule, \[
+    p(\vec{x}) = \prod_{i=1}^{n} p(x_i\mid \vec{x}_{1:i-1}).
+\]
+
+Autoregressive models use data from the same input variable at previous timesteps. This is where
+they get their name from; they perform regression of themselves. In particular, autoregressive
+models generate one element of the sequence at a time, conditioning on previously generated
+elements. Thus, it takes $\vec{x}_{1:k}$ as input and outputs $x_{k+1}$. Because of this, they can
+build a probability distribution over possible sequences, using the chain rule as above.
+
+The hard part of this approach is that we must parametrize all possible conditional distributions
+$p(x_{k+1} \mid \vec{x}_{1:k})$. Suppose we have a binary image consisting of $n$ pixels. Then, we
+need \[
+    \sum_{i=1}^{n} 2^{i-1} \in \bigo{2^n}
+\]
+parameters to parametrize this model. Thus, we need to make additional assumptions to find more
+compact representations of the distribution.\sidenote{A naive solution would be to assume that all
+    points are independent, which would result in \[ p(\vec{x}) = p(x_1) \cdot p(x_n). \] Then, we only require $n$ parameters. However, in practice, this would result in a random sampling
+    of pixels, making the generations incoherent.} We will explore the idea of learning a function
+$f_i: \{ 0,1 \}^{i-1} \to [0,1]$, parametrized by $\vec{\theta}_i$, which takes as input the
+previous pixels and outputs the probability $p(x_i = 1 \mid \vec{x}_{1:i-1})$. The number of total
+parameters is \[
+    \sum_{i=1}^{n} |\vec{\theta}_i|.
+\]
+
+Furthermore, we need to think about in which order we generate the pixels of the image.
+Intuitively, it would make sense to do left-right top-down or top-down left-right. However, in
+practice, randomly ordering the pixels works just as well. One just needs to make sure that the
+ordering remains the same for all data points.
+
+\subsection{Fully visible sigmoid belief network}
+
+In a \textit{fully visible sigmoid belief network} (FVSBN) \citep{frey1998graphical}, each timestep
+has its own function $f_i$ that is modeled by logistic regression, \[
+    f_i(\vec{x}_{1:i-1}) = \sigma\lft(\alpha_0^{(i)} + \alpha_1^{(i)} x_1 + \cdots + \alpha_{i-1}^{(i)} x_{i-1}\rgt).
+\]
+
+At the $i$-th timestep, we have $i$ parameters denoted by $\vec{\theta}_i = [\alpha_0, \ldots,
+    \alpha_{i-1}]$. Thus, the total number of parameters is \[
+    \sum_{i=1}^{n} |\bm{\theta}_i| = \sum_{i=1}^{n} i = \frac{n^2 + n}{2} \in \bigo{n^2},
+\]
+which is much better than the exponential number of parameters we had before.
+
+\subsection{Neural autoregressive density estimator}
+
+The problem with FVSBN is that they are likely not expressive enough for any meaningful tasks,
+since they only consist of a single linear layer for each timestep. The \textit{neural
+    autoregressive density estimator} (NADE) \citep{uria2016neural} offers an alternative
+parametrization based on MLPs, where we have hidden layers, increasing expressivity, and the
+weights are shared between timesteps, decreasing the number of parameters. Specifically, the hidden
+layer activations can be computed by the following,
+\begin{align*}
+    \vec{h}_i & = \sigma(\mat{W}_{:,1:i-1} \vec{x}_{1:i-1} + \vec{b}) \\
+    \hat{x}_i & = \sigma\lft(\mat{V}_{i,:} \vec{h}_i + c_i\rgt).
+\end{align*}
+The advantage of shared parameters is that the total number of parameters gets reduced from
+$\bigo{n^2 d}$ to $\bigo{nd}$, and the hidden unit activations can be evaluated in $\bigo{nd}$
+by using an alternative recursive definition,
+\begin{align*}
+    \vec{a}_0     & = \vec{0}                              \\
+    \vec{a}_{i+1} & = \vec{a}_i + \mat{W}_{:,i} x_i        \\
+    \vec{h}_i     & = \sigma\lft(\vec{a}_i + \vec{b}\rgt).
+\end{align*}
+
+Since NADE is a model for binary data, $\hat{x} \in [0,1]$ is the probability $p(x_i \mid
+    \vec{x}_{1:i-1})$ at each timestep $i$. NADE is trained by maximizing the average log-likelihood,
+\begin{align*}
+    \frac{1}{T} \sum_{t=1}^{T} \log p(\vec{x}^{t}) & = \frac{1}{T} \sum_{t=1}^{T} \log \prod_{i=1}^n p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt)                                                                                            \\
+                                                   & = \frac{1}{T} \sum_{t=1}^{T} \sum_{i=1}^n \log p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt). \margintag{Thus, we optimize the log-likelihood exactly, which was not possible for VAEs.}
+\end{align*}
+
+During training, a \textit{teacher forcing} approach is used, where the ground truth values of
+pixels are used for conditioning, rather than the predicted ones. This leads to more stable
+training. However, at inference time we use the predicted value, since we do not have access to the
+ground truth.
+
+\subsection{Masked autoencoder distribution estimation}
+
+The idea behind \textit{masked autoencoder distribution estimation} (MADE) \citep{germain2015made}
+is to construct an autoencoder which fulfills the autoregressive property, such that its outputs
+can be used as conditionals. In order to achieve this, no computational path between output unit
+$\hat{x}_{k+1}$ and any of the input units $x_{k+1}, \ldots, x_n$ may exist. This has the result
+that $\hat{x}_{k+1}$ is only conditioned on $\vec{x}_{1:k}$, relative to the ordering.
+
+The way to do this is to first assign a number from $1$ to $n$ to each input unit $x_i$, which we
+call the ordering. Then, for each hidden unit, uniformly sample an integer $m$, between $1$ and
+$n-1$. In the hidden layers, we then only allow units in layer $\ell$ to propagate to units in
+layer $\ell+1$ with higher or equal value. Finally, we allow connections between the last hidden
+layer and the output only to units with value that is strictly greater. Let $m^{(\ell)}(k)$ be the
+value assigned to the $k$-th element of layer $\ell$, then these constraints can be encoded in mask
+matrices,
+\begin{align*}
+    \mat{M}^{\mat{W^{(\ell)}}}_{ij} & = \mathbb{1}\lft\{ m^{(\ell-1)}(j) \leq m^{(\ell)}(i) \rgt\} \\
+    \mat{M}^{\mat{V}}_{ij}          & = \mathbb{1}\lft\{ m^{(\ell-1)}(j) < m^{(\ell)}(i) \rgt\}.
+\end{align*}
+Then, we alter the weight matrices by
+\begin{align*}
+    \bar{\mat{W}}^{(\ell)} & = \mat{W}^{(\ell)} \odot \mat{M}^{\mat{W^{(\ell)}}} \\
+    \bar{\mat{V}}          & = \mat{V} \odot \mat{M}^{\mat{V}},
+\end{align*}
+and use those instead.
+
+\begin{marginfigure}[-7cm]
+    \centering
+    \incfig{made-masking}
+    \caption{MADE masking with $n=3$.}
+    \label{fig:made-masking}
+\end{marginfigure}
+
+However, a problem with this approach is that it requires very large hidden layers to retain
+expressivity.
+
+\subsection{Generating images}
+
+\paragraph{Pixel-RNN.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{pixel-rnn}
+    \caption{Pixel-RNN generation process.}
+    \label{fig:pixel-rnn}
+\end{marginfigure}
+
+The idea behind \textit{Pixel-RNN} \citep{van2016pixel} is to generate image pixels starting from
+the corner and modeling the dependency on previous pixels using an RNN. In particular, a pixel
+value is dependent on its top-left neighboring pixels and the RNNs hidden state; see
+\Cref{fig:pixel-rnn}. However, the problem with this approach is that the generation of new pixels
+depends on the hidden state, making the generation process sequential, and thus slow.
+
+\paragraph{Pixel-CNN.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{pixel-cnn}
+    \caption{Pixel-CNN generation process. The black pixel depends explicitly on the yellow pixels,
+        where the thick-lined pixels denote the masked convolutional layer. The black pixel should
+        also depend on the gray pixels, but it does not due to the way the stacked masked
+        convolutions work; a blind spot.}
+    \label{fig:pixel-cnn}
+\end{marginfigure}
+
+We can solve the problem of Pixel-RNN by assuming that pixel values only depend on a context region
+around the pixel. This is exactly what the \textit{Pixel-CNN} does \citep{van2016pixel}. This
+allows for parallelization during training, because the context region values are known during
+training.\sidenote{However, we still have to sequentially predict every token during inference, but
+    this is an issue with all autoregressive models.} Just as Pixel-RNN, it starts from the top-left
+corner, but it models the dependencies with a CNN. During training, we need to make sure that only
+the previously generated pixels are used for prediction of the next, thus we need a mask that masks
+out all unknown pixel values. However, stacking layers of masked convolutions creates a blind spot
+in the convolution; see \Cref{fig:pixel-cnn}. The solution to this is to combine horizontal and
+vertical stacks of convolutions \citep{van2016conditional}. The former conditions on the row so
+far, while the latter conditions on all rows above. The final output is obtained by summing the two
+outputs.
+
+To enforce the autoregressive property, the model also needs to go over the color channels in an
+autoregressive manner. Thus the conditional probability is expressed as \[
+    p(\vec{x}_i \mid \vec{x}_{1:i-1}) = p(x_{i,\mathrm{R}} \mid \vec{x}_{1:i-1}) p(x_{i,\mathrm{G}} \mid \vec{x}_{1:i-1}, x_{i,\mathrm{R}}) p(x_{i,\mathrm{B}} \mid \vec{x}_{1:i-1}, x_{i,\mathrm{R}}, x_{i,\mathrm{G}}).
+\]
+
+\subsection{Generating audio}
+
+\begin{marginfigure}
+    \centering
+    \incfig{dilated-convolutions}
+    \caption{Stacked dilated convolutional layers in WaveNet.}
+    \label{fig:dilated-convolutions}
+\end{marginfigure}
+
+\textit{WaveNet} \citep{oord2016wavenet} adapts the Pixel-CNN framework for audio data. However,
+audio typically has much longer time horizons, since they consist of 16000 samples per second. To be
+able to capture these long-term dependencies efficiently, WaveNet incorporates \textit{dilated
+    convolutions} \citep{yu2016multiscale}. This allows for an exponential increase in the receptive
+field. In dilated convolutions, the filter is applied with gaps between the filter elements. WaveNet
+increases the dilation factor as we go up in the layers to attain an exponential receptive field; see
+\Cref{fig:dilated-convolutions}.
+
+\subsection{Variational RNN}
+
+RNNs can also be used to generate sequences by sampling $\vec{h}^{(0)}$ and then sequentially
+predicting the next element, and updating the hidden state. However, the generation of new
+sequences is very slow, because of the sequential nature of the generation process. Another
+limitation of vanilla RNNs is that their structure is entirely deterministic and thus limited in
+expressive power.
+
+The \textit{variational RNN} \citep{chung2015recurrent} (VRNN) is a recurrent version of the VAE. A
+different VAE is used at each timestep. However, the VAEs are not the same as we have seen. In
+particular, the prior distribution is no longer a standard Gaussian, but follows the distribution
+$\mathcal{N}\lft(\vec{\mu}_0^{(t)}, \mathrm{diag}\lft(\vec{\sigma}_0^{(t)}\rgt)\rgt)$, where
+$\lft(\vec{\mu}_0^{(t)}, \vec{\sigma}_0^{(t)}\rgt)$ is predicted by the network
+$\phi_{\mathrm{prior}}\lft(\vec{h}^{(t)}\rgt)$ based on the hidden state of the RNN at each
+timestep. This introduces randomness to the generation.
+
+The \textit{conditional VRNN} (C-VRNN) is an extension to the VRNN, where we can condition on \eg
+style or, in the case of MNIST, which digit should be generated. During training, the model
+predicts the conditional variable, called the posterior, and hidden state from the input
+$\vec{x}^{(t)}$. From the hidden state it also predicts the conditional variable, called the prior.
+It then minimizes the reconstruction error from the style variable, and the KL divergence between
+prior and posterior. During inference, it only uses the priors for next token prediction, predicted
+from the hidden state, since it does not have access to $\vec{x}^{(t)}$. Then, given the predicted
+token, it predicts the posterior conditional variables, which are used to predict the next hidden
+state $\vec{h}^{(t+1)}$.
+
+\subsection{Transformers}
+
+Transformers \citep{vaswani2017attention} are used in nearly all the state-of-the-art models at the
+moment. At the basis of transformers lies the self-attention mechanism, where we extract key,
+value, and query representations from the input. These are then used in a soft-lookup mechanism,
+where the query and key values decide how much attention is paid to the values.\sidenote{Note the
+    parallel with dictionaries in programming languages, which use a hard-lookup.}
+
+It computes the keys, values, and queries by
+\begin{align*}
+    \mat{K} & = \mat{X} \mat{W}_K  \\
+    \mat{V} & = \mat{X} \mat{W}_V  \\
+    \mat{Q} & = \mat{X} \mat{W}_Q,
+\end{align*}
+where $\mat{X} \in \R^{n\times d}$ and $\mat{W}_K,\mat{W}_V,\mat{W}_Q \in \R^{d\times d}$. Now, we have
+key, value, and query representations of the input that are all in $\R^{n \times d}$. Then, we can
+compute the output by \[
+    \mat{Y} = \mathrm{softmax}\lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d}} \rgt) \mat{V}.
+\]
+Intuitively, the softmax computes how much ``attention'' should be given to each of the previous
+timesteps by outputting a probability distribution over timesteps.
+
+Since $\mat{Y} \in \R^{n \times d}$ is of the same dimensionality as $\mat{X}$, we can stack
+self-attention layers. This is the basis of the transformer architecture. However, this does not
+respect the autoregressive property, thus we need to use a mask $\mat{M}$ to prevent the model from
+accessing future timesteps, where \[
+    \mat{M} = \begin{bmatrix}
+        -\infty & -\infty & \cdots & -\infty \\
+        0       & -\infty & \cdots & -\infty \\
+        \vdots  & \vdots  & \ddots & \vdots  \\
+        0       & 0       & \cdots & -\infty
+    \end{bmatrix}.
+\]
+Then, the attention computation becomes \[
+    \mat{Y} = \mathrm{softmax}\lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d}} + \mat{M} \rgt) \mat{V}.
+\]
+
+The computational complexity of self-attention is $\bigo{n^2 d}$, which is quite high for large
+inputs, such as audio and images. But, we gain a maximum path length of $\bigo{1}$ to any of the
+previous timesteps, making sure that no information gets ``forgotten'', and it allows for easy
+error propagation during training, in contrast to RNNs.

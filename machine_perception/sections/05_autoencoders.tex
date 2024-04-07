@@ -96,7 +96,8 @@ $q_{\vec{\phi}}(\vec{z}\mid \vec{x})$, which is computed by the encoder. We can 
                     & \geq \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - D_{\mathrm{KL}}(q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z})). \margintag{KL-divergence is non-negative.}
 \end{align*}
 The first term of the ELBO encourages low reconstruction error, while the second term makes sure that
-the approximate posterior $q_{\vec{\phi}}$ does not deviate too far from the prior $p$.
+the approximate posterior $q_{\vec{\phi}}$ does not deviate too far from the prior $p$. The second
+term can be computed in a closed-form, since both arguments are Gaussian.
 
 A minor problem is that, during training, we cannot compute the derivative of expectations \wrt the
 parameters that we wish to optimize. Thus, we must use the \textit{reparametrization trick}, which
