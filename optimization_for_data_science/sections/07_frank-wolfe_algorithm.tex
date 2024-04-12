@@ -1,0 +1,272 @@
+\section{The Frank-Wolfe algorithm}
+
+\begin{marginfigure}
+    \centering
+    \incfig{frank-wolfe}
+    \caption{Illustration of a Frank-Wolfe step.}
+    \label{fig:frank-wolfe}
+\end{marginfigure}
+
+Projected gradient descent is the only algorithm we have seen that dealt with constrained
+optimization problems. However, that algorithm came with the clear disadvantage that projections
+can be very expensive, even when $\mathcal{X}$ is convex. The Frank-Wolfe algorithm solves
+constrained optimization problems without projection steps. Instead, it makes use of a
+\textit{linear minimization oracle} (LMO). For the feasible region $\mathcal{X} \subseteq
+    \mathcal{R}^d$ and an arbitrary vector $\vec{g} \in R^d$,\sidenote{$\vec{g}$ can be thought of as
+    an ``optimization direction''.} \[
+    \mathrm{LMO}_{\mathcal{X}}(\vec{g}) \doteq \argmin_{\vec{z} \in \mathcal{X}} \transpose{\vec{g}} \vec{z}.
+\]
+Notice that this is the minimization of a linear function.
+
+The Frank-Wolfe algorithm iteratively updates by calling the oracle in the direction of the
+gradient,
+\begin{align*}
+    \vec{s}       & \doteq \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})                              \\
+    \vec{x}_{t+1} & \doteq (1- \gamma_t) \vec{x}_t + \gamma_t \vec{s}. \margintag{Move toward minimizer.}
+\end{align*}
+
+The algorithm reduces non-linear constrained optimization to linear optimization over the same set
+$\mathcal{X}$; it is able to solve general non-linear constrained optimization problems by only
+solving a simpler linear constrained optimization over the same set $\mathcal{X}$ in each
+iteration, by calling the oracle. We solve this linear optimization problem in the direction of the
+gradient, since that is the best linear approximation of $f$ at $\vec{x}_t$.
+
+A nice property of the oracle is that if $\mathcal{X} = \mathrm{conv}(\mathcal{A})$, then
+$\mathrm{LMO}_{\mathcal{X}}(\vec{x}) \in \mathcal{A}$. So, if we have a set $\mathcal{X}$ that is
+the convex hull of a small number of points, such as the $\ell_1$-ball, we have an easy
+optimization problem with runtime $\bigo{|\mathcal{A}|}.$
+
+The advantages of this method are
+\begin{itemize}
+    \item Iterates are always feasible if $\mathcal{X}$ is convex;
+    \item No projections, which are often harder to compute than linear optimization problems;
+    \item Iterates always have a simple sparse representations: $\vec{x}_t$ is a convex combination of
+          $\vec{x}_0$ and all $\vec{s}$ used so far.
+\end{itemize}
+
+\subsection{Linear minimization oracles}
+
+\paragraph{LASSO.}
+
+The LASSO problem in its standard form is given by \[
+    \begin{aligned}
+         & \text{minimize}   &  & \| \mat{A} \vec{x} - \vec{b} \|^2 \\
+         & \text{subject to} &  & \| \vec{x} \|_1 \leq 1.
+    \end{aligned}
+\]
+The constraint set $\mathcal{X} = \{ \vec{x} \in \R^d \mid \| \vec{x} \|_1 \leq 1 \}$ is the unit
+$\ell_1$-ball. This is the convex hull of the unit basis vectors; $\mathcal{X} = \mathrm{conv}(\{
+    \pm \vec{e}_1, \ldots, \pm \vec{e}_d \})$. The LMO for this set is easy to compute,
+\begin{align*}
+    \mathrm{LMO}_{\mathcal{X}}(\vec{g}) & = \argmin_{\vec{z}\in \mathcal{X}} \transpose{\vec{z}} \vec{g}                                 \\
+                                        & = \argmin_{\vec{z} \in \{ \pm \vec{e}_1, \ldots, \pm \vec{e}_d \}} \transpose{\vec{z}} \vec{g} \\
+                                        & = -\mathrm{sign}(g_i) \vec{e}_i, \quad i \doteq \argmax_{i \in [d]} |g_i|.
+\end{align*}
+So, we only have to identify $\vec{g}$'s largest coordinate, which is much more efficient than
+projection onto an $\ell_1$-ball.
+
+\subsection{Duality gap}
+
+We define the duality gap of $\vec{x} \in \mathcal{X}$ as \[
+    g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s}), \quad \vec{s} \doteq \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x})}{}).
+\]
+This can be interpreted as the optimality gap $\transpose{\grad{f(\vec{x})}{}} \vec{x} -
+    \transpose{\grad{f(\vec{x})}{}} \vec{s}$ of the linear subproblem.
+
+\begin{lemma}
+    Suppose that the constrained minimization problem has a minimizer $\vec{x}^\star$. Let $\vec{x} \in \mathcal{X}$, then \[
+        g(\vec{x}) \geq f(\vec{x}) - f(\vec{x}^\star),
+    \]
+    meaning that the duality gap is an upper bound for the optimality gap.
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        g(\vec{x}) & = \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})                                                                                                                                                    \\
+                   & \geq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \margintag{$\vec{s}$ is the minimizer of $f(\vec{z}) \doteq \transpose{\grad{f(\vec{x})}{}} \vec{z}$.}                                    \\
+                   & \geq f(\vec{x}) - f(\vec{x}^\star). \margintag{First-order characterization of convexity: $f(\vec{y}) \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}), \forall \vec{x}, \vec{y}$.}
+    \end{align*}
+\end{proof}
+
+Thus, we always have a computable upper bound $g(\vec{x}_t)$ on the unknown error $f(\vec{x}_t) -
+    f(\vec{x}^\star)$, which is not the case in general for \textit{unconstrained} optimization.
+Furthermore, at an optimal point $\vec{x}^\star$, $g(\vec{x}^\star) = 0$, which follows from the
+optimality conditions for constrained convex
+optimization.\sidenote{$\transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \geq 0, \forall
+        \vec{x} \in \mathcal{X}$.}
+
+\subsection{Convergence analysis}
+
+To prove convergence, we need the following descent lemma,
+
+\begin{lemma}
+    \label{lem:fw-descent}
+
+    For a step $\vec{x}_{t+1} \doteq \vec{x}_t + \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize
+    $\gamma_t \in [0,1]$, it holds that \[
+        f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
+    \]
+    where $\vec{s} = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})$.
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        f(\vec{x}_{t+1}) & = f(\vec{x}_t + \gamma_t(\vec{s} - \vec{x}_t))                                                                                                                                                                                                                                               \\
+                         & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \gamma_t (\vec{s} - \vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2 \margintag{Smoothness: $f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}}(\vec{y} - \vec{x}) + \frac{L}{2} \| \vec{x} - \vec{y} \|^2$.} \\
+                         & = f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2. \margintag{Duality gap: $g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})$.}
+    \end{align*}
+\end{proof}
+
+Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
+
+\begin{theorem}
+    Consider the constrained minimization problem where $f: \R^d \to \R$ is convex and smooth with
+    parameter $L$, and $\mathcal{X}$ is convex, closed and bounded. (This means that the minimizer
+    $\vec{x}^\star$ of $f$ over $\mathcal{X}$ exists and that all minimization oracles have
+    minimizers.) With any $\vec{x}_0 \in \mathcal{X}$ and stepsizes \[
+        \gamma_t \doteq \frac{2}{t+2},
+    \]
+    the Frank-Wolfe algorithm yields \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{2L}{T+1} \mathrm{diam}(\mathcal{X})^2,
+    \]
+    where $\mathrm{diam}(\vec{x}) \doteq \max_{\vec{x},\vec{y}\in \mathcal{X}} \| \vec{x} - \vec{y} \|$
+    is the diameter of $\mathcal{X}$.
+\end{theorem}
+
+\begin{proof}
+    Let $h(\vec{x}) \doteq f(\vec{x}) - f(\vec{x}^\star)$ and $C \doteq \frac{L}{2} \mathrm{diam}(\mathcal{X})^2$.
+    \begin{align*}
+        f(\vec{x}_{t+1}) - f(\vec{x}^\star) & \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2 - f(\vec{x}^\star) \margintag{\Cref{lem:fw-descent} and subtract $f(\vec{x}^\star)$ from both sides.} \\
+        h(\vec{x}_{t+1})                    & \leq h(\vec{x}_t) - \gamma_t h(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2 \margintag{Duality gap, $g(\vec{x}) \geq h(\vec{x})$.}                                                \\
+                                            & = (1- \gamma_t) h(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2                                                                                                                    \\
+                                            & \leq (1- \gamma_t) h(\vec{x}_t) + \gamma_t^2 C.
+    \end{align*}
+
+    Using our new definitions, we want to prove \[
+        h(\vec{x}_T) \leq \frac{4C}{T+1}, \quad T \geq 1.
+    \]
+    We can prove this by induction. The base case is $T = 1$,
+    \begin{align*}
+        h(\vec{x}_1) & \leq (1- \gamma_0) h(\vec{x}_0) + \gamma_0^2 C \\
+                     & = C \margintag{$\gamma_0 = 1$.}                \\
+                     & \leq 2C.
+    \end{align*}
+    Suppose it holds for $T = k$, \[
+        h(\vec{x}_k) \leq \frac{4C}{k+1}.
+    \]
+    then we need to show that it also holds for $T = k+1$,
+    \begin{align*}
+        h(\vec{x}_{k+1}) & \leq (1-\gamma_k) h(\vec{x}_k) + \gamma_k^2 C                                                                                                    \\
+                         & \leq \lft( 1 - \frac{2}{k+2} \rgt) \frac{4C}{k+1} + \lft( \frac{2}{k+2} \rgt)^2 C \margintag{Induction step and $\gamma_k = \nicefrac{2}{k+2}$.} \\
+                         & = \frac{k}{k+2} \frac{4C}{k+1} + \frac{4}{(k+2)^2} C                                                                                             \\
+                         & = \frac{4C}{k+2} \lft( \frac{k}{k+1} + \frac{1}{k+2} \rgt)                                                                                       \\
+                         & \leq \frac{4C}{k+2}.
+    \end{align*}
+    Thus, it holds for all $T \geq 1$.
+\end{proof}
+
+\paragraph{Affine invariance.}
+
+Consider the problem of minimizing $f(x_1, x_2) \doteq x_1^2 + x_2^2$ over the unit square
+$\mathcal{X} = \{ [x_1,x_2] \mid 0 \leq x_1 \leq 1, 0 \leq x2 \leq 1 \}$. This function is smooth
+with $L=2$ and $\mathrm{diam}(\mathcal{X})^2 = 2$. This has the following error bound, \[
+    f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{8}{T+1}.
+\]
+Next consider $f'(x_1, x_2) \doteq x_1^2 + (10x_2)^2$ over the rectangle $\mathcal{X}'' = \{ [x_1,
+            x_2] \mid 0 \leq x_1 \leq 1, 0\leq x_2 \leq \nicefrac{1}{10} \}$. This function is smooth with $L'
+    = 200$ and $\mathrm{diam}(\mathcal{X}')^2 = 1 + \nicefrac{1}{100}$. Thus, $f'$ has the error bound \[
+    f'(\vec{x}_T) - f'(\vec{x}^\star) \leq \frac{404}{T+1}.
+\]
+Hence, according to our analysis, it seems that the error of the Frank-Wolfe algorithm on $f'$ over
+$\mathcal{X}'$ is roughly 50 times larger than on $f$ over $\mathcal{X}$.
+
+However, when we look more closely at the function, the two problems $(f,\mathcal{X})$ and
+$(f',\mathcal{X}')$ are equivalent under a rescaling of $x_2$. The Frank-Wolfe algorithm is
+invariant under affine transformations, thus there should be no difference in the analysis of the
+two considered problems.
+
+Formally, two problems $(f, \mathcal{X})$ and $(f', \mathcal{X}')$ are \textit{affinely equivalent}
+if $f'(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$ and $\mathcal{X}' = \{ \inv{\mat{A}}(\vec{x} -
+    \vec{b}) \mid \vec{x} \in \mathcal{X} \}$ for some invertible matrix $\mat{A}$ and some vector
+$\vec{b}$. The consequence is that $f(\vec{x}) = f'(\vec{x}')$ if $\vec{x}' = \inv{\mat{A}}
+    (\vec{x} - \vec{b})$.\sidenote{In our example problem, this means that we have \[
+        \mat{A} = \begin{bmatrix} 1 & 0 \\ 0 & 10 \end{bmatrix}, \quad \vec{b} = \vec{0}.
+    \]}
+
+By the chain rule, we get \[
+    \grad{f'(\vec{x}')}{} = \transpose{\mat{A}} \grad{f(\mat{A} \vec{x}' + \vec{b})}{} = \transpose{\mat{A}} f(\vec{x}).
+\]
+
+Consider the iterate $\vec{x}_k$ and its corresponding iterate $\vec{x}'_k = \inv{\mat{A}}
+    (\vec{x}_k - \vec{b})$, in their respective problems. We can compute the their oracle calls by
+\begin{align*}
+    \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_k)}{})    & = \argmin_{\vec{z} \in \mathcal{X}} \transpose{\grad{f(\vec{x}_k)}{}} \vec{z}                                                                        \\
+                                                         & \doteq \vec{s}                                                                                                                                       \\
+    \mathrm{LMO}_{\mathcal{X}'}(\grad{f'(\vec{x}'_k)}{}) & = \argmin_{\vec{z}' \in \mathcal{X}'} \transpose{\grad{f'(\vec{x}'_k)}{}} \vec{z}'                                                                   \\
+                                                         & = \argmin_{\inv{\mat{A}} (\vec{z} - \vec{b}) \in \mathcal{X}'} \transpose{\grad{f(\vec{x}_k)}{}} \mat{A} \inv{\mat{A}} (\vec{z} - \vec{b})           \\
+                                                         & = \argmin_{\inv{\mat{A}} (\vec{z} - \vec{b}) \in \mathcal{X}'} \transpose{\grad{f(\vec{x}_k)}{}} \vec{z} - \transpose{\grad{f(\vec{x}_k)}{}} \vec{b} \\
+                                                         & = \inv{\mat{A}} \lft( \lft(\argmin_{\vec{z} \in \mathcal{X}} \transpose{\grad{f(\vec{x}_k)}{}} \vec{z}\rgt) - \vec{b} \rgt)                          \\
+                                                         & = \inv{\mat{A}} (\vec{s} - \vec{b}).
+\end{align*}
+Thus, the step directions $\vec{s}'$ and $\vec{s}$ also correspond to each other under the affine
+transformation. As a consequence, the next iterates will also correspond to each other,
+\begin{align*}
+    \vec{x}_{k+1}  & = (1- \gamma) \vec{x}_k + \gamma \vec{s}                                                     \\
+    \vec{x}'_{k+1} & = (1- \gamma) \vec{x}'_k + \gamma \vec{s}'                                                   \\
+                   & = (1- \gamma) \inv{\mat{A}} (\vec{x}_k - \vec{b}) + \gamma \inv{\mat{A}} (\vec{s} - \vec{b}) \\
+                   & = \inv{\mat{A}} ((1-\gamma)\vec{x}_k + \gamma \vec{s}) - \vec{b}                             \\
+                   & = \inv{\mat{A}} \vec{x}_{k+1} - \vec{b}.
+\end{align*}
+
+In particular, after any number of steps, both problems will incur the same optimization error.
+Thus, we need a better analysis that provides a bound that is invariant under affine
+transformations. For this, we define a \textit{curvature constant}, \[
+    C_{(f,\mathcal{X})} \doteq \sup_{\substack{\vec{x},\vec{s}\in \mathcal{X}, \gamma\in(0,1] \\ \vec{y} = (1-\gamma) \vec{x} + \gamma \vec{s})}} \frac{1}{\gamma^2} \lft( f(\vec{y}) - f(\vec{x}) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \rgt).
+\]
+This quantity serves as a notion of complexity of both the objective function $f$ and the
+constraint set $\mathcal{X}$. It is essentially the supremum of the normalized pointwise vertical
+distance between the graph of $f$, $f(\vec{y})$ and its linear approximation at $\vec{x}$,
+$f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x})$.
+
+\begin{theorem}
+    Consider the constrained minimization problem, where $f: \R^d \to \R$ is convex, and $\mathcal{X}$ is convex, closed and bounded. Let $C_{(f, \mathcal{X})}$ be the curvature constant of $f$ over $\mathcal{X}$. With any $\vec{x}_0 \in \mathcal{X}$ and with stepsizes \[
+        \gamma_t = \frac{2}{t+2},
+    \]
+    the Frank-Wolfe algorithm yields \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{4 C_{(f, \mathcal{X})}}{T+1}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    We can regain the descent lemma by rewriting the curvature constant. We know by the definition of the supremum, \[
+        \frac{1}{\gamma^2} \lft( f(\vec{y}) - f(\vec{x}) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \rgt) \leq C_{(f,\mathcal{X})}. \margintag{$\forall \vec{x},\vec{s}\in \mathcal{X}, \gamma \in (0,1], \vec{y} = (1-\gamma) \vec{x} + \gamma \vec{s}.$}
+    \]
+    Setting the variables, \[
+        \vec{x} \doteq \vec{x}_t, \quad \vec{y} \doteq \vec{x}_{t+1} = (1-\gamma_t) \vec{x}_t + \gamma_t \vec{s}, \quad \vec{y} - \vec{x} = -\gamma_t (\vec{x} - \vec{s}),
+    \]
+    we get
+    \begin{align*}
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (-\gamma_t (\vec{x} - \vec{s})) + \gamma_t^2 C_{(f, \mathcal{X})} \\
+                         & = f(\vec{x}_t) - \gamma g(\vec{x}_t) + \gamma_t^2 C_{(f, \mathcal{X})}.
+    \end{align*}
+    The rest of the proof follows as in the previous analysis.
+\end{proof}
+
+You might suspect that this bound is worse than the best bound obtainable from the previous
+analysis. However, one can show \[
+    C_{(f, \mathcal{X})} \leq \frac{L}{2} \mathrm{diam}(\mathcal{X})^2.
+\]
+
+Furthermore, we can prove a convergence of the duality gap.
+
+\begin{theorem}
+    Let $f: \R^d \to \R$, $\mathcal{X}$ convex with $C_{(f, \mathcal{X})} < \infty$, $\vec{x}_0
+        \in \mathcal{X}$, and $T \geq 2$. Then, choosing stepsize \[
+        \gamma_t = \frac{2}{t+2},
+    \]
+    the Frank-Wolfe algorithm yields a $t$ with $1 \leq t \leq T$, such that \[
+        g(\vec{x}_t) \leq \frac{\nicefrac{27}{2} \cdot C_{(f, \mathcal{X})}}{T+1}.
+    \]
+
+\end{theorem}
+
