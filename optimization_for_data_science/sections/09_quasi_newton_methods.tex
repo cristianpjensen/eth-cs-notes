@@ -1,0 +1,140 @@
+\section{Quasi-Newton methods}
+
+The problem with Newton's method is that it has a high computational complexity, due to the Hessian
+and inverse of it, which both have $\bigo{d^3}$ runtime complexity. \textit{Quasi-Newton methods}
+are optimization methods that approximate the Hessian by a matrix $\mat{H}_t \approx
+    \hess{f(\vec{x}_t)}{}$, which is a function of $\vec{x}_t$, $\vec{x}_{t-1}$, and $\mat{H}_{t-1}$.
+We then iteratively update by \[
+    \vec{x}_{t+1} \doteq \vec{x}_t - \inv{\mat{H}}_t \grad{f(\vec{x}_t)}{},
+\]
+where $\mat{H}_t \in \R^{d\times d}$ must be symmetric and satisfy the \textit{secant condition}, \[
+    \grad{f(\vec{x}_t)}{} - \grad{f(\vec{x}_{t-1})}{} = \mat{H}_t (\vec{x}_t - \vec{x}_{t-1}).
+\]
+In general, there are many matrices that satisfy these conditions. Thus, we must choose which
+$\inv{\mat{H}}_t$ to pick, based on $\vec{x}_{t-1}$, $\vec{x}_t$, and
+$\inv{\mat{H}}_t$.\sidenote{We directly work with $\inv{\mat{H}}_t$, instead of $\mat{H}_t$, since
+    computing the inverse would again result in a $\bigo{d^3}$ runtime complexity.}
+
+Recall from Newton's method that we wanted $\hess{f(\vec{x}_t)}{}$ to fluctuate very little in
+regions of fast convergence. Hence, in Quasi-Newton methods, it makes sense if $\inv{\mat{H}}_{t-1}
+    \approx \inv{\mat{H}}_t$. This intuition yields the approach by \cite{greenstadt1970variations},
+where we update $\inv{\mat{H}}_{t-1}$ by an error matrix $\mat{E}_t$, \[
+    \inv{\mat{H}}_t = \inv{\mat{H}}_{t-1} + \mat{E}_t,
+\]
+and we want this error to be as small as possible, \ie minimize $\| \mat{E} \|_F^2$, subject to its
+constraints. \cite{greenstadt1970variations} found this method ``too specialized'', which lead him
+to minimize the following error term instead, \[
+    \| \mat{A} \mat{E} \transpose{\mat{A}} \|_F^2,
+\]
+where $\mat{A} \in \R^{d\times d}$ is a fixed invertible transformation matrix.
+
+Let's now use the following notation to develop further algorithms,
+\begin{align*}
+    \mat{H}      & \doteq \inv{\mat{H}}_{t-1}                               \\
+    \mat{H}'     & \doteq \inv{\mat{H}}_t                                   \\
+    \mat{E}      & \doteq \mat{E}_t                                         \\
+    \vec{\sigma} & \doteq \vec{x}_t - \vec{x}_{t-1}                         \\
+    \vec{y}      & \doteq \grad{f(\vec{x}_t)}{} - \grad{f(\vec{x}_{t-1})}{} \\
+    \vec{r}      & \doteq \vec{\sigma} - \mat{H} \vec{y}.
+\end{align*}
+We then have the following convex constrained minimization problem in $d^2$ variables, \[
+    \begin{aligned}
+         & \text{minimize}   &  & \frac{1}{2} \| \mat{A} \mat{E} \transpose{\mat{A}} \|_F^2 \\
+         & \text{subject to} &  & \mat{E} \vec{y} = \vec{r}                                 \\
+         &                   &  & \transpose{\mat{E}} - \mat{E} = \mat{0},
+    \end{aligned}
+\]
+where the first condition is the secant condition, \[
+    \mat{H}' \vec{y} = \vec{\sigma} \Leftrightarrow (\mat{H} + \mat{E}) \vec{y} = \vec{\sigma} \Leftrightarrow \mat{E}\vec{y} = \vec{\sigma} - \mat{H}\vec{y} \Leftrightarrow \mat{E} \vec{y} = \vec{r},
+\]
+and the second condition ensures symmetry, since if $\inv{\mat{H}}_{t-1}$ and $\mat{E}_t$ are
+symmetric, then $\inv{\mat{H}}_t$ is as well.
+
+Let \[
+    f(\mat{E}) = \frac{1}{2} \| \mat{A} \mat{E} \transpose{\mat{A}} \|_F^2.
+\]
+Because the conditions are all linear, we can summarize them in one equation as $\mat{C} \vec{E} =
+    \mat{B}$ for some matrices $\mat{C}$ and $\mat{B}$. Furthermore, due to this convex program only
+having equality constraints, the Slater point condition for strong duality becomes void. Thus, we
+obtain strong duality ``for free''. Thus, the Karush-Kuhn-Tucker conditions hold, which imply there
+exists a vector $\vec{\lambda}\in \R^m$ such that \[
+    \transpose{\grad{f(\vec{E}^\star)}{}} = \transpose{\vec{\lambda}} \mat{C}. \margintag{Directly follows from the vanishing gradient condition in KTT.}
+\]
+
+Let $\mat{W} = \transpose{\mat{A}} \mat{A}$ and $\mat{M} = \inv{\mat{W}}$, then the gradient of $f$
+can be computed by \[
+    \grad{f(\mat{E})}{} = \transpose{\mat{A}} \mat{A} \mat{E} \transpose{\mat{A}} \mat{A} = \mat{W} \mat{E} \mat{W} = \inv{\mat{M}} \mat{E} \inv{\mat{M}}.
+\]
+
+Now, since the objective is quadratic, we can obtain the minimizer $\vec{x}^\star$ and the Lagrange
+multipliers $\vec{\lambda}$ by solving the following system of linear equations,
+\begin{align*}
+    \mat{C} \mat{E} & = \mat{B}                                                                    \\
+    \mat{E}         & = \transpose{\mat{M}} \transpose{\vec{\lambda}} \mat{C} \transpose{\mat{M}}.
+\end{align*}
+Solving this system yields
+\begin{align*}
+    \mat{E}^\star = \frac{1}{\transpose{\vec{y}} \mat{M} \vec{y}} \Big( \vec{\sigma} \transpose{\vec{y}} \mat{M} + \mat{M} \vec{y} \transpose{\vec{\sigma}} - \mat{H} \vec{y} \transpose{\vec{y}} \mat{M} - \mat{M} \vec{y} \transpose{\vec{y}} \mat{H} \quad & \\
+    - \frac{1}{\transpose{\vec{y}} \mat{M} \vec{y}} \lft( \transpose{\vec{y}} \vec{\sigma} - \transpose{\vec{y}} \mat{H} \vec{y} \rgt) \mat{M} \vec{y} \transpose{\vec{y}} \mat{M} \Big).                                                                     &
+\end{align*}
+This is called the \textit{Greenstadt method} with parameter $\mat{M}$.
+
+Now, we need to decide which $\mat{M}$ to use. \cite{greenstadt1970variations} suggested $\mat{M} =
+    \mat{I}$ and $\mat{M} = \mat{H} \doteq \inv{\mat{H}}_{t-1}$. \cite{goldfarb1970family} suggested
+$\mat{M} = \mat{H}' \doteq \inv{\mat{H}}_t$. Because of the secant condition, we get the following, \[
+    \mat{M} \vec{y} = \mat{H}' \vec{y} = \vec{\sigma}.
+\]
+Hence, despite not knowing this value yet, we can still use it, since it will cancel out all terms,
+containing $\mat{M} = \mat{H}'$. This is called the \textit{BFGS method}, and the optimal error
+matrix becomes \[
+    \mat{E}^\star = \frac{1}{\transpose{\vec{y}} \vec{\sigma}} \lft( - \mat{H} \vec{y} \transpose{\vec{\sigma}} - \vec{\sigma} \transpose{\vec{y}} \mat{H} + \lft( 1 + \frac{\transpose{\vec{y}} \mat{H} \vec{y}}{\transpose{\vec{y}} \vec{\sigma}} \rgt) \vec{\sigma} \transpose{\vec{\sigma}} \rgt).
+\]
+With this error matrix, we get the following update, \[
+    \mat{H}' = \lft( \mat{I} - \frac{\vec{\sigma} \transpose{\vec{y}}}{\transpose{\vec{y}}\vec{\sigma}} \rgt) \mat{H} \lft( \mat{I} - \frac{\vec{y} \transpose{\vec{\sigma}}}{\transpose{\vec{y}} \vec{\sigma}} \rgt) + \frac{\vec{\sigma} \transpose{\vec{\sigma}}}{\transpose{\vec{y}} \vec{\sigma}}.
+\]
+The cost per step of this algorithm is $\bigo{d^2}$, which is a big upgrade over $\bigo{d^3}$ that
+we had for Newton's method. However, we can make it even faster by making another approximation,
+which will yield the \textit{L-BFGS} algorithm.
+
+Recall the Quasi-Newton update step, \[
+    \vec{x}_{t+1} \doteq \vec{x}_t - \inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}.
+\]
+Observe that we do not necessarily need the $d \times d$ matrix $\inv{\mat{H}}_t$; we only need the
+$d$-dimensional vector $\inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}$. Let $\vec{g}' \in \R^d$. Suppose
+that we have an oracle to compute $\vec{s} = \mat{H} \vec{g}$ for any vector $\vec{g}$, then we can
+compute $\vec{s}' = \mat{H}' \vec{g}'$ with one oracle call and $\bigo{d}$ additional operations,
+assuming that $\vec{y}$ and $\vec{\sigma}$ are known.
+
+We can implement the oracle recursively,
+\begin{align*}
+    \vec{\sigma}_k & \doteq \vec{x}_k - \vec{x}_{k-1}                          \\
+    \vec{y}_k      & \doteq \grad{f(\vec{x}_k)}{} - \grad{f(\vec{x}_{k+1})}{}.
+\end{align*}
+This allows us to compute the BFGS-step $\inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}$ recursively. However,
+this would result in $\bigo{td}$ runtime complexity per step, since we would have to go down all
+steps, and generally $t > d$. Thus, we have a worse algorithm if we want to compute the next vector
+exactly. But, if we only go down $m$ steps of recursion for some small $m$, we get $\bigo{md}$
+complexity, which is linear if $m$ is constant; see \Cref{alg:l-bfgs}. Intuitively, this should give
+a good approximation, since the earlier steps should not be so relevant anymore, since we are likely
+in a different landscape at the current timestep.
+
+\begin{algorithm}
+    \begin{algorithmic}
+        \Function{L-BFGS-Step}{$k,\ell,\vec{g}'$}
+        \If{$\ell = 0$}
+        \State \Return $\inv{\mat{H}}_0 \vec{g}'$
+        \EndIf
+
+        \State $\vec{h} = \vec{\sigma} \frac{\transpose{\vec{\sigma}_k} \vec{g}'}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
+        \State $\vec{g} = \vec{g}' - \vec{y} \frac{\transpose{\vec{\sigma}_k} \vec{g}'}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
+        \State $\vec{s} = \Call{L-BFGS-Step}{k-1, \ell - 1, \vec{g}}$
+        \State $\vec{w} = \vec{s} - \vec{\sigma}_k \frac{\transpose{\vec{y}_k} \vec{s}}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
+        \State $\vec{z} = \vec{w} + \vec{h}$
+
+        \State \Return $\vec{z}$
+        \EndFunction
+    \end{algorithmic}
+    \caption{The L-BFGS algorithm. The outer products can be computed as inner products, giving $\bigo{d}$ runtime complexity to all the products.}
+    \label{alg:l-bfgs}
+\end{algorithm}
+
