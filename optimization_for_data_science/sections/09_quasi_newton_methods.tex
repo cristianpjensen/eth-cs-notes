@@ -120,14 +120,14 @@ in a different landscape at the current timestep.
 
 \begin{algorithm}
     \begin{algorithmic}
-        \Function{L-BFGS-Step}{$k,\ell,\vec{g}'$}
+        \Function{LBFGSStep}{$k,\ell,\vec{g}'$}
         \If{$\ell = 0$}
         \State \Return $\inv{\mat{H}}_0 \vec{g}'$
         \EndIf
 
         \State $\vec{h} = \vec{\sigma} \frac{\transpose{\vec{\sigma}_k} \vec{g}'}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
         \State $\vec{g} = \vec{g}' - \vec{y} \frac{\transpose{\vec{\sigma}_k} \vec{g}'}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
-        \State $\vec{s} = \Call{L-BFGS-Step}{k-1, \ell - 1, \vec{g}}$
+        \State $\vec{s} = \Call{LBFGSStep}{k-1, \ell - 1, \vec{g}}$
         \State $\vec{w} = \vec{s} - \vec{\sigma}_k \frac{\transpose{\vec{y}_k} \vec{s}}{\transpose{\vec{y}_k} \vec{\sigma}_k}$
         \State $\vec{z} = \vec{w} + \vec{h}$
 
