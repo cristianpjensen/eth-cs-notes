@@ -1,0 +1,76 @@
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'coupling-layer.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{180bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.55555556)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{coupling-layer.pdf}}%
+    \put(0.05910015,0.2656318){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{coupling-layer.pdf}}%
+    \put(0.90408135,0.2656318){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{y}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{coupling-layer.pdf}}%
+    \put(0.24844887,0.47782819){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}_A$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{coupling-layer.pdf}}%
+    \put(0.2488107,0.05343544){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}_B$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{coupling-layer.pdf}}%
+    \put(0.67883987,0.47782818){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{y}_A$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{coupling-layer.pdf}}%
+    \put(0.67920169,0.05343542){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{y}_B$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{coupling-layer.pdf}}%
+    \put(0.06305484,0.39763096){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\textit{split}\end{tabular}}}}%
+    \put(0.84316425,0.39763096){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\textit{merge}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{coupling-layer.pdf}}%
+    \put(0.48594447,0.47824435){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$h$\end{tabular}}}}%
+    \put(0.37586121,0.26358714){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\beta$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{coupling-layer.pdf}}%
+  \end{picture}%
+\endgroup%

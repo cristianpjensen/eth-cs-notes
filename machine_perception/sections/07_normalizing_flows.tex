@@ -1,0 +1,131 @@
+\section{Normalizing flows}
+
+As we have seen, VAEs learn meaningful representation through latent variables, but they suffer
+from intractable marginal likelihoods. On the other hand, autoregressive models have a tractable
+likelihood, but lack a latent space and direct feature learning mechanism. \textit{Normalizing
+    flows} \citep{rezende2015variational} try to have the best of both worlds; meaningful latent space
+and a tractable likelihood. They achieve this by leveraging the change of variable technique of
+integration.
+
+\subsection{Change of variables}
+
+In the one-dimensional, integration by substitution works as follows. Let $g: [a,b] \to I$ be a
+differentiable function with a continuous derivative and $f: I \to \R$ be a continuous function,
+where $I \subset \R$ is an interval. Then, \[
+    \int_{g(a)}^{g(b)} f(x)\mathrm{d}x = \int_a^b f(g(u)) \odv{x}{u} \mathrm{d}u = \int_a^b f(g(u)) g'(u) \mathrm{d}u.
+\]
+
+Similarly, we can make the same change of variables transformation to probability distributions.
+Let $z \sim p_Z$, $x = f(z)$, where $f(\cdot)$ is a monotonic and differentiable function with an
+inverse $z = \inv{f}(x)$. Then, the probability density function of $x$ is \[
+    p_X(x) = p_Z\lft(\inv{f}(x)\rgt) \lft|\odv{\inv{f}(x)}{x}\rgt| = p_Z(z) \lft|\odv{\inv{f}(x)}{x}\rgt|.
+\]
+
+We can generalize this to any dimensionality by the following, \[
+    p_X(\vec{x}) = p_Z \lft( \inv{f}(\vec{x}) \rgt) \lft| \det{\pdv{\inv{f}(\vec{x})}{\vec{x}}} \rgt| = p_Z(\vec{z}) \inv{\lft| \det{\pdv{f(\vec{z})}{\vec{z}}} \rgt|},
+\]
+where the last equality is a property of Jacobians of invertible functions. We can view the
+absolute determinant as computing the volume of change of $f$.
+
+Thus, this gives us a way to compute the exact probability of $\vec{x}$ in an exact and tractable
+manner. The downside of this approach is that $f$ must be invertible, thus we must carefully
+parametrize the model, which means that we cannot use any model we would like to use. Furthermore,
+this has the consequence that it must preserve dimensionality, thus the latent space must be as
+large as the data space.
+
+From a computational perspective, we require the Jacobian of the transformation to be computed
+efficiently. In general, computing the Jacobian takes $\bigo{d^3}$ to compute for a $d \times d$
+matrix. However, this is not fast enough. A way to achieve linear complexity is to design $f$ such
+that its Jacobian is a triangular matrix, which takes $\bigo{d}$ to compute. This requirement
+further reduces the number of modeling decisions we can make.
+
+\subsection{Coupling layers}
+
+\begin{marginfigure}
+    \centering
+    \incfig{coupling-layer}
+    \caption{Diagram of a coupling layer. $h$ is an invertible element-wise operation and $\beta$ is
+        can be arbitrarily complex and does not need to be invertible.}
+    \label{fig:coupling-layer}
+\end{marginfigure}
+
+A \textit{coupling layer} is a type of network layer that effectively meets the above requirements
+of a normalizing flow function. It is invertible and offers efficient computation of the
+determinant. It consists of two functions; $\beta$ and $h$. $\beta$ can be any neural network and
+does not necessarily need to be invertible.\sidenote{This is very important, because requiring a
+    neural network to be invertible would significantly reduce the number of available modeling
+    decisions.} $h$ is an invertible element-wise operation and combines an unprocessed portion of the
+input $\vec{x}_A$ with the transformed other half of the input $\beta(\vec{x}_B)$. $h(\vec{x}_A,
+    \beta(\vec{x}_B))$ produces the first half of the input and $\vec{x}_B$ produces the second half.
+
+This gives the following function, \[
+    f: \begin{bmatrix} \vec{x}_A \\ \vec{x}_B \end{bmatrix} \mapsto \begin{bmatrix} h(\vec{x}_A, \beta(\vec{x}_B)) \\ \vec{x}_B \end{bmatrix}.
+\]
+The inverse of this function is given by \[
+    \inv{f}: \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} \mapsto \begin{bmatrix} \inv{h}(\vec{y}_A, \beta(\vec{y}_B)) \\ \vec{y}_B \end{bmatrix}.
+\]
+The Jacobian matrix can be efficiently computed by \[
+    \mat{J}(\vec{x}) = \begin{bmatrix}
+        h'(\vec{x}_A, \beta(\vec{x}_B)) & h'(\vec{x}_A, \beta(\vec{x}_B)) \beta'(\vec{x}_B) \\
+        \mat{0}                         & \mat{I}
+    \end{bmatrix}.
+\]
+
+When implementing this, we notice that this layer leaves part of its input unchanged. The role of
+the two subsets in the partition thus gets exchanged in alternating layers, so that both subsets
+get updates. In practice, we often randomly choose the splits to ensure proper mixing.
+
+\subsection{Composing transformations}
+
+Often, a single non-linear transformation is insufficient to capture complex patterns. Thus, to
+achieve more complex transformations, we can compose multiple transformations together. We then get
+the following function \[
+    \vec{x} = f(\vec{z}) = (f_m \circ \cdots \circ f_1)(\vec{z}).
+\]
+Again using the change of variables, we can then compute the likelihood by \[
+    p_X(\vec{x}) = p_Z \lft( \inv{f}(\vec{x}) \rgt) \prod_{k=1}^{m} \inv{\lft| \det{\pdv{f_k(\vec{x})}{\vec{x}}} \rgt|}.
+\]
+
+\subsection{Training and inference}
+
+At training time, we can learn the model by maximizing the exact log likelihood over the dataset, \[
+    \log p_X(\mathcal{D}) = \sum_{i=1}^n \log p_Z \lft( \inv{f}(\vec{x}) \rgt) + \sum_{k=1}^{m} \log \lft| \det{\pdv{\inv{f_k}(\vec{x})}{\vec{x}}} \rgt|.
+\]
+
+At inference time, we generate a sample $\vec{x}$ by drawing a random $\vec{z} \sim p_Z$ and
+transform it via $f$, obtaining $\vec{x} = f(\vec{z})$. To evaluate the probability of an
+observation, we use the inverse transform to get its latent variable $\vec{z} = \inv{f}(\vec{x})$,
+and compute its probability at $p_Z(\vec{z})$.
+
+\subsection{Architectures}
+
+The main difference between flow architectures is the choice of $h$ and the way it splits the input
+into $\vec{x}_A$ and $\vec{x}_B$.
+
+\paragraph{NICE.} NICE \citep{dinh2014nice} splits the data by dividing the input into two parts $\vec{x}_A =
+    \vec{x}_{1:\nicefrac{d}{2}}$ and $\vec{x}_B = \vec{x}_{\nicefrac{d}{2}+1:d}$. In the coupling
+layer, it uses an additive coupling law and the output is computed as \[
+    \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} = \begin{bmatrix} \vec{x}_A + \beta(\vec{x}_B) \\ \vec{x}_B \end{bmatrix}.
+\]
+
+\paragraph{RealNVP.} RealNVP \citep{dinh2016density} uses a combination of a spatial checkerboard pattern, channel-wise
+masking, and affine mapping in its architecture. It does so by first partitioning the data in a
+checkerboard pattern. Then, it applies a squeeze operation to go from $C \times H \times W$
+dimensionality to $4C \times \nicefrac{H}{2} \times \nicefrac{W}{2}$. After squeezing, it applies
+channel-wise masking. Instead of a simple additive $h$ as in NICE, RealNVP implements it as an
+affine mapping, \[
+    \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} = \begin{bmatrix} \vec{x}_A \odot \exp(s(\vec{x}_B)) + t(\vec{x}_B) \\ \vec{x}_B \end{bmatrix}.
+\]
+Here, $s$ and $t$ can be arbitrarily complex.
+
+\paragraph{GLOW.} GLOW \citep{kingma2018glow} is an architecture that utilizes invertible $1 \times 1$ convolutions,
+affine coupling layers, and multi-scale architecture. It consists of $L$ levels, each of which is
+composed of $K$ steps of flow. The $L$ levels allow for effective processing of all parts of the
+input, while the $K$ steps are used to increase the flexibility of the transformation $f$.
+
+A step of flow consists of applying activation norm, an invertible $1 \times 1$ convolution, and a
+coupling layer, in order. The activation norm is similar to batch norm, but it normalized each
+input channel. As we saw, a permutation of the input is needed in order to be able to process the
+entire input. The $1 \times 1$ convolution with $C$ filters is a generalization of a permutation in
+the channel dimension. This allows us to learn the required permutation. The coupling layer is
+implemented as in RealNVP, while the split is performed along the channel dimension only.
