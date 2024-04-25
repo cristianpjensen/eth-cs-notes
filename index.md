@@ -3,6 +3,7 @@
 ## Optimization for Data Science, S24
 
 - [Summary](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-summary.pdf)
+- [Cheatsheet](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-cheatsheet.pdf)
 
 ## Computational Intelligence Lab, S24
 
