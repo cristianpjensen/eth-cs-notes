@@ -1,0 +1,370 @@
+\documentclass{article}
+
+\usepackage[landscape, a4paper, margin=0.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[most]{tcolorbox}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac,colonequals}
+\usepackage{blindtext}
+\usepackage{derivative}
+\usepackage{nicefrac}
+\usepackage{parskip}
+% \usepackage{savetrees}
+\usepackage[document]{ragged2e}
+
+\usepackage{color,soul}
+\usepackage{xcolor}
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+\newcommand{\lft}{\mathopen{}\mathclose\bgroup\left}
+\newcommand{\rgt}{\aftergroup\egroup\right}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{#1}
+\newcommand{\transpose}[1]{#1^\top}
+\newcommand{\dom}[1]{\mathrm{dom}(#1)}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\title{Optimization for Data Science Cheatsheet}
+
+\newenvironment{topic}[1]
+{\textbf{\sffamily \colorbox{black}{\textcolor{white}{#1}}} \\ \vspace{0.2cm}}
+{}
+
+\begin{document}
+
+\setlength{\columnsep}{0.2cm}
+
+\begin{multicols*}{3}
+    \textbf{Cauchy-Schwarz}: $|\transpose{\vec{u}} \vec{v}| \leq \| \vec{u} \| \| \vec{v} \|$.
+
+    \textbf{Spectral norm}: $\| \mat{A} \| \colonequals \max_{\| \vec{v} \| = 1} \| \mat{A} \vec{v} \|$.
+
+    \textbf{Mean-value theorem}: If $a < b$ and $h: [a,b] \to \R$ continuous and differentiable in $(a,b)$, then
+    there exists $c \in (a,b)$ such that \[
+        h'(c) = \frac{h(b) - h(a)}{b-a}.
+    \]
+
+    \textbf{Fundamental theorem of calculus}: If $a < b$ and $h$ differentiable on an open domain $(a,b)$ and
+    $h'$ continuous on $[a,b]$, then \[
+        h(b) - h(a) = \int_a^b h'(t)dt.
+    \]
+
+    \textbf{Differentiable}: $f: \dom{f} \to \R^m$, where $\dom{f} \subseteq \R^d$ is differentiable at
+    $\vec{x}$ if there exists $\mat{A} \in \R^{m \times d}$ and an error function $r: \R^d \to \R^m$
+    defined in some neighborhood of $\vec{0} \in \R^d$ such that for all $\vec{y}$ in the neighborhood
+    of $\vec{x}$, \[
+        f(\vec{y}) = f(\vec{x}) + \mat{A} (\vec{y} - \vec{x}) + r(\vec{y} - \vec{x}),
+    \]
+    where \[
+        \lim_{\vec{v} \to \vec{0}} \frac{\| r(\vec{v}) \|}{\| \vec{v} \|} = \vec{0}.
+    \]
+    $\mat{A}$ is then the Jacobian of $f$ at $\vec{x}$.
+
+    \textbf{B-Lipschitz}: $f$ is $B$-Lipschitz if \[
+        \| f(\vec{x}) - f(\vec{y}) \| \leq B \| \vec{x} - \vec{y} \|,
+    \]
+    which is equivalent to bounded gradients on open domains (in closed domains, only $\Leftarrow$
+    holds) \[
+        \| \nabla f(\vec{x}) \| \leq B.
+    \]
+
+    \textbf{Cosine theorem}: $2 \transpose{\vec{v}}\vec{w} = \| \vec{v} \|^2 + \| \vec{w} \|^2 - \| \vec{v} - \vec{w} \|^2$.
+
+    \begin{topic}{2 Convexity}
+        Domain must be convex. Strict convexity if inequalities become strict inequalities.
+        Equivalent definitions $\forall \vec{x},\vec{y} \in \dom{f}$:
+        \begin{itemize}
+            \item $f(\lambda \vec{x} + (1-\lambda)\vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y})$.
+            \item First-order exists: $f(\vec{y}) \geq f(\vec{x}) + \transpose{\nabla f(\vec{x})} (\vec{y} -
+                      \vec{x})$.
+            \item First-order exists: $\transpose{(\nabla f(\vec{y}) - \nabla f(\vec{x}))} (\vec{y} - \vec{x}) \geq
+                      0$.
+            \item Second-order exists: $\nabla^2 f(\vec{x}) \succeq \mat{0}$.
+        \end{itemize}
+        Intuition: $f$ is above its tangential hyperplane at $(\vec{x}, f(\vec{x}))$.
+
+        \textbf{Jensen's inequality}: If $f$ convex, and $\sum_{i=1}^m \lambda_i = 1$, then \[
+            f \lft( \sum_{i=1}^{m} \lambda_i \vec{x}_i \rgt) \leq \sum_{i=1}^{m} \lambda_i f(\vec{x}_i).
+        \]
+        The other direction holds for concave functions ($-f$ is convex).
+
+        \textbf{Preserving convexity}: Max, sum, and multiplication with positive scalars preserve
+        convexity. $f \circ g$ is convex on $\dom{f \circ g} \colonequals \{ \vec{x} \in \R^m \mid
+            g(\vec{x}) \in \dom{f} \}$ if $g$ is affine.
+
+        \textbf{Local minimum}: A point $\vec{x}$, such that there exists $\epsilon > 0$ with \[
+            f(\vec{x}) \leq f(\vec{y}), \quad \forall \vec{y} \in \dom{f} \text{ satisfying } \| \vec{y} - \vec{x} \| < \epsilon.
+        \]
+
+        \textbf{Global minimum}: A point $\vec{x}$ such that \[
+            f(\vec{x}) \leq f(\vec{y}), \quad \forall \vec{y} \in \dom{f}.
+        \]
+        If $f$ is convex and differentiable over an open domain, then $\nabla f(\vec{x}) = \vec{0}$ if and
+        only if $\vec{x}$ is a global minimum.
+
+        \textbf{Sublevel set}: Let $f$ be continuous (not convex). If there exists a nonempty and
+        bounded sublevel set $f^{\leq \alpha}$, then $f$ has a global minimum.
+
+        TODO: Convex programs.
+    \end{topic}
+
+    \begin{topic}{3 Gradient descent}
+        $f$ must be differentiable, then we use the update rule: \[
+            \vec{x}_{t+1} \colonequals \vec{x}_t - \gamma_t \nabla f(\vec{x}_t).
+        \]
+
+        \textbf{Vanilla analysis}: Assuming only convexity, we get a bound on the summed error \[
+            \sum_{t=0}^{T-1} (f(\vec{x}_t) - f^\star) \leq \frac{\gamma_t}{2} \sum_{t=0}^{T-1} \| \nabla f(\vec{x}_t) \|^2 + \frac{1}{2 \gamma_t} \| \vec{x}_0 - \vec{x}^\star \|^2.
+        \]
+        \underline{Proof} by using first-order convexity on $\vec{x}_t$ and $\vec{x}^\star$, and rewrite the gradient
+        descent update rule.
+
+        \textbf{Lipschitz functions} ($\mathcal{O}(\nicefrac{1}{\epsilon^2})$): Setting
+        $\gamma \colonequals \nicefrac{R}{B \sqrt{T}}$, we get \[
+            \frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f^\star) \leq \frac{RB}{\sqrt{T}}.
+        \]
+        Using bound $\| \vec{x}_0 - \vec{x}^\star \| \leq R$.
+    \end{topic}
+
+    \begin{topic}{3 Smooth functions}
+        $L$-smooth with equivalent definitions $\forall \vec{x}, \vec{y} \in X$:
+        \begin{itemize}
+            \item $f(\vec{y}) \leq f(\vec{x}) + \transpose{\nabla f(\vec{x})} (\vec{y} - \vec{x}) + \frac{L}{2} \| \vec{x} - \vec{y} \|^2$.
+            \item Lemma 3.3: $\frac{L}{2} \transpose{\vec{x}} \vec{x} - f(\vec{x})$ is convex.
+            \item Lemma 3.5: $\| \nabla f(\vec{x}) - \nabla f(\vec{y}) \| \leq L \| \vec{x} - \vec{y} \|$.
+            \item Lemma 6.1: $\| \nabla^2 f(\vec{x}) \| \leq L$ ($\Leftarrow$ only if $X$ is open).
+        \end{itemize}
+        Intuition: $f$ is below a not-too-steep tangential paraboloid at $(\vec{x}, f(\vec{x}))$.
+
+        \textbf{Affine functions} (Lemma 3.4): $f(\vec{x}) = \transpose{\vec{x}} \mat{Q} \vec{x} +
+            \transpose{\vec{b}} \vec{x} + c$ is smooth with parameter $2 \| \mat{Q} \|$ if $\mat{Q}$ is
+        symmetric.
+
+        \textbf{Sufficient decrease} (Lemma 3.7): Choosing $\gamma \colonequals \nicefrac{1}{L}$, gradient descent satisfies \[
+            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \nabla f(\vec{x}_t) \|^2, \quad t \geq 0.
+        \]
+        (Already holds if $f$ is $L$-smooth over line segment connecting $\vec{x}_t$ and $\vec{x}_{t+1}$.)
+        \underline{Proof} by first definition of smoothness, cosine theorem, and gradient descent update rule.
+
+        \textbf{Convergence} $(\mathcal{O}(\nicefrac{1}{\epsilon}))$ (Theorem 3.8): Choosing $\gamma \colonequals \nicefrac{1}{L}$, gradient descent yields \[
+            f(\vec{x}_T) - f^\star \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2, \quad T > 0.
+        \]
+        \underline{Proof} by starting from vanilla analysis and bounding gradient sum with sufficient decrease.
+
+        Accelerated gradient descent achieves $\mathcal{O}(\nicefrac{1}{\sqrt{\epsilon}})$ by using an
+        intermediate variable.
+    \end{topic}
+
+    \begin{topic}{3 Strongly convex functions}
+        $\mu$-strongly convex with equivalent definitions $\forall \vec{x}, \vec{y} \in X$:
+        \begin{itemize}
+            \item $f(\vec{y}) \geq f(\vec{x}) + \transpose{\nabla f(\vec{x})} (\vec{y} - \vec{x}) + \frac{\mu}{2} \| \vec{x} - \vec{y} \|^2$.
+            \item Lemma 3.11: $f(\vec{x}) - \frac{\mu}{2} \transpose{\vec{x}} \vec{x}$ is convex.
+        \end{itemize}
+        Intuition: $f$ is above a not-too-flat tangential paraboloid at $(\vec{x}, f(\vec{x}))$.
+
+        \textbf{Strict convexity} (Lemma 3.12): If $f$ is $\mu$-strongly convex, then $f$ is strictly convex.
+
+        \textbf{Geometrically decreasing distances} (Theorem 3.14): Choosing $\gamma \colonequals \nicefrac{1}{L}$, gradient descent satisfies \[
+            \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \lft( 1 - \frac{\mu}{L} \rgt) \| \vec{x}_t - \vec{x}^\star \|^2, \quad t \geq 0.
+        \]
+        \underline{Proof} by rewriting vanilla analysis with first definition of strong convexity and
+        sufficient decrease.
+
+        \textbf{Convergence} $\mathcal{O}(\log \nicefrac{1}{\epsilon})$ (Theorem 3.14): Choosing $\gamma \colonequals \nicefrac{1}{L}$, gradient descent yields \[
+            f(\vec{x}_T) - f^\star \leq \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2, \quad T > 0.
+        \]
+        \underline{Proof} by using geometrically decreasing distances and smoothness with
+        $\nabla f(\vec{x}^\star) = \vec{0}$.
+    \end{topic}
+
+    \begin{topic}{4 Projected gradient descent}
+        Optimization within closed convex subset $X \subseteq \R^d$.
+        \begin{align*}
+            \vec{y}_{t+1} & \colonequals \vec{x}_t - \gamma \nabla f(\vec{x})                                                       \\
+            \vec{x}_{t+1} & \colonequals \Pi_X(\vec{y}_{t+1}) \colonequals \argmin_{\vec{x} \in X} \| \vec{x} - \vec{y}_{y+1} \|^2.
+        \end{align*}
+        After every step, project back onto $X$.
+
+        \textbf{Projection properties} (Fact 4.1): $\vec{x} - \Pi_X(\vec{y})$ and $\vec{y} - \Pi_X(\vec{y})$ form an obtuse angle,
+        \begin{itemize}
+            \item $\transpose{(\vec{x} - \Pi_X(\vec{y}))}(\vec{y} - \Pi_X(\vec{y})) \leq 0$.
+            \item $\| \vec{x} - \Pi_X(\vec{y}) \|^2 + \| \vec{y} - \Pi_X(\vec{y}) \|^2 \leq \| \vec{x} - \vec{y} \|^2$.
+        \end{itemize}
+
+        \textbf{Lipschitz functions} ($\mathcal{O}(\nicefrac{1}{\epsilon^2})$) (Theorem 4.2): Same bound as gradient
+        descent. \underline{Proof} by replacing $\vec{x}_{t+1}$ by $\vec{y}_{t+1}$ in the vanilla
+        analysis and using the second projection property with $\vec{x} = \vec{x}^\star$ and
+        $\vec{y} = \vec{y}_{t+1}$.
+
+        \textbf{Sufficient decrease} (Lemma 4.3): If $f$ is $L$-smooth,
+        choosing stepsize $\gamma \colonequals \nicefrac{1}{L}$, we get \[
+            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \nabla f(\vec{x}_t) \|^2 + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2.
+        \]
+        \underline{Proof} by the same as gradient descent, but then with projection step.
+
+        \textbf{Smooth functions} ($\mathcal{O}(\nicefrac{1}{\epsilon})$) (Theorem 4.4): Same result
+        as in gradient descent. \underline{Proof} by compensating for the extra term in sufficient
+        decrease by the vanilla analysis.
+
+        \textbf{Strongly convex} ($\mathcal{O}(\log \nicefrac{1}{\epsilon})$) (Theorem 4.5):
+        Decreasing distances still holds, but extra term in convergence bound when choosing
+        $\gamma \colonequals \nicefrac{1}{L}$,
+        \begin{align*}
+            f(\vec{x}_T) - f^\star & \leq \| \nabla f(\vec{x}^\star) \| \lft( 1 - \frac{\mu}{L} \rgt)^{\nicefrac{T}{2}} \| \vec{x}_0 - \vec{x}^\star \| \\
+                                   & \quad + \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2.
+        \end{align*}
+        This is due to the fact that we cannot use $\nabla f(\vec{x}^\star) = \vec{0}$ in the constrained
+        case.
+    \end{topic}
+
+    \begin{topic}{5 Coordinate descent}
+        Update only one coordinate of $\vec{x}_t$ at a time, meaning that we only need to compute the
+        gradient of one coordinate of $\nabla f(\vec{x}_t)$.
+
+        \textbf{PL inequality}: $f$ has a global minimum $\vec{x}^\star$. Definition $\forall \vec{x}
+            \in X$: \[
+            \frac{1}{2} \| \nabla f(\vec{x}) \|^2 \geq \mu (f(\vec{x}) - f(\vec{x}^\star)).
+        \]
+
+        \textbf{Strong convexity $\Rightarrow$ PL inequality} (Lemma 5.2).
+
+        \textbf{Coordinate-wise smoothness}: $f$ is coordinate-wise smooth with $\mathcal{L} =
+            [L_1, \ldots, L_d] \in \R_+^d$ if $\forall \vec{x}, \vec{y} \in X, i \in [d]$: \[
+            f(\vec{x} + \lambda \vec{e}_i) \leq f(\vec{x}) + \lambda \nabla_i f(\vec{x}) + \frac{L_i}{2} \lambda^2.
+        \]
+        This gives a more fine-grained picture of $f$ than smoothness. It might be the case that all $L_i$
+        are significantly smaller than the best possible $L$-smoothness.
+
+        \textbf{Update rule}:
+        \begin{align*}
+             & \text{choose an active coordinate $i \in [d]$}                                   \\
+             & \vec{x}_{t+1} \colonequals \vec{x}_t - \gamma_i \nabla_i f(\vec{x}_t) \vec{e}_i.
+        \end{align*}
+
+        \textbf{Coordinate-wise sufficient decrease} (Lemma 5.5): With stepsize $\gamma_i = \nicefrac{1}{L_i}$, coordinate descent satisfies \[
+            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L_i} | \nabla_i f(\vec{x}_t) |^2.
+        \]
+
+        \textbf{Randomized coordinate descent convergence} (Theorem 5.6): $f$ is coordinate-wise
+        smooth with $L$ and satisfies PL-inequality with $\mu$. Choosing $\gamma_i = \frac{1}{L}$, we
+        get \[
+            \E[f(\vec{x}_T) - f^\star] \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f^\star).
+        \]
+        \underline{Proof} by using coordinate-wise sufficient decrease and taking expectation with
+        respect to $i$ on both sides. Then, expectation over $\vec{x}_t$ to remove condition.
+
+        \textbf{Importance sampling convergence} (Theorem 5.7): Sample $i$ with probability $\nicefrac{L_i}{\sum_{j=1}^{d} L_j}$. Let $\bar{L} = \nicefrac{1}{d} \sum_{i=1}^{d} L_i$. Choosing $\gamma_i = \nicefrac{1}{L_i}$, we get \[
+            \E[f(\vec{x}_T) - f^\star] \leq \lft( 1 - \frac{\mu}{d \bar{L}} \rgt)^T (f(\vec{x}_0) - f^\star).
+        \]
+        \underline{Proof} by the same method as randomized coordinate descent.
+
+        \textbf{Steepest coordinate descent convergence} (Corollary 5.8): Choose index with largest
+        absolute gradient. Same conditions as randomized coordinate descent. Then, we get \[
+            f(\vec{x}_T) - f^\star \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f^\star).
+        \]
+
+        TODO: Strong convexity with respect to $\ell_1$-norm.
+
+        \textbf{Greedy coordinate descent}: Choose the index by one of the above methods, but then
+        perform a line search over that coordinate and minimize by solving a 1-dimensional
+        optimization problem (easy). This does not require $f$ to be differentiable. But, this does
+        not always return the global minimum, since there are functions with points where it can make
+        no progress.
+
+        Theorem 5.11: Let $f$ be of the form $f(\vec{x}) \colonequals g(\vec{x}) + h(\vec{x})$ with
+        $h(\vec{x}) = \sum_{i} h_i(x_i)$, $h_i$ convex, and $g$ convex and differentiable. If $\vec{x}$ is
+        a point that greedy coordinate descent cannot make progress in any coordinate, then $\vec{x}$ is a
+        global minimum of $f$.
+    \end{topic}
+
+    \begin{topic}{6 Nonconvex functions}
+        For nonconvex functions, gradient descent may get stuck in a local minimum, stuck in a saddle
+        point (flat region), or infinitely decrease, but never reach a critical point (e.g. $\nicefrac{1}{e^x}$).
+
+        \textbf{Gradient convergence} (Theorem 6.2): $f$ is $L$-smooth. Choosing $\gamma \colonequals \nicefrac{1}{L}$, then \[
+            \frac{1}{T} \sum_{t=0}^{T-1} \| \nabla f(\vec{x}_t) \|^2 \leq \frac{2L}{T} (f(\vec{x}_0) - f^\star).
+        \]
+        In particular, $\| \nabla f(\vec{x}_t) \|^2 \leq \frac{2L}{T} (f(\vec{x}_0) - f^\star)$ for some $t
+            \in [T-1]$, and $\lim_{t \to \infty} \| \nabla f(\vec{x}_t) \|^2 = 0$. This does not mean that it
+        converges to a critical point, since it may never reach a point with 0 gradient, but only move
+        toward it asymptotically. \underline{Proof} by sufficient decrease, which does not require
+        convexity.
+
+        \textbf{$\gamma \colonequals \nicefrac{1}{L}$ does not overshoot critical points} (Lemma 6.3).
+
+        TODO: Trajectory analysis.
+    \end{topic}
+
+    \begin{topic}{7 The Frank-Wolfe algorithm}
+        Constrained optimization algorithm without projection (which can be very complex) by making
+        use of linear minimization oracle: \[
+            \mathrm{LMO}_X(\vec{g}) \colonequals \argmin_{\vec{z} \in X} \transpose{\vec{g}} \vec{z}.
+        \]
+        The algorithm is then
+        \begin{align*}
+            \vec{s}_t     & \colonequals \mathrm{LMO}_X(\nabla f(\vec{x}_t))            \\
+            \vec{x}_{t+1} & \colonequals (1 - \gamma_t) \vec{x}_t + \gamma_t \vec{s}_t.
+        \end{align*}
+        Reduces non-linear constrained optimization to linear optimization over the same set.
+        Rationale is that the gradient defines the best linear approximation of $f$ at $\vec{x}_t$.
+
+        \textbf{Properties}: (1) iterates are always feasible, i.e., in $X$, (2) projection-free, which can be
+        very complex, and (3) iterates have a simple sparse representation, i.e., $\vec{x}_t$ is
+        always a convex combination of $\vec{x}_0$ and the minimizers $\vec{s}_{1:t-1}$.
+
+        Let $X = \mathrm{conv}(\mathcal{A})$, then every $\vec{s} \colonequals \mathrm{LMO}_X(\vec{g}) \in
+            \mathrm{conv}(X)$ is a convex combination of atoms, $\vec{s} = \sum_{i=1}^{n} \lambda_i \vec{a}_i$
+        with $\sum_{i=1}^{n} \lambda_i = 1$. Furthermore, there is always an atom in $\mathcal{A}$ that
+        minimizes the LMO.
+
+        \textbf{$\ell_1$-ball}: The LMO for $X = \{ \vec{x} \in \R^d \mid \| \vec{x} \|_1 \leq 1 \}$ is given by \[
+            \mathrm{LMO}_X(\vec{g}) = -\mathrm{sign}(g_i) \vec{e}_i \text{ with } i \colonequals \argmax_{i \in [d]} | g_i |.
+        \]
+
+        TODO: Spectahedron.
+
+        \textbf{Duality gap} (Lemma 7.2): We can easily compute an upper bound of the optimality gap, \[
+            g(\vec{x}) \colonequals \transpose{\nabla f(\vec{x})} (\vec{x} - \vec{s}) \geq f(\vec{x}) - f^\star,
+        \]
+        with $\vec{s} \colonequals \mathrm{LMO}_X(\nabla f(\vec{x}))$. At any optimal point
+        $\vec{x}^\star$, $g(\vec{x}^\star) = 0$. \underline{Proof} by using $\transpose{\nabla f(\vec{x})}
+            \vec{s} \leq \transpose{\nabla f(\vec{x})} \vec{x}^\star$, and the first-order characterization of
+        convexity.
+
+        \textbf{Descent} (Lemma 7.4): For a step $\vec{x}_{t+1} \colonequals \vec{x}_t - \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize $\gamma_t \in [0,1]$, it holds that \[
+            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t f(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
+        \]
+        with $\vec{s} \colonequals \mathrm{LMO}_X(\nabla f(\vec{x}))$. \underline{Proof} by first
+        definition of smoothness and duality gap.
+
+        \textbf{Convergence analysis} ($\mathcal{O}(\nicefrac{1}{\epsilon})$) (Theorem 7.3): $f$ is $L$-smooth and convex. With $\gamma_t = \nicefrac{2}{t+2}$, Frank-Wolfe yields \[
+            f(\vec{x}_T) - f^\star \leq \frac{2L \mathrm{diam}(X)^2}{T+1}.
+        \]
+        \underline{Proof} by duality gap and descent lemma, and then induction.
+
+        \textbf{Linear search stepsize}: Choose $\gamma_t \in [0,1]$ such that the progress is maximized, \[
+            \gamma_t \colonequals \argmin_{\gamma \in [0,1]} f((1-\gamma) \vec{x}_t + \gamma \vec{s}).
+        \]
+        The descent lemma still holds for this stepsize, since this stepsize can only be better than a
+        predetermined stepsize. And, thus the convergence also holds.
+
+        TODO: Gap-based stepsize.
+
+        TODO: Affine invariance.
+
+        TODO: Curvature constant.
+
+    \end{topic}
+
+\end{multicols*}
+
+\end{document}
