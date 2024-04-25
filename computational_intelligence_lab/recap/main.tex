@@ -13,8 +13,12 @@
 \pagenumbering{roman}
 \maketitle
 \newpage
+\microtypesetup{protrusion=false}
 \tableofcontents
-\newpage\pagenumbering{arabic}
+\microtypesetup{protrusion=true}
+\newpage
+\input{sections/symbols}
+\newpage\cleardoublepage\pagenumbering{arabic}
 
 \section{Inner product and norms}
 
@@ -43,6 +47,10 @@
 
 \begin{corollary}
     $\ang{\vec{x}+\vec{y},\vec{x}+\vec{y}} = \ang{\vec{x},\vec{x}} + 2\ang{\vec{x},\vec{y}} + \ang{\vec{y},\vec{y}}$.
+\end{corollary}
+
+\begin{corollary}
+    $\ang{\mat{A}\vec{x}, \vec{y}} = \ang{\vec{x}, \transpose{\mat{A}} \vec{y}}$.
 \end{corollary}
 
 The vector space $\mathcal{V}$, along with an inner product, defines an inner vector space. During

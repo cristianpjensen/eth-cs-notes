@@ -8,5 +8,5 @@ modifyLineBreaks:
     blocksBeginWith:
       other: "\\caption"
     comments:
-      wrap: 1
+      wrap: 0
       inheritLeadingSpace: 1

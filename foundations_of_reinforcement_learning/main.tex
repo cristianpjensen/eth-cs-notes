@@ -1,12 +1,10 @@
 \documentclass[justified,nobib]{tufte-handout}
 
-\input{../../settings}
-\input{../../commands}
+\input{../settings}
+\input{../commands}
 
-\title{Computational Intelligence Lab}
+\title{Foundations of Reinforcement Learning}
 \author{Cristian Perez Jensen}
-
-\newcommand{\ang}[1]{\langle #1 \rangle}
 
 \begin{document}
 
@@ -20,10 +18,13 @@
 \input{sections/symbols}
 \newpage\cleardoublepage\pagenumbering{arabic}
 
-\input{sections/01_dimensionality_reduction}
+\input{sections/01_markov_decision_processes}
 
 \newpage
-\input{sections/02_matrix_completion}
+\input{sections/02_reinforcement_learning}
+
+\newpage
+\input{sections/03_value_based_rl}
 
 \newpage
 \bibliography{main}

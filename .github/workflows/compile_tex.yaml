@@ -38,12 +38,19 @@ jobs:
         root_file: main.tex
         working_directory: algorithms_lab
 
-    - name: Compile optimization for data science
+    - name: Compile optimization for data science summary
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
-        working_directory: optimization_for_data_science
+        working_directory: optimization_for_data_science/summary
+
+    - name: Compile optimization for data science cheatsheet
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: optimization_for_data_science/cheatsheet
 
     - name: Compile machine perception
       uses: xu-cheng/latex-action@v3
@@ -73,7 +80,8 @@ jobs:
         file computer_vision/main.pdf | grep -q ' PDF '
         file probabilistic_artificial_intelligence/main.pdf | grep -q ' PDF '
         file algorithms_lab/main.pdf | grep -q ' PDF '
-        file optimization_for_data_science/main.pdf | grep -q ' PDF '
+        file optimization_for_data_science/summary/main.pdf | grep -q ' PDF '
+        file optimization_for_data_science/cheatsheet/main.pdf | grep -q ' PDF '
         file machine_perception/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/recap/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
@@ -96,7 +104,8 @@ jobs:
         cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
         cp -f probabilistic_artificial_intelligence/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence-summary.pdf"
         cp -f algorithms_lab/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab-summary.pdf"
-        cp -f optimization_for_data_science/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-summary.pdf"
+        cp -f optimization_for_data_science/summary/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-summary.pdf"
+        cp -f optimization_for_data_science/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-cheatsheet.pdf"
         cp -f machine_perception/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
         cp -f computational_intelligence_lab/recap/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-recap.pdf"
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-summary.pdf"
@@ -109,6 +118,7 @@ jobs:
         git add probabilistic_artificial_intelligence-summary.pdf
         git add algorithms_lab-summary.pdf
         git add optimization_for_data_science-summary.pdf
+        git add optimization_for_data_science-cheatsheet.pdf
         git add machine_perception-summary.pdf
         git add computational_intelligence_lab-recap.pdf
         git add computational_intelligence_lab-summary.pdf

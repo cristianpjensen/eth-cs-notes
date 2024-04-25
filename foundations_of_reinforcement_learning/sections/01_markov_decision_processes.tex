@@ -1,0 +1,233 @@
+\section{Markov decision processes}
+
+Markov decision processes (MDP) are important for reinforcement learning (RL), because they
+formalize the environments in which RL is done.
+
+\begin{definition}[Markov chain]
+    A (time-homogeneous) Markov chain is a stochastic process $\{ X_0, X_1, \ldots \}$ satisfying the Markov property, \[
+        \mathbb{P}(X_{t+1} = j \mid X_t = i, X_{t-1}, \ldots, X_0) = \mathbb{P}(X_{t+1} = j \mid X_t = i) = P_{ij}.
+    \]
+    In words, the future states only depend on the current state; the current state encapsulates all
+    information about the past.
+\end{definition}
+
+The stationary distribution $\vec{\mu}$ of a Markov chain can be found by solving $\vec{\mu} =
+    \vec{\mu} \mat{P}$, where $\mat{P}$ is the transition matrix.
+
+A Markov chain is \textit{irreducible} if every state can be reached from every other state. A
+Markov chain is \textit{aperiodic} if the greatest common divisor of timesteps needed to reach any
+state from itself is 1. If a Markov chain is irreducible, aperiodic with finite states, then there
+exists a unique stationary distribution and $\{ X_t \}$ converges to it, \ie, \[
+    \lim_{t \to \infty} \mathbb{P}(X_t = j \mid X_0 = i) = \mu_j, \quad \forall i,j.
+\]
+
+An MDP can be roughly described as a controlled Markov chain with a performance objective.
+
+\begin{marginfigure}
+    \centering
+    \incfig{mdp-diagram}
+    \caption{Diagram of an MDP.}
+    \label{fig:mdp-diagram}
+\end{marginfigure}
+
+\begin{definition}[Markov decision process]
+    A Markov decision process is formalized as $\langle \mathcal{S},\mathcal{A},P,r,\mu_0 \rangle$, where
+    \begin{enumerate}
+        \item $\mathcal{S}$ is the state space;
+        \item $\mathcal{A}$ is the action space;
+        \item $P(s' \mid s, a): \mathcal{S} \times \mathcal{A} \to \Delta(\mathcal{S})$ is the state transition model;
+        \item $r(s, a): \mathcal{S} \times \mathcal{A} \to \R$ is the expected reward function;
+        \item $\mu_0 \in \Delta(\mathcal{S})$ is the initial state distribution.
+    \end{enumerate}
+\end{definition}
+
+An MDP can be seen as a controlled Markov chain, because the next state is independent of all
+actions before $t$ if we know $(s_t,a_t)$, \[
+    \mathbb{P}(s_{t+1} = s' \mid s_t = s, a_t = a, \ldots, s_0, a_0) = P(s' \mid s, a).
+\]
+The performance objective is the reward.
+
+Deterministic policies can be subdivided into the following three classes,
+\begin{itemize}
+    \item Stationary policy $\pi: \mathcal{S} \to \mathcal{A}$;
+    \item Markov policy $\pi_t: \mathcal{S} \to \mathcal{A}$, where the policy is timestep-dependent;
+    \item History-dependent policy $\pi_t: \mathcal{H} \to \mathcal{A}$, where $\mathcal{H}$ is the set of
+          all possible trajectories.
+\end{itemize}
+
+Non-deterministic policies can be subdivided in the same manner,
+\begin{itemize}
+    \item Stationary policy $\pi: \mathcal{S} \to \Delta(\mathcal{A})$;
+    \item Markov policy $\pi_t: \mathcal{S} \to \Delta(\mathcal{A})$;
+    \item History-dependent policy $\pi_t: \mathcal{H} \to \Delta(\mathcal{A})$.
+\end{itemize}
+
+Typically, we only care about stationary policies.
+
+Generally, we want to maximize the reward over some time horizon. This can be a finite horizon with
+a fixed horizon $T$. We then wish to maximize the cumulative reward, \[
+    \E_\pi \lft[ \sum_{t=0}^{T-1} r(s_t,a_t) \rgt].
+\]
+However, we typically want to optimize a discounted reward over an infinite horizon, \[
+    \E_\pi \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t,a_t) \rgt], \quad \gamma \in [0,1].
+\]
+
+\begin{remark}
+    The infinite horizon objective can be maximized by a stationary policy, while the finite horizon
+    objective needs a Markov policy.
+\end{remark}
+
+\begin{definition}[State value function]
+    \[
+        V^\pi(s) \doteq \E_\pi \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t,a_t) \;\middle|\; s_0 = s \rgt].
+    \]
+\end{definition}
+
+\begin{definition}[State-action value function]
+    \[
+        Q^\pi(s,a) \doteq \E_\pi \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t,a_t) \;\middle|\; s_0 = s, a_0 = a \rgt].
+    \]
+\end{definition}
+
+The state value function represents the expected return, starting at the state under policy $\pi$.
+The state-action value function represents the value of an action at a state, under policy $\pi$.
+The relation between the two functions is formalized by the following equations,
+\begin{align*}
+    Q^\pi(s,a) & = r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s'\mid s,a) V^\pi(s') \\
+    V^\pi(s)   & = \sum_{a\in \mathcal{A}} \pi(a\mid s) Q^\pi(s,a).
+\end{align*}
+
+\begin{important}
+    The goal of reinforcement learning is to find an optimal policy $\pi^\star \in \Pi$, such that \[
+        V^{\pi^\star}(s) = V^\star(s) \doteq \max_{\pi \in \Pi} V^\pi(s), \quad \forall s \in \mathcal{S}.
+    \]
+\end{important}
+
+\begin{theorem}[Bellman consistency equation]
+    \[
+        V^\pi(s) = \E_{a\sim \pi(\cdot \mid s)} \lft[ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s'\mid s,a) V^\pi(s') \rgt].
+    \]
+\end{theorem}
+
+In matrix form, the Bellman consistency equation can be written as \[
+    \vec{v}^\pi = \vec{r}^\pi + \gamma \mat{P}^\pi \vec{v}^\pi,
+\]
+where $\vec{v}^\pi \in \R^{|\mathcal{S}|}$, $\vec{r}^\pi \in \R^{|\mathcal{S}|}$, $\mat{P}^\pi \in
+    \R^{|\mathcal{S}\times \mathcal{S}|}$. From this equation, we can compute the value function in
+closed form, \[
+    \vec{v}^\pi = \inv{(\mat{I} - \gamma \mat{P}^\pi)} \vec{r}^\pi.
+\]
+However, this has complexity $\bigo{|\mathcal{S}|^3 + |\mathcal{S}|^2 |\mathcal{A}|}$, which is
+expensive.
+
+\begin{definition}[Bellman expectation operator]
+    Let $\mathcal{T}^\pi: \R^{|\mathcal{S}|} \to \R^{|\mathcal{S}|}$, \[
+        \mathcal{T}^\pi \vec{v} \doteq \vec{r}^\pi + \gamma \mat{P}^\pi \vec{v}.
+    \]
+\end{definition}
+
+The Bellman consistency equation implies that $\vec{v}^\pi$ is the \textit{fixed point} of
+$\mathcal{T}^\pi$; $\mathcal{T}^\pi \vec{v}^\pi = \vec{v}^\pi$. This operator is an affine operator
+and a $\gamma$-contraction mapping. Thus, we can iteratively apply it to compute the value function
+of a policy $\pi$. This has complexity $\bigo{\nicefrac{|\mathcal{S}|^2|\mathcal{A}|}{1-\gamma}}$.
+
+\begin{theorem}[Bellman optimality equations]
+    \begin{align*}
+        V^\star(s)   & = \max_{a\in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s'\mid s,a) V^\star(s') \rgt\}   \\
+        Q^\star(s,a) & = r(s,a) + \gamma \lft( \sum_{s' \in \mathcal{S}} P(s'\mid s,a) \max_{a'\in \mathcal{A}} Q^\star(s',a') \rgt) \\
+    \end{align*}
+\end{theorem}
+
+\begin{definition}[Bellman optimality operator]
+    \[
+        (\mathcal{T}\vec{v})(s) \doteq \max_{a\in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s'\mid s,a) \vec{v}(s')  \rgt\}.
+    \]
+\end{definition}
+
+The Bellman optimality equations imply that $\vec{v}^\star$ is the fixed point of $\mathcal{T}$.
+Furthermore, $\mathcal{T}$ is a $\gamma$-contraction \wrt the $\ell_{\infty}$ norm, \[
+    \| \mathcal{T} \vec{v}' - \mathcal{T} \vec{v} \|_\infty \leq \gamma \| \vec{v}' - \vec{v} \|_\infty,
+\]
+and monotonic; $\vec{v}_1 \leq \vec{v}_2 \implies \mathcal{T}\vec{v}_1 \leq \mathcal{T} \vec{v}_2$.
+
+\subsection{Value iteration}
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \State $\vec{v}_0 \gets \vec{0}$ \Comment{Arbitrary guess}
+        \While {$\| \vec{v}_t - \vec{v}_{t-1} \|_\infty > \epsilon$}
+        \State $\vec{v}_{t+1} = \mathcal{T} \vec{v}_t$
+        \EndWhile
+        \State \Return $\vec{v}$
+    \end{algorithmic}
+    \caption{Value iteration algorithm for solving MDPs.}
+\end{algorithm}
+
+Value iteration iteratively computes the Bellman optimality operator to improve its value function.
+After obtaining $V^\star(s) \doteq \vec{v}^\star_s$, we can obtain an optimal policy from the
+greedy policy, \[
+    \pi^\star(s) = \argmax_{a\in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s'\mid s,a) V^\star(s) \rgt\}.
+\]
+
+The runtime complexity of an iteration is $\bigo{|\mathcal{S}|^2 |\mathcal{A}|}$ and converges
+linearly in the number of iterations, \[
+    \| \vec{v}^{\pi_t} - \vec{v}^\star \|_\infty \leq \gamma^t \| \vec{v}^{\pi_0} - \vec{v}^\star \|_\infty.
+\]
+
+\subsection{Policy iteration}
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \State $\pi_0 \gets \text{random policy}$
+        \While {$\| \vec{v}^{\pi_t} - \vec{v}^{\pi_{t-1}} \|_\infty > \epsilon$}
+        \State $V^{\pi_t} \gets \Call{ValueFunction}{\pi_t}$ \Comment{Policy evaluation}
+        \State $\pi_{t+1} \gets \Call{GreedyPolicy}{V^{\pi_t}}$ \Comment{Policy improvement}
+        \EndWhile
+    \end{algorithmic}
+    \caption{Policy iteration algorithms for solving MDPs. The \textit{policy evaluation} step can be
+        computed by the closed-form solution, or by iteratively applying the policy Bellman operator
+        until convergence. The \textit{policy improvement} step is computed as follows, \[
+            \pi_{t+1}(s) = \argmax_{a\in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s'\mid s,a) V^{\pi_t}(s') \rgt\}.
+        \]}
+\end{algorithm}
+
+Policy iteration also has a linear convergence rate, but converges in very few iterations, compared
+to value iteration. However, the iterations are more costly than value iteration. The per-iteration
+cost of policy iteration is $\mathcal{O}(|\mathcal{S}|^3 + |\mathcal{S}|^2|\mathcal{A}|)$ or
+$\bigo{\nicefrac{|\mathcal{S}|^2|\mathcal{A}|}{1-\gamma}}$, dependent on how the value function is
+computed.
+
+\subsection{Linear programming}
+
+Finding the optimal value function can also be framed as a linear program,
+
+\begin{important}
+    \begin{align*}
+        \underset{\vec{v}}{\text{minimize}} \;\; & \sum_{s\in \mathcal{S}} \mu_0(s) V(s)                                                        \\
+        \text{subject to} \;\;                   & V(s) \geq r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s'\mid s, a) V(s'), \quad \forall s,a.
+    \end{align*}
+\end{important}
+
+This linear program has $|\mathcal{S}|$ variables and $|\mathcal{S}| \cdot |\mathcal{A}|$
+constraints.
+
+The dual of this linear program is the following,
+
+\begin{important}
+    \begin{align*}
+        \underset{\lambda}{\text{maximize}} \;\; & \sum_{s\in \mathcal{S}} \sum_{a\in \mathcal{A}} r(s,a) \lambda(s,a)                                                  \\
+        \text{subject to} \;\;                   & \sum_{a\in \mathcal{A}} \lambda(s,a) = \mu_0(s) + \gamma \sum_{s',a'} P(s\mid s',a') \lambda(s',a'), \quad \forall s \\
+                                                 & \lambda(s,a) \geq 0, \quad \forall s, a.
+    \end{align*}
+\end{important}
+
+This linear program has $|\mathcal{S}| |\mathcal{A}|$ variables and $|\mathcal{S}|$ constraints.
+The solution to the dual, $\lambda^\star$ corresponds to the \textit{state-action occupancy} of the
+optimal policy, \[
+    \lambda^\pi(s,a) \doteq \sum_{t=0}^{\infty} \gamma^t P(s_t=s, a_t=a \mid s_0 \sim \mu_0, \pi).
+\]
+By rescaling this measure, we get the \textit{state-action visitation distribution}, \[
+    d_{\mu_0}^\pi(s,a) \doteq (1-\gamma) \E_\pi \lft[ \sum_{t=0}^{\infty} \gamma^t \mathbb{1}\{ s_t = s, a_t = a \} \;\middle|\; s_0 \sim \mu_0 \rgt],
+\]
+which is the probability of being at a state-action $(s,a)$ at any given timestep.
+
