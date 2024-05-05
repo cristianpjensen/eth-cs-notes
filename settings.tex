@@ -144,3 +144,22 @@
 \algdef{SE}[REPEATN]{RepeatN}{End}[1]{\algorithmicrepeat\ #1 \textbf{times}}{\algorithmicend}
 
 \renewcommand{\qedsymbol}{$\blacksquare$}
+
+\usepackage{authoraftertitle}
+
+\renewcommand*{\maketitle}{%
+    \begin{titlepage}
+        \setlength{\parindent}{0pt}%
+        \setlength{\parskip}{4pt}%
+        {\LARGE\itshape\MyTitle\par}
+        {\Large\itshape\MyAuthor\par}
+        {\Large\itshape\today\par}
+
+        \vfill
+        {Note that these are not the official lecture notes of the taught course, but only notes
+            written by me. As such, it might contain mistakes. The source code can be found at
+            \url{github.com/cristianpjensen/eth-cs-notes}. If you find a mistake, please create an
+            issue or open a pull request.}
+        \vspace{4cm}
+    \end{titlepage}
+}
