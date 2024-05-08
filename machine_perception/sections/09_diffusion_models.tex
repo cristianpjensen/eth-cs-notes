@@ -1,0 +1,178 @@
+\section{Diffusion models}
+
+Unlike VAEs and GANs, \textit{diffusion models} do not generate a sample in a single step. They do
+so in many small steps. They start from pure noise and iteratively denoise it. At the end of all
+the denoising steps, the goal is to obtain a sample from the data distribution. The diffusion chain
+can be traversed in two directions: going from noise to sample is called \textit{denoising} and
+going from sample to noise is called \textit{diffusion}. In general, we have \[
+    \vec{x}_0 \sim q, \quad \vec{x}_T \sim \mathcal{N}(\vec{0},\mat{I}),
+\]
+where $q$ is the data distribution and $T$ is the total number of steps in the diffusion chain.
+$\vec{x}_t$ is then a noisy version of $\vec{x}_0$ at timestep $t$, where higher $t$ means more
+noise. The goal of diffusion models is to train a model that can predict $\vec{x}_{t-1}$, given
+$\vec{x}_t$ to reverse the diffusion process. It then performs these small steps $T$ times,
+starting from $\vec{x}_T \sim \mathcal{N}(\vec{0},\mat{I})$.
+
+\subsection{Diffusion step}
+
+To generate the training data for a diffusion model, we need an efficient way of computing
+$\vec{x}_t$ and $\vec{x}_{t+1}$. The diffusion chain is governed by a variance schedule $(\beta_t
+    \in (0, 1))_{t=1}^T$, where $\beta_t < \beta_{t+1}$ for all $t$.\sidenote{There are two main ways
+    of defining the scheduler; a linear schedule and a cosine schedule. It was found that linear
+    schedulers add too much noise too quickly, making it hard for the model to learn. Thus, a cosine
+    scheduler is usually preferred in practice.} A naive way of computing the diffusion steps is
+sequentially, \[
+    q(\vec{x}_t \mid \vec{x}_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t} \vec{x}_{t-1}, \beta_t \mat{I}).
+\]
+However, this is very inefficient, since to compute $\vec{x}_t$, we need to perform $t$ diffusion
+steps. Luckily, there exists a closed-form solution for $\vec{x}_t$ by using the reparametrization
+trick, \[
+    \vec{x}_t = \sqrt{1 - \beta_t} \vec{x}_{t-1} + \sqrt{\beta_t} \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
+\]
+Let $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$. Using the new notation,
+we get \[
+    \vec{x}_t = \sqrt{\alpha_t} \vec{x}_{t-1} + \sqrt{1 - \alpha_t} \vec{\epsilon}.
+\]
+Using induction, we can find a closed-form solution,
+% \begin{align*}
+%     \vec{x}_t & = \lft( \prod_{i=1}^t \sqrt{\alpha_i} \rgt) \vec{x}_0 + \sum_{i=1}^t \lft( \prod_{j=i+1}^t \sqrt{\alpha_j} \rgt) \sqrt{1 - \alpha_i} \vec{\epsilon}_i, \quad \vec{\epsilon}_i \sim \mathcal{N}(\vec{0}, \mat{I}) \\
+%               & = \sqrt{\prod_{i=1}^t \alpha_i} \vec{x}_0 + \sum_{i=1}^{t} \sqrt{\lft( \prod_{j=i+1}^{t} \alpha_j \rgt) (1 - \alpha_i)} \vec{\epsilon}_i.
+% \end{align*}
+\begin{align*}
+    \vec{x}_t & = \sqrt{\alpha_t} (\sqrt{\alpha_{t-1}} \vec{x}_{t-2} + \sqrt{1-\alpha_{t-1}} \vec{\eta}) + \sqrt{1 - \alpha_t} \vec{\epsilon}, \quad \vec{\eta} \sim \mathcal{N}(\vec{0}, \mat{I}) \\
+              & = \sqrt{\alpha_t \alpha_{t-1}} \vec{x}_{t-2} + \sqrt{\alpha_t (1-\alpha_{t-1})} \vec{\eta} + \sqrt{1 - \alpha_t} \vec{\epsilon}                                                    \\
+              & = \circledast
+\end{align*}
+Using the properties of multivariate Gaussians, we get
+\begin{align*}
+     &          & \sqrt{1-\alpha_t} \vec{\epsilon}                                                 & \sim \mathcal{N}(\vec{0}, (1 - \alpha_t) \mat{I})                                \\
+     &          & \sqrt{\alpha_t (1 - \alpha_{t-1})} \vec{\eta}                                    & \sim \mathcal{N}(\vec{0}, \alpha_t(1 - \alpha_{t-1}) \mat{I})                    \\
+     & \implies & \sqrt{\alpha_t (1 - \alpha_{t-1})} \vec{\eta} + \sqrt{1-\alpha_t} \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, (\alpha_t(1 - \alpha_{t-1}) + (1 - \alpha_t)) \mat{I}) \\
+     &          &                                                                                  & = \mathcal{N}(\vec{0}, (1 - \alpha_t \alpha_{t-1}) \mat{I}).
+\end{align*}
+Thus, we have \[
+    \sqrt{\alpha_t (1-\alpha_{t-1})} \vec{\eta} + \sqrt{1 - \alpha_t} \vec{\epsilon} = \sqrt{1 - \alpha_t\alpha_{t-1}} \vec{\epsilon}', \quad \vec{\epsilon}' \sim \mathcal{N}(\vec{0}, \mat{I}).
+\]
+Since $\vec{\epsilon}$ and $\vec{\epsilon}'$ are samples from the same distribution, we can
+continue using $\vec{\epsilon}$,
+\begin{align*}
+    \circledast & = \sqrt{\alpha_t \alpha_{t-1}} \vec{x}_{t-2} + \sqrt{1 - \alpha_t\alpha_{t-1}} \vec{\epsilon} \\
+    \intertext{Continuing this, we obtain}
+                & = \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}.
+\end{align*}
+
+\subsection{Denoising step}
+
+The reverse diffusion (denoising) process obviously has no closed-form solution. Thus, we want to
+parametrize a model $p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)$ that performs the denoising
+from $\vec{x}_t$ to $\vec{x}_{t-1}$. We defined $q(\vec{x}_t \mid \vec{x}_{t-1})$ to be a Gaussian
+with known parameters. For small enough $\beta_t$, we can also model
+$p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)$ as a Gaussian, \[
+    p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) = \mathcal{N}(\vec{x}_{t-1} ; \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t), \mat{\Sigma}_{\vec{\theta}}(\vec{x}_t, t)).
+\]
+Similarly to VAEs, instead of predicting the full distribution (which would be very hard), we only
+need to predict the parameters of the Gaussian (which is not as hard). Using this model, we can
+compute the probability of the full process, \[
+    p_{\vec{\theta}}(\vec{x}_{0:T}) = p(\vec{x}_T) \prod_{t=1}^{T} p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t).
+\]
+
+\subsection{Training}
+
+Similarly to VAEs, we can derive an ELBO to optimize the log-likelihood,
+\begin{align*}
+    \log p_{\vec{\theta}}(\vec{x}_0) & = \log \int p_{\vec{\theta}}(\vec{x}_{0:T}) \mathrm{d}\vec{x}_{1:T}                                                                                                            \\
+                                     & = \log \int q(\vec{x}_{1:T} \mid \vec{x}_0) \frac{p_{\vec{\theta}}(\vec{x}_{0:T})}{q(\vec{x}_{1:T} \mid \vec{x}_0)} \mathrm{d} \vec{x}_{1:T}                                   \\
+                                     & = \log \E_{\vec{x}_{1:T} \sim q(\cdot \mid \vec{x}_0)} \lft[ \frac{p_{\vec{\theta}}(\vec{x}_{0:T})}{q(\vec{x}_{1:T} \mid \vec{x}_0)} \rgt]                                     \\
+                                     & \geq \E_{\vec{x}_{1:T} \sim q(\cdot \mid \vec{x}_0)} \lft[ \log \frac{p_{\vec{\theta}}(\vec{x}_{0:T})}{q(\vec{x}_{1:T} \mid \vec{x}_0)} \rgt] \margintag{Jensen's inequality.} \\
+                                     & \quad\quad\quad\quad\quad\quad \vdots \\
+                                     & = \underbrace{\E_{\vec{x}_{1:T} \sim q(\cdot \mid \vec{x}_0)} \lft[ \log p_{\vec{\theta}}(\vec{x}_{0:T}) \rgt]}_{\textit{reconstruction term}} - \underbrace{D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \lVert p(\vec{x}_T))}_{\textit{prior matching term}} \\
+                                     &\quad\quad - \underbrace{\sum_{t=2}^{T} \E_{\vec{x}_t \sim q(\cdot \mid \vec{x}_0)} \lft[ D_{\mathrm{KL}}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \lVert p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) \rgt]}_{\textit{denoising matching term}}.
+\end{align*}
+
+In practice, we assume that the covariance matrix $\mat{\Sigma}_t = \sigma_t^2 \mat{I}$ of $p$ and $q$ are the same. Then, we can simplify the denoising matching term,
+\begin{align*}
+    &\argmin_{\vec{\theta}} D_{\mathrm{KL}}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \lVert p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) \\
+    & = \argmin_{\vec{\theta}} D_{\mathrm{KL}}\lft( \mathcal{N}(\vec{\mu}_q, \mat{\Sigma}_t) \lVert \mathcal{N}(\vec{\mu}_{\vec{\theta}}, \mat{\Sigma}_t) \rgt) \\
+    & = \argmin_{\vec{\theta}} \frac{1}{2} \lft( \log \frac{\det{\mat{\Sigma}_t}}{\det{\mat{\Sigma}}} - d + \tr{\inv{\mat{\Sigma}_t} \mat{\Sigma}_t} + \transpose{(\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q)} \inv{\mat{\Sigma}} (\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q) \rgt) \\
+    & = \argmin_{\vec{\theta}} \transpose{(\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q)} \inv{(\sigma^2_t \mat{I})} (\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q) \\
+    & = \argmin_{\vec{\theta}} \frac{1}{\sigma_t^2} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|^2.
+\end{align*}
+Thus, we want to minimize the difference between the means of the two distributions. Assuming that we have a model that can predict the noise at timestep $t$, we can compute the two means by
+\begin{align*}
+    \vec{\mu}_q(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{\bar{\alpha}_t} \sqrt{\alpha_t}}} \vec{\epsilon} \\
+    \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t} \sqrt{\alpha_t}}} \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t).
+\end{align*}
+A further simplification can be made by formulating the loss directly as the difference between the two actual and predicted noise, \[
+    \| \vec{\epsilon} - \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t) \|^2 = \lft\| \vec{\epsilon} - \hat{\vec{\epsilon}}_{\vec{\theta}}\lft(\sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t}\vec{\epsilon}, t\rgt) \rgt\|^2.
+\]
+We then get the following algorithms for training and sampling a diffusion model.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \Require{$\{ \beta_t \}_{t=1}^T$}
+        \While{not converged}
+        \State $\vec{x}_0 \sim q$
+        \State $t \sim \mathrm{Unif}([T])$
+        \State $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$
+        \State $\mathcal{L} = \lft\| \vec{\epsilon} - \hat{\vec{\epsilon}}_{\vec{\theta}}\lft( \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, t \rgt) \rgt\|^2$
+        \State {perform a gradient descent step on $\mathcal{L}$}
+        \EndWhile
+    \end{algorithmic}
+    \caption{Diffusion model training algorithm.}
+\end{algorithm}
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \Require{$\{ \beta_t \}_{t=1}^T$, $\hat{\vec{\epsilon}}_{\vec{\theta}}$}
+        \State $\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$
+        \For{$t = T, \ldots, 1$}
+        \State $\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})$ if $t > 1$ else $\vec{z} = \vec{0}$
+        \State $\vec{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sigma_t \vec{z}$
+        \EndFor
+        \State \Return $\vec{x}_0$
+    \end{algorithmic}
+    \caption{Diffusion model sampling algorithm.}
+\end{algorithm}
+
+\subsection{Guidance}
+
+In use-cases such as text-to-image, we want to condition the generated image $\vec{x}$ on the input
+text $y$, meaning that we need to model a conditional distribution, \[
+    p_{\vec{\theta}}(\vec{x}\mid y) = p(\vec{x}_T) \prod_{t=1}^{T}  p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t, y).
+\]
+\textit{Contrastive language-image pretraining} (CLIP) \citep{radford2021learning} is a large
+image-language model that has been trained on image-caption pairs. It consists of an image encoder
+and a text encoder network. By using a contrastive loss, CLIP is encouraged to encode the image and
+caption into similar embeddings.\sidenote{A possible application of CLIP is \textit{zero-shot
+classification}, which leverages the CLIP model to predict the class of an image without any
+training. It achieves this by predicting the class that maximizes the cosine similarity between the
+image and the class name.}
+
+The idea of \textit{classifier guidance} is to guide denoising in a ``direction'' favoring images
+that are more reliably classified by a trained classifier. For this we need a pretrained
+unconditional diffusion model and a classifier trained on noisy images. Then, we guide the denoising
+in the ``direction'' of the classifier by injecting gradients of the classifier model into the
+sampling process. However, the problem is that this requires training a very specific classifier on
+noisy data, because we want to guide the diffusion model in all steps of the process. Furthermore, it
+is hard to interpret what the classifier guidance is doing.
+
+\textit{Classifier-free guidance} \citep{ho2022classifierfree} address these issues by jointly training a class-conditional and unconditional diffusion model. It then guides the generation process in the generation of conditioning by \[
+    \vec{\epsilon}^\star_{\vec{\theta}}(\vec{x}, y; t) = (1 + \rho) \vec{\epsilon}_{\vec{\theta}}(\vec{x}, y; t) - \rho \vec{\epsilon}_{\vec{\theta}}(\vec{x}; t),
+\]
+where $y$ is the conditioning variable and is usually obtained by encoding text using CLIP and $\rho$
+controls the strength of the guidance.\sidenote{In practice, we usually train a single model and just
+set the conditioning variable to all zero for the unconditional generation.} However, the problem
+with this approach is that generation takes twice as long when compared to classifier guidance.
+Overall, guidance improves the quality of the outputs, but reduces the diversity of the generated
+images.
+
+\subsection{Latent diffusion models}
+
+Diffusion models for image generation typically operate on the original, high-dimensional image size,
+which can result in slow training and sampling. \textit{Latent diffusion models}
+\citep{rombach2022highresolution} address this issue by operating on the latent space of a VAE. The
+VAE is trained beforehand and is frozen during training of the diffusion model. The diffusion model
+then does the diffusion reversal on the latent space, rather than the high-dimensional space of the
+data. This has the advantage that it significantly improves the efficiency of sampling and training.
+Furthermore, in this approach, the diffusion model only needs to focus on the ``semantic'' aspect of
+the image, because the VAE has already captured the relevant information in the latent space.
