@@ -1,0 +1,301 @@
+\section{Reinforcement learning}
+
+\begin{marginfigure}
+    \centering
+    \incfig{markov-decision-process}
+    \caption{Diagram of an MDP.}
+    \label{fig:markov-decision-process}
+\end{marginfigure}
+
+\begin{marginfigure}
+    \centering
+    \incfig{reinforcement-learning}
+    \caption{Reinforcement learning.}
+    \label{fig:reinforcement-learning}
+\end{marginfigure}
+
+\begin{definition}[Markov decision process]
+    A Markov decision process (MDP) is a 5-tuple $\langle \mathcal{S}, \mathcal{A}, P, r, \gamma \rangle$, where
+    \begin{itemize}
+        \item $\mathcal{S}$ is the state space;
+        \item $\mathcal{A}$ is the action space;
+        \item $P: \mathcal{S} \times \mathcal{A} \to \Delta(\mathcal{S})$ is the state transition model;
+        \item $r: \mathcal{S} \times \mathcal{A} \to \R$ is the expected reward function;
+        \item $\gamma \in [0,1]$ is the discount factor. If $\gamma = 1$, all future rewards count as
+              much as current reward. If $\gamma = 0$, only immediate rewards matter. Usually, we want
+              a value between $0$ and $1$, because we want a balance between the two extremes.
+    \end{itemize}
+\end{definition}
+
+An MDP can be seen as a controlled Markov chain, because the next state $s_{t+1}$ is independent of
+all states and actions before $t$ if we know $(s_t, a_t)$, \[
+    \mathbb{P}(s_{t+1} = s' \mid s_t = s, a_t = a, \ldots, s_0, a_0) = P(s' \mid s, a).
+\]
+The performance objective is maximizing the expected discounted reward.
+
+\begin{definition}[Policy]
+    A policy $\pi: \mathcal{S} \to \Delta(\mathcal{A})$ expresses an agent's behavior by mapping
+    states to a probability distribution over actions. A policy can be made deterministic by
+    outputting only Dirac distributions.
+\end{definition}
+
+With a fixed policy, we can then put the probability of the next action as \[
+    \mathbb{P}(a_t = a \mid s_t = s, \ldots, s_0, a_0) = \pi(a\mid s).
+\]
+At any point in the Markov chain, the objective of an agent is to maximize the (discounted) return, \[
+    G_t = \sum_{k=0}^{\infty} \gamma^k r(s_{t+k},a_{t+k}).
+\]
+This can also be written in recursive form as \[
+    G_t = r(s_t, a_t) + \gamma G_{t+1}.
+\]
+
+\begin{definition}[Value function]
+    The value function $V^\pi: \mathcal{S} \to \R$ is defined as the expected return under policy
+    $\pi$, starting from state $s$, \[
+        V^\pi(s) \doteq \E_{\pi} \lft[ G_0 \;\middle|\; s_0=s \rgt] = \E_{\pi} \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t, a_t) \;\middle|\; s_0=s \rgt].
+    \]
+\end{definition}
+
+From the definition of the value function, we can derive the Bellman consistency equation,
+\begin{align*}
+    V^\pi(s) & \doteq \E_{\pi}[G_0 \mid s_0 = s]                                                                                                                                                                                                                              \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \E_{\pi}[r(s,a) + \gamma G_1 \mid s_0 = s, a_0 = a] \margintag{Recursive definition of return and condition on action.}                                                                                                \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s,a) + \gamma \E_{\pi}[G_1 \mid s_0 = s, a_0 = a] \rgt] \margintag{Linearity of expectation.}                                                                                                                  \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_1 \mid s_1 = s'] \rgt] \margintag{Condition on next state, which makes $(s_0, a_0)$ irrelevant for further return due to Markov property.} \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_0 \mid s_0 = s'] \rgt] \margintag{Markov property.}                                                                                        \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
+\end{align*}
+Furthermore, we have the Bellman optimality equation, \[
+    V^\star(s) = \max_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s' \mid s, a) V^\star(s') \rgt\}.
+\]
+This must always hold for the optimal policy, because the optimal policy acts greedily \wrt the
+optimal value function. We can formalize this as the Bellman optimality operator \[
+    (\mathcal{T} \vec{v})(s) \doteq \max_{a\in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s'\in \mathcal{S}} P(s' \mid s, a) \vec{v}(s') \rgt\}. \margintag{$\vec{v}$ is the vector containing all state values, where $\vec{v}_s = V^\pi(s)$.}
+\]
+This operator is a $\gamma$-contraction \wrt the $\ell_{\infty}$-norm, \[
+    \| \mathcal{T} \vec{v}' - \mathcal{T} \vec{v} \|_{\infty} \leq \gamma \| \vec{v}' - \vec{v} \|_{\infty},
+\]
+and monotonic, \[
+    \vec{v} \leq \vec{v}' \implies \mathcal{T}\vec{v} \leq \mathcal{T} \vec{v}'.
+\]
+As we saw above, $\vec{v}^\star$ is the fixed-point of the Bellman optimality operator, \[
+    \vec{v}^\star = \mathcal{T} \vec{v}^\star.
+\]
+Thus, by applying $\mathcal{T}$ iteratively, we converge linearly in $\gamma$, \[
+    \| \mathcal{T} \vec{v}_t - \vec{v}^\star \|_{\infty} = \| \mathcal{T} \vec{v}_t - \mathcal{T} \vec{v}^\star \|_{\infty} \leq \gamma \| \vec{v}_t - \vec{v}^\star \|.
+\]
+This telescopes, giving \[
+    \| \vec{v}_t - \vec{v}^\star \| \leq \gamma^t \| \vec{v}_0 - \vec{v}^\star \|.
+\]
+As $t \to \infty$, $\gamma^t \to 0$, showing convergence. This leads us to \textit{value
+    iteration}, which does exactly that; see \Cref{alg:value-iteration}. After computing the optimal
+value function, we can get the optimal policy by acting greedily \wrt the returned value function, \[
+    \pi^\star(s) \in \argmax_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\star(s') \rgt\}.
+\]
+The runtime complexity of a single iteration is $\bigo{|\mathcal{S}|^2 |\mathcal{A}|}$.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \State $\vec{v}_0 \gets \vec{0}$
+        \While{$\| \vec{v}_t - \vec{v}_{t-1} \|_{\infty} > \epsilon$}
+        \State $\vec{v}_{t+1} = \mathcal{T} \vec{v}_t$
+        \EndWhile
+        \State \Return $\vec{v}$
+    \end{algorithmic}
+    \caption{Value iteration, where $\mathcal{T}$ is the Bellman optimality operator.}
+    \label{alg:value-iteration}
+\end{algorithm}
+
+\textit{Policy iteration} is another algorithm that computes the optimal policy given a known MDP.
+Instead of only operating in the space of the value function, it alternates between computing the
+value function and the greedy policy \wrt the value function; see \Cref{alg:policy-iteration}. This
+algorithm converges in fewer iterations than value iteration, but has higher iteration cost of
+$\bigo{|\mathcal{S}| + |\mathcal{S}|^2|\mathcal{A}|}$.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \State $\pi_0 \gets \text{random policy}$
+        \While{$\| \vec{v}^{\pi_t} - \vec{v}^{\pi_{t-1}} \|_{\infty} > \epsilon$}
+        \State $V^{\pi_t} \gets \Call{ValueFunction}{\pi_t}$ \Comment{Policy evaluation}
+        \State $\pi_{t+1} \gets \Call{GreedyPolicy}{V^{\pi_t}}$ \Comment{Policy improvement}
+        \EndWhile
+    \end{algorithmic}
+    \caption{Policy iteration.}
+    \label{alg:policy-iteration}
+\end{algorithm}
+
+\paragraph{Reinforcement learning.}
+
+\begin{marginfigure}[5cm]
+    \centering
+    \incfig{rl-overview}
+    \caption{Overview of the kinds of reinforcement learning algorithms.}
+    \label{fig:rl-overview}
+\end{marginfigure}
+
+Unlike in MDPs, in reinforcement learning (RL), we do not have access to the transition model $P$
+and reward function $r$. Thus, we cannot make use of value iteration or policy iteration. In some
+way, we must learn to act optimally within an environment by interacting with it. We can
+distinguish between two kinds of RL algorithms: \textit{model-free} and \textit{model-based}. In
+model-based RL, we learn the underlying MDP by approximating $P$ and $r$. Then, we solve this
+learned MDP by value or policy iteration. However, we do not \textit{need} the underlying MDP to
+act optimally. In model-free RL, we learn either the value function, which induces a greedy policy,
+or directly learn the policy. Generally, model-free algorithms are less expensive to run, while
+model-based algorithms are more sample efficient.
+
+Furthermore, we can distinguish between RL algorithms in how they learn from data;
+\textit{on-policy} and \textit{off-policy}. On-policy algorithms must learn from actions that
+result from its own actions, while off-policy algorithms can learn from the trajectory data of any
+algorithm. Generally, off-policy are preferred, since we can collect data more efficiently.
+
+Lastly, a way that RL differs from supervised learning is that the data depends on past actions,
+\ie, they are highly correlated, which violates the \textit{independently and identically
+    distributed} assumption made by supervised learning. RL algorithms learn from trajectory data, \[
+    \tau = (s_0, a_0, r_0, s_1, a_1, r_1, s_2, \ldots).
+\]
+
+\subsection{Monte Carlo methods}
+
+The most naive method is the \textit{Monte Carlo method}, which is a value-based on-policy
+algorithm that estimates the value function by the empirical mean return, \[
+    V^\pi(s) \approx \frac{1}{n} \sum_{i=1}^{n} G(s)^i,
+\]
+where $G(s)^i$ is the return of episode $i$, starting from $s$. The problem with this method is
+that we need to wait for a trajectory to finish before we can use it for approximating the value
+function.
+
+\subsection{Temporal difference learning}
+
+\textit{Temporal difference} (TD) learning makes it possible to learn from transitions $(s,a,r,s')$,
+instead of full trajectories, by approximating the Bellman equation by a single reward, action,
+and next-state sample, \[
+    V(s) \gets \alpha V(s) + (1-\alpha) (r + \gamma V(s')),
+\]
+where $\alpha > 0$ is the learning rate. We use \textit{bootstrapping} here, which means that we
+use ``old'' information $V(s')$ as labels. This can also be interpreted as updating the value by
+the TD error,
+\begin{align*}
+    \delta & = r + \gamma V(s') - V(s)   \\
+    V(s)   & \gets V(s) + \alpha \delta.
+\end{align*}
+
+However, to find the optimal value function, we must visit all states sufficiently often. This
+means that we have to find a balance between exploration and exploitation. A commonly used method
+is the $\epsilon$-greedy policy, which chooses a random action with small probability $\epsilon$.
+
+\paragraph{SARSA.} \textit{SARSA} is an on-policy algorithm that learns the Q-values of a policy
+$\pi$. It updates Q-values given a transition $(s, a, r, s')$ as follows, \[
+    Q(s,a) \gets \alpha Q(s,a) + (1-\alpha) (r + \gamma Q(s', a')), \quad a' \sim \pi(\cdot, s').
+\]
+This is on-policy, because it requires the policy for the update.
+
+\paragraph{Q-learning.} An off-policy version of SARSA is \textit{Q-learning}. Note that this learns the optimal Q-values,
+rather than the Q-values of a certain policy. It updates the Q-values by \[
+    Q(s,a) \gets \alpha Q(s,a) + (1-\alpha) (r + \gamma Q(s', a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
+\]
+Notice that this is an off-policy algorithm, because nowhere in the learning algorithm does it
+depend on the policy. Given optimal Q-values, it is easy to compute the optimal policy by always
+acting greedily, \[
+    \pi(s) \in \argmax_{a \in \mathcal{A}} Q(s, a).
+\]
+
+\subsection{Deep reinforcement learning}
+
+Notice that the policy and the value are simply functions, \[
+    \pi: \mathcal{S} \to \mathcal{A}, \quad V^\pi: \mathcal{S} \to \R.
+\]
+Thus, we can use neural networks to approximate them. This is especially useful for large state and
+action spaces, since these would not fit in memory.
+
+\paragraph{Replay buffer.}
+
+The key component to training the following models is the \textit{replay buffer}. Since transitions
+are highly correlated and we want to use supervised learning techniques, we cannot always use the
+latest transition for training. Instead, the replay buffer stores the last $n$ transitions and
+randomly samples from them, making the data points independent and identically distributed.
+
+\paragraph{Deep Q-learning.}
+
+Deep Q-networks (DQN) estimate the value function of a large, potentially infinite, state space
+with a finite number of parameters $\vec{\theta}$, \[
+    V(s) \approx V_{\vec{\theta}}(s).
+\]
+It does so in a very similar way to discrete Q-learning. However, instead of updating the Q-values
+directly, the parameters of the network are updated by the gradients of the following loss function
+given a transition $(s, a, r, s')$, \[
+    \ell(\vec{\theta}) = \lft( Q_{\vec{\theta}}(s, a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s',a')) \rgt)^2, \quad a' \in \argmax_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
+\]
+Notice that we use different parameters $\bar{\vec{\theta}}$ for the target value. This is a copy
+of the parameters $\vec{\theta}$ that is only updated occasionally. This helps with convergence,
+because the target is more stable than if we used $\vec{\theta}$.
+
+\paragraph{Policy search methods.}
+
+The problem with DQNs is that they do not address potentially large state spaces. \textit{Policy
+    search methods} solve this by directly parametrizing the policy $\pi_{\vec{\theta}}$. However, it
+is not trivial to train such a model, since there is no way of knowing what the target action
+should be. Furthermore, we want the policy to be a probability distribution. Thus, instead we
+parameterize a Gaussian as the policy, \[
+    \pi(a \mid s) = \mathcal{N}\lft(a; \mu_{\vec{\theta}}, \sigma_{\vec{\theta}}^2\rgt).
+\]
+Recall that the probability of a trajectory $\tau$ is computed by \[
+    \pi_{\vec{\theta}}(\tau) = p(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) p(s_{t+1} \mid a_t, s_t).
+\]
+And, ideally, we want our policy to make trajectories with high return more likely and trajectories
+with low return unlikely. Thus, we have the following training objective that we want to maximize, \[
+    J(\vec{\theta}) \doteq \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt].
+\]
+Then, we update the parameters by gradient ascent, \[
+    \vec{\theta} \gets \vec{\theta} + \eta \grad{J(\vec{\theta})}{\vec{\theta}}.
+\]
+But, since we take the expectation \wrt the parameters $\vec{\theta}$, we need to rederive it, such
+that we can compute its gradient. First, we can rewrite the expectation as
+\begin{align*}
+    J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} [r(\tau)] \margintag{Let $r(\tau) \doteq \sum_{t=0}^{T} \gamma^t r(s_t, a_t)$.} \\
+                    & = \int \pi_{\vec{\theta}}(\tau) r(\tau) d\tau.
+\end{align*}
+Now, we can rewrite the gradient,
+\begin{align*}
+    \grad{J(\vec{\theta})}{\vec{\theta}} & = \int \grad{\pi_{\vec{\theta}}(\tau)}{\vec{\theta}} r(\tau) d\tau                                                                                                                                   \\
+                                         & = \int \pi_{\vec{\theta}}(\tau) \grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}} r(\tau) d\tau \margintag{By chain rule, $\grad{\log f(\vec{x})}{} = \nicefrac{\grad{f(\vec{x})}{}}{f(\vec{x})}$.} \\
+                                         & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}} r(\tau) \rgt].
+\end{align*}
+We can evaluate $\log \pi_{\vec{\theta}}$ as
+\begin{align*}
+    \log \pi_{\vec{\theta}}(\tau) & = \log \lft( p(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) p(s_{t+1} \mid a_t, s_t) \rgt)                    \\
+                                  & = \log p(s_0) + \sum_{t=0}^{T} \log \pi_{\vec{\theta}}(a_t \mid s_t) + \sum_{t=0}^{T} \log p(s_{t+1} \mid a_t, s_t).
+\end{align*}
+Thus, when we take the gradient, only the second term remains, \[
+    \grad{\log \pi_{\vec{\theta}}(\tau)}{\vec{\theta}} = \sum_{t=0}^{T} \grad{\log \pi_{\vec{\theta}}(a_t \mid s_t)}{\vec{\theta}}.
+\]
+So, we are able to update $\vec{\theta}$ without knowing the MDP. Thus, we get the following
+objective gradient, \[
+    \grad{J(\vec{\theta})}{\vec{\theta}} = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \lft( \sum_{t=0}^{T} \grad{\log \pi_{\vec{\theta}}(a_t \mid s_t)}{\vec{\theta}} \rgt) \lft( \sum_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt) \rgt].
+\]
+Despite that this value is unbiased, it exhibits high variance. To reduce the variance, we can
+introduce a baseline $b(\tau)$, \[
+    \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \lft( \sum_{t=0}^{T} \grad{\log \pi_{\vec{\theta}}(a_t \mid s_t)}{\vec{\theta}} \rgt) (r(\tau) - b(\tau)) \rgt],
+\]
+which does not influence the unbiasedness.\sidenote{Critically, the baseline may not depend on the
+    policy $\pi_{\vec{\theta}}$.} Thus, we are allowed to shift the reward up or down to reduce the
+variance. REINFORCE \citep{sutton1999policy} sets this baseline to be \[
+    b_t(\tau) = \sum_{t'=0}^{t-1} \gamma^{t'} r(s_{t'}, a_{t'}).
+\]
+Thus, we get the following expectation, \[
+    \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \lft( \sum_{t=0}^{T} \grad{\log \pi_{\vec{\theta}}(a_t \mid s_t)}{\vec{\theta}} \rgt) G_t \rgt].
+\]
+\Ie, instead of total discounted reward, we only consider the reward from timestep $t$ onward, which
+naturally has lower variance. Note that REINFORCE is an on-policy algorithm, because it requires
+training on its own trajectory data, since the expectation is \wrt trajectories from the policy itself.
+
+\paragraph{Actor-critic methods.}
+
+A natural next question is how we can make this off-policy. The key idea behind
+\textit{actor-critic methods} is to introduce bias and reduce variance by learning a value network
+next to the policy network. We can then estimate $G_t$ in the REINFORCE gradient by bootstrapping, \[
+    \grad{\log \pi_{\vec{\theta}}(a_t \mid s_t)}{\vec{\theta}} \lft( V(s_t) - (r(s_t, a_t) + \gamma V(s_{t+1})) \rgt).
+\]
+We can remove the expectation since nothing depends on $\tau$ anymore, since we estimate $G_t$ as
+$V(s_t) - (r(s_t, a_t) + \gamma V(s_{t+1}))$. Note that if the TD error is zero, it means that the
+value network has learned the optimal value function and the policy network has learned the optimal
+policy, leading to no update.
