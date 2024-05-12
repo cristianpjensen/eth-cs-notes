@@ -183,14 +183,14 @@ However, to find the optimal value function, we must visit all states sufficient
 means that we have to find a balance between exploration and exploitation. A commonly used method
 is the $\epsilon$-greedy policy, which chooses a random action with small probability $\epsilon$.
 
-\paragraph{SARSA.} \textit{SARSA} is an on-policy algorithm that learns the Q-values of a policy
-$\pi$. It updates Q-values given a transition $(s, a, r, s')$ as follows, \[
+\paragraph{SARSA.} \textit{SARSA} \citep{rummery1994line} is an on-policy algorithm that learns the
+Q-values of a policy $\pi$. It updates Q-values given a transition $(s, a, r, s')$ as follows, \[
     Q(s,a) \gets \alpha Q(s,a) + (1-\alpha) (r + \gamma Q(s', a')), \quad a' \sim \pi(\cdot, s').
 \]
 This is on-policy, because it requires the policy for the update.
 
-\paragraph{Q-learning.} An off-policy version of SARSA is \textit{Q-learning}. Note that this learns the optimal Q-values,
-rather than the Q-values of a certain policy. It updates the Q-values by \[
+\paragraph{Q-learning.} An off-policy version of SARSA is \textit{Q-learning} \citep{watkins1992q}. Note that this learns
+the optimal Q-values, rather than the Q-values of a certain policy. It updates the Q-values by \[
     Q(s,a) \gets \alpha Q(s,a) + (1-\alpha) (r + \gamma Q(s', a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
 \]
 Notice that this is an off-policy algorithm, because nowhere in the learning algorithm does it
@@ -216,8 +216,8 @@ randomly samples from them, making the data points independent and identically d
 
 \paragraph{Deep Q-learning.}
 
-Deep Q-networks (DQN) estimate the value function of a large, potentially infinite, state space
-with a finite number of parameters $\vec{\theta}$, \[
+Deep Q-networks (DQN) \citep{mnih2013playing} estimate the value function of a large, potentially
+infinite, state space with a finite number of parameters $\vec{\theta}$, \[
     V(s) \approx V_{\vec{\theta}}(s).
 \]
 It does so in a very similar way to discrete Q-learning. However, instead of updating the Q-values

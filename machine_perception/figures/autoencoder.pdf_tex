@@ -54,10 +54,13 @@
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{autoencoder.pdf}}%
-    \put(0.25730363,0.34692041){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$f$\end{tabular}}}}%
-    \put(0.69227729,0.34692041){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$g$\end{tabular}}}}%
-    \put(0.39393965,0.14864118){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\textit{latent space}\end{tabular}}}}%
-    \put(0.0457847,0.34692041){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}$\end{tabular}}}}%
-    \put(0.91752789,0.34692041){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\hat{\vec{x}}$\end{tabular}}}}%
+    \put(0.25730363,0.31562608){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$f$\end{tabular}}}}%
+    \put(0.69227729,0.31562608){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$g$\end{tabular}}}}%
+    \put(0.39393965,0.11734684){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}\textit{latent space}\end{tabular}}}}%
+    \put(0.0457847,0.31562608){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{x}$\end{tabular}}}}%
+    \put(0.91752789,0.31562608){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\hat{\vec{x}}$\end{tabular}}}}%
+    \put(0.47402065,0.0638569){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{Z}$\end{tabular}}}}%
+    \put(0.1181108,0.67074525){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{X}$\end{tabular}}}}%
+    \put(0.84290199,0.67074525){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{X}$\end{tabular}}}}%
   \end{picture}%
 \endgroup%

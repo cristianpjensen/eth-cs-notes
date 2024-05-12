@@ -58,8 +58,14 @@ Since convolutions are linear, discrete convolutions can be implemented using ma
     \label{fig:cnn}
 \end{marginfigure}
 
-A convolutional neural network (CNN) is composed of a sequence of \textit{convolutional layers} and
-\textit{pooling layers}, followed by a final \textit{dense layer} (MLP).
+A \textit{convolutional neural network} (CNN) \citep{krizhevsky2012imagenet} is composed of a
+sequence of \textit{convolutional layers} and \textit{pooling layers}, followed by a final
+\textit{dense layer} (MLP).
+
+This architecture is loosely inspired by the brain, which, at a high level, first extracts
+high-level features and then more and more specific features. Furthermore, the HMAX model of the
+brain distinguishes between simple and complex cells, which correspond to the linear layer and
+max-pool layer, respectively.
 
 \paragraph{Convolutional layer.}
 
@@ -71,9 +77,14 @@ A convolutional neural network (CNN) is composed of a sequence of \textit{convol
     \label{fig:convolutional-layer}
 \end{marginfigure}
 
-A convolutional layer applies a filter $\mat{W}$ to an input image $\mat{Z}$ by convolution. This
-filter is learned. Hence, we need to derive its derivative. We will focus on the single filter case
-for simplicity, whose forward pass is computed by \[
+A convolutional layer applies many filters $\tens{W} \in \R^{\mathrm{C_{in}} \times
+        C_{\mathrm{out}} \times k \times k}$ to an input image $\tens{Z} \in \R^{C_{\mathrm{in}} \times H
+        \times W}$ by convolution, \[
+    \mat{Z}^{(\ell)}_j = \sum_{k=1}^{C_{\mathrm{in}}} \mat{W}^{(\ell)}_{kj} * \mat{Z}^{(\ell - 1)}_k + b_j, \quad j \in [C_{\mathrm{out}}].
+\]
+
+This filter is learned. Hence, we need to derive its derivative. We will focus on the single filter
+case ($C_{\mathrm{in}} = C_{\mathrm{out}} = 1$) for simplicity, whose forward pass is computed by \[
     z^{(\ell)}[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} w^{(\ell)}[m,n] z^{(\ell-1)}[i-m,j-n] + b.
 \]
 

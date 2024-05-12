@@ -3,7 +3,14 @@
 \textit{Recurrent neural networks} (RNN) are a type of neural network that processes sequential data,
 such as text and video. Unlike traditional neural networks, which take fixed-length inputs, RNNs can
 take inputs of variable length.\sidenote{This is useful for data structures such as text, where the
-    number of words in a text is not fixed.}
+    number of words in a text is not fixed.} Generally, RNNs have the following form, \[
+    \vec{h}^{(t)} = f_{\vec{\theta}}\lft(\vec{h}^{(t-1)}, \vec{x}^{(t)}\rgt).
+\]
+In this way, an RNN behaves much like a dynamical system. If we unroll the timesteps, it becomes
+clear how $\vec{h}^{(t)}$ depends on $\vec{x}^{(1:t)}$, \[
+    \vec{h}^{(t)} = f_{\vec{\theta}}\lft(f_{\vec{\theta}}\lft(\cdots \lft(f_{\vec{\theta}}\lft(\vec{h}^{(0)}, \vec{x}^{(1)}\rgt), \cdots\rgt), \vec{x}^{(t-1)}\rgt), \vec{x}^{(t)}\rgt).
+\]
+Because of this, we can see $\vec{h}^{(t)}$ as a representation of $\vec{x}^{(1:t)}$.
 
 RNNs can have different applications, for example, \textit{one to one}, where at each time step we
 have one input and one output,\sidenote{\Eg, part-of-speech tagging.}, \textit{one to many}, where
@@ -17,18 +24,25 @@ length.\sidenote{\Eg, machine translation, where we map a sentence in one langua
 
 \subsection{Elman RNN}
 
-The Elman RNN is characterized by a hidden vector $\vec{h}^{(t)}$, which forms the state of the
-network at timestep $t$. The hidden state is updated at each timestep by combining the previous
-hidden state with the input, \[
-    \vec{h}^{(t)} = \tanh\lft(\mat{W}_h \vec{h}^{(t-1)} + \mat{W}_x \vec{x}^{(t)}\rgt). \margintag{We use the $\tanh$ activation function, because it is centered at 0.}
+The Elman RNN \citep{elman1990finding} is characterized by a hidden vector $\vec{h}^{(t)}$, which
+forms the state of the network at timestep $t$. The hidden state is updated at each timestep by
+combining the previous hidden state with the input, \[
+    f_{\vec{\theta}} \lft( \vec{h}^{(t-1)}, \vec{x}^{(t)} \rgt) = \tanh\lft(\mat{W}_h \vec{h}^{(t-1)} + \mat{W}_x \vec{x}^{(t)}\rgt). \margintag{We use the $\tanh$ activation function, because it is centered at 0.}
 \]
-We can then use the hidden state as a representation of the input up until that timestep. Thus, we
-can use it as the input to a feed-forward neural network, \[
-    \hat{\vec{y}}^{(t)} = \mat{W}_y \vec{h}^{(t)}.
+Since $\vec{h}^{(t)}$ represents the subsequence $\vec{x}^{(1:t)}$, we can use it as input to an
+MLP, \[
+    \hat{\vec{y}} = \mat{W}_y \vec{h}^{(t)}.
 \]
 Then, we can compute the loss function as the sum of each individual loss function, \[
     \mathcal{L} \doteq \sum_{t=1}^{T} \ell^{(t)}.
 \]
+
+\begin{marginfigure}[2cm]
+    \centering
+    \incfig{rnn}
+    \caption{The computational graph of an unrolled recurrent neural network. The inputs $\vec{x}_{1:T}$ and outputs $\vec{y}_{1:T}$ are omitted.}
+    \label{fig:rnn}
+\end{marginfigure}
 
 We use \textit{backpropagation through time} (BPTT) to compute the gradient of an RNN. This
 involves first unrolling the RNN; see \Cref{fig:rnn}. Then we can compute the gradient by
@@ -37,13 +51,6 @@ backpropagation on the resulting computational graph, \[
 \]
 where $\pdv{^+ \vec{h}^{(k)}}{\mat{W}}$ is the immediate derivative that treats $\vec{h}^{(k-1)}$
 as constant \wrt $\mat{W}$.
-
-\begin{marginfigure}
-    \centering
-    \incfig{rnn}
-    \caption{The computational graph of an unrolled recurrent neural network. The inputs $\vec{x}_{1:T}$ and outputs $\vec{y}_{1:T}$ are omitted.}
-    \label{fig:rnn}
-\end{marginfigure}
 
 Let's only consider the following term of the product,
 \begin{align*}
@@ -65,23 +72,30 @@ Let $\lambda_1$ be the largest eigenvalue of $\mat{W}_h$, then we have two cases
               \lft\| \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} \rgt\| = \lft\| \prod_{i=k+1}^t \pdv{\vec{h}^{(i)}}{\vec{h}^{(i-1)}} \rgt\| < \eta^{t-k}.
           \]
           This converges to zero, as $t \to \infty$. Thus, we have a \textit{vanishing gradient};
-    \item $\lambda_1 > \frac{1}{\gamma}$. Then we have the following,  \[
-              \lft\| \pdv{\vec{h}^{(i)}}{\vec{h}^{(i-1)}} \rgt\| \leq \|\mat{W}_h\| \lft\|\mathrm{diag}\lft( \sigma' \lft( \mat{W}_h \vec{h}^{(t-1)} + \mat{W}_x \vec{x}^{(t)} \rgt) \rgt) \rgt\| > \frac{1}{\gamma} \gamma = 1.
-          \]
-          Using the same logic as in the other case, this yields \[
+    \item $\lambda_1 > \frac{1}{\gamma}$. Using the same logic as in the other case, this yields \[
               \lft\| \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} \rgt\| = \lft\| \prod_{i=k+1}^t \pdv{\vec{h}^{(i)}}{\vec{h}^{(i-1)}} \rgt\| > \eta^{t-k}.
           \]
           for an upper bound $\eta > 1$. Thus, this diverges to $\infty$ as $t \to \infty$. Thus, we have a
           \textit{exploding gradient}.
 \end{enumerate}
 Thus, we will always have vanishing or exploding gradients when using an Elman RNN. This makes it
-hard for the architecture to capture long-term dependencies.
+hard for the architecture to capture long-term dependencies. A naive solution is to truncate BPTT to
+only go back $m$ steps. However, then we still lose long-term signals, which we wanted to preserve.
 
 \subsection{Long-short term memory}
 
-The \textit{long-short term memory} (LSTM) architecture \citep{hochreiter1997long} fixes the
-vanishing gradient problem of the Elman RNN by making sure there is always a path between hidden
-units, such that errors can always propagate; see \Cref{fig:lstm}.
+We need to make sure there is constant error flow. For this, we need a connection between timesteps
+that avoids exploding and vanishing gradients. A simple solution is the leaky unit,
+\begin{align*}
+    \hat{\vec{h}}^{(t)} & = f_{\vec{\theta}}\lft(\vec{h}^{(t-1)}, \vec{x}^{(t)}\rgt) \\
+    \vec{h}^{(t)}       & = \alpha \vec{h}^{(t-1)} + (1- \alpha) \hat{\vec{h}}^{t}.
+\end{align*}
+
+The \textit{long-short term memory} (LSTM) architecture \citep{hochreiter1997long} takes this idea
+further by keeping a separate memory cell. Access to this cell is protected through gates to make
+sure that there is always a path between units, such that errors can propagate; see
+\Cref{fig:lstm}. Furthermore, in contrast to the leaky unit, the LSTM Learns how to ``remember''
+and ``forget'' information.
 
 \begin{figure}
     \centering
@@ -90,20 +104,25 @@ units, such that errors can always propagate; see \Cref{fig:lstm}.
     \label{fig:lstm}
 \end{figure}
 
-The cell of an LSTM consists of 4 layers, called gates. In particular, these gates have the
-following instructions,
+The cell of an LSTM consists of 4 gates. All gates get $\vec{h}^{(t-1)}$ and $\vec{x}^{(t)}$ as
+input. In particular, these gates have the following instructions,
 \begin{itemize}
-    \item $f$ is the \textit{forget gate} and has the role of scaling the old cell state
-          $\vec{h}^{(t-1)}$. It ``decides which information should be forgotten'' from the previous
-          cell state, based on the new input $\vec{x}^{(t)}$;
+    \item $f: \R^d \times \R^d \to [0,1]^d$ is the \textit{forget gate} and has the role of scaling
+          the old cell state $\vec{h}^{(t-1)}$. It ``decides which information should be forgotten''
+          from the previous cell state. It does so by outputting a vector in $[0,1]^d$ where $0$ means
+          forgetting completely and $1$ means remembering everything;
 
-    \item $i$ is the \textit{input gate} and has the role of ``deciding which values of the cell state $\vec{c}^{(t)}$
-          should be updated'' at the current time step;
+    \item $g: \R^d \times \R^d \to [-1, 1]^d$ is the \textit{gate} that decides what to write in the
+          cell state $\vec{h}^{(t)}$.
 
-    \item $o$ is the \textit{output gate} and has the role of ``deciding which values of the current
-          cell state $\vec{c}^{(t)}$ should be put in the output of the cell $\vec{h}^{(t)}$''.
+    \item $i: \R^d \times \R^d \to [0,1]^d$ is the \textit{input gate} and has the role of ``deciding
+          which values of the cell state $\vec{c}^{(t)}$ should be updated'' at the current time step.
+          Again, it does so by outputting a vector in $[0,1]^d$ to decide what of the output of the $g$
+          gate should be written to the cell state $\vec{c}^{(t)}$;
 
-    \item $g$ is the \textit{gate} that decides what to write in the cell state $\vec{h}^{(t)}$.
+    \item $o: \R^d \times \R^d \to [0,1]^d$ is the \textit{output gate} and has the role of
+          ``deciding which values of the current cell state $\vec{c}^{(t)}$ should be put in the output
+          of the cell $\vec{h}^{(t)}$''.
 \end{itemize}
 
 We first compute all the gates,
@@ -115,16 +134,15 @@ We first compute all the gates,
 \end{align*}
 Then, we compute the outputs that are propagated to the next layer,
 \begin{align*}
-    \vec{c}^{(t)} & = \vec{f}^{(t)} \odot \vec{c}^{(t-1)} + \vec{i}^{(t)} \odot \vec{g}^{(t)} \\
+    \vec{c}^{(t)} & = \vec{f}^{(t)} \odot \vec{c}^{(t-1)} + \vec{i}^{(t)} \odot \vec{g}^{(t)} \margintag{$\vec{f}^{(t)} \odot \vec{c}^{(t-1)}$ computes what to keep/forget and $\vec{i}^{(t)} \odot \vec{g}^{(t)}$ computes what to add.} \\
     \vec{h}^{(t)} & = \vec{o}^{(t)} \odot \tanh \lft( \vec{c}^{(t)} \rgt).
 \end{align*}
 
 The addition in the computation of $\vec{c}^{(t)}$ allows for gradients to directly propagate
 through $\vec{c}^{(t-1)} \odot \vec{f}$. Also, it allows the model to ``select'' what information
 should be retained. For example, at a high level in text, it might be helpful to store information
-such as gender and countries of origin. See
-\href{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}{\underline{Colah's
-        ``Understanding LSTM Networks''}} for more information about the gates.
+such as gender and countries of origin. See \citep{olah2015understanding} for more information
+about the gates.
 
 \subsection{Gradient clipping}
 
@@ -133,8 +151,8 @@ of exploding gradients. This is what \textit{gradient clipping} solves. The idea
 maximum value of the gradient if it surpasses a predetermined threshold. In practice, the gradient
 descent step gets transformed into the following update rule, \[
     \vec{\theta} \gets \begin{cases}
-        \vec{\theta} - \gamma \vec{g}                         & \| \vec{g} \| \leq T \\
-        \vec{\theta} - \gamma T \frac{\vec{g}}{\| \vec{g} \|} & \text{otherwise},
+        \vec{\theta} - \gamma \vec{g}                         & \| \vec{g} \| \leq k \\
+        \vec{\theta} - \gamma \frac{k}{\| \vec{g} \|} \vec{g} & \text{otherwise},
     \end{cases}
 \]
-where $\vec{g}$ is the gradient, $\gamma$ is the learning rate, and $T$ is the gradient threshold.
+where $\vec{g}$ is the gradient, $\gamma$ is the learning rate, and $k$ is the gradient threshold.

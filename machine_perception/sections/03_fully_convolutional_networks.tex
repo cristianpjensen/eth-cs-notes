@@ -13,7 +13,7 @@ method is expensive.
 
 In practice, the most common approach is to downsample the features obtained using convolution and
 pooling layers and then upsample them again. By downsampling, this method is more computationally
-efficient, has larger receptive field, and suffers less from ``The curse of dimensionality''. By
+efficient, has larger receptive field, and suffers less from ``The curse of dimensionality.'' By
 upsampling, the model produces an output of the same resolution as the input.
 
 \subsection{Upsampling methods}
@@ -58,19 +58,20 @@ information is then used to place each element back in the correct position; see
 
 \paragraph{Transposed convolutions.}
 
-Transposed convolution is a learned upsampling technique. This layer learns a kernel that is used
-to produce the terms whose sum will be the final output. Each term is obtained by multiplying all
-the element of the kernel by the same value of one single input pixel and then inserting the result
-in the correct position of a matrix of the same size as the output.
+Transposed convolution \citep{shelhamer2016fully} is a learned upsampling technique. This layer
+learns a kernel that is used to produce the terms whose sum will be the final output. Each term is
+obtained by multiplying all the element of the kernel by the same value of one single input pixel
+and then inserting the result in the correct position of a matrix of the same size as the output.
 
 \subsection{U-net}
 
-The \textit{U-net} is a FCNN architecture, whose main idea is to combine global and local feature
-maps by copying corresponding tensors from earlier stages in each upsampling stage; see
-\Cref{fig:u-net}. This allows the network to capture both local and global context. In each
-upsampling, the corresponding output from the downsampling phase is appended to the output. The
-copied tensor can be seen as the ``global'' information, while the input of the upsampling layer is
-the ``local'' information. Combining these allows for more fine-grained outputs.
+The \textit{U-net} \citep{ronneberger2015unet} is an FCNN architecture, whose main idea is to
+combine global and local feature maps by copying corresponding tensors from earlier stages in each
+upsampling stage; see \Cref{fig:u-net}. This allows the network to capture both local and global
+context. In each upsampling, the corresponding output from the downsampling phase is appended to
+the output. The copied tensor can be seen as the ``global'' information, while the input of the
+upsampling layer is the ``local'' information. Combining these allows for more fine-grained
+outputs.
 
 \begin{marginfigure}
     \centering

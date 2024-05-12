@@ -1,10 +1,10 @@
 \section{Diffusion models}
 
-Unlike VAEs and GANs, \textit{diffusion models} do not generate a sample in a single step. They do
-so in many small steps. They start from pure noise and iteratively denoise it. At the end of all
-the denoising steps, the goal is to obtain a sample from the data distribution. The diffusion chain
-can be traversed in two directions: going from noise to sample is called \textit{denoising} and
-going from sample to noise is called \textit{diffusion}. In general, we have \[
+Unlike VAEs and GANs, \textit{diffusion models} \citep{ho2020denoising} do not generate a sample in a
+single step. They do so in many small steps. They start from pure noise and iteratively denoise it.
+At the end of all the denoising steps, the goal is to obtain a sample from the data distribution. The
+diffusion chain can be traversed in two directions: going from noise to sample is called
+\textit{denoising} and going from sample to noise is called \textit{diffusion}. In general, we have \[
     \vec{x}_0 \sim q, \quad \vec{x}_T \sim \mathcal{N}(\vec{0},\mat{I}),
 \]
 where $q$ is the data distribution and $T$ is the total number of steps in the diffusion chain.
@@ -57,7 +57,7 @@ Since $\vec{\epsilon}$ and $\vec{\epsilon}'$ are samples from the same distribut
 continue using $\vec{\epsilon}$,
 \begin{align*}
     \circledast & = \sqrt{\alpha_t \alpha_{t-1}} \vec{x}_{t-2} + \sqrt{1 - \alpha_t\alpha_{t-1}} \vec{\epsilon} \\
-    \intertext{Continuing this, we obtain}
+    \intertext{Continuing this pattern, we obtain}
                 & = \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}.
 \end{align*}
 
@@ -94,13 +94,13 @@ In practice, we assume that the covariance matrix $\mat{\Sigma}_t = \sigma_t^2 \
     &\argmin_{\vec{\theta}} D_{\mathrm{KL}}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \lVert p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) \\
     & = \argmin_{\vec{\theta}} D_{\mathrm{KL}}\lft( \mathcal{N}(\vec{\mu}_q, \mat{\Sigma}_t) \lVert \mathcal{N}(\vec{\mu}_{\vec{\theta}}, \mat{\Sigma}_t) \rgt) \\
     & = \argmin_{\vec{\theta}} \frac{1}{2} \lft( \log \frac{\det{\mat{\Sigma}_t}}{\det{\mat{\Sigma}}} - d + \tr{\inv{\mat{\Sigma}_t} \mat{\Sigma}_t} + \transpose{(\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q)} \inv{\mat{\Sigma}} (\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q) \rgt) \\
-    & = \argmin_{\vec{\theta}} \transpose{(\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q)} \inv{(\sigma^2_t \mat{I})} (\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q) \\
-    & = \argmin_{\vec{\theta}} \frac{1}{\sigma_t^2} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|^2.
+    & = \argmin_{\vec{\theta}} \frac{1}{2} \transpose{(\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q)} \inv{(\sigma^2_t \mat{I})} (\vec{\mu}_{\vec{\theta}} - \vec{\mu}_q) \\
+    & = \argmin_{\vec{\theta}} \frac{1}{2\sigma_t^2} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|^2.
 \end{align*}
 Thus, we want to minimize the difference between the means of the two distributions. Assuming that we have a model that can predict the noise at timestep $t$, we can compute the two means by
 \begin{align*}
-    \vec{\mu}_q(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{\bar{\alpha}_t} \sqrt{\alpha_t}}} \vec{\epsilon} \\
-    \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t} \sqrt{\alpha_t}}} \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t).
+    \vec{\mu}_q(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon} \\
+    \vec{\mu}_q(\vec{x}_t, t) &= \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t} \sqrt{\alpha_t}} \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t).
 \end{align*}
 A further simplification can be made by formulating the loss directly as the difference between the two actual and predicted noise, \[
     \| \vec{\epsilon} - \hat{\vec{\epsilon}}_{\vec{\theta}}(\vec{x}_t, t) \|^2 = \lft\| \vec{\epsilon} - \hat{\vec{\epsilon}}_{\vec{\theta}}\lft(\sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t}\vec{\epsilon}, t\rgt) \rgt\|^2.
@@ -133,6 +133,8 @@ We then get the following algorithms for training and sampling a diffusion model
     \end{algorithmic}
     \caption{Diffusion model sampling algorithm.}
 \end{algorithm}
+
+Typically, $\vec{\epsilon}_{\vec{\theta}}$ is implemented as a U-net that is shared across timesteps.
 
 \subsection{Guidance}
 

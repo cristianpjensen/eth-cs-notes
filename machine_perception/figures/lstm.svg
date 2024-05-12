@@ -28,9 +28,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="25.803749"
-     inkscape:cx="231.28422"
-     inkscape:cy="143.21562"
+     inkscape:zoom="5.4917872"
+     inkscape:cx="211.86181"
+     inkscape:cy="89.861457"
      inkscape:window-width="1792"
      inkscape:window-height="1067"
      inkscape:window-x="0"
@@ -859,6 +859,13 @@
        width="10.013227"
        height="4.6573739"
        x="66.328392"
+       y="17.021362" />
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.140441;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-start:none;marker-end:none;stop-color:#000000"
+       id="rect3-8-6-0"
+       width="10.013227"
+       height="4.6573739"
+       x="9.6991682"
        y="17.021362" />
     <text
        xml:space="preserve"

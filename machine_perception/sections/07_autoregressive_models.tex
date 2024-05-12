@@ -19,10 +19,13 @@ need \[
 \]
 parameters to parametrize this model. Thus, we need to make additional assumptions to find more
 compact representations of the distribution.\sidenote{A naive solution would be to assume that all
-    points are independent, which would result in \[ p(\vec{x}) = p(x_1) \cdot p(x_n). \] Then, we only require $n$ parameters. However, in practice, this would result in a random sampling
+    points are independent, which would result in \[
+        p(\vec{x}) = \prod_{i=1}^{n} p(x_i).
+    \]
+    Then, we only require $n$ parameters. However, in practice, this would result in a random sampling
     of pixels, making the generations incoherent.} We will explore the idea of learning a function
 $f_i: \{ 0,1 \}^{i-1} \to [0,1]$, parametrized by $\vec{\theta}_i$, which takes as input the
-previous pixels and outputs the probability $p(x_i = 1 \mid \vec{x}_{1:i-1})$. The number of total
+previous pixels and outputs the parameter for the Bernoulli distribution. The total number of
 parameters is \[
     \sum_{i=1}^{n} |\vec{\theta}_i|.
 \]
@@ -69,8 +72,8 @@ by using an alternative recursive definition,
 Since NADE is a model for binary data, $\hat{x} \in [0,1]$ is the probability $p(x_i \mid
     \vec{x}_{1:i-1})$ at each timestep $i$. NADE is trained by maximizing the average log-likelihood,
 \begin{align*}
-    \frac{1}{T} \sum_{t=1}^{T} \log p(\vec{x}^{t}) & = \frac{1}{T} \sum_{t=1}^{T} \log \prod_{i=1}^n p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt)                                                                                            \\
-                                                   & = \frac{1}{T} \sum_{t=1}^{T} \sum_{i=1}^n \log p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt). \margintag{Thus, we optimize the log-likelihood exactly, which was not possible for VAEs.}
+    \frac{1}{T} \sum_{t=1}^{T} \log p\lft( \vec{x}^{(t)} \rgt) & = \frac{1}{T} \sum_{t=1}^{T} \log \prod_{i=1}^n p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt)                                                                                            \\
+                                                               & = \frac{1}{T} \sum_{t=1}^{T} \sum_{i=1}^n \log p \lft( x_i^{(t)} \mid \vec{x}_{1:i-1}^{(t)} \rgt). \margintag{Thus, we optimize the log-likelihood exactly, which was not possible for VAEs.}
 \end{align*}
 
 During training, a \textit{teacher forcing} approach is used, where the ground truth values of
@@ -112,7 +115,8 @@ and use those instead.
 \end{marginfigure}
 
 However, a problem with this approach is that it requires very large hidden layers to retain
-expressivity.
+expressivity. And, while it is possible to compute $p(\vec{x})$ in a single pass, sampling still
+requires $n$ passes.
 
 \subsection{Generating images}
 
@@ -192,7 +196,7 @@ particular, the prior distribution is no longer a standard Gaussian, but follows
 $\mathcal{N}\lft(\vec{\mu}_0^{(t)}, \mathrm{diag}\lft(\vec{\sigma}_0^{(t)}\rgt)\rgt)$, where
 $\lft(\vec{\mu}_0^{(t)}, \vec{\sigma}_0^{(t)}\rgt)$ is predicted by the network
 $\phi_{\mathrm{prior}}\lft(\vec{h}^{(t)}\rgt)$ based on the hidden state of the RNN at each
-timestep. This introduces randomness to the generation.
+timestep. This introduces randomness to the generation, whereas RNNs are typically deterministic.
 
 The \textit{conditional VRNN} (C-VRNN) is an extension to the VRNN, where we can condition on \eg
 style or, in the case of MNIST, which digit should be generated. During training, the model
