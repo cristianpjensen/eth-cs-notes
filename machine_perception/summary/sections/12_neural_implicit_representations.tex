@@ -1,0 +1,209 @@
+\section{Neural implicit representations}
+
+The most obvious way to represent 3D objects is by voxels, which are the 3D correspondent of
+pixels.\sidenote{Essentially, the same as Minecraft blocks.} However, this has $\bigo{n^3}$ space
+complexity, which means that the resolution will be very limited. A second approach would be to
+model 3D objects as points, however this does not model connectivity. Third, we could use meshes,
+which is used by many downstream tasks. This approach discretizes the object into vertices and
+faces. However, the problem with this approach is that there will always be an approximation error
+and may lead to self-intersections.
+
+The approach that we will focus on is the implicit function representation, where the analytic
+function that represents the 3D surface is learned. This allows us to achieve zero approximation
+error and a smooth continuous surface with a fixed memory requirement. By the universal
+approximation theorem, we know that neural networks are able to learn an approximation of any
+continuous function and since we represent objects as continuous functions, we will be using them
+for this use case. The only problem with this approach is that a graphical visualization is not
+directly possible unless we convert the function to one of the previous approaches. Thus, it is
+still difficult to obtain high frequency details.
+
+There are two kinds of functions that we can use:
+\begin{itemize}
+    \item \textit{Occupancy networks} \citep{mescheder2019occupancy} output the probability of being inside the surface, \[
+              f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to [0,1]; \margintag{$\mathcal{Z}$ is the set of conditioning variables.}
+          \]
+    \item \textit{DeepSDF} \citep{park2019deepsdf} outputs the signed distance from the surface (negative if inside, positive if outside), \[
+              f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R.
+          \]
+\end{itemize}
+With these, we get a continuous representation with an arbitrary topology and resolution, while
+achieving a low memory footprint of $\bigo{|\vec{\theta}|}$.
+
+\subsection{Training with watertight meshes}
+
+It is not obvious how to train these networks. We can have multiple kinds of ground truth data,
+each requiring a different training regimen.
+
+The simplest case is when we have watertight meshes as ground truth.\sidenote{``Watertight'' means
+    that the meshes have no holes, thus the space is divided into inside and outside.} In the case of
+occupancy networks, we uniformly sample $n$ points $(\vec{x}_i, y_i) \in \R^3 \times [0,1]$ inside
+the surface and we train the model using binary cross entropy, \[
+    \mathcal{L}(\vec{\theta}) = - \sum_{i=1}^{n} y_i \log f_{\vec{\theta}}\lft(\vec{x}_i\rgt) + \lft(1-y_i\rgt) \log \lft(1-f_{\vec{\theta}}\lft(\vec{x}_i\rgt)\rgt).
+\]
+To train a DeepSDF network, we can compute the distance to the mesh and train it as a regression
+problem. The problem with this ground truth is that it is very expensive.
+
+\subsection{Training with point clouds}
+
+\marginnote[3cm]{It is possible to prove that if we parametrize a linear model with random initialization and the points are sampled from a plane, this method will be able to solve the problem by optimizing with gradient descent.}
+
+A cheaper alternative is to use point clouds. With this data, it would be very hard to train an
+occupancy network, because we have no concept of inside or outside. But, training DeepSDF would be
+possible by training the model to output 0 at the points. However, in this case, a trivial optimal
+solution with zero loss would be for the model to always output 0. Thus, we introduce the
+\textit{Eikonal term} \citep{gropp2020implicit} to the loss function, which pushes the gradient to
+be 1 everywhere, \[
+    \mathcal{L}(\vec{\theta}) = \sum_{i=1}^{n} \underbrace{|f_{\vec{\theta}}(\vec{x}_i)|^2}_{\textit{Vanish term}} + \lambda \underbrace{\E_{\vec{x}}\lft[(\| \grad{f_{\vec{\theta}}(\vec{x})}{\vec{x}} - 1)^2\rgt]}_{\textit{Eikonal term}}.
+\]
+This makes sense from a ``distance'' perspective, since we want to increase the distance by 1 when
+we move 1 unit away. Also, always outputting 0 is no longer optimal.
+
+\subsection{Training with 2D images}
+
+While point clouds are relatively inexpensive compared to watertight meshes, we have an
+exponentially larger dataset if we only consider 2D images. The idea is to render the model induced
+by $f_{\vec{\theta}}$ in the same angle as the image and using a photometric reconstruction loss, \[
+    \ell(\hat{\tens{I}}, \tens{I}) = \sum_{\vec{u}} \lft\| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \rgt\|.
+\]
+In order to learn from this, the entire computational graph between $f_{\vec{\theta}}$ and
+$\ell(\hat{\tens{I}},\tens{I})$, including the rendering, must be differentiable. In order to
+render color images, we introduce a texture field, \[
+    \vec{t}_{\vec{\theta}}: \R^3 \to \mathcal{Z} \to \R^3.
+\]
+
+\begin{marginfigure}
+    \centering
+    \incfig{differentiable-rendering}
+    \caption{To render an object from the occupancy network $f_{\vec{\theta}}$ and texture field $\vec{t}_{\vec{\theta}}$, we cast a ray with direction $\vec{w}$ through a pixel $\vec{u}$ and determine the intersection point $\hat{\vec{p}}$ with the isosurface $f_{\vec{\theta}}(\hat{\vec{p}}) = \tau$. Afterward, we evaluate the texture field $\vec{t}_{\vec{\theta}}(\hat{\vec{p}})$ to obtain the color prediction $\hat{\tens{I}}_{\vec{u}}$.}
+    \label{fig:differentiable-rendering}
+\end{marginfigure}
+
+For a camera located at $\vec{r}_0$, we can predict the color $\hat{\tens{I}}_{\vec{u}}$ at pixel
+location $\vec{u}$ by casting a ray from $\vec{r}_0$ through $\vec{u}$ and determining the first
+point of intersection $\hat{\vec{p}}$ with the isosurface $\{ \vec{p} \in \R^3 \mid
+    f_{\vec{\theta}}(\vec{p}) = \tau \}$; see \Cref{fig:differentiable-rendering}. The color is then
+given by the texture field $\hat{\tens{I}}_{\vec{u}} = t_{\vec{\theta}}(\hat{\vec{p}})$
+\citep{niemeyer2020differentiable}. The point $\hat{\vec{p}}$ is found by the secant method.
+
+\paragraph{Secant method.}
+
+In order to efficiently find points on the surface, we use the secant method; see
+\Cref{alg:secant}. It involves iteratively approximating $f_{\vec{\theta}}$ as the plane connecting
+$(\vec{x}_{t-2}, f_{\vec{\theta}}(\vec{x}_{t-2}))$ and $(\vec{x}_{t-1},
+    f_{\vec{\theta}}(\vec{x}_{t-1}))$, and computing the zero-crossing of that plane. This
+approximation gets closer and closer to the actual zero-crossing of $f_{\vec{\theta}}$; see
+\Cref{fig:secant-method}.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \Require Initial points $x_0, x_1$
+        \For{$t = 2, \ldots, T$}
+        \State Compute intersection of line connecting $(x_{t-2}, f(x_{t-2}))$ and $(x_{t-1}, f(x_{t-1}))$, and the $x$-axis, \[
+            x_t = x_{t-1} - f(x_{t-1}) \frac{x_{t-1} - x_{t-2}}{f(x_{t-1}) - f(x_{t-2})}.
+        \]
+        \EndFor
+        \State \Return $\vec{x}_T$
+    \end{algorithmic}
+    \caption{Secant method for finding a zero-crossing of $f$.}
+    \label{alg:secant}
+\end{algorithm}
+
+\begin{marginfigure}
+    \centering
+    \incfig{secant-method}
+    \caption{Illustration of the secant method.}
+    \label{fig:secant-method}
+\end{marginfigure}
+
+\paragraph{Forward pass.}
+
+The forward pass is done by querying the occupancy network for all the pixels. This gives us three
+types of points:
+\begin{itemize}
+    \item $f_{\vec{\theta}}(\vec{p}) < \tau$: outside surface;
+    \item $f_{\vec{\theta}}(\vec{p}) > \tau$: inside surface;
+    \item $f_{\vec{\theta}}(\vec{p}) = \tau$: in the surface.
+\end{itemize}
+Thus, for all points $\vec{p}$ with $f_{\vec{\theta}}(\vec{p}) = \tau$, we evaluate the texture field
+$\vec{t}_{\vec{\theta}}(\vec{p})$ and assign the pixel $\vec{u}$ that color.
+
+\paragraph{Backward pass.}
+
+To obtain gradients, we use the chain rule,
+\begin{align*}
+    \pdv{\ell(\vec{\theta})}{\vec{\theta}} & = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \pdv{\hat{\tens{I}}_{\vec{u}}}{\vec{\theta}}                                                                                                                                                                                                                                         \\
+                                           & = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} + \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \pdv{\hat{\vec{p}}}{\vec{\theta}} \rgt)                                                                                                              \\
+                                           & = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} + \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \pdv{\vec{r}(\hat{d})}{\vec{\theta}} \rgt) \margintag{$\vec{r}(d) \doteq \vec{r}_0 + d \vec{w}$ is the ray through pixel $\vec{u}$}                  \\
+                                           & = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} + \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \pdv{\hat{d}}{\vec{\theta}} \rgt)                                                                                                            \\
+    \intertext{
+        To compute $\pdv{\hat{d}}{\vec{\theta}}$, we need to use implicit differentiation, meaning
+        that we take the derivative of $f_{\vec{\theta}}(\hat{\vec{p}}) = \tau$ on both sides,
+        \begin{align*}
+            \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}}                                                                                               & = 0                                                                                                                                        \\
+            \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} + \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \pdv{\hat{\vec{p}}}{\vec{\theta}}   & = 0                                                                                                                                        \\
+            \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} + \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \pdv{\hat{d}}{\vec{\theta}} & = 0                                                                                                                                        \\
+            \pdv{\hat{d}}{\vec{\theta}}                                                                                                                       & = - \inv{\lft( \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \rgt)} \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}}.
+        \end{align*}
+        Thus, we get the following,
+    }
+                                           & = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} - \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \inv{\lft( \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \rgt)} \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} \rgt).
+\end{align*}
+Thus, we do not need to store intermediate results of $\hat{\vec{p}}$ to compute the gradient.
+
+\subsection{Neural radiance field}
+
+\marginnote{Compared to implicit surfaces, the advantage of NERF is that it can model transparency and thin structure, but it generally leads to worse geometry.}
+
+The problem with the approach thus far is that it is not great at learning very complex scenes. For
+example, representing thin structures by a surface is very difficult. Also, transparency is not
+possible. To solve these problems, neural radiance fields (NERF) \citep{mildenhall2021nerf} were
+introduced. It introduces a density $\sigma$ that can be used to learn difficult structures, such
+as hair and windows. In particular, our new function takes a 3D position $(x, y, z)$ and the camera
+parameters $(\theta, \phi)$ as input, and output the color $(r, g, b)$ and density $\sigma$; see
+\Cref{fig:nerf-architecture}.
+
+\begin{marginfigure}
+    \centering
+    \incfig{nerf-architecture}
+    \caption{NERF architecture. The location information $(x,y,z)$ is introduced twice to make sure that the network does not ``forget'' it. Furthermore, the view direction $(\theta, \phi)$ is introduced after outputting the density $\sigma$, because density does not depend on the view direction physically.}
+    \label{fig:nerf-architecture}
+\end{marginfigure}
+
+\paragraph{Rendering.}
+
+Technically, we do not represent surfaces, but rather ``volumetric clouds''. Instead of looking for
+the surface, we sample along the whole ray and compute a weighted average to be the color. The
+density models how much light is propagated to the next point on the ray. Let $\sigma_i$ be the
+density of point $i$ along the ray, then we define the probability of light stopping at this point
+as \[
+    \alpha_i = 1 - \exp(-\sigma_i \delta_i), \quad \delta_i = t_{i+1} - t_i.
+\]
+Then, we can compute the probability of light reaching point $i$ by \[
+    T_i = \prod_{j=1}^{i-1} 1 - \alpha_i.
+\]
+Then, in order to compute the final color, we take the weighted average of the colors along the
+ray, weighted by the probability $T_i \alpha_i$ of light reaching the point and stopping there, \[
+    \vec{c} = \sum_{i=1}^{n} T_i \alpha_i \vec{c}_i.
+\]
+We then do a simple backward pass by backpropagating from the loss of this color, compared to the
+actual image.
+
+Since the sampling is quite expensive, we can try to sample more in positions with higher weights.
+This can be done by initially sampling a few points uniformly and then sampling more around points
+with high weight.
+
+\paragraph{Positional encoding.}
+
+In general, neural networks perform poorly at representing high-frequency variation in color and
+geometry. This happens because they are biased toward learning lower frequency functions. Thus, the
+reconstructions using the above architecture result in poor renderings. The solution to this is to
+introduce positional encodings, mapping the inputs $(x,y,z,\theta,\phi)$ to a higher dimensional
+space by \[
+    \gamma(p) = \lft[\sin\lft(p \cdot 2^0 \pi\rgt), \cos\lft(p \cdot 2^0 \pi\rgt), \ldots, \sin\lft(p \cdot 2^{L-1} \pi\rgt), \cos\lft(p \cdot 2^{L-1} \pi\rgt)\rgt].
+\]
+(A similar mapping is used in the transformer architecture.)
+
+\paragraph{Limitations.}
+
+The problems with NERF are that it requires many calibrated views, rendering is slow, and it can
+only model static scenes.
