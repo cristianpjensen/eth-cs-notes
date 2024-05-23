@@ -52,12 +52,19 @@ jobs:
         latexmk_shell_escape: true
         working_directory: optimization_for_data_science/cheatsheet
 
-    - name: Compile machine perception
+    - name: Compile machine perception summary
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
-        working_directory: machine_perception
+        working_directory: machine_perception/summary
+
+    - name: Compile machine perception cheatsheet
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: machine_perception/cheatsheet
 
     - name: Compile computational intelligence lab recap
       uses: xu-cheng/latex-action@v3
@@ -82,7 +89,8 @@ jobs:
         file algorithms_lab/main.pdf | grep -q ' PDF '
         file optimization_for_data_science/summary/main.pdf | grep -q ' PDF '
         file optimization_for_data_science/cheatsheet/main.pdf | grep -q ' PDF '
-        file machine_perception/main.pdf | grep -q ' PDF '
+        file machine_perception/summary/main.pdf | grep -q ' PDF '
+        file machine_perception/cheatsheet/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/recap/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
 
@@ -106,7 +114,8 @@ jobs:
         cp -f algorithms_lab/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab-summary.pdf"
         cp -f optimization_for_data_science/summary/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-summary.pdf"
         cp -f optimization_for_data_science/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-cheatsheet.pdf"
-        cp -f machine_perception/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
+        cp -f machine_perception/summary/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
+        cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-cheatsheet.pdf"
         cp -f computational_intelligence_lab/recap/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-recap.pdf"
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-summary.pdf"
 
@@ -120,6 +129,7 @@ jobs:
         git add optimization_for_data_science-summary.pdf
         git add optimization_for_data_science-cheatsheet.pdf
         git add machine_perception-summary.pdf
+        git add machine_perception-cheatsheet.pdf
         git add computational_intelligence_lab-recap.pdf
         git add computational_intelligence_lab-summary.pdf
 

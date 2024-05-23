@@ -1,0 +1,224 @@
+\documentclass{article}
+
+\usepackage[a4paper, margin=0.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[most]{tcolorbox}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac,colonequals}
+\usepackage{blindtext}
+\usepackage{derivative}
+\usepackage{nicefrac}
+\usepackage{parskip}
+% \usepackage{savetrees}
+\usepackage[document]{ragged2e}
+
+\usepackage{color,soul}
+\usepackage{xcolor}
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+\newcommand{\lft}{\mathopen{}\mathclose\bgroup\left}
+\newcommand{\rgt}{\aftergroup\egroup\right}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{#1}
+\newcommand{\transpose}[1]{#1^\top}
+\newcommand{\dom}[1]{\mathrm{dom}(#1)}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\title{Machine Perception Cheatsheet}
+
+\newenvironment{topic}[1]
+{\textbf{\sffamily \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}} \\ \vspace{0.2cm}}
+{}
+
+\begin{document}
+
+\setlength{\columnsep}{0.2cm}
+
+\textbf{\LARGE Machine Perception Cheatsheet} \\
+\hrulefill
+
+\begin{multicols*}{2}
+
+    TODO: General tips.
+
+    \begin{topic}{Neural networks}
+
+        \textbf{Multi-layer perceptron}:
+
+        \textbf{Loss functions}:
+
+        \textbf{Backpropagation}:
+
+        \textbf{Universal approximation theorem}:
+
+    \end{topic}
+
+    \begin{topic}{Convolutional neural networks}
+
+        \textbf{Convolution}:
+
+        \textbf{CNN}:
+
+    \end{topic}
+
+    \begin{topic}{Fully convolutional neural networks}
+
+        \textbf{Upsampling methods}:
+
+        \textbf{U-net}:
+
+    \end{topic}
+
+    \begin{topic}{Recurrent neural networks}
+
+        \textbf{Elman RNN}:
+
+        \textbf{LSTM}:
+
+        \textbf{Gradient clipping}:
+
+    \end{topic}
+
+    \begin{topic}{Generative models}
+
+        \textbf{Taxonomy}:
+
+    \end{topic}
+
+    \begin{topic}{Autoencoders}
+
+        \textbf{Linear autoencoder}:
+
+        \textbf{Non-linear autoencoder}:
+
+        \textbf{VAE}:
+
+        \textbf{$\beta$-VAE}:
+
+    \end{topic}
+
+    \begin{topic}{Autoregressive models}
+
+        \textbf{FVSBN}:
+
+        \textbf{NADE}:
+
+        \textbf{MADE}:
+
+        \textbf{WaveNet}:
+
+        \textbf{VRNN}:
+
+        \textbf{C-VRNN}:
+
+        \textbf{Transformers}:
+
+    \end{topic}
+
+    \begin{topic}{Normalizing flow}
+
+        \textbf{Change of variables}:
+
+        \textbf{Coupling layer}:
+
+        \textbf{Composing transformations}:
+
+        \textbf{Training}:
+
+        \textbf{Inference}:
+
+        \textbf{NICE}:
+
+        \textbf{RealNVP}:
+
+        \textbf{GLOW}:
+
+    \end{topic}
+
+    \begin{topic}{Generative adversarial network}
+
+        \textbf{Problem with optimizing log-likelihood}:
+
+        \textbf{GAN}:
+
+        \textbf{Optimal discriminator}:
+
+        \textbf{Global optimality}:
+
+        \textbf{Convergence guarantee}:
+
+        \textbf{Training instability}:
+
+        \textbf{Problem with optimizing Jensen-Shannon divergence}:
+
+        \textbf{Gradient penalty}:
+
+    \end{topic}
+
+    \begin{topic}{Diffusion models}
+
+        \textbf{Diffusion}:
+
+        \textbf{Denoising}:
+
+        \textbf{Training}:
+
+        \textbf{Guidance}:
+
+        \textbf{Latent diffusion models}:
+
+    \end{topic}
+
+    \begin{topic}{Reinforcement learning}
+
+        \textbf{Markov decision process}:
+
+        \textbf{Policy}:
+
+        \textbf{Value function}:
+
+        \textbf{Value iteration}:
+
+        \textbf{Policy iteration}:
+
+        \textbf{Model-based and model-free}:
+
+        \textbf{On-policy and off-policy}:
+
+        \textbf{Monte Carlo}:
+
+        \textbf{TD learning}:
+
+        \textbf{SARSA}:
+
+        \textbf{Q-learning}:
+
+        \textbf{DQN}:
+
+        \textbf{Policy search}:
+
+        \textbf{REINFORCE}:
+
+        \textbf{Actor-critic}:
+
+    \end{topic}
+
+    \begin{topic}{Implicit surfaces and neural radiance fields}
+        TODO
+    \end{topic}
+
+    \begin{topic}{Parametric human body models}
+        TODO
+    \end{topic}
+
+\end{multicols*}
+
+\end{document}
