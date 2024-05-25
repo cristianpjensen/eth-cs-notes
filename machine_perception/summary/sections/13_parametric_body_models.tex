@@ -1,0 +1,153 @@
+\section{Parametric body models}
+
+Being able to represent and track a body is interesting for many applications, such as virtual
+reality and augmented reality. The easier problem is to estimate the projected pose from 2D images,
+while the harder problem is to estimate 3D pose from images. For both problems, we need to model
+the body and learn a feature representation for prediction.
+
+\subsection{2D poses}
+
+\paragraph{Body modeling.}
+
+Body modeling entails finding a way to understand how the different parts of the body are linked.
+The pictorial structure model models the body as a graph, where the joints are vertices and they
+are connected by edges. For example, in a simplified model, the foot vertex might be connected to
+the knee vertex.
+
+In a 2D image, we indicate the position of vertex $i$ by $\ell_i = [x_i, y_i]$. Then, given an
+image $\tens{I}$ and a configuration $L = [\ell_1, \ell_k]$, we can define the score of that
+configuration by \[
+    S(\tens{I}, L) = \sum_{i \in V} \alpha_i \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij} \psi(\ell_i, \ell_j),
+\]
+where the first term measures the score of placing vertex $i$ at $\ell_i$ in image $\tens{I}$ and
+the second term measures the deformation between connected vertices. The best configuration is the
+one that minimizes the score.
+
+We can further generalize this model to a mixture of non-oriented pictorial structures. Let $m_i$
+be the mixture component type of vertex $i$. The mixture component expresses concepts as
+orientations of a part, such as vertically vs horizontally oriented hand, front-view head vs
+side-view head, or open versus closed hand. Formally, we compute the score by \[
+    S(\tens{I}, L, M) = \sum_{i \in V} \alpha_i^{m_i} \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij}^{m_i,m_j} \psi(\ell_i, \ell_j)+ S(M),
+\]
+where $\alpha_i^{m_i}$ is the ``local appearance template'' for part $i$ with type $m_i$,
+$\beta_{ij}^{m_i,m_j}$ expresses the likelihood of having template $m_i$ for pat $i$ and template
+$m_j$ for part $j$ given the distance between $\ell_i$ and $\ell_j$, and $S(M)$ is the
+co-occurrence bias defined by \[
+    S(M) = {i,j\in E} b_{ij}^{m_i,m_j}.
+\]
+
+\paragraph{Feature learning.}
+
+One architecture that does feature representation learning by direct regression is
+\textit{DeepPose} \citep{toshev2014deeppose}, which uses CNNs to directly compute $\ell_i$ for all
+$i$. It does so in multiple stages, where in the first stage, it only gets the image as input. In
+the further stages, it gets the image and the previous estimate and input and must refine the
+estimate by taking only a patch around the previous estimate.
+
+A different way of doing it is through heatmaps. \textit{Convolutional pose machines}
+\citep{wei2016convolutional} predicts heatmaps for each vertex. Like DeepPose, it also uses a
+refinement process with intermediate losses. The key is that the receptive field grows as stages
+are applied, which allows the model to capture long-range dependencies.
+
+\paragraph{Body modeling and feature learning.}
+
+We can also combine the two methods by first obtaining the heatmaps and then refining the
+predictions using body modeling.
+
+TODO: Check slides how much of this is covered.
+
+\subsection{3D poses}
+
+\paragraph{Linear blend skinning.}
+
+Linear blend skinning (LBS) is the simplest method of transforming a rest pose into a specified
+pose. It does so by transforming vertices as a weighted combination of global joint
+transformations, \[
+    \vec{t}_i' = \sum_{k} w_{k,i} \mat{G}_k(\vec{\theta}, \mat{J}) \vec{t}_i.
+\]
+Each bone-joint pair is given a weight $w_{k,i}$, which determines the influence of the
+transformation of a bone on the joint. $\mat{G}_k(\vec{\theta})$ is the rigid bone transformation
+for bone $k$, which transforms the original joint location $\vec{t}_i$, which is linearly weighted
+by $w_{k,i}$. Here, $\vec{\theta}$ is the desired pose and $\mat{J}$ are the joint locations.
+
+The problem with this approach is that it does not account for any variation in the body shape.
+Also, often there are problems with unrealistic deformations, caused by the pose.
+
+\paragraph{SMPL.}
+
+The skinned multi-person linear (SMPL) model \citep{loper2015smpl} solves the problems of linear
+blend skinning by allowing the model to learn how to account for body shape variation and
+deformations caused by the poses. First an overview of how these problems are solved is given, then
+they are worked out in more detail.
+
+SMPL encodes human subjects by two parameters: a body shape parameter $\vec{\beta} \in \R^{10}$ and
+a pose parameter $\vec{\theta} \in \R^{9K}$. The template mesh $\bar{\mat{T}}$ is the starting
+pose, which transformations are relative to.\sidenote{The template mesh is a T-pose.} In the
+following, we assume access to $\mat{B}_S(\vec{\beta})$ and $\mat{B}_P(\vec{\theta})$, which we
+learn from data.
+
+\begin{enumerate}
+    \item First, translate the template mesh to the identity mesh for the specific body shape, parametrized
+          by $\vec{\beta}$, \[
+              \bar{\mat{T}} + \mat{B}_S(\vec{\beta}); \margintag{$\mat{B}_S(\vec{\beta})$ encodes the variation in the body shape from the mean shape.}
+          \]
+    \item Then, translate the identity mesh to correct for deformations caused by linear blend skinning,
+          which is a function of the pose, \[
+              \mat{T}_P(\vec{\beta}, \vec{\theta}) = \bar{\mat{T}} + \mat{B}_S(\vec{\beta}) + \mat{B}_P(\vec{\theta});
+          \]
+    \item Lastly, perform linear blend skinning on the resulting base mesh, \[
+              W(\mat{T}_P(\vec{\beta}, \vec{\theta}), \mat{J}(\vec{\beta}), \vec{\theta}, \mathcal{W}).
+          \]
+\end{enumerate}
+
+\paragraph{Learning shape variation.}
+
+To learn the variations in body shape, we need a dataset of many body shapes. Each body shape is
+represented by its joint locations. To be able to represent any body shape with a small amount of
+parameters, we perform PCA on this dataset, and only take the top-10 principal components. Each
+body shape can then be defined by a linear combination of these components, \[
+    \mat{B}_S(\vec{\beta}; \mathcal{S}) = \sum_{n=1}^{|\vec{\beta}|} \beta_n \mat{S}_n.
+\]
+Specifically, the data must be relative to the template mesh joints, such that
+$\mat{B}_S(\vec{\beta})$ is also relative to these joints, such that we can use them as a measure
+of variation from the template.
+
+\paragraph{Learning pose-dependent deformations.}
+
+Let $\mat{R}: \R^{|\vec{\theta}|} \to \R^{9K}$ be a function that maps the pose vector
+$\vec{\theta}$ to a vector of concatenated relative rotation matrices.\sidenote{Each rotation
+    matrix has dimensionality $3 \times 3$.} The used rig has $K=23$ joints, thus
+$\mat{R}(\vec{\theta}) \in \R^{207}$. Let $\vec{\theta}^\star$ be the rest pose, then the vertex
+deviations from the rest template are given by \[
+    \mat{B}_P(\vec{\theta}; \mathcal{P}) = \sum_{n=1}^{9K} (\mat{R}_n(\vec{\theta}) - \mat{R}_n(\vec{\theta}^\star)) \mat{P}_n,
+\]
+where $\mat{P}_n \in \R^{3N}$ is a vector of vertex displacements.\sidenote{There are $N$ vertices,
+    each having $x,y,z$ components.} Thus, the pose-dependent translation is a linear combination of
+vertex displacements $\mathcal{P}$, dependent on the difference in pose. This matrix $\mathcal{P}$
+is learned.
+
+\subsection{Learned gradient descent}
+
+\textit{Learned gradient descent} (LGD) \citep{song2020human} is a method for fitting 3D human shapes
+to images by combining gradient-based optimization and neural networks. It leverages a neural network
+to predict the parameter update rule for each optimization iteration. This allows the algorithm to
+converge in few steps. See \Cref{alg:lgd} for the full algorithm.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \State Sample $\vec{\theta}, \vec{\beta}$ from data
+        \State Sample $\mat{R}, \vec{t}, s$ uniformly from feasible range
+        \State $\mat{X} \gets \mat{W} \mat{M}(\vec{\theta}, \vec{\beta})$
+        \State $\vec{x} \gets s \Pi(\mat{R} \mat{X}) + \vec{t}$
+        \State $\Theta_0 \gets \{ \vec{\theta}_0 = \vec{0}, \vec{\beta}_0 = \vec{0}, \mat{R}_0 = \mat{0}, \vec{t}_0 = \vec{0}, s_0 = 0 \}$
+        \For {$n = 0, \ldots, N-1$}
+        \State $\mat{X}_n \gets \mat{W} \mat{M}(\vec{\theta}_n, \vec{\beta}_n)$
+        \State $\vec{x}_n \gets s_n \Pi(\mat{R}_n \mat{X}_n) + \vec{t}_n$
+        \State $\mathcal{L}(\Theta_n) \gets L_{\mathrm{reproj}}(\vec{x}_n, \vec{x})$
+        \State $\Delta \gets \mathcal{N}_{\vec{w}} \lft( \pdv{\mathcal{L}(\Theta_n)}{\Theta_n}, \Theta_n, \vec{x} \rgt)$
+        \State $\Theta_{n+1} \gets \Theta_n + \Delta$
+        \EndFor
+    \end{algorithmic}
+    \caption{Learned gradient descent training scheme. $\mathcal{N}_{\vec{w}}$ is the neural network that predicts the update rule. $\vec{x}$ is a 2D projection of the 3D pose $\mat{X}$ onto the image. $\mat{M}(\cdot, \cdot)$ computes the body mesh using SMPL. $\mat{W}$ is a matrix that maps vertices to $k$ joints of interest. The camera model is parametrized by the global rotation $\mat{R} \in \R^{3\times 3}$.}
+    \label{alg:lgd}
+\end{algorithm}
