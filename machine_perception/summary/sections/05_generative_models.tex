@@ -1,3 +1,22 @@
 \section{Generative models}
 
-TODO
+In \textit{discriminative models}, the goal is to learn a function that maps inputs $\vec{x}$ to
+their correct output $y$. On the other hand, \textit{generative models} aim to learn the underlying
+hidden structure of a dataset by modeling the distribution $p_{\mathrm{model}}$ to generate new
+samples that resemble the distribution $p_{\mathrm{data}}$.
+
+\begin{figure}
+    \centering
+    \incfig{taxonomy}
+    \caption{Taxonomy of generative models.}
+    \label{fig:taxonomy}
+\end{figure}
+
+Generative models can be classified into two main categories:
+\begin{itemize}
+    \item \textit{Explicit models} explicitly define the probability distribution
+          $p_{\mathrm{model}}$ and then sample from it;
+    \item \textit{Implicit models} define a model from which we can sample. By being able to sample
+          from the model, it implicitly induces a probability distribution $p_{\mathrm{model}}$.
+\end{itemize}
+See \Cref{fig:taxonomy} for further classifications of different models.
