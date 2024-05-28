@@ -132,7 +132,7 @@ this, the \textit{receptive field} becomes exponentially larger.
 
 The forward pass is computed as follows,
 \[
-    z^{(\ell)}[i,j] = \max \lft\{ z^{(\ell)}[i',j'] \;\middle|\; i' \in [si:si+k], j' \in [sj:sj+k] \rgt\},
+    z^{(\ell)}[i,j] = \max \lft\{ z^{(\ell-1)}[i',j'] \;\middle|\; i' \in [si:si+k], j' \in [sj:sj+k] \rgt\},
 \]
 where $s$ is the stride and $k$ is the kernel size. Let $[i^\star,j^\star]$ be the indices which
 corresponded to the maximum value in the forward pass, then we can compute the error propagation in
