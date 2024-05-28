@@ -1,16 +1,15 @@
 \documentclass{article}
 
-\usepackage[a4paper, margin=0.5cm]{geometry}
+\usepackage[a4paper, margin=0.15cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[most]{tcolorbox}
 \usepackage{multicol}
-\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac,colonequals}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
 \usepackage{blindtext}
 \usepackage{derivative}
-\usepackage{nicefrac}
 \usepackage{parskip}
-% \usepackage{savetrees}
+\usepackage[extreme, mathspacing=normal, leadingfraction=0.85]{savetrees}
 \usepackage[document]{ragged2e}
 
 \usepackage{color,soul}
@@ -25,10 +24,9 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\R}{\mathbb{R}}
 
-\renewcommand{\vec}[1]{\mathbf{#1}}
-\newcommand{\mat}[1]{#1}
-\newcommand{\transpose}[1]{#1^\top}
-\newcommand{\dom}[1]{\mathrm{dom}(#1)}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\tens}[1]{\bm{\mathsf{#1}}}
 
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -40,183 +38,727 @@
 
 \begin{document}
 
-\setlength{\columnsep}{0.2cm}
+\setlength{\columnsep}{0.15cm}
 
-\textbf{\LARGE Machine Perception Cheatsheet} \\
-\hrulefill
+% \textbf{\LARGE Machine Perception Cheatsheet} \\
+% \hrulefill
 
 \begin{multicols*}{2}
 
-    TODO: General tips.
+    \begin{itemize}
+        \item Derivatives of common activation functions: \[
+                  \sigma'(x) = \sigma(x) (1 - \sigma(x)), \quad \tanh'(x) = 1 - \tanh^2(x).
+              \]
+              Can re-use components of the computational graph to rewrite this.
+
+        \item If $\vec{x} \in \R^{m_1 \times \cdots \times m_d}$ and $\vec{y} \in \R^{n_1 \times \cdots \times
+                      n_\ell}$, then \[
+                  \pdv{\vec{x}}{\vec{y}} \in \R^{m_1 \times \cdots \times m_d \times n_1 \times \cdots \times n_\ell}.
+              \]
+        \item When computing gradient, think about changing parameters and how that would affect the output.
+        \item Always type-check gradients.
+    \end{itemize}
+
+    % Multi-variate Gaussian: \[
+    %     \mathcal{N}(\vec{x} ; \vec{\mu}, \mat{\Sigma}) = \frac{1}{2\pi \sqrt{\det(\mat{\Sigma})^{-1}}} \exp \lft( -\frac{1}{2} (\vec{x}-\vec{\mu})^\top \mat{\Sigma}^{-1} (\vec{x} - \vec{\mu}) \rgt).
+    % \]
 
     \begin{topic}{Neural networks}
 
-        \textbf{Multi-layer perceptron}:
+        \textbf{Perceptron}: The original perceptron was a single-layer perceptron with non-linearity
+        $\mathds{1}\{ x > 0 \}$. Classification is then done by $\hat{y} = \mathds{1}\{ \vec{w}^\top
+            \vec{x} + b > 0 \}$. The learning algorithm iteratively applies $\vec{\theta} \gets
+            \vec{\theta} + \eta(y_i - \hat{y}_i) \vec{x}_i$. % This is equivalent to gradient descent
+        % with a Hinge loss.
+
+        If the data is linearly separable, the perceptron converges in linear time.
+
+        \textbf{Multi-layer perceptron}: $\hat{y} = \sigma \lft( \mat{W}_k \sigma( \mat{W}_{k-1} \cdots \sigma( \mat{W}_1 \vec{x} ) ) \rgt)$.
 
         \textbf{Loss functions}:
+        \begin{itemize}
+            \item MLE: $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
+            \item BCE (MLE with Bern.): $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} y_i \log \hat{y}_i + (1-y_i) \log (1
+                      - \hat{y}_i)$.
+            \item MAP: $\argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i \mid
+                      \vec{\theta})$.
+        \end{itemize}
 
-        \textbf{Backpropagation}:
+        \textbf{Backpropagation}: Linear-time algorithm to compute gradients using chain rule.
+        Intuitively, gradients work well for updating weights, because it measures the direction in
+        which the loss decreases at a point. Gradient descent update rule: \[
+            \vec{\theta} \gets \vec{\theta} - \eta \nabla_{\vec{\theta}} \mathcal{L}(\hat{\vec{y}}, \vec{y}).
+        \]
 
-        \textbf{Universal approximation theorem}:
+        \textbf{Universal approximation theorem}: Let $g$ be any function on unit hypercube. Let
+        $\epsilon > 0$, then there exists a NN with a single hidden layer that can
+        approximate this function with $\epsilon$ precision, \[
+            | f_{\vec{\theta}}(\vec{x}) - g(\vec{x}) | < \epsilon, \quad \forall \vec{x} \in I_m.
+        \]
+        In practice, this hidden layer may need to be infinitely large.
 
     \end{topic}
 
     \begin{topic}{Convolutional neural networks}
 
-        \textbf{Convolution}:
+        \textbf{Convolution}: \[
+            (\mat{K} * \mat{I})[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} \mat{K}[m,n] \mat{I}[i-m, j-n].
+        \]
+        Correlation uses plus instead of minus. Convolution is commutative, linear, and shift-equivariant.
+        Can be implemented as matrix operation: \[
+            \mat{K} * \mat{I} = \begin{bmatrix}
+                k_1    & 0      & \cdots & 0      \\
+                k_2    & k_1    & \cdots & 0      \\
+                \vdots & \vdots & \ddots & \vdots \\
+                0      & 0      & \cdots & k_m
+            \end{bmatrix}
+            \begin{bmatrix}
+                I_1 \\ I_2 \\ \vdots \\ I_n
+            \end{bmatrix}.
+        \]
 
-        \textbf{CNN}:
+        \textbf{CNN}: Sequence of alternating convolutional and pooling layers. Convolutional layer from $C_{\mathrm{in}}$ to $C_{\mathrm{out}}$ channels: \[
+            \mat{Z}_j^{(\ell)} = \sum_{k=1}^{C_{\mathrm{in}}} \mat{W}_{kj}^{(\ell)} * \mat{Z}_k^{(\ell)} + b_j, \quad j \in [C_{\mathrm{out}}].
+        \]
+        With $C_{\mathrm{in}} = C_{\mathrm{out}} = 1$, we have derivative:
+        \begin{align*}
+            \delta^{(\ell-1)}[i,j]              & \doteq \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]} = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j] \\
+            \mat{\Delta}^{(\ell-1)}             & = \mat{\Delta}^{(\ell)} * \mathrm{Rot}_{180}(\mat{W}^{(\ell)})                                                   \\
+            \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} & = \mat{\Delta}^{(\ell)} * \mat{Z}^{(\ell - 1)}.
+        \end{align*}
+        Max-pooling layer:
+        \begin{align*}
+            z^{(\ell)}[i,j]                                & = \max \lft\{ z^{(\ell-1)}[i',j'] \mid i' \in [i : i + k], j' \in [j : j+k] \rgt\} \\
+            \pdv{z^{(\ell)}[i{,}j]}{z^{(\ell-1)}[i'{,}j']} & = \mathds{1}\{ [i',j'] = [i^\star,j^\star] \}.
+        \end{align*}
+        No learnable parameters, only propagation of the error.
 
     \end{topic}
 
     \begin{topic}{Fully convolutional neural networks}
+        Example application: Pixel segmentation. Downsample, then upsample.
 
         \textbf{Upsampling methods}:
 
-        \textbf{U-net}:
+        \begin{itemize}
+            \item Nearest neighbor: Put value into all corresponding cells.
+            \item Bed of nails: Only put value into the top-left cell.
+            \item Max unpooling: Remember original position from max-pooling.
+            \item Transposed convolution: Insert $s-1$ zeros between pixels and $k-p-1$ zeros as padding. Then,
+                  convolve with kernel.
+        \end{itemize}
+
+        \textbf{U-net}: Add skip-connection between corresponding down- and upsampling layers. This facilitates the
+        combination of global from skip-connection with local information from previous layer.
 
     \end{topic}
 
     \begin{topic}{Recurrent neural networks}
 
-        \textbf{Elman RNN}:
+        Processes sequential data and is able to take variable-length input. At each timestep, use the same
+        network: \[
+            \vec{h}^{(t)} = f_{\vec{\theta}} \lft( \vec{h}^{(t-1)}, \vec{x}^{(t)} \rgt).
+        \]
+        This behaves like a dynamical system.
 
-        \textbf{LSTM}:
+        \textbf{Elman RNN}: $f_{\vec{\theta}}(\vec{h}^{(t-1)}, \vec{x}^{(t)}) = \tanh \lft( \mat{W}_h \vec{h}^{(t-1)} + \mat{W}_x \vec{x}^{(t)} \rgt)$.
+        $\vec{h}^{(t)}$ represents the sequence until timestep $t$, which we can use as input into an
+        MLP for further processing.
 
-        \textbf{Gradient clipping}:
+        Backpropagation through time (BPTT) to optimize by unrolling the RNN and applying backpropagation
+        on the computational graph: \[
+            \pdv{\ell^{(t)}}{\mat{W}_h} = \sum_{k=1}^{t} \pdv{\ell^{(t)}}{\hat{\vec{y}}^{(t)}} \pdv{\hat{\vec{y}}^{(t)}}{\vec{h}^{(t)}} \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} \pdv{^+ \vec{h}^{(k)}}{\mat{W}_h}.
+        \]
+        We have \[
+            \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} = \prod_{i=k+1}^t \pdv{\vec{h}^{(i)}}{\vec{h}^{(i-1)}}.
+        \]
+        Suffers from exploding or vanishing gradient because of the many multiplications of $\mat{W}_h$
+        with itself in the gradient. If the largest eigenvalue of this matrix is greater than the upper
+        bound of the non-linearity, the gradient will explode. If it is smaller, it will vanish.
 
-    \end{topic}
+        \textbf{Leaky unit}: Make sure there is constant error flow to solve vanishing gradient problem:
+        \begin{align*}
+            \hat{\vec{h}}^{(t)} & = f_{\vec{\theta}}\lft( \vec{h}^{(t-1)}, \vec{x}^{(t)} \rgt) \\
+            \vec{h}^{(t)}       & = \alpha \vec{h}^{(t-1)} + (1-\alpha) \hat{\vec{h}}^{(t)}.
+        \end{align*}
 
-    \begin{topic}{Generative models}
+        \textbf{LSTM}: Take idea of leaky unit to the next level by introducing gates, which protect the memory cell to make sure there is always error flow:
+        \begin{align*}
+            \vec{f}^{(t)} & = \sigma \lft( \mat{W}_{hf} \vec{h}^{(t-1)} + \mat{W}_{xf} \vec{x}^{(t)} \rgt) \\
+            \vec{i}^{(t)} & = \sigma \lft( \mat{W}_{hi} \vec{h}^{(t-1)} + \mat{W}_{xi} \vec{x}^{(t)} \rgt) \\
+            \vec{o}^{(t)} & = \sigma \lft( \mat{W}_{ho} \vec{h}^{(t-1)} + \mat{W}_{xo} \vec{x}^{(t)} \rgt) \\
+            \vec{g}^{(t)} & = \tanh \lft( \mat{W}_{hg} \vec{h}^{(t-1)} + \mat{W}_{xg} \vec{x}^{(t)} \rgt).
+        \end{align*}
+        Then, the memory cell and hidden state are computed by
+        \begin{align*}
+            \vec{c}^{(t)} & = \vec{f}^{(t)} \odot \vec{c}^{(t-1)} + \vec{i}^{(t)} \odot \vec{g}^{(t)} \\
+            \vec{h}^{(t)} & = \vec{o}^{(t)} \odot \tanh \lft( \vec{c}^{(t)} \rgt).
+        \end{align*}
+        The forget gate $\vec{f}$ decides what information to keep from previous cell state. The gate
+        gate $\vec{g}$ decides what to write to the cell state. The input gate $\vec{i}$ decides what
+        values of the cell state should be updated. The output gate $\vec{o}$ decides what values of
+        the cell state to put into the hidden state.
 
-        \textbf{Taxonomy}:
+        The gates form an ``information highway'' that can easily propagate errors through the cell state
+        due to the minimal modifications made to it.
+
+        \textbf{Gradient clipping}: Solve exploding gradient by limiting the norm of the gradient, \[
+            \vec{\theta} \gets \begin{cases}
+                \vec{\theta} - \eta \vec{g},                         & \| \vec{g} \| \leq k \\
+                \vec{\theta} - \eta \frac{k}{\| \vec{g} \|} \vec{g}, & \text{otherwise}.
+            \end{cases}
+        \]
 
     \end{topic}
 
     \begin{topic}{Autoencoders}
 
-        \textbf{Linear autoencoder}:
+        Autoencoders are generative model, meaning that they model the underlying distribution of the data,
+        which makes it possible to sample from it. It works by an encoder-decoder structure, where $f$ maps
+        data points $\vec{x} \in \R^n$ to latent variables $\vec{z} \in \R^d$, i.e., encodes the
+        information compactly in $d \ll n$ dimensions. The decoder $g$ maps latent variables $\vec{z}$ back
+        to the input space for a reconstruction $\hat{\vec{x}}$. Thus, $g \circ f$ aims to approximate the
+        identity function. The assumption is that if the decoder is able to reconstruct the original input
+        from the latent representation, this representation must be meaningful.
 
-        \textbf{Non-linear autoencoder}:
+        \textbf{Linear autoencoder}: Principal component analysis.
 
-        \textbf{VAE}:
+        \textbf{Non-linear}: Parametrize $f$ and $g$ as NNs to gain performance.
 
-        \textbf{$\beta$-VAE}:
+        \textbf{VAE}: Autoencoders have bad sampling quality, because the latent space is not
+        well-structured, meaning that there is no continuity or interpolation. The reason for this is
+        that there are large regions in the latent space where there are no observations.
+
+        The solution is to make the generator output a distribution over latents. Specifically, it outputs
+        a Gaussian distribution $\mathcal{N}(\vec{\mu}_{\vec{\theta}}(\vec{x}),
+            \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(\vec{x})))$ over latent vectors. However, naively using
+        this method will result in very different $\vec{\mu}$ with very low $\vec{\sigma}^2$ for the
+        different data points, which is essentially the same as outputting points.
+
+        To solve this, we must minimize the KL-divergence between the output distribution and the standard
+        Gaussian. This encourages the encoder to distribute the encodings evenly around the origin.
+
+        We want to maximize the likelihood $p(\vec{x}) = \int p_{\vec{\theta}}(\vec{x} \mid \vec{z})
+            p(\vec{z}) \mathrm{d}\vec{z}$. However, this is intractable. The best we can do is optimize the
+        ELBO: \[
+            \log p(\vec{x}) \geq \E_{\vec{z} \sim q_{\vec{\theta}}(\cdot \mid \vec{x})} [\log p_{\vec{\theta}}(\vec{x} \mid \vec{z})] - \mathrm{KL}(q_{\vec{\theta}}(\vec{z} \mid \vec{x}) \lVert p(\vec{z})).
+        \]
+        We need to use the reparametrization trick to take the gradient of the expectation, which means
+        that instead of sampling $\vec{z} \sim \mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$, we
+        sample $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$ and compute $\vec{z} = \vec{\mu} +
+            \vec{\sigma} \odot \vec{\epsilon}$. After training, we can sample from the distribution by sampling
+        $\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})$ and giving this to the decoder.
+
+        \textbf{$\beta$-VAE}: The VAE still has problems with its latent space: it is entangled. A
+        latent space is disentangled if each dimensions changes a single feature of the output. We
+        solve this by introducing a hyperparameter $\beta$ which gives more weight to the KL term. The
+        intuition behind this is that if factors are in practice independent from each other, the
+        model should benefit from disentangling them. This can be derived theoretically as a
+        Lagrangian.
 
     \end{topic}
 
     \begin{topic}{Autoregressive models}
 
-        \textbf{FVSBN}:
+        Autoregressive models can compute the likelihood $p(\vec{x})$ in a tractable way by the chain rule: \[
+            p(\vec{x}) = \prod_{i=1}^n p(x_i \mid \vec{x}_{1:i-1}).
+        \]
+        The hard part of this approach is that we must parametrize all possible conditional distributions
+        $p(x_{k+1} | \vec{x}_{1:k})$.
 
-        \textbf{NADE}:
+        \textbf{FVSBN}: Fully visible sigmoid belief networks parametrize each timestep by its own function: \[
+            f_i(\vec{x}_{1:i-1}) = \sigma \lft( \alpha_0^{(i)} + \alpha_1^{(i)} x_1 + \cdots + \alpha_{i-1}^{(i)} x_{i-1} \rgt),
+        \]
+        which has $\mathcal{O}(n^2)$ parameters.
 
-        \textbf{MADE}:
+        \textbf{NADE}: Problem with FVSBN is that they only have a single hidden layer, making them
+        not expressive. NADE uses MLPs: \[
+            \vec{h}_i = \sigma(\mat{W}_{:,1:i-1} \vec{x}_{1:i-1} + \vec{b}), \quad \hat{x}_i = \sigma(\mat{V}_{i,:} \vec{h}_i + c_i).
+        \]
+        This model shares the parameters of $\mat{W}$ between timesteps, which means that it has
+        $\mathcal{O}(nd)$ parameters.
 
-        \textbf{WaveNet}:
+        \textbf{MADE}: Constructs an autoencoder which fulfills the autoregressive property. For this,
+        we must ensure that there is no computational path between output unit $\hat{x}_{k+1}$ and
+        any of $x_{k+1}, \ldots, x_n$, relative to an
+        arbitrary ordering. This is done by uniformly assigning integers $1$ to $n$ to each input
+        unit and integer $1$ to $n-1$ to each hidden unit. Then, we only allow values to propagate
+        from units in layer $\ell$ to units in layer $\ell+1$ with equal or higher value. Finally,
+        we allow connections between the last hidden layer and the output only to units with value
+        that is strictly greater.
 
-        \textbf{VRNN}:
+        The problem with this approach is that it requires very large networks. And, while it is possible
+        to train efficiently, sampling still requires $n$ passes through the network.
 
-        \textbf{C-VRNN}:
+        \textbf{Pixel-RNN}: The idea is to generate image pixels starting from the corner and
+        modeling the dependency on previous pixels using an RNN. This is slow, because of its
+        sequential nature.
 
-        \textbf{Transformers}:
+        \textbf{Pixel-CNN}: We can solve the efficiency issue of Pixel-RNN by assuming that pixels
+        only depend on a context region around them. This allows for parallelization during training.
+        During training we need to make sure only previous pixels are used, thus we use a masked
+        convolution. However, this creates a blind spot. Solution: horizontal and vertical stacks of
+        convolutions. To enforce the autoregressive property, we need to go over the color channels
+        autoregressively as well.
 
+        \textbf{WaveNet}: Pixel-CNN framework for audio data. Makes use of dilated convolutions to
+        achieve an exponentially growing receptive field.
+
+        % \textbf{VRNN}: RNNs can be used for autoregressive modeling, but they are deterministic. We
+        % can add stochasticity by sampling from VAEs.
+        %
+        % \textbf{C-VRNN}: Extend previous framework by allowing conditioning.
+
+        \textbf{Transformers}: Stack normalization, MLPs, and self-attention: \[
+            \mat{Y} = \mathrm{softmax}\lft( \nicefrac{\mat{X} \mat{W}_Q \mat{W}_K^\top \mat{X}^\top}{\sqrt{d}} + \mat{M} \rgt) \mat{X} \mat{W}_V,
+        \]
+        where $\mat{M}$ is a mask that masks out future timesteps with $-\infty$. Intuitively, the softmax
+        computes how much attention should be given to certain values. Computational complexity is
+        $\mathcal{O}(n^2d)$ with a maximum path length between input and output of $\mathcal{O}(1)$. This
+        allows for easy error propagation during training.
     \end{topic}
 
     \begin{topic}{Normalizing flow}
+        \begin{align*}
+            \log |\det(\mat{A})^{-1}|                          & = \log |\det(\mat{A})|^{-1} = -\log |\det(\mat{A})|                \\
+            \det \lft( \mat{I} + \vec{u} h' \vec{w}^\top \rgt) & = 1 + h' \vec{u}^\top \vec{w}                                      \\
+            \vec{x} \odot \vec{y}                              & = \mathrm{diag}(\vec{x}) \vec{y} = \mathrm{diag}(\vec{y}) \vec{x}.
+        \end{align*}
+        The determinant of a triangular matrix is the product of its diagonal.
 
-        \textbf{Change of variables}:
+        \textbf{Change of variables}: Best of both worlds: latent space and a tractable likelihood by
+        leveraging change of variables: \[
+            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) | \det(\mat{J}_{\vec{x}} f^{-1}(\vec{x})) | = p_Z(\vec{z}) |\det(\mat{J}_{\vec{z}} f(\vec{z}))|^{-1}.
+        \]
+        Downside is that $f$ must be invertible, which means that we must preserve dimensionality between
+        latent space and data space. Furthermore the determinant of the Jacobian must be efficiently
+        computed, thus we must design $f$ such that its Jacobian is triangular.
 
-        \textbf{Coupling layer}:
+        \textbf{Coupling layer}: \[
+            f: \begin{bmatrix}
+                \vec{x}_A \\ \vec{x}_B
+            \end{bmatrix}
+            \mapsto
+            \begin{bmatrix}
+                h(\vec{x}_A, \beta(\vec{x}_B)) \\
+                \vec{x}_B
+            \end{bmatrix},
+        \]
+        where $\beta$ can be any NN and $h$ is invertible w.r.t. its first argument, given the second. The
+        inverse is: \[
+            f^{-1}: \begin{bmatrix}
+                \vec{y}_A \\
+                \vec{y}_B
+            \end{bmatrix}
+            \mapsto
+            \begin{bmatrix}
+                h^{-1}(\vec{y}_A, \beta(\vec{y}_B)) \\
+                \vec{y}_B
+            \end{bmatrix}.
+        \]
+        Jacobian:
+        \begin{align*}
+            \mat{J}_{\vec{x}} f(\vec{x}) & = \begin{bmatrix}
+                                                 \pdv{\vec{y}_A}{\vec{x}_A} & \pdv{\vec{y}_A}{\vec{x}_B} \\
+                                                 \pdv{\vec{y}_B}{\vec{x}_A} & \pdv{\vec{y}_B}{\vec{x}_B}
+                                             \end{bmatrix} \\
+                                         & = \begin{bmatrix}
+                                                 h'(\vec{x}_A, \beta(\vec{x}_B)) & h'(\vec{x}_A, \beta(\vec{x}_B)) \beta'(\vec{x}_B) \\
+                                                 \mat{0}                         & \mat{I}
+                                             \end{bmatrix}.
+        \end{align*}
+        To compute the det, we need the upper left and lower right matrices.
 
-        \textbf{Composing transformations}:
+        This layer leaves part of its input unchanged, thus we must make sure to alternate what parts of
+        the input get transformed.
 
-        \textbf{Training}:
+        \textbf{Composing transformations}: Chaining many layers: \[
+            \vec{x} = f(\vec{z}) = (f_m \circ \cdots \circ f_1)(\vec{z}).
+        \]
+        Using change of variables: \[
+            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) \prod_{k=1}^m |\det(\mat{J}_{\vec{x}} f_k(\vec{x}))|^{-1}.
+        \]
 
-        \textbf{Inference}:
+        \textbf{Training}: Maximize the log-likelihood: \[
+            \log p_{X}(\mat{X}) = \sum_{i=1}^{n} \log p_Z(f^{-1}(\vec{x}_i)) + \sum_{k=1}^{m} \log |\det(\mat{J}_{\vec{x}} f_k(\vec{x}_i))|^{-1}.
+        \]
 
-        \textbf{NICE}:
+        \textbf{NICE}: Split data by partitioning into two subsets and randomly alternating which is given to the NN. Additive coupling network: \[
+            \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix}
+            =
+            \begin{bmatrix} \vec{x}_A + \beta(\vec{x}_B) \\ \vec{x}_B \end{bmatrix}.
+        \]
 
-        \textbf{RealNVP}:
+        \textbf{RealNVP}: Splits data by partitioning using a checkerboard and a channel-wise
+        masking. The channel-wise masking is used after a squeezing operation to go from $C\times H
+            \times W$ to $4C \times \nicefrac{H}{2} \times \nicefrac{W}{2}$. This ensures all data can interact with each other. Affine mapping: \[
+            \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} = \begin{bmatrix} \vec{x}_A \odot \exp(s(\vec{x}_B)) + t(\vec{x}_B) \\ \vec{x}_B \end{bmatrix},
+        \]
+        where $s$ and $t$ can be arbitrarily complex.
 
-        \textbf{GLOW}:
+        \textbf{GLOW}: Uses invertible $1\times 1$ convolutions to split the data, meaning that it
+        learns how to split. It consists of $L$ levels, consisting of $K$ steps of flow, which apply
+        activation norm, invertible $1 \times 1$ convolution, and a coupling layer as in RealNVP, in
+        that order.
 
     \end{topic}
 
     \begin{topic}{Generative adversarial network}
 
-        \textbf{Problem with optimizing log-likelihood}:
+        \begin{itemize}
+            \item KL div: $\mathrm{KL}(p \lVert q) = \E_{\vec{x} \sim p} \lft[ \log \nicefrac{p(\vec{x})}{q(\vec{x})}
+                          \rgt] = - \E_{\vec{x} \sim p} \lft[ \log \nicefrac{q(\vec{x})}{p(\vec{x})} \rgt]$.
+            \item JS div: $\mathrm{JS}(p \lVert q) = \nicefrac{1}{2} \mathrm{KL}\lft(p \middle\lVert \nicefrac{(p +
+                              q)}{2} \rgt) + \nicefrac{1}{2} \mathrm{KL}\lft( q \middle\lVert \nicefrac{(p + q)}{2} \rgt)$.
+        \end{itemize}
 
-        \textbf{GAN}:
+        \textbf{Problem with optimizing likelihood}: Optimizing likelihood does not necessarily give good results. Two possible cases:
+        \begin{itemize}
+            \item Good likelihood with bad sample quality. Let $p$ be a good model and $q$ a model that only outputs
+                  noise. $0.01p + 0.99q$ has log-likelihood: \[
+                      \log(0.01p(\vec{x}) + 0.99q(\vec{x})) \geq \log(p(\vec{x})) - \log 100.
+                  \]
+                  The $\log p(\vec{x})$ is proportional to the dimensionality of the input. Thus, will be high for
+                  high-dimensional data.
 
-        \textbf{Optimal discriminator}:
+            \item Low likelihood with high sample quality, which occurs when he model overfits on the training data.
+                  Results in bad likelihood on test set.
 
-        \textbf{Global optimality}:
+        \end{itemize}
 
-        \textbf{Convergence guarantee}:
+        \textbf{GAN}: Solve the above problem by introducing a discriminator. The objective of the
+        generator is then to maximize the discriminator's classification loss by generating images
+        similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function: \[
+            V(D, G) = \log D(\vec{x}) + \log (1 - D(G(\vec{z}))), \quad \vec{x} \in \mathcal{D}, \vec{z} \in \mathcal{N}(\vec{0}, \mat{I}).
+        \]
+        Then, we have the following two-player zero-sum game: \[
+            \argmin_G \argmax_D V(D,G).
+        \]
 
-        \textbf{Training instability}:
+        \textbf{Optimal discriminator}: $D^\star(\vec{x}) = \nicefrac{p_{\mathrm{data}}(\vec{x})}{p_{\mathrm{data}}(\vec{x}) + p_{\mathrm{model}}(\vec{x})}$.
 
-        \textbf{Problem with optimizing Jensen-Shannon divergence}:
+        \textbf{Global optimality}: The generator is optimal if $p_{\mathrm{model}} = p_{\mathrm{data}}$ and at optimum, we have \[
+            V(D^\star, G^\star) = -\log 4.
+        \]
+        The generator implicitly optimizes the Jensen-Shannon divergence.
 
-        \textbf{Gradient penalty}:
+        \textbf{Convergence guarantee}: Assuming that $D$ and $G$ have sufficient capacity, at each update step $D \to D^\star$, and $p_{\mathrm{model}}$ is updated to improve
+        \begin{align*}
+            V(D^\star, p_{\mathrm{model}}) & = \E_{\vec{x} \sim p_d} [\log D^\star(\vec{x})] + \E_{\vec{x} \sim p_m} [\log (1 - D^\star(\vec{x}))] \\
+                                           & \propto \sup_D \int p_{\mathrm{model}}(\vec{x}) \log (1 - D(\vec{x})) \mathrm{d}\vec{x}.
+        \end{align*}
+        Then, $p_{\mathrm{model}}$ converges to $p_{\mathrm{data}}$, because $V(D^\star,
+            p_{\mathrm{model}})$ is convex in $p_{\mathrm{model}}$ and supremum preserves convexity.
+
+        Weak result: $G$ and $D$ have finite capacity, $D$ does not necessarily converge to $D^\star$, and
+        due to the NN parametrization of $G$, the objective is no longer convex.
+
+        \textbf{Generator loss saturates}: Early in training, $G$ is poor, which results in $\log (1
+            - D(G(\vec{z})))$ saturating, i.e., going to $-\infty$. Instead, we should train $G$ to
+        maximize $\log D(G(\vec{z}))$.
+
+        \textbf{Mode collapse}: The generator learns to produce high-quality samples with low
+        variability. Solution: Unrolled GAN, which optimizes the generator w.r.t. the last $k$
+        discriminators.
+
+        \textbf{Training instability}: Optimizing two-player games lead to training instabilities,
+        since making progress for one player may mean that the other player is worse off. Finding
+        Nash-Equilibria is hard.
+
+        \textbf{Optimizing JS divergence}: If the supports of
+        $p_{\mathrm{model}}$ and $p_{\mathrm{data}}$ are disjoint, it is always possible to find a
+        perfect discriminator. This results in the loss function equaling zero, meaning that there
+        will be no gradient to update the generator's parameters. The solution is use the Wasserstein
+        GAN, which optimizes the Wasserstein distance. In this case, the loss does not fall to zero
+        for disjoint supports, because it measures divergence by how different they are horizontally,
+        rather than vertically. Intuitively, it measures how much “work” it takes to turn one
+        distribution into the other.
+
+        \textbf{Gradient penalty}: To stabilize training, add a gradient penalty: \[
+            \E_{\vec{x} \sim p_d} \lft[ \log D(\vec{x}) + \lambda \| \nabla D(\vec{x}) \|^2 \rgt] + \E_{\vec{x} \sim p_m} [\log (1 - D(\vec{x}))].
+        \]
 
     \end{topic}
 
     \begin{topic}{Diffusion models}
 
-        \textbf{Diffusion}:
+        Diffusion models do not generate samples in single steps, but in many small steps. Starting from
+        pure noise, they iteratively denoise it: \[
+            \vec{x}_0 \sim p_d, \quad \vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I}).
+        \]
 
-        \textbf{Denoising}:
+        \textbf{Diffusion}: Governed by a noise schedule $\{ \beta_t \}_{t=1}^T$: \[
+            q(\vec{x}_t \mid \vec{x}_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t} \vec{x}_{t-1}, \beta_t \mat{I}).
+        \]
+        Closed-form solution to efficiently compute training data: \[
+            \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}),
+        \]
+        where $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$.
 
-        \textbf{Training}:
+        \textbf{Denoising}: Parametrize network to predict noise
+        $\vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t)$. Iteratively denoise by
+        \begin{align*}
+            \vec{z}       & \sim \mathcal{N}(\vec{0}, \mat{I}) \text{ if $t > 1$, else $\vec{z} = \vec{0}$}                                                                                    \\
+            \vec{x}_{t-1} & = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sigma_t \vec{z}.
+        \end{align*}
 
-        \textbf{Guidance}:
+        \textbf{Training}: Loss function: \[
+            \lft\| \vec{e} - \vec{e}_{\vec{\theta}}\lft( \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, t \rgt) \rgt\|^2, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
+        \]
 
-        \textbf{Latent diffusion models}:
+        \textbf{CLIP}: Image-language model that has been trained on image-caption pairs. It consists
+        of an image encoder and a text encoder network. By using a contrastive loss, CLIP is
+        encouraged to encode the image and caption into similar embeddings.
+
+        \textbf{Classifier guidance}: Pretrain a classifier and guide the denoising in a direction
+        favoring images that are more reliably classified by the classifier. This is done by
+        injecting gradients of the classifier model into the sampling process. However, this requires
+        training a very specific classifier on noisy data.
+
+        \textbf{Classifier-free guidance}: Jointly train a class-conditional and unconditional diffusion model. It then guides the generation process by \[
+            \vec{\epsilon}^\star(\vec{x}, y; t) = (1 + \rho) \vec{\epsilon}_{\vec{\theta}}(\vec{x}, y; t) - \rho \vec{\epsilon}_{\vec{\theta}}(\vec{x}; t)
+        \]
+        In practice, we usually train a single model and just set the conditioning variable to all zero for
+        the unconditional generation. Overall, guidance improves the quality, but reduces the diversity of
+        outputs.
+
+        \textbf{Latent diffusion models}: Train VAE and perform diffusion on latent space for
+        efficiency. The diffusion model then only needs to focus on the ``semantic'' aspect of
+        generation.
 
     \end{topic}
 
     \begin{topic}{Reinforcement learning}
 
-        \textbf{Markov decision process}:
+        MDP: $(\mathcal{S}, \mathcal{A}, P, r, \gamma)$. Policy: $\pi: \mathcal{S} \to
+            \mathscr{P}(\mathcal{A})$. At every point, the goal of the agent is to maximize:
+        \begin{align*}
+            G_t & = \sum_{k=0}^{\infty} \gamma^k r(s_{t+k}, a_{t+k}) \\
+                & = r(s_t, a_t) + \gamma G_{t+1}.
+        \end{align*}
+        Value function and Bellman equation:
+        \begin{align*}
+            V^\pi(s) & = \E_{\pi} [G_0 \mid S_0 = s]                                                                                             \\
+                     & = \sum_{a \in \mathcal{A}} \pi(a \mid s) \lft[ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
+        \end{align*}
+        Bellman optimality operator \[
+            (\mathcal{T} V) (s) \doteq \max_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V(s') \rgt\}.
+        \]
+        $\gamma$-contraction and monotonic:
+        \begin{gather*}
+            \max_{s \in \mathcal{S}} |(\mathcal{T}V')(s) - (\mathcal{T}V)(s)| \leq \gamma \max_{s \in \mathcal{S}} |V'(s) - V(s)| \\
+            V(s) \leq V'(s) \implies (\mathcal{T}V)(s) \leq (\mathcal{T}V')(s).
+        \end{gather*}
+        The optimal value function $V^\star$ is the fixed-point of $\mathcal{T}$.
 
-        \textbf{Policy}:
+        \textbf{Value iteration}: Iteratively apply $\mathcal{T}$. Linear convergence: \[
+            \max_{s \in \mathcal{S}} |V_t(s) - V^\star(s)| \leq \gamma^t \max_{s \in \mathcal{S}} |V_0(s) - V^\star(s)|.
+        \]
+        After convergence, we can get the optimal policy by acting greedily: \[
+            \pi^\star(s) \in \argmax_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\star(s') \rgt\}.
+        \]
 
-        \textbf{Value function}:
+        \textbf{Policy iteration}: Alternates between computing the greedy policy and the value
+        function of the policy.
 
-        \textbf{Value iteration}:
+        \textbf{Model-based and model-free}: MB:Learn the underlying MDP and solve it.
+        MF: Learn the policy or value function directly.
 
-        \textbf{Policy iteration}:
+        \textbf{On-policy and off-policy}: On-policy: Must learn from policy's own data. Off-policy:
+        Can learn from any data.
 
-        \textbf{Model-based and model-free}:
+        \textbf{Monte Carlo}: On-policy method that learns from full trajectory and estimates the value function empirically: \[
+            V^\pi(s) \approx \frac{1}{n} \sum_{i=1}^{n} G(s)^i,
+        \]
+        where $G(s)^i$ is the return of episode $i$, starting from $s$.
 
-        \textbf{On-policy and off-policy}:
+        \textbf{TD learning}: Learn from transitions $(s, a, r, s')$ using bootstrapping: \[
+            V(s) \gets \alpha V(s) + (1- \alpha) (r + \gamma V(s')).
+        \]
+        % This can also be interpreted as updating the value by the TD error:
+        % \begin{align*}
+        %     \delta & = r + \gamma V(s') - V(s)   \\
+        %     V(s)   & \gets V(s) + \alpha \delta.
+        % \end{align*}
+        To find the optimal value function, we must visit all states sufficiently often. For this, we can
+        use $\epsilon$-greedy with Robbins-Monro conditions.
 
-        \textbf{Monte Carlo}:
+        \textbf{SARSA}: Learns Q-values of a policy $\pi$ (on-policy): \[
+            Q^\pi(s,a) \gets \alpha Q^\pi(s,a) + (1-\alpha) (r + \gamma Q^\pi(s', a')), \quad a' \sim \pi(s').
+        \]
 
-        \textbf{TD learning}:
+        \textbf{Q-learning}: Learns optimal Q-values (off-policy): \[
+            Q(s,a) \gets \alpha Q(s,a) + (1-\alpha)(r + \gamma Q(s',a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
+        \]
 
-        \textbf{SARSA}:
+        \textbf{DQN}: Large or infinite state spaces $\Rightarrow$ Function approximation. DQN learns
+        the Q-values for states. Loss function: \[
+            \ell(\vec{\theta}) = (Q_{\vec{\theta}}(s,a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s', a')))^2, \quad a' \in \argmax_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
+        \]
+        We train as in supervised learning. Data is not i.i.d. $\Rightarrow$ Replay buffer.
 
-        \textbf{Q-learning}:
+        \textbf{Policy search}: Large or infinite action spaces $\Rightarrow$ parametrize
+        $\pi_{\vec{\theta}}$: \[
+            \pi_{\vec{\theta}}(\cdot \mid s) = \mathcal{N}(\vec{\mu}_{\vec{\theta}}(s), \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(s))).
+        \]
+        Probability of trajectory $\tau$ can be computed by \[
+            \pi_{\vec{\theta}}(\tau) = P(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) P(s_{t+1} \mid s_t, a_t).
+        \]
+        Want trajectories with high return more likely $\Rightarrow$ Training objective:
+        \begin{align*}
+            J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]                  \\
+            % & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) ]                                                      \\
+                            & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) ],
+        \end{align*}
+        using chain rule $\nabla \log f(\vec{x}) = \nicefrac{\nabla f(\vec{x})}{f(\vec{x})}$. We have \[
+            \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) = \sum_{t=0}^{T} \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(a_t \mid s_t).
+        \]
+        Thus, the gradient does not depend on the MDP.
 
-        \textbf{DQN}:
+        \textbf{REINFORCE}: The above is unbiased, but has high variance. We can reduce variance by
+        introducing a baseline $b_t(\tau) = \sum_{t'=0}^{t-1} \gamma^{t'} r(s_{t'}, a_{t'})$, which
+        turns $r(\tau)$ into $G_t$. This is on-policy.
 
-        \textbf{Policy search}:
-
-        \textbf{REINFORCE}:
-
-        \textbf{Actor-critic}:
+        \textbf{Actor-critic}: We can make it off-policy by estimating $G_t$ by bootstrapping using a value network. This introduces bias, but reduces variance: \[
+            \nabla_{\vec{\theta}} J(\vec{\theta}) = \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}} (a_t \mid s_t) (V(s_t, a_t) - (r(s_t, a_t) + \gamma V(s_{t+1}))).
+        \]
 
     \end{topic}
 
     \begin{topic}{Implicit surfaces and neural radiance fields}
-        TODO
+        Voxels are bad because of $\mathcal{O}(n^3)$ memory cost. 3D points is bad because it does not
+        model connectivity. Meshes are bad because of approximation error. We use learned implicit
+        functions:
+        \begin{itemize}
+            \item Occupancy network: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to [0,1]$ outputting probability of
+                  being inside mesh.
+            \item DeepSDF: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R$ outputting distance to surface.
+        \end{itemize}
+        Implicit surfaces can do non-rigid transformations.
+
+        \textbf{Training with watertight meshes}: Simplest case. Sample $n$ points that are either
+        inside or outside the mesh. Train occupancy network by binary cross entropy. Train DeepSDF by
+        regression of distance to mesh of the sampled points.
+
+        \textbf{Training with point clouds}: Train to make sure distance is 0 at points. However, this will result in trivial model that always outputs zero $\Rightarrow$ Eikonal term: \[
+            \mathcal{L}(\vec{\theta}) = \sum_{i=1}^{n} |f_{\vec{\theta}}(\vec{x}_i)|^2  + \lambda \E_{\vec{x}} \lft[ (\| \nabla_{\vec{x}} f_{\vec{\theta}}(\vec{x}) \| - 1)^2 \rgt].
+        \]
+        This makes sense from a ``distance'' perspective, since we want to increase the distance by 1 when
+        we move 1 unit away.
+
+        \textbf{Training with images}: Exponentially more data. High-level idea: Render model in same
+        view as image and use photometric loss: \[
+            \ell(\hat{\tens{I}}, \tens{I}) = \sum_{\vec{u}} \| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \| .
+        \]
+        For this, we need a texture network $\vec{t}_{\vec{\theta}}: \R^3 \times \mathcal{X} \to \R^3$ that
+        outputs color. This requires the rendering pipeline to be differentiable.
+
+        \textit{Forward pass}: For every pixel $\vec{u}$, determine the first intersection with surface
+        $\hat{\vec{p}}$ using the secant method, which iteratively finds the linear intersection of the
+        line connecting the points and the $x$-axis. $\hat{\tens{I}}_{\vec{u}} =
+            \vec{t}_{\vec{\theta}}(\hat{\vec{p}})$.
+
+        \textit{Backward pass}: Compute gradients (using implicit differentiation) \[
+            \pdv{\ell(\vec{\theta})}{\vec{\theta}} = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} - \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \lft( \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \rgt)^{-1} \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} \rgt),
+        \]
+        where $\vec{r}(d) = \vec{r}_0 + d \vec{w}$ is the ray connecting camera origin to $\vec{u}$.
+
+        \textbf{NERF}: Problem: Implicit surfaces are not good at complex scenes, especially with
+        transparency or thin structures. NERF takes as input $(x,y,z,\theta,\phi)$ and outputs
+        $(r,g,b,\sigma)$, where $(\theta,\phi)$ are the view direction and $\sigma$ is the density,
+        allowing the modeling of transparency.
+
+        In the architecture, we must make sure that $\sigma$ does not depend on $(\theta,\phi)$. If
+        $\sigma$ depends on $(\theta,\phi)$, it will overfit on the images and learn to remember images,
+        rather than reconstruct the geometry. This is because the loss is based on the images.
+
+        \textit{Rendering}: We render ``volumetric clouds''. Instead of only sampling at the surface, we sample
+        along the whole ray and compute a weighted average. Let $\alpha_i = 1 - \exp(-\sigma_i \delta_i)$
+        with $\delta_i = t_{i+1} - t_i$ be the prob. of light stopping at point $i$. Then, we can compute
+        the prob. of light reaching $i$ by $T_i = \prod_{j=1}^{i-1} 1 - \alpha_j$. Then, we compute
+        the final color: \[
+            \vec{c} = \sum_{i=1}^{n} T_i \alpha_i \vec{c}_i.
+        \]
+        The fundamental difference with differentiable rendering is that we backpropagate through multiple
+        points rather than a single point.
+
+        In general, NNs are biased toward low frequency functions, while we need high frequency functions.
+        The solution is positional encodings. The low frequency function w.r.t. the encoding is then a high
+        frequency function w.r.t. $(x,y,z,\theta,\phi)$.
+
+        \textbf{Gaussian splatting}: Problem with NERF: Slow, because of the high number of samples.
+        We can reduce by estimating a set of primitives around the object boundary and only sampling
+        within these shapes. Cubes are hard to optimize. Spheres are bad at modeling thin structures.
+        Solution: Model by many 3D Gaussians. The scene is initialized by a point cloud. Then,
+        iteratively, we project the Gaussians onto the image plane and weight them similarly to NERF,
+        compute the loss, and backpropagate to update the Gaussians. Note that there are no
+        NNs. The weight of a Gaussian at a pixel $\vec{u}$ is computed by \[
+            \alpha_i(\vec{u}) = o_i \cdot \exp \lft( -\frac{1}{2} (\vec{x} - \vec{\mu}_i')^\top \mat{\Sigma}_i'^{-1} (\vec{x} - \vec{\mu}_i') \rgt),
+        \]
+        where $o_i$ is the opacity, and $\vec{\mu}_i', \mat{\Sigma}'$ are the parameters of the 2D
+        projection of the $i$-th 3D Gaussian.
     \end{topic}
 
     \begin{topic}{Parametric human body models}
-        TODO
+        \textbf{2D poses}: Body modeling: Use the pictorial structure model, which models the body
+        as a graph. Given an image $\tens{I}$ and vertex locations $L = [\ell_1, \ldots, \ell_k]$, we want
+        to minimize score: \[
+            S(\tens{I}, L) = \sum_{i\in V} \alpha_i \cdot \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij} \psi(\ell_i, \ell_j).
+        \]
+        Generalize by assigning mixture components $m_i$: \[
+            S(\tens{I}, L, M) = \sum_{i\in V} \alpha_i^{m_i} \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij}^{m_im_j} \psi(\ell_i,\ell_j) + \sum_{i,j \in E} b_{ij}^{m_im_j}.
+        \]
+        where $\alpha^{m_i}_i$ is the ``local appearance template'' for part $i$ with type $m_i$,
+        $\beta^{m_im_j}_{ij}$ expresses the likelihood of having template $m_i$ for part $i$ and template
+        $m_j$ for part $j$ given the distance between $\ell_i$ and $\ell_j$, and $b_{ij}^{m_im_j}$ is the
+        pairwise co-occurrence prior.
+
+        Feature learning: Use deep learning to either regress the locations (DeepPose) or output heatmaps
+        for each vertex (Convolutional Pose Machine). They both use architectures with a refinement
+        process.
+
+        The two can also be combined by first using feature learning and then refining with body modeling.
+
+        \textbf{Linear-blend skinning}: Simplest method that transforms vertices as a weighted linear combination of global joint transformations: \[
+            \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}) \rgt) \vec{t}_i,
+        \]
+        where $k$ are bones and $i$ are vertices, $\mat{G}_k(\vec{\theta})$ is the rigid bone
+        transformation for bone $k$, which is weighted by $w_{ki}$ which determines the influence of bone
+        $k$ on vertex $i$.
+
+        \textbf{Skinned multi-person linear model}: Problem with LBS: Does not account for variation
+        in body shape and poses often result in unwanted deformations. SMPL solves this by encoding a
+        body shape parameter $\vec{\beta} \in \R^{10}$ and pose parameter $\vec{\theta} \in \R^{9K}$.
+
+        \begin{enumerate}
+            \item Translate template to identity mesh: $\bar{\mat{T}} + \mat{B}_S(\vec{\beta})$.
+            \item Correct for future deformations: $\bar{\mat{T}} + \mat{B}_S(\vec{\beta}) +
+                      \mat{B}_P(\vec{\theta})$.
+            \item Linear-blend skinning: \[
+                      \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) (\vec{t}_i + \vec{s}_i(\vec{\beta}) + \vec{p}_i(\vec{\theta})).
+                  \]
+        \end{enumerate}
+
+        We learn $\mat{B}_S(\vec{\beta})$ by PCA on a body shape dataset. $\vec{\beta}$ are the linear
+        weights of the largest principal components: \[
+            \mat{B}_S(\vec{\beta}; \mathcal{S}) = \sum_{n=1}^{|\vec{\beta}|} \beta_n \mat{S}_n.
+        \]
+
+        We learn $\mat{B}_P(\vec{\theta})$ from a body pose dataset: \[
+            \mat{B}_P(\vec{\theta}; \mathcal{P}) = \sum_{n=1}^{9K} (\mat{R}_n(\vec{\theta}) - \mat{R}_n(\vec{\theta}^\star)) \mat{P}_n,
+        \]
+        where $\vec{\theta}^\star$ is the template pose, $\mat{R}(\vec{\theta})$ maps pose vectors to
+        vectors of rotation matrices, and $\mat{P}_n \in \R^{3N}$ is a vector of vertex displacements
+
+        \textbf{Learned gradient descent}: Method for fitting 3D human shapes to images by combining
+        gradient-based optimization with NNs. It leverages a NN to predict
+        the parameter update rule for each optimization iteration.
+        \begin{align*}
+            \mathcal{L}(\Theta_n) & = L_{\mathrm{reproj}}(\hat{\vec{x}}_n, \vec{x}_{\mathrm{GT}})                                             \\
+            \Delta                & = \mathcal{N}_{\vec{w}}\lft( \pdv{\mathcal{L}(\Theta_n)}{\Theta_n}, \Theta_n, \vec{x}_{\mathrm{GT}} \rgt) \\
+            \Theta_{n+1}          & = \Theta_n + \Delta,
+        \end{align*}
+        where $\mathcal{N}_{\vec{w}}$ is a NN that predicts the update.
     \end{topic}
 
 \end{multicols*}
