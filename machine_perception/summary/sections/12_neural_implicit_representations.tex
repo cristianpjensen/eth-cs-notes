@@ -190,7 +190,7 @@ as \[
     \alpha_i = 1 - \exp(-\sigma_i \delta_i), \quad \delta_i = t_{i+1} - t_i.
 \]
 Then, we can compute the probability of light reaching point $i$ by \[
-    T_i = \prod_{j=1}^{i-1} 1 - \alpha_i.
+    T_i = \prod_{j=1}^{i-1} 1 - \alpha_j.
 \]
 In order to compute the final color, we take the weighted average of the colors along the ray,
 weighted by the probability $T_i \alpha_i$ of light reaching the point and stopping there, \[
@@ -241,7 +241,7 @@ adaptively adds more points as necessary.\sidenote{It does so by densifying poin
         \epsilon_{\alpha}$. It densifies by splitting Gaussians with large variance into two smaller ones.
     Furthermore, to keep the amount of Gaussians low, it sets all $o_i$ to zero every 300 iterations.
     The model will then increase the opacity of Gaussians that are needed and the rest are culled by
-    the deletion process.} The opacity of each Gaussian at a point $\vec{x}$ can be computed by \[
+    the deletion process.} The weight of each Gaussian at a point $\vec{x}$ can be computed by \[
     \alpha_i(\vec{x}) = o_i \cdot \exp\lft(-\frac{1}{2} \transpose{(\vec{x} - \vec{\mu}_i')} \inv{\mat{\Sigma}_i'} (\vec{x} - \vec{\mu}_i')\rgt),
 \]
 where $o_i$ is the opacity, and $\vec{\mu}_i'$ and $\mat{\Sigma}_i'$ are the parameters of the 2D

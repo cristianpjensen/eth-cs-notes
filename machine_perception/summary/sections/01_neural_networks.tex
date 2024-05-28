@@ -63,7 +63,7 @@ cross-entropy,
 \begin{align*}
     \mathcal{L}(\vec{\theta}) & = - \sum_{i=1}^{n} \log \mathrm{Ber}(y_i \mid \hat{y}_i \doteq f(\vec{x}_i\mid\vec{\theta})) \margintag{$f$ is a model that outputs the Bernoulli parameter. Note that this parameter must be in $[0,1]$, thus we use a sigmoid non-linearity, \[ \sigma(x) = \frac{1}{1 + \exp(-x)}. \]} \\
                               & = - \sum_{i=1}^{n} \log \hat{y}_i^{y_i} (1-\hat{y}_i)^{1-y_i}                                                                                                                                                                                                                             \\
-                              & = - \sum_{i=1}^{n} y_i \log \hat{y}_i - (1-y_i) \log (1-\hat{y}_i).
+                              & = - \sum_{i=1}^{n} y_i \log \hat{y}_i + (1-y_i) \log (1-\hat{y}_i).
 \end{align*}
 This loss is minimized if $y_i = \hat{y}_i$ for all $i \in [n]$; see \Cref{fig:bce-loss}. We can
 extend this to multi-class classification by using the softmax and a categorical distribution.

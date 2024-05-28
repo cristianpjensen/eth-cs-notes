@@ -15,8 +15,8 @@ where the joints are vertices and they are connected by edges. For example, in a
 the foot vertex might be connected to the knee vertex.
 
 In a 2D image, we indicate the position of vertex $i$ by $\ell_i = [x_i, y_i]$. Then, given an
-image $\tens{I}$ and a configuration $L = [\ell_1, \ell_k]$, we can define the score of that
-configuration by \[
+image $\tens{I}$ and a configuration $L = [\ell_1, \ldots, \ell_k]$, we can define the score of
+that configuration by \[
     S(\tens{I}, L) = \sum_{i \in V} \alpha_i \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij} \psi(\ell_i, \ell_j),
 \]
 where the first term measures the score of placing vertex $i$ at $\ell_i$ in image $\tens{I}$ and
@@ -30,7 +30,7 @@ side-view head, or open versus closed hand. Formally, we compute the score by \[
     S(\tens{I}, L, M) = \sum_{i \in V} \alpha_i^{m_i} \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij}^{m_i,m_j} \psi(\ell_i, \ell_j)+ S(M),
 \]
 where $\alpha_i^{m_i}$ is the ``local appearance template'' for part $i$ with type $m_i$,
-$\beta_{ij}^{m_i,m_j}$ expresses the likelihood of having template $m_i$ for pat $i$ and template
+$\beta_{ij}^{m_i,m_j}$ expresses the likelihood of having template $m_i$ for part $i$ and template
 $m_j$ for part $j$ given the distance between $\ell_i$ and $\ell_j$, and $S(M)$ is the
 co-occurrence bias defined by \[
     S(M) = \sum_{i,j\in E} b_{ij}^{m_i,m_j},
@@ -65,10 +65,10 @@ pose. It does so by transforming vertices as a weighted linear combination of gl
 transformations, \[
     \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}, \mat{J}) \rgt) \vec{t}_i.
 \]
-Each bone-joint pair is given a weight $w_{k,i}$, which determines the influence of the
+Each bone-joint pair is given a weight $w_{ki}$, which determines the influence of the
 transformation of a bone on the joint. $\mat{G}_k(\vec{\theta})$ is the rigid bone transformation
 for bone $k$, which transforms the original joint location $\vec{t}_i$, which is linearly weighted
-by $w_{k,i}$. Here, $\vec{\theta}$ is the desired pose and $\mat{J}$ are the joint locations.
+by $w_{ki}$. Here, $\vec{\theta}$ is the desired pose and $\mat{J}$ are the joint locations.
 
 The problem with this approach is that it does not account for any variation in the body shape.
 Also, often there are problems with unrealistic deformations, caused by the pose.

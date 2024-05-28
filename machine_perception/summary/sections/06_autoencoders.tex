@@ -66,14 +66,14 @@ observations, thus the model does not know what to output when it get an input f
 \textit{Variational autoencoders} (VAE) \citep{kingma2013auto} are designed to have a continuous
 latent space. It achieves this by making the encoder output a probability distribution over latent
 vectors, rather than a single latent vector. Generally, it outputs a mean vector $\vec{\mu}$ and
-standard deviation vector $\vec{\sigma}$ to form a Gaussian distribution over latents
-$\mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}))$. The idea is that even for the same input, the
+standard deviation vector $\vec{\sigma}^2$ to form a Gaussian distribution over latents
+$\mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$. The idea is that even for the same input, the
 latent vector can be different, but in the same area. This means that data points cover areas in the
 latent space, rather than single points, ensuring continuity and interpolation.
 
-However, since there are no limits on the values taken by $\vec{\mu}$ and $\vec{\sigma}$, the
+However, since there are no limits on the values taken by $\vec{\mu}$ and $\vec{\sigma}^2$, the
 encoder may learn to generate very different $\vec{\mu}$ for each class while minimizing
-$\vec{\sigma}$. This would mean that the encoder essentially outputs points again to decrease the
+$\vec{\sigma}^2$. This would mean that the encoder essentially outputs points again to decrease the
 reconstruction error. We can avoid this by minimizing the KL-divergence between the output
 distribution and a standard normal distribution.\sidenote{The KL-divergence is defined as \[
         D_{\mathrm{KL}}(p \lVert q) \doteq \E \lft[ \log \lft( \frac{p(x)}{q(x)} \rgt) \rgt].
@@ -99,15 +99,15 @@ The first term of the ELBO encourages low reconstruction error, while the second
 the approximate posterior $q_{\vec{\phi}}$ does not deviate too far from the prior $p$. The second
 term can be computed in a closed-form, since both arguments are Gaussian,
 \begin{align*}
-    q_{\vec{\phi}}(\vec{z} \mid \vec{x}) & = \mathcal{N}(\vec{z} ; \vec{\mu}_{\vec{\phi}}(\vec{x}), \mathrm{diag}(\vec{\sigma}_{\vec{\phi}}(\vec{x}))) \\
+    q_{\vec{\phi}}(\vec{z} \mid \vec{x}) & = \mathcal{N}(\vec{z} ; \vec{\mu}_{\vec{\phi}}(\vec{x}), \mathrm{diag}(\vec{\sigma}^2_{\vec{\phi}}(\vec{x}))) \\
     p(\vec{z})                           & = \mathcal{N}(\vec{z}; \vec{0}, \mat{I}).
 \end{align*}
 
 A minor problem is that, during training, we cannot compute the derivative of expectations \wrt the
 parameters that we wish to optimize. Thus, we must use the \textit{reparametrization trick}, which
 involves treating the random sampling as a single noise term. In particular, instead of sampling
-$\vec{z} \sim \mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}))$, we sample $\vec{\epsilon} \sim
-    \mathcal{N}(\vec{0},\mat{I})$ and compute $\vec{z} = \vec{\mu} + \vec{\sigma} \odot
+$\vec{z} \sim \mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$, we sample $\vec{\epsilon}
+    \sim \mathcal{N}(\vec{0},\mat{I})$ and compute $\vec{z} = \vec{\mu} + \vec{\sigma} \odot
     \vec{\epsilon}$. Using this trick, we can remove the mean and variance from the sampling operation,
 meaning that we can differentiate \wrt the model parameters.
 

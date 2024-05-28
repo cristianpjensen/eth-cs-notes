@@ -99,7 +99,7 @@ Again using the change of variables, we can then compute the likelihood by \[
 \subsection{Training and inference}
 
 At training time, we can learn the model by maximizing the exact log likelihood over the dataset, \[
-    \log p_X(\mathcal{D}) = \sum_{i=1}^n \log p_Z \lft( \inv{f}(\vec{x}_i) \rgt) + \sum_{k=1}^{m} \log \inv{\lft| \det{\jacob{f_k(\vec{x_i})}{}} \rgt|}.
+    \log p_X(\mathcal{D}) = \sum_{i=1}^n \log p_Z \lft( \inv{f}(\vec{x}_i) \rgt) + \sum_{k=1}^{m} \log \inv{\lft| \det{\jacob{f_k(\vec{x}_i)}{}} \rgt|}.
 \]
 
 At inference time, we generate a sample $\vec{x}$ by drawing a random $\vec{z} \sim p_Z$ and

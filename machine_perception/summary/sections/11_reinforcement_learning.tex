@@ -52,17 +52,17 @@ This can also be written in recursive form as \[
 \begin{definition}[Value function]
     The value function $V^\pi: \mathcal{S} \to \R$ is defined as the expected return under policy
     $\pi$, starting from state $s$, \[
-        V^\pi(s) \doteq \E_{\pi} \lft[ G_0 \;\middle|\; s_0=s \rgt] = \E_{\pi} \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t, a_t) \;\middle|\; s_0=s \rgt].
+        V^\pi(s) \doteq \E_{\pi} \lft[ G_0 \;\middle|\; S_0=s \rgt] = \E_{\pi} \lft[ \sum_{t=0}^{\infty} \gamma^t r(s_t, a_t) \;\middle|\; S_0=s \rgt].
     \]
 \end{definition}
 
 From the definition of the value function, we can derive the Bellman consistency equation,
 \begin{align*}
-    V^\pi(s) & \doteq \E_{\pi}[G_0 \mid s_0 = s]                                                                                                                                                                                                                              \\
-             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \E_{\pi}[r(s,a) + \gamma G_1 \mid s_0 = s, a_0 = a] \margintag{Recursive definition of return and condition on action.}                                                                                                \\
-             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s,a) + \gamma \E_{\pi}[G_1 \mid s_0 = s, a_0 = a] \rgt] \margintag{Linearity of expectation.}                                                                                                                  \\
-             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_1 \mid s_1 = s'] \rgt] \margintag{Condition on next state, which makes $(s_0, a_0)$ irrelevant for further return due to Markov property.} \\
-             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_0 \mid s_0 = s'] \rgt] \margintag{Markov property.}                                                                                        \\
+    V^\pi(s) & \doteq \E_{\pi}[G_0 \mid S_0 = s]                                                                                                                                                                                                                              \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \E_{\pi}[r(s,a) + \gamma G_1 \mid S_0 = s, A_0 = a] \margintag{Recursive definition of return and condition on action.}                                                                                                \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s,a) + \gamma \E_{\pi}[G_1 \mid S_0 = s, A_0 = a] \rgt] \margintag{Linearity of expectation.}                                                                                                                  \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_1 \mid S_1 = s'] \rgt] \margintag{Condition on next state, which makes $(s_0, a_0)$ irrelevant for further return due to Markov property.} \\
+             & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \E_{\pi}[G_0 \mid S_0 = s'] \rgt] \margintag{Markov property.}                                                                                        \\
              & = \sum_{a \in \mathcal{A}} \pi(a\mid s) \lft[ r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
 \end{align*}
 Furthermore, we have the Bellman optimality equation, \[
@@ -185,7 +185,7 @@ is the $\epsilon$-greedy policy, which chooses a random action with small probab
 
 \paragraph{SARSA.} \textit{SARSA} \citep{rummery1994line} is an on-policy algorithm that learns the
 Q-values of a policy $\pi$. It updates Q-values given a transition $(s, a, r, s')$ as follows, \[
-    Q(s,a) \gets \alpha Q(s,a) + (1-\alpha) (r + \gamma Q(s', a')), \quad a' \sim \pi(\cdot, s').
+    Q^\pi(s,a) \gets \alpha Q^\pi(s,a) + (1-\alpha) (r + \gamma Q^\pi(s', a')), \quad a' \sim \pi(\cdot, s').
 \]
 This is on-policy, because it requires the policy for the update.
 
@@ -231,7 +231,7 @@ because the target is more stable than if we used $\vec{\theta}$.
 
 \paragraph{Policy search methods.}
 
-The problem with DQNs is that they do not address potentially large state spaces. \textit{Policy
+The problem with DQNs is that they do not address potentially large action spaces. \textit{Policy
     search methods} solve this by directly parametrizing the policy $\pi_{\vec{\theta}}$. However, it
 is not trivial to train such a model, since there is no way of knowing what the target action
 should be. Furthermore, we want the policy to be a probability distribution. Thus, instead we
@@ -239,7 +239,7 @@ parameterize a Gaussian as the policy, \[
     \pi(a \mid s) = \mathcal{N}\lft(a; \mu_{\vec{\theta}}, \sigma_{\vec{\theta}}^2\rgt).
 \]
 Recall that the probability of a trajectory $\tau$ is computed by \[
-    \pi_{\vec{\theta}}(\tau) = p(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) p(s_{t+1} \mid a_t, s_t).
+    \pi_{\vec{\theta}}(\tau) = p(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) p(s_{t+1} \mid s_t, a_t).
 \]
 And, ideally, we want our policy to make trajectories with high return more likely and trajectories
 with low return unlikely. Thus, we have the following training objective that we want to maximize, \[
