@@ -1,0 +1,75 @@
+%% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'gaussian-splatting-workflow.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{320bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.5625)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{gaussian-splatting-workflow.pdf}}%
+    \put(0.01585122,0.30645872){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}SfM Points\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{gaussian-splatting-workflow.pdf}}%
+    \put(0.54048528,0.09410649){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Differentiable\end{tabular}}}}%
+    \put(0.53706808,0.05849899){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Tile Rasterizer\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{gaussian-splatting-workflow.pdf}}%
+    \put(0.27549039,0.09410649){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Adaptive\end{tabular}}}}%
+    \put(0.22988568,0.05849899){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Density Control\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{gaussian-splatting-workflow.pdf}}%
+    \put(0.56884725,0.21171754){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Projection\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{gaussian-splatting-workflow.pdf}}%
+    \put(0.25177146,0.44077683){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Initialization\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{gaussian-splatting-workflow.pdf}}%
+    \put(0.84594213,0.07829239){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Image\end{tabular}}}}%
+    \put(0.25502943,0.21368929){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}3D Gaussians\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{gaussian-splatting-workflow.pdf}}%
+    \put(0.84125464,0.21365512){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}Camera\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{gaussian-splatting-workflow.pdf}}%
+  \end{picture}%
+\endgroup%

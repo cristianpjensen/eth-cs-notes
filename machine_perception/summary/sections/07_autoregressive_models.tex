@@ -190,13 +190,35 @@ sequences is very slow, because of the sequential nature of the generation proce
 limitation of vanilla RNNs is that their structure is entirely deterministic and thus limited in
 expressive power.
 
-The \textit{variational RNN} \citep{chung2015recurrent} (VRNN) is a recurrent version of the VAE. A
-different VAE is used at each timestep. However, the VAEs are not the same as we have seen. In
-particular, the prior distribution is no longer a standard Gaussian, but follows the distribution
-$\mathcal{N}\lft(\vec{\mu}_0^{(t)}, \mathrm{diag}\lft(\vec{\sigma}_0^{(t)}\rgt)\rgt)$, where
-$\lft(\vec{\mu}_0^{(t)}, \vec{\sigma}_0^{(t)}\rgt)$ is predicted by the network
-$\phi_{\mathrm{prior}}\lft(\vec{h}^{(t)}\rgt)$ based on the hidden state of the RNN at each
-timestep. This introduces randomness to the generation, whereas RNNs are typically deterministic.
+\begin{marginfigure}
+    \centering
+    \incfig{vrnn-inference}
+    \caption{Computational graph of VRNN for inference.}
+    \label{fig:vrnn-inference}
+\end{marginfigure}
+
+\begin{marginfigure}
+    \centering
+    \incfig{vrnn-generation}
+    \caption{Computational graph of VRNN for generation.}
+    \label{fig:vrnn-generation}
+\end{marginfigure}
+
+The \textit{variational RNN} \citep{chung2015recurrent} (VRNN) introduces stochasticity to the
+generations of the RNN, which are typically deterministic. It does so by adding a VAE and sampling
+the hidden state $\vec{h}^{(t)}$ from it. For inference (\ie, encoding), it samples the new hidden
+state by
+\begin{align*}
+    \vec{z}^{(t)} & \sim q_{\vec{\phi}} \lft( \cdot \mid \vec{x}^{(t)}, \vec{h}^{(t-1)} \rgt)                   \\
+    \vec{h}^{(t)} & \sim p_{\vec{\theta}} \lft( \cdot \mid \vec{h}^{(t-1)}, \vec{z}^{(t)}, \vec{x}^{(t)} \rgt).
+\end{align*}
+For generation, $\vec{z}_t$ may not depend on $\vec{x}_t$, so we have
+\begin{align*}
+    \vec{z}^{(t)} & \sim q_{\vec{\phi}} \lft( \cdot \mid \vec{h}^{(t-1)} \rgt)                                  \\
+    \vec{x}^{(t)} & \sim p_{\vec{\theta}} \lft( \cdot \mid \vec{h}^{(t)}, \vec{z}^{(t)} \rgt)                   \\
+    \vec{h}^{(t)} & \sim p_{\vec{\theta}} \lft( \cdot \mid \vec{h}^{(t-1)}, \vec{z}^{(t)}, \vec{x}^{(t)} \rgt).
+\end{align*}
+The prior is also sampled from a learned distribution.
 
 The \textit{conditional VRNN} (C-VRNN) is an extension to the VRNN, where we can condition on \eg
 style or, in the case of MNIST, which digit should be generated. During training, the model

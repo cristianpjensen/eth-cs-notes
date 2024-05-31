@@ -224,6 +224,13 @@ only model static scenes.
 
 \subsection{Gaussian splatting}
 
+\begin{figure}
+    \centering
+    \incfig{gaussian-splatting-workflow}
+    \caption{Workflow of Gaussian splatting. The dashed lines are gradient flow and solid lines are operation flow.}
+    \label{fig:gaussian-splatting-workflow}
+\end{figure}
+
 The problem with NERF is that it is slow, because of the number of samples needed for rendering. We
 can reduce the amount of samples by estimating a set of primitives around the object boundary and
 only training/sampling within these objects \citep{lombardi2021mixture}. This paper used cubes, but
