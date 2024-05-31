@@ -46,17 +46,18 @@
 \begin{multicols*}{2}
 
     \begin{itemize}
-        \item Derivatives of common activation functions: \[
-                  \sigma'(x) = \sigma(x) (1 - \sigma(x)), \quad \tanh'(x) = 1 - \tanh^2(x).
+        \item Derivatives of common functions: \[
+                  \sigma'(x) = \sigma(x) (1 - \sigma(x)), \quad \tanh'(x) = 1 - \tanh^2(x), \quad |x|' = \nicefrac{x}{|x|}.
               \]
-              Can re-use components of the computational graph to rewrite this.
-
         \item If $\vec{x} \in \R^{m_1 \times \cdots \times m_d}$ and $\vec{y} \in \R^{n_1 \times \cdots \times
                       n_\ell}$, then \[
                   \pdv{\vec{x}}{\vec{y}} \in \R^{m_1 \times \cdots \times m_d \times n_1 \times \cdots \times n_\ell}.
               \]
         \item When computing gradient, think about changing parameters and how that would affect the output.
         \item Always type-check gradients.
+        \item Quotient rule: $(\nicefrac{f}{g})'(x) = \nicefrac{f'(x)\cdot g(x) - f(x)\cdot g'(x)}{g^2(x)}$.
+        \item $\pdv{\mat{A} \vec{x}}{\vec{x}} = \mat{A}$, $\pdv{\vec{x} \odot \vec{y}}{\vec{x}} = \mathrm{diag}(\vec{y})$, $\pdv{\vec{x} \odot \vec{y}}{\vec{y}} = \mathrm{diag}(\vec{x})$.
+
     \end{itemize}
 
     % Multi-variate Gaussian: \[
@@ -73,7 +74,9 @@
 
         If the data is linearly separable, the perceptron converges in linear time.
 
-        \textbf{Multi-layer perceptron}: $\hat{y} = \sigma \lft( \mat{W}_k \sigma( \mat{W}_{k-1} \cdots \sigma( \mat{W}_1 \vec{x} ) ) \rgt)$.
+        \textbf{MLP}: $\hat{y} = \sigma (\mat{W}_k \sigma( \mat{W}_{k-1} \cdots \sigma( \mat{W}_1 \vec{x} + \vec{b}_1 ) \cdots + \vec{b}_{k-1} ) + \vec{b}_k )$.
+
+        Do not forget biases!
 
         \textbf{Loss functions}:
         \begin{itemize}
@@ -83,6 +86,9 @@
             \item MAP: $\argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i \mid
                       \vec{\theta})$.
         \end{itemize}
+
+        \textbf{Early stopping}: Stop training if the validation error has increased for the last
+        $p$ checks. We check every $n$ epochs.
 
         \textbf{Backpropagation}: Linear-time algorithm to compute gradients using chain rule.
         Intuitively, gradients work well for updating weights, because it measures the direction in
@@ -95,15 +101,14 @@
         approximate this function with $\epsilon$ precision, \[
             | f_{\vec{\theta}}(\vec{x}) - g(\vec{x}) | < \epsilon, \quad \forall \vec{x} \in I_m.
         \]
-        In practice, this hidden layer may need to be infinitely large.
+        \textit{In words}: An MLP with a single hidden layer and continuous non-linear activation function can
+        approximate any continuous function with arbitrary precision.
 
     \end{topic}
 
     \begin{topic}{Convolutional neural networks}
 
-        \textbf{Convolution}: \[
-            (\mat{K} * \mat{I})[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} \mat{K}[m,n] \mat{I}[i-m, j-n].
-        \]
+        \textbf{Convolution}: $(\mat{K} * \mat{I})[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} \mat{K}[m,n] \mat{I}[i-m, j-n]$.
         Correlation uses plus instead of minus. Convolution is commutative, linear, and shift-equivariant.
         Can be implemented as matrix operation: \[
             \mat{K} * \mat{I} = \begin{bmatrix}
@@ -121,12 +126,14 @@
             \mat{Z}_j^{(\ell)} = \sum_{k=1}^{C_{\mathrm{in}}} \mat{W}_{kj}^{(\ell)} * \mat{Z}_k^{(\ell)} + b_j, \quad j \in [C_{\mathrm{out}}].
         \]
         With $C_{\mathrm{in}} = C_{\mathrm{out}} = 1$, we have derivative:
-        \begin{align*}
-            \delta^{(\ell-1)}[i,j]              & \doteq \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]} = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j] \\
-            \mat{\Delta}^{(\ell-1)}             & = \mat{\Delta}^{(\ell)} * \mathrm{Rot}_{180}(\mat{W}^{(\ell)})                                                   \\
-            \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} & = \mat{\Delta}^{(\ell)} * \mat{Z}^{(\ell - 1)}.
-        \end{align*}
-        Max-pooling layer:
+        \begin{gather*}
+            \delta^{(\ell-1)}[i,j] \doteq \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]} = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j] \\
+            \mat{\Delta}^{(\ell-1)} = \mat{\Delta}^{(\ell)} * \mathrm{Rot}_{180}(\mat{W}^{(\ell)}), \quad \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} = \mat{\Delta}^{(\ell)} * \mat{Z}^{(\ell - 1)}.
+        \end{gather*}
+        $D_{\mathrm{out}} = \lft\lfloor \frac{D_{\mathrm{in}} + 2 \times p - d \times (k - 1) - 1}{s} + 1 \rgt\rfloor$.
+        Params: $(C_{\mathrm{in}} \times H \times W + 1) \times C_{\mathrm{out}}$.
+
+        \textbf{Max-pooling layer}:
         \begin{align*}
             z^{(\ell)}[i,j]                                & = \max \lft\{ z^{(\ell-1)}[i',j'] \mid i' \in [i : i + k], j' \in [j : j+k] \rgt\} \\
             \pdv{z^{(\ell)}[i{,}j]}{z^{(\ell-1)}[i'{,}j']} & = \mathds{1}\{ [i',j'] = [i^\star,j^\star] \}.
@@ -136,7 +143,7 @@
     \end{topic}
 
     \begin{topic}{Fully convolutional neural networks}
-        Example application: Pixel segmentation. Downsample, then upsample.
+        Downsample, then upsample. \textit{Examples}: Semantic segmentation, Image-to-image translation, Human pose estimation.
 
         \textbf{Upsampling methods}:
 
@@ -165,7 +172,7 @@
         $\vec{h}^{(t)}$ represents the sequence until timestep $t$, which we can use as input into an
         MLP for further processing.
 
-        Backpropagation through time (BPTT) to optimize by unrolling the RNN and applying backpropagation
+        \textbf{Backpropagation through time} (BPTT) to optimize by unrolling the RNN and applying backpropagation
         on the computational graph: \[
             \pdv{\ell^{(t)}}{\mat{W}_h} = \sum_{k=1}^{t} \pdv{\ell^{(t)}}{\hat{\vec{y}}^{(t)}} \pdv{\hat{\vec{y}}^{(t)}}{\vec{h}^{(t)}} \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} \pdv{^+ \vec{h}^{(k)}}{\mat{W}_h}.
         \]
@@ -194,9 +201,9 @@
             \vec{c}^{(t)} & = \vec{f}^{(t)} \odot \vec{c}^{(t-1)} + \vec{i}^{(t)} \odot \vec{g}^{(t)} \\
             \vec{h}^{(t)} & = \vec{o}^{(t)} \odot \tanh \lft( \vec{c}^{(t)} \rgt).
         \end{align*}
-        The forget gate $\vec{f}$ decides what information to keep from previous cell state. The gate
-        gate $\vec{g}$ decides what to write to the cell state. The input gate $\vec{i}$ decides what
-        values of the cell state should be updated. The output gate $\vec{o}$ decides what values of
+        The \textit{forget gate} $\vec{f}$ decides what information to keep from previous cell state. The \textit{gate
+            gate} $\vec{g}$ decides what to write to the cell state. The \textit{input gate} $\vec{i}$ decides what
+        values of the cell state should be updated. The \textit{output gate} $\vec{o}$ decides what values of
         the cell state to put into the hidden state.
 
         The gates form an ``information highway'' that can easily propagate errors through the cell state
@@ -213,9 +220,9 @@
 
     \begin{topic}{Autoencoders}
 
-        Autoencoders are generative model, meaning that they model the underlying distribution of the data,
-        which makes it possible to sample from it. It works by an encoder-decoder structure, where $f$ maps
-        data points $\vec{x} \in \R^n$ to latent variables $\vec{z} \in \R^d$, i.e., encodes the
+        Autoencoders are generative models, meaning that they model the underlying distribution of the
+        data, which makes it possible to sample from it. It works by an encoder-decoder structure, where
+        $f$ maps data points $\vec{x} \in \R^n$ to latent variables $\vec{z} \in \R^d$, i.e., encodes the
         information compactly in $d \ll n$ dimensions. The decoder $g$ maps latent variables $\vec{z}$ back
         to the input space for a reconstruction $\hat{\vec{x}}$. Thus, $g \circ f$ aims to approximate the
         identity function. The assumption is that if the decoder is able to reconstruct the original input
@@ -249,7 +256,7 @@
             \vec{\sigma} \odot \vec{\epsilon}$. After training, we can sample from the distribution by sampling
         $\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})$ and giving this to the decoder.
 
-        \textbf{$\beta$-VAE}: The VAE still has problems with its latent space: it is entangled. A
+        \textbf{$\beta$-VAE}: The VAE still has problems with its latent space: It is \textit{entangled}. A
         latent space is disentangled if each dimensions changes a single feature of the output. We
         solve this by introducing a hyperparameter $\beta$ which gives more weight to the KL term. The
         intuition behind this is that if factors are in practice independent from each other, the
@@ -297,17 +304,14 @@
         \textbf{Pixel-CNN}: We can solve the efficiency issue of Pixel-RNN by assuming that pixels
         only depend on a context region around them. This allows for parallelization during training.
         During training we need to make sure only previous pixels are used, thus we use a masked
-        convolution. However, this creates a blind spot. Solution: horizontal and vertical stacks of
+        convolution. Blind spot $\Rightarrow$ Horizontal and vertical stacks of
         convolutions. To enforce the autoregressive property, we need to go over the color channels
-        autoregressively as well.
+        autoregressively.
 
-        \textbf{WaveNet}: Pixel-CNN framework for audio data. Makes use of dilated convolutions to
-        achieve an exponentially growing receptive field.
+        \textbf{WaveNet}: Pixel-CNN (audio) with dilated convs for an exponential RF.
 
-        % \textbf{VRNN}: RNNs can be used for autoregressive modeling, but they are deterministic. We
-        % can add stochasticity by sampling from VAEs.
-        %
-        % \textbf{C-VRNN}: Extend previous framework by allowing conditioning.
+        \textbf{VRNN}: RNNs are deterministic $\Rightarrow$ Add stoch. by sampling $\vec{h}_t$ from VAE:
+        $\vec{z}_t \sim q_{\vec{\phi}}(\cdot \mid \vec{x}_t, \vec{h}_{t-1}), \vec{h}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}, \vec{z}_t, \vec{x}_t)$. Prior is learned.
 
         \textbf{Transformers}: Stack normalization, MLPs, and self-attention: \[
             \mat{Y} = \mathrm{softmax}\lft( \nicefrac{\mat{X} \mat{W}_Q \mat{W}_K^\top \mat{X}^\top}{\sqrt{d}} + \mat{M} \rgt) \mat{X} \mat{W}_V,
@@ -429,7 +433,7 @@
         \textbf{GAN}: Solve the above problem by introducing a discriminator. The objective of the
         generator is then to maximize the discriminator's classification loss by generating images
         similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function: \[
-            V(D, G) = \log D(\vec{x}) + \log (1 - D(G(\vec{z}))), \quad \vec{x} \in \mathcal{D}, \vec{z} \in \mathcal{N}(\vec{0}, \mat{I}).
+            V(D, G) = \E_{\vec{x} \sim p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})} [\log (1 - D(G(\vec{z})))].
         \]
         Then, we have the following two-player zero-sum game: \[
             \argmin_G \argmax_D V(D,G).
@@ -530,21 +534,21 @@
 
     \begin{topic}{Reinforcement learning}
 
-        MDP: $(\mathcal{S}, \mathcal{A}, P, r, \gamma)$. Policy: $\pi: \mathcal{S} \to
-            \mathscr{P}(\mathcal{A})$. At every point, the goal of the agent is to maximize:
+        \textbf{MDP}: $(\mathcal{S}, \mathcal{A}, P, r, \gamma)$. \textbf{Policy}: $\pi: \mathcal{S} \to
+            \Delta(\mathcal{A})$. At every point, the goal of the agent is to maximize:
         \begin{align*}
             G_t & = \sum_{k=0}^{\infty} \gamma^k r(s_{t+k}, a_{t+k}) \\
                 & = r(s_t, a_t) + \gamma G_{t+1}.
         \end{align*}
-        Value function and Bellman equation:
+        \textbf{Value function} and \textbf{Bellman equation}:
         \begin{align*}
             V^\pi(s) & = \E_{\pi} [G_0 \mid S_0 = s]                                                                                             \\
                      & = \sum_{a \in \mathcal{A}} \pi(a \mid s) \lft[ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
         \end{align*}
-        Bellman optimality operator \[
+        \textbf{Bellman optimality operator}: \[
             (\mathcal{T} V) (s) \doteq \max_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V(s') \rgt\}.
         \]
-        $\gamma$-contraction and monotonic:
+        This function is a $\gamma$-contraction and monotonic:
         \begin{gather*}
             \max_{s \in \mathcal{S}} |(\mathcal{T}V')(s) - (\mathcal{T}V)(s)| \leq \gamma \max_{s \in \mathcal{S}} |V'(s) - V(s)| \\
             V(s) \leq V'(s) \implies (\mathcal{T}V)(s) \leq (\mathcal{T}V')(s).
@@ -561,7 +565,7 @@
         \textbf{Policy iteration}: Alternates between computing the greedy policy and the value
         function of the policy.
 
-        \textbf{Model-based and model-free}: MB:Learn the underlying MDP and solve it.
+        \textbf{Model-based and model-free}: MB: Learn the underlying MDP and solve it.
         MF: Learn the policy or value function directly.
 
         \textbf{On-policy and off-policy}: On-policy: Must learn from policy's own data. Off-policy:
@@ -588,7 +592,7 @@
         \]
 
         \textbf{Q-learning}: Learns optimal Q-values (off-policy): \[
-            Q(s,a) \gets \alpha Q(s,a) + (1-\alpha)(r + \gamma Q(s',a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
+            Q(s,a) \gets (1-\alpha) Q(s,a) + \alpha (r + \gamma Q(s',a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
         \]
 
         \textbf{DQN}: Large or infinite state spaces $\Rightarrow$ Function approximation. DQN learns
@@ -597,7 +601,10 @@
         \]
         We train as in supervised learning. Data is not i.i.d. $\Rightarrow$ Replay buffer.
 
-        \textbf{Policy search}: Large or infinite action spaces $\Rightarrow$ parametrize
+        \textbf{Sample inefficiency of deep RL}: As the policy improves, we can collect better data.
+        So, we have to keep training on new better data.
+
+        \textbf{Policy search}: Large or infinite action spaces $\Rightarrow$ Parametrize
         $\pi_{\vec{\theta}}$: \[
             \pi_{\vec{\theta}}(\cdot \mid s) = \mathcal{N}(\vec{\mu}_{\vec{\theta}}(s), \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(s))).
         \]
@@ -630,9 +637,9 @@
         model connectivity. Meshes are bad because of approximation error. We use learned implicit
         functions:
         \begin{itemize}
-            \item Occupancy network: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to [0,1]$ outputting probability of
+            \item \textit{Occupancy network}: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to [0,1]$ outputting probability of
                   being inside mesh.
-            \item DeepSDF: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R$ outputting distance to surface.
+            \item \textit{DeepSDF}: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R$ outputting distance to surface.
         \end{itemize}
         Implicit surfaces can do non-rigid transformations.
 
@@ -650,7 +657,7 @@
         view as image and use photometric loss: \[
             \ell(\hat{\tens{I}}, \tens{I}) = \sum_{\vec{u}} \| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \| .
         \]
-        For this, we need a texture network $\vec{t}_{\vec{\theta}}: \R^3 \times \mathcal{X} \to \R^3$ that
+        For this, we need a texture network $\vec{t}_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R^3$ that
         outputs color. This requires the rendering pipeline to be differentiable.
 
         \textit{Forward pass}: For every pixel $\vec{u}$, determine the first intersection with surface
@@ -693,10 +700,13 @@
         iteratively, we project the Gaussians onto the image plane and weight them similarly to NERF,
         compute the loss, and backpropagate to update the Gaussians. Note that there are no
         NNs. The weight of a Gaussian at a pixel $\vec{u}$ is computed by \[
-            \alpha_i(\vec{u}) = o_i \cdot \exp \lft( -\frac{1}{2} (\vec{x} - \vec{\mu}_i')^\top \mat{\Sigma}_i'^{-1} (\vec{x} - \vec{\mu}_i') \rgt),
+            \alpha_i(\vec{u}) = o_i \cdot \exp ( -\nicefrac{1}{2} (\vec{x} - \vec{\mu}_i')^\top \mat{\Sigma}_i'^{-1} (\vec{x} - \vec{\mu}_i')), \quad \mat{\Sigma}' = \mat{J} \mat{W} \mat{\Sigma} \mat{W}^\top \mat{J}^\top,
         \]
         where $o_i$ is the opacity, and $\vec{\mu}_i', \mat{\Sigma}'$ are the parameters of the 2D
-        projection of the $i$-th 3D Gaussian.
+        projection of the $i$-th 3D Gaussian. Simple covariance matrix: \[
+            \mat{\Sigma} = \mat{R} \mat{S} \mat{S}^\top \mat{R}^\top, \quad \mat{R} \in \R^{3\times 3}, \mat{S} \in \R^3.
+        \]
+
     \end{topic}
 
     \begin{topic}{Parametric human body models}
@@ -720,7 +730,7 @@
         The two can also be combined by first using feature learning and then refining with body modeling.
 
         \textbf{Linear-blend skinning}: Simplest method that transforms vertices as a weighted linear combination of global joint transformations: \[
-            \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}) \rgt) \vec{t}_i,
+            \bar{\vec{t}}_i' = \lft( \sum_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}) \rgt) \bar{\vec{t}}_i, \quad \mat{G}'_k(\vec{\theta}, \mat{J}) = \mat{G}_k(\vec{\theta}, \mat{J}) \mat{G}_k(\vec{\theta}^\star, \mat{J})^{-1},
         \]
         where $k$ are bones and $i$ are vertices, $\mat{G}_k(\vec{\theta})$ is the rigid bone
         transformation for bone $k$, which is weighted by $w_{ki}$ which determines the influence of bone
@@ -735,7 +745,7 @@
             \item Correct for future deformations: $\bar{\mat{T}} + \mat{B}_S(\vec{\beta}) +
                       \mat{B}_P(\vec{\theta})$.
             \item Linear-blend skinning: \[
-                      \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) (\vec{t}_i + \vec{s}_i(\vec{\beta}) + \vec{p}_i(\vec{\theta})).
+                      \bar{\vec{t}}_i' = \lft( \sum_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) \lft(\bar{\vec{t}}_i + \vec{b}_{S,i}(\vec{\beta}) + \vec{b}_{P,i}(\vec{\theta})\rgt).
                   \]
         \end{enumerate}
 
