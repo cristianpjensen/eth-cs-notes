@@ -13,6 +13,7 @@
 ## Machine Perception, S24
 
 - [Summary](https://cristianpjensen.github.io/eth-cs-notes/machine_perception-summary.pdf)
+- [Cheatsheet](https://cristianpjensen.github.io/eth-cs-notes/machine_perception-cheatsheet.pdf)
 
 ## Natural Language Processing, F23
 
