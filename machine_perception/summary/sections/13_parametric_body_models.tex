@@ -97,7 +97,7 @@ learn from data.
               \mat{T}_P(\vec{\beta}, \vec{\theta}) = \bar{\mat{T}} + \mat{B}_S(\vec{\beta}) + \mat{B}_P(\vec{\theta});
           \]
     \item Lastly, perform linear blend skinning on the resulting base mesh, \[
-              \vec{t}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) (\vec{t}_i + \vec{s}_i(\vec{\beta}) + \vec{p}_i(\vec{\theta})).
+              \bar{\vec{t}}_i' = \lft( \sum_{k} w_{ki} \mat{G}_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) (\bar{\vec{t}}_i + \vec{b}_{S,i}(\vec{\beta}) + \vec{b}_{P,i}(\vec{\theta})).
           \]
 \end{enumerate}
 

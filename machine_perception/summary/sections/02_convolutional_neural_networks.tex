@@ -97,7 +97,7 @@ $(\ell-1)$-th layer as the following,
                            & = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j].
 \end{align*}
 From this, we can see that we can compute all values of $\delta^{(\ell-1)}$ by a single convolution, \[
-    \delta^{(\ell-1)} = \delta^{(\ell)} * \mathrm{Rot}_{180} \lft( \mat{W}^{(\ell)} \rgt) = \delta^{(\ell)} \star \mat{W}^{(\ell)}.
+    \delta^{(\ell-1)} = \delta^{(\ell)} * \mathrm{Flip}\lft( \mat{W}^{(\ell)} \rgt) = \delta^{(\ell)} \star \mat{W}^{(\ell)}.
 \]
 
 Using this value, we can compute the derivative \wrt the weights, which we need for the parameter

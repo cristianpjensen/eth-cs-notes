@@ -95,7 +95,8 @@ computed by the encoder. We can now derive the \textit{evidence lower bound} (EL
                     & = \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - D_{\mathrm{KL}}(q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z})) + D_{\mathrm{KL}} (q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z} \mid \vec{x}))                                                                                            \\
                     & \geq \E_{\vec{z}\mid \vec{x}}[\log p_{\vec{\psi}}(\vec{x}\mid \vec{z})] - D_{\mathrm{KL}}(q_{\vec{\phi}}(\vec{z}\mid \vec{x}) \rVert p(\vec{z})). \margintag{KL-divergence is non-negative.}
 \end{align*}
-The first term of the ELBO encourages low reconstruction error, while the second term makes sure that
+The first term of the ELBO encourages low reconstruction error, which encourages the latent space to
+be structured such that similar data is clustered together. The second term makes sure that
 the approximate posterior $q_{\vec{\phi}}$ does not deviate too far from the prior $p$. The second
 term can be computed in a closed-form, since both arguments are Gaussian,
 \begin{align*}

@@ -140,7 +140,7 @@ and the MLP architecture, then intuitively, we can do two things to increase $\h
               \pdv{\mathcal{L}}{h_k} = \pdv{\mathcal{L}}{\hat{y}} \pdv{\hat{y}}{\transpose{\vec{w}} \vec{h}} \pdv{\transpose{\vec{w}} \vec{h}}{h_k} = (y - \hat{y}) \sigma' \lft( \transpose{\vec{w}} \vec{h} \rgt) w_k.
           \]
           This also matches our intuition, since the amount that we want to increase $h_k$ by is proportional
-          to $w_k$. But, we cannot increase $h_k$ directly, but we can update the weights connected to $h_k$,
+          to $w_k$. We cannot increase $h_k$ directly, but we can update the weights connected to $h_k$,
           which brings us back to the first case. This update will be proportional to
           $\pdv{\mathcal{L}}{h_k}$ by the chain rule. In this way, we can recursively update all the weights
           using gradient information.
@@ -173,6 +173,8 @@ mappings.
     where $|f_{\vec{\theta}}(\vec{x}) - g(\vec{x})| < \epsilon$ for all $\vec{x}\in I_m$.
 \end{theorem}
 
-The universal approximation theorem holds for any single hidden layer network. However, this hidden
-layer may need to have infinite width to approximate $f$. In practice, deeper networks work better
-than wider networks.
+In words, this means that any continuous function can be approximated by a single hidden layer MLP
+with a continuous non-linear activation function with arbitrary precision. The universal
+approximation theorem holds for any single hidden layer network. However, this hidden layer may
+need to have infinite width to approximate $f$. In practice, deeper networks work better than wider
+networks.

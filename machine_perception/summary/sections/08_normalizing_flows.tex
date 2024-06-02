@@ -37,7 +37,8 @@ data space.
 From a computational perspective, we require the Jacobian of the transformation to be computed
 efficiently. In general, computing the Jacobian takes $\bigo{d^3}$ to compute for a $d \times d$
 matrix. However, this is not fast enough. A way to achieve linear complexity is to design $f$ such
-that its Jacobian is a triangular matrix, which takes $\bigo{d}$ to compute. This requirement
+that its Jacobian is a triangular matrix, which takes $\bigo{d}$ to compute.\sidenote{The
+    determinant of a triangular matrix is the product of its diagonal entries.} This requirement
 further reduces the number of modeling decisions we can make.
 
 \subsection{Coupling layers}
