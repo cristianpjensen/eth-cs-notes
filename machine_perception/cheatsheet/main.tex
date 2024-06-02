@@ -30,6 +30,8 @@
 
 \renewcommand{\familydefault}{\sfdefault}
 
+\setlength{\columnseprule}{0.4pt}
+
 \title{Machine Perception Cheatsheet}
 
 \newenvironment{topic}[1]
@@ -46,16 +48,29 @@
 \begin{multicols*}{2}
 
     \begin{itemize}
-        \item Derivatives of common functions: \[
-                  \sigma'(x) = \sigma(x) (1 - \sigma(x)), \quad \tanh'(x) = 1 - \tanh^2(x), \quad |x|' = \nicefrac{x}{|x|}.
+        \item $\sigma(x) = \nicefrac{1}{1 + e^{-x}}$, $\tanh(x) = \nicefrac{e^x - e^{-x}}{e^x + e^{-x}}$, $\mathrm{ReLU}(x) = \max\{ 0,x \}$.
+        \item \textbf{Derivatives}:
+              \begin{align*}
+                  \vec{y} = \sigma(\vec{x})        & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathrm{diag}(\vec{y} \odot (1 - \vec{y})) \\
+                  \vec{y} = \tanh(\vec{x})         & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathrm{diag}(1 - \vec{y}^2)               \\
+                  \vec{y} = \mathrm{ReLU}(\vec{x}) & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathds{1}\{ \vec{x} \geq 0 \}             \\
+                  |x|'                             & = \frac{x}{|x|}.
+              \end{align*}
+
+              % $\vec{y} = \sigma(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\vec{y} \odot (1 - \vec{y}))$,
+              %   $\vec{y} = \tanh(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(1 - \vec{y}^2)$,
+              %   $\vec{y} = \mathrm{ReLU}(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathds{1}\{ \vec{x} \geq 0 \}$,
+              %   $|x|' = \nicefrac{x}{|x|}$.
+        \item \textbf{Chain rule}: \[
+                  \vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \pdv{\vec{z}}{\vec{x}} = \pdv{\vec{z}}{\vec{y}} \pdv{\vec{y}}{\vec{x}}.
               \]
-        \item If $\vec{x} \in \R^{m_1 \times \cdots \times m_d}$ and $\vec{y} \in \R^{n_1 \times \cdots \times
-                      n_\ell}$, then \[
-                  \pdv{\vec{x}}{\vec{y}} \in \R^{m_1 \times \cdots \times m_d \times n_1 \times \cdots \times n_\ell}.
-              \]
-        \item When computing gradient, think about changing parameters and how that would affect the output.
-        \item Always type-check gradients.
-        \item Quotient rule: $(\nicefrac{f}{g})'(x) = \nicefrac{f'(x)\cdot g(x) - f(x)\cdot g'(x)}{g^2(x)}$.
+
+              % $\vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \nicefrac{\partial \vec{z}}{\partial \vec{x}} = \nicefrac{\partial \vec{z}}{\partial \vec{y}} \nicefrac{\partial \vec{y}}{\partial \vec{x}}$.
+        \item If $\vec{x} \in \R^{m}$ and $\vec{y} \in \R^{n}$, then $\nicefrac{\partial \vec{x}}{\partial
+                      \vec{y}} \in \R^{m\times n}$.
+        \item Gradient computation: Look at effect of changing param. on output.
+        \item Always \textbf{type-check} gradients.
+        \item \textbf{Quotient rule}: $(\nicefrac{f}{g})'(x) = \nicefrac{f'(x)\cdot g(x) - f(x)\cdot g'(x)}{g^2(x)}$.
         \item $\pdv{\mat{A} \vec{x}}{\vec{x}} = \mat{A}$, $\pdv{\vec{x} \odot \vec{y}}{\vec{x}} = \mathrm{diag}(\vec{y})$, $\pdv{\vec{x} \odot \vec{y}}{\vec{y}} = \mathrm{diag}(\vec{x})$.
 
     \end{itemize}
@@ -68,49 +83,49 @@
 
         \textbf{Perceptron}: The original perceptron was a single-layer perceptron with non-linearity
         $\mathds{1}\{ x > 0 \}$. Classification is then done by $\hat{y} = \mathds{1}\{ \vec{w}^\top
-            \vec{x} + b > 0 \}$. The learning algorithm iteratively applies $\vec{\theta} \gets
-            \vec{\theta} + \eta(y_i - \hat{y}_i) \vec{x}_i$. % This is equivalent to gradient descent
-        % with a Hinge loss.
-
+            \vec{x} + b > 0 \}$. Learning: iteratively apply $\vec{\theta} \gets
+            \vec{\theta} + \eta(y_i - \hat{y}_i) \vec{x}_i$. GD with Hinge loss.
         If the data is linearly separable, the perceptron converges in linear time.
 
         \textbf{MLP}: $\hat{y} = \sigma (\mat{W}_k \sigma( \mat{W}_{k-1} \cdots \sigma( \mat{W}_1 \vec{x} + \vec{b}_1 ) \cdots + \vec{b}_{k-1} ) + \vec{b}_k )$.
 
         Do not forget biases!
 
-        \textbf{Loss functions}:
-        \begin{itemize}
-            \item MLE: $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
-            \item BCE (MLE with Bern.): $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} y_i \log \hat{y}_i + (1-y_i) \log (1
-                      - \hat{y}_i)$.
-            \item MAP: $\argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i \mid
-                      \vec{\theta})$.
-        \end{itemize}
-
-        \textbf{Early stopping}: Stop training if the validation error has increased for the last
-        $p$ checks. We check every $n$ epochs.
+        \textbf{Loss functions}: MLE: $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
+        BCE (MLE with Bern.): $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} y_i \log \hat{y}_i + (1-y_i) \log (1 - \hat{y}_i)$.
+        MAP: $\argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
 
         \textbf{Backpropagation}: Linear-time algorithm to compute gradients using chain rule.
         Intuitively, gradients work well for updating weights, because it measures the direction in
-        which the loss decreases at a point. Gradient descent update rule: \[
-            \vec{\theta} \gets \vec{\theta} - \eta \nabla_{\vec{\theta}} \mathcal{L}(\hat{\vec{y}}, \vec{y}).
-        \]
+        which the loss decreases at a point. \textbf{Gradient descent}: If we have to increase the
+        output value, we can (1) increase the weight connected to a neuron with strong activation, or
+        (2) increase the activation that is connected to a strong weight by recursion. The gradient
+        tells us how to do this. Update: $\vec{\theta} \gets \vec{\theta} - \eta \nabla_{\vec{\theta}} \mathcal{L}(\hat{\vec{y}}, \vec{y})$.
 
         \textbf{Universal approximation theorem}: Let $g$ be any function on unit hypercube. Let
-        $\epsilon > 0$, then there exists a NN with a single hidden layer that can
-        approximate this function with $\epsilon$ precision, \[
-            | f_{\vec{\theta}}(\vec{x}) - g(\vec{x}) | < \epsilon, \quad \forall \vec{x} \in I_m.
-        \]
-        \textit{In words}: An MLP with a single hidden layer and continuous non-linear activation function can
-        approximate any continuous function with arbitrary precision.
+        $\epsilon > 0$, then there exists a NN $f_{\vec{\theta}}$ with a single hidden layer that can
+        approximate this function with $\epsilon$ precision. \textit{In words}: An MLP with a single
+        hidden layer and continuous non-linear activation function can approximate any continuous
+        function with arbitrary precision.
+
+        \textbf{Early stopping}: Stop training if the validation error has increased for the last
+        $p$ checks. We check every $n$ epochs. \textbf{Batch norm}: Solves internal covariate shift
+        problem: The distribution of the input changes during training, because the weights change.
+        Problem because the gradient tells us how to change parameters given that the other
+        layers do not change. Learnable parameters are running averages of mean and variance.
+        \textbf{Data augmentation}: Randomly transform data to enforce robustness.
+        \textbf{Pre-training}: First train on task with large dataset to initialize model for task
+        with small dataset. \textbf{Regularization}: Any technique that aims to improve
+        generalization, e.g., $\ell_1$ parameter norm penalty: $\lambda \| \vec{w} \|_1$.
+        \textbf{Residual layer}: Use cases: Prevent vanishing gradient, Propagate high-freq. information.
 
     \end{topic}
 
     \begin{topic}{Convolutional neural networks}
 
         \textbf{Convolution}: $(\mat{K} * \mat{I})[i,j] = \sum_{m=-k}^{k} \sum_{n=-k}^{k} \mat{K}[m,n] \mat{I}[i-m, j-n]$.
-        Correlation uses plus instead of minus. Convolution is commutative, linear, and shift-equivariant.
-        Can be implemented as matrix operation: \[
+        Cross-correlation uses $+$ instead of $-$. Any linear, shift-equivariant transform can be
+        written as a convolution. Matrix operation: \[
             \mat{K} * \mat{I} = \begin{bmatrix}
                 k_1    & 0      & \cdots & 0      \\
                 k_2    & k_1    & \cdots & 0      \\
@@ -121,13 +136,14 @@
                 I_1 \\ I_2 \\ \vdots \\ I_n
             \end{bmatrix}.
         \]
+        Convolution = Cross-correlation iff $\mat{K}[i,j] = \mat{K}[-i,-j]$.
 
         \textbf{CNN}: Sequence of alternating convolutional and pooling layers. Convolutional layer from $C_{\mathrm{in}}$ to $C_{\mathrm{out}}$ channels: \[
-            \mat{Z}_j^{(\ell)} = \sum_{k=1}^{C_{\mathrm{in}}} \mat{W}_{kj}^{(\ell)} * \mat{Z}_k^{(\ell)} + b_j, \quad j \in [C_{\mathrm{out}}].
+            \mat{Z}_j^{(\ell)} = \sum\nolimits_{k=1}^{C_{\mathrm{in}}} \mat{W}_{kj}^{(\ell)} * \mat{Z}_k^{(\ell)} + b_j, \quad j \in [C_{\mathrm{out}}].
         \]
         With $C_{\mathrm{in}} = C_{\mathrm{out}} = 1$, we have derivative:
         \begin{gather*}
-            \delta^{(\ell-1)}[i,j] \doteq \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]} = \sum_{i'} \sum_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j] \\
+            \delta^{(\ell-1)}[i,j] \doteq \pdv{\mathcal{L}}{z^{(\ell-1)}[i{,}j]} = \sum\nolimits_{i'} \sum\nolimits_{j'} \delta^{(\ell)}[i',j'] w^{(\ell)}[i'-i,j'-j] \\
             \mat{\Delta}^{(\ell-1)} = \mat{\Delta}^{(\ell)} * \mathrm{Rot}_{180}(\mat{W}^{(\ell)}), \quad \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} = \mat{\Delta}^{(\ell)} * \mat{Z}^{(\ell - 1)}.
         \end{gather*}
         $D_{\mathrm{out}} = \lft\lfloor \frac{D_{\mathrm{in}} + 2 \times p - d \times (k - 1) - 1}{s} + 1 \rgt\rfloor$.
@@ -145,15 +161,10 @@
     \begin{topic}{Fully convolutional neural networks}
         Downsample, then upsample. \textit{Examples}: Semantic segmentation, Image-to-image translation, Human pose estimation.
 
-        \textbf{Upsampling methods}:
-
-        \begin{itemize}
-            \item Nearest neighbor: Put value into all corresponding cells.
-            \item Bed of nails: Only put value into the top-left cell.
-            \item Max unpooling: Remember original position from max-pooling.
-            \item Transposed convolution: Insert $s-1$ zeros between pixels and $k-p-1$ zeros as padding. Then,
-                  convolve with kernel.
-        \end{itemize}
+        \textbf{Upsampling methods}: \textit{Nearest neighbor}: Put value into all corresponding cells.
+        \textit{Bed of nails}: Only put value into the top-left cell.
+        \textit{Max unpooling}: Remember original position from max-pooling.
+        \textit{Transposed convolution}: Insert $s-1$ zeros between pixels and $k-p-1$ zeros as padding. Then, convolve with kernel.
 
         \textbf{U-net}: Add skip-connection between corresponding down- and upsampling layers. This facilitates the
         combination of global from skip-connection with local information from previous layer.
@@ -164,20 +175,20 @@
 
         Processes sequential data and is able to take variable-length input. At each timestep, use the same
         network: \[
-            \vec{h}^{(t)} = f_{\vec{\theta}} \lft( \vec{h}^{(t-1)}, \vec{x}^{(t)} \rgt).
+            \vec{h}_t = f_{\vec{\theta}} \lft( \vec{h}_{t-1}, \vec{x}_t \rgt).
         \]
         This behaves like a dynamical system.
 
-        \textbf{Elman RNN}: $f_{\vec{\theta}}(\vec{h}^{(t-1)}, \vec{x}^{(t)}) = \tanh \lft( \mat{W}_h \vec{h}^{(t-1)} + \mat{W}_x \vec{x}^{(t)} \rgt)$.
-        $\vec{h}^{(t)}$ represents the sequence until timestep $t$, which we can use as input into an
+        \textbf{Elman RNN}: $f_{\vec{\theta}}(\vec{h}_{t-1}, \vec{x}_t) = \tanh \lft( \mat{W}_h \vec{h}_{t-1} + \mat{W}_x \vec{x}_t \rgt)$.
+        $\vec{h}_t$ represents the sequence until timestep $t$, which we can use as input into an
         MLP for further processing.
 
         \textbf{Backpropagation through time} (BPTT) to optimize by unrolling the RNN and applying backpropagation
         on the computational graph: \[
-            \pdv{\ell^{(t)}}{\mat{W}_h} = \sum_{k=1}^{t} \pdv{\ell^{(t)}}{\hat{\vec{y}}^{(t)}} \pdv{\hat{\vec{y}}^{(t)}}{\vec{h}^{(t)}} \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} \pdv{^+ \vec{h}^{(k)}}{\mat{W}_h}.
+            \pdv{\ell_t}{\mat{W}_h} = \sum\nolimits_{k=1}^{t} \pdv{\ell_t}{\hat{\vec{y}}_t} \pdv{\hat{\vec{y}}_t}{\vec{h}_t} \pdv{\vec{h}_t}{\vec{h}_k} \pdv{^+ \vec{h}_k}{\mat{W}_h}.
         \]
         We have \[
-            \pdv{\vec{h}^{(t)}}{\vec{h}^{(k)}} = \prod_{i=k+1}^t \pdv{\vec{h}^{(i)}}{\vec{h}^{(i-1)}}.
+            \pdv{\vec{h}_t}{\vec{h}_k} = \prod_{i=k+1}^t \pdv{\vec{h}_i}{\vec{h}_{i-1}}.
         \]
         Suffers from exploding or vanishing gradient because of the many multiplications of $\mat{W}_h$
         with itself in the gradient. If the largest eigenvalue of this matrix is greater than the upper
@@ -185,21 +196,21 @@
 
         \textbf{Leaky unit}: Make sure there is constant error flow to solve vanishing gradient problem:
         \begin{align*}
-            \hat{\vec{h}}^{(t)} & = f_{\vec{\theta}}\lft( \vec{h}^{(t-1)}, \vec{x}^{(t)} \rgt) \\
-            \vec{h}^{(t)}       & = \alpha \vec{h}^{(t-1)} + (1-\alpha) \hat{\vec{h}}^{(t)}.
+            \hat{\vec{h}}_t & = f_{\vec{\theta}}\lft( \vec{h}_{t-1}, \vec{x}_t \rgt) \\
+            \vec{h}_t       & = \alpha \vec{h}_{t-1} + (1-\alpha) \hat{\vec{h}}_t.
         \end{align*}
 
         \textbf{LSTM}: Take idea of leaky unit to the next level by introducing gates, which protect the memory cell to make sure there is always error flow:
         \begin{align*}
-            \vec{f}^{(t)} & = \sigma \lft( \mat{W}_{hf} \vec{h}^{(t-1)} + \mat{W}_{xf} \vec{x}^{(t)} \rgt) \\
-            \vec{i}^{(t)} & = \sigma \lft( \mat{W}_{hi} \vec{h}^{(t-1)} + \mat{W}_{xi} \vec{x}^{(t)} \rgt) \\
-            \vec{o}^{(t)} & = \sigma \lft( \mat{W}_{ho} \vec{h}^{(t-1)} + \mat{W}_{xo} \vec{x}^{(t)} \rgt) \\
-            \vec{g}^{(t)} & = \tanh \lft( \mat{W}_{hg} \vec{h}^{(t-1)} + \mat{W}_{xg} \vec{x}^{(t)} \rgt).
+            \vec{f}_t & = \sigma \lft( \mat{W}_{f} [\vec{h}_{t-1}, \vec{x}_t] \rgt) \\
+            \vec{i}_t & = \sigma \lft( \mat{W}_{i} [\vec{h}_{t-1}, \vec{x}_t] \rgt) \\
+            \vec{o}_t & = \sigma \lft( \mat{W}_{o} [\vec{h}_{t-1}, \vec{x}_t] \rgt) \\
+            \vec{g}_t & = \tanh \lft( \mat{W}_{g} [\vec{h}_{t-1}, \vec{x}_t] \rgt).
         \end{align*}
         Then, the memory cell and hidden state are computed by
         \begin{align*}
-            \vec{c}^{(t)} & = \vec{f}^{(t)} \odot \vec{c}^{(t-1)} + \vec{i}^{(t)} \odot \vec{g}^{(t)} \\
-            \vec{h}^{(t)} & = \vec{o}^{(t)} \odot \tanh \lft( \vec{c}^{(t)} \rgt).
+            \vec{c}_t & = \vec{f}_t \odot \vec{c}_{t-1} + \vec{i}_t \odot \vec{g}_t \\
+            \vec{h}_t & = \vec{o}_t \odot \tanh \lft( \vec{c}_t \rgt).
         \end{align*}
         The \textit{forget gate} $\vec{f}$ decides what information to keep from previous cell state. The \textit{gate
             gate} $\vec{g}$ decides what to write to the cell state. The \textit{input gate} $\vec{i}$ decides what
@@ -311,7 +322,7 @@
         \textbf{WaveNet}: Pixel-CNN (audio) with dilated convs for an exponential RF.
 
         \textbf{VRNN}: RNNs are deterministic $\Rightarrow$ Add stoch. by sampling $\vec{h}_t$ from VAE:
-        $\vec{z}_t \sim q_{\vec{\phi}}(\cdot \mid \vec{x}_t, \vec{h}_{t-1}), \vec{h}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}, \vec{z}_t, \vec{x}_t)$. Prior is learned.
+        $\vec{z}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}), \vec{x}_t \sim q_{\vec{\phi}}(\cdot \mid \vec{z}_t, \vec{h}_{t-1}), \vec{h}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}, \vec{z}_t, \vec{x}_t)$. This is for generation. For encoding, $\vec{z}_t$ depends on $\vec{x}_t$. Prior is learned.
 
         \textbf{Transformers}: Stack normalization, MLPs, and self-attention: \[
             \mat{Y} = \mathrm{softmax}\lft( \nicefrac{\mat{X} \mat{W}_Q \mat{W}_K^\top \mat{X}^\top}{\sqrt{d}} + \mat{M} \rgt) \mat{X} \mat{W}_V,
@@ -360,17 +371,16 @@
                 \vec{y}_B
             \end{bmatrix}.
         \]
-        Jacobian:
-        \begin{align*}
-            \mat{J}_{\vec{x}} f(\vec{x}) & = \begin{bmatrix}
-                                                 \pdv{\vec{y}_A}{\vec{x}_A} & \pdv{\vec{y}_A}{\vec{x}_B} \\
-                                                 \pdv{\vec{y}_B}{\vec{x}_A} & \pdv{\vec{y}_B}{\vec{x}_B}
-                                             \end{bmatrix} \\
-                                         & = \begin{bmatrix}
-                                                 h'(\vec{x}_A, \beta(\vec{x}_B)) & h'(\vec{x}_A, \beta(\vec{x}_B)) \beta'(\vec{x}_B) \\
-                                                 \mat{0}                         & \mat{I}
-                                             \end{bmatrix}.
-        \end{align*}
+        Jacobian: \[
+            \mat{J}_{\vec{x}} f(\vec{x}) = \begin{bmatrix}
+                \pdv{\vec{y}_A}{\vec{x}_A} & \pdv{\vec{y}_A}{\vec{x}_B} \\
+                \pdv{\vec{y}_B}{\vec{x}_A} & \pdv{\vec{y}_B}{\vec{x}_B}
+            \end{bmatrix}
+            = \begin{bmatrix}
+                h'(\vec{x}_A, \beta(\vec{x}_B)) & h'(\vec{x}_A, \beta(\vec{x}_B)) \beta'(\vec{x}_B) \\
+                \mat{0}                         & \mat{I}
+            \end{bmatrix}.
+        \]
         To compute the det, we need the upper left and lower right matrices.
 
         This layer leaves part of its input unchanged, thus we must make sure to alternate what parts of
@@ -384,7 +394,7 @@
         \]
 
         \textbf{Training}: Maximize the log-likelihood: \[
-            \log p_{X}(\mat{X}) = \sum_{i=1}^{n} \log p_Z(f^{-1}(\vec{x}_i)) + \sum_{k=1}^{m} \log |\det(\mat{J}_{\vec{x}} f_k(\vec{x}_i))|^{-1}.
+            \log p_{X}(\mat{X}) = \sum\nolimits_{i=1}^{n} \log p_Z(f^{-1}(\vec{x}_i)) + \sum\nolimits_{k=1}^{m} \log |\det(\mat{J}_{\vec{x}} f_k(\vec{x}_i))|^{-1}.
         \]
 
         \textbf{NICE}: Split data by partitioning into two subsets and randomly alternating which is given to the NN. Additive coupling network: \[
@@ -432,19 +442,24 @@
 
         \textbf{GAN}: Solve the above problem by introducing a discriminator. The objective of the
         generator is then to maximize the discriminator's classification loss by generating images
-        similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function: \[
+        similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function (derived from BCE): \[
             V(D, G) = \E_{\vec{x} \sim p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})} [\log (1 - D(G(\vec{z})))].
         \]
         Then, we have the following two-player zero-sum game: \[
-            \argmin_G \argmax_D V(D,G).
+            \argmin\nolimits_G \argmax\nolimits_D V(D,G).
         \]
 
         \textbf{Optimal discriminator}: $D^\star(\vec{x}) = \nicefrac{p_{\mathrm{data}}(\vec{x})}{p_{\mathrm{data}}(\vec{x}) + p_{\mathrm{model}}(\vec{x})}$.
+
+        $\blacksquare:$ $V(G,D)$ def. $\Rightarrow$ $\int$ $\Rightarrow$ $p_{\mathrm{model}}$ $\Rightarrow$ Combine $\int$ $\Rightarrow$ $\max_y a \log(y) + b \log(1-y) = \nicefrac{a}{a+b}$ for $a,b > 0$.
 
         \textbf{Global optimality}: The generator is optimal if $p_{\mathrm{model}} = p_{\mathrm{data}}$ and at optimum, we have \[
             V(D^\star, G^\star) = -\log 4.
         \]
         The generator implicitly optimizes the Jensen-Shannon divergence.
+
+        $\blacksquare:$ $D^\star$ $\Rightarrow$ $\times \nicefrac{2}{2}$ in $\E$s $\Rightarrow$ Take
+        out $-\log 2$ of $\E$s $\Rightarrow$ $2 \mathrm{JS}(p \| q) - \log 4$.
 
         \textbf{Convergence guarantee}: Assuming that $D$ and $G$ have sufficient capacity, at each update step $D \to D^\star$, and $p_{\mathrm{model}}$ is updated to improve
         \begin{align*}
@@ -486,38 +501,41 @@
 
     \begin{topic}{Diffusion models}
 
-        Diffusion models do not generate samples in single steps, but in many small steps. Starting from
-        pure noise, they iteratively denoise it: \[
-            \vec{x}_0 \sim p_d, \quad \vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I}).
+        \textbf{Diffusion}: Governed by a noise schedule $\{ \beta_t \}_{t=1}^T$: $q(\vec{x}_t \mid \vec{x}_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t} \vec{x}_{t-1}, \beta_t \mat{I})$.
+        Closed-form solution: $\vec{x}_t = \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$,
+        where $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$. \\
+        \textbf{Denoising}: Learn $p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) \approx
+            q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0)$. For small steps, $q(\vec{x}_{t-1} \mid \vec{x}_t)$
+        is Gaussian, so we parametrize Gaussian \[
+            p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) = \mathcal{N}(\vec{x}_{t-1} ; \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t), \sigma_t^2 \mat{I}).
         \]
-
-        \textbf{Diffusion}: Governed by a noise schedule $\{ \beta_t \}_{t=1}^T$: \[
-            q(\vec{x}_t \mid \vec{x}_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t} \vec{x}_{t-1}, \beta_t \mat{I}).
-        \]
-        Closed-form solution to efficiently compute training data: \[
-            \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}),
-        \]
-        where $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$.
-
-        \textbf{Denoising}: Parametrize network to predict noise
-        $\vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t)$. Iteratively denoise by
+        In practice, parametrize network to predict noise $\vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t)$.
+        Iteratively:
         \begin{align*}
             \vec{z}       & \sim \mathcal{N}(\vec{0}, \mat{I}) \text{ if $t > 1$, else $\vec{z} = \vec{0}$}                                                                                    \\
             \vec{x}_{t-1} & = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sigma_t \vec{z}.
         \end{align*}
 
-        \textbf{Training}: Loss function: \[
-            \lft\| \vec{e} - \vec{e}_{\vec{\theta}}\lft( \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, t \rgt) \rgt\|^2, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
+        \textbf{Training}: \textit{ELBO}: $\E_{q(\vec{x}_1\mid \vec{x}_0)}[\log p_{\vec{\theta}}(\vec{x}_0 \mid \vec{x}_1)] - \mathrm{KL}(q(\vec{x}_T \mid \vec{x}_0) \| p(\vec{x}_T)) - \sum_{t=2}^{T} \E_{q(\vec{x}_t \mid \vec{x}_0)} [\mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t))]$ (reconstruction term, prior matching term, denoising matching term).
+        \textit{Closed-form}: \[
+            \argmin\nolimits_{\vec{\theta}} \mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) = \argmin\nolimits_{\vec{\theta}} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|_2^2,
         \]
+        with
+        \begin{align*}
+            \vec{\mu}_q(\vec{x}_t, \vec{x}_0)      & = \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon}                                 \\
+            \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t) & = \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1-\bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t).
+        \end{align*}
+        \textit{Loss function}: $\lft\| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}\lft(
+            \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, t \rgt) \rgt\|^2,
+            \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$.
 
-        \textbf{CLIP}: Image-language model that has been trained on image-caption pairs. It consists
-        of an image encoder and a text encoder network. By using a contrastive loss, CLIP is
-        encouraged to encode the image and caption into similar embeddings.
+        \textbf{CLIP}: Image-language model that has been trained on image-caption pairs. By using a
+        contrastive loss, CLIP is encouraged to encode the image and caption into similar embeddings.
 
         \textbf{Classifier guidance}: Pretrain a classifier and guide the denoising in a direction
         favoring images that are more reliably classified by the classifier. This is done by
-        injecting gradients of the classifier model into the sampling process. However, this requires
-        training a very specific classifier on noisy data.
+        injecting gradients of the classifier model into the sampling process. Bad: Requires
+        training a classifier on noisy data.
 
         \textbf{Classifier-free guidance}: Jointly train a class-conditional and unconditional diffusion model. It then guides the generation process by \[
             \vec{\epsilon}^\star(\vec{x}, y; t) = (1 + \rho) \vec{\epsilon}_{\vec{\theta}}(\vec{x}, y; t) - \rho \vec{\epsilon}_{\vec{\theta}}(\vec{x}; t)
@@ -535,31 +553,29 @@
     \begin{topic}{Reinforcement learning}
 
         \textbf{MDP}: $(\mathcal{S}, \mathcal{A}, P, r, \gamma)$. \textbf{Policy}: $\pi: \mathcal{S} \to
-            \Delta(\mathcal{A})$. At every point, the goal of the agent is to maximize:
-        \begin{align*}
-            G_t & = \sum_{k=0}^{\infty} \gamma^k r(s_{t+k}, a_{t+k}) \\
-                & = r(s_t, a_t) + \gamma G_{t+1}.
-        \end{align*}
+            \Delta(\mathcal{A})$. At every point, the goal of the agent is to maximize: \[
+            G_t = \sum\nolimits_{k=0}^{\infty} \gamma^k r(s_{t+k}, a_{t+k}) = r(s_t, a_t) + \gamma G_{t+1}.
+        \]
         \textbf{Value function} and \textbf{Bellman equation}:
         \begin{align*}
-            V^\pi(s) & = \E_{\pi} [G_0 \mid S_0 = s]                                                                                             \\
-                     & = \sum_{a \in \mathcal{A}} \pi(a \mid s) \lft[ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
+            V^\pi(s) & = \E_{\pi} [G_0 \mid S_0 = s]                                                                                                               \\
+                     & = \sum\nolimits_{a \in \mathcal{A}} \pi(a \mid s) \lft[ r(s,a) + \gamma \sum\nolimits_{s' \in \mathcal{S}} P(s' \mid s, a) V^\pi(s') \rgt].
         \end{align*}
         \textbf{Bellman optimality operator}: \[
-            (\mathcal{T} V) (s) \doteq \max_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V(s') \rgt\}.
+            (\mathcal{T} V) (s) \doteq \max\nolimits_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum\nolimits_{s' \in \mathcal{S}} P(s' \mid s, a) V(s') \rgt\}.
         \]
         This function is a $\gamma$-contraction and monotonic:
         \begin{gather*}
-            \max_{s \in \mathcal{S}} |(\mathcal{T}V')(s) - (\mathcal{T}V)(s)| \leq \gamma \max_{s \in \mathcal{S}} |V'(s) - V(s)| \\
+            \max\nolimits_{s \in \mathcal{S}} |(\mathcal{T}V')(s) - (\mathcal{T}V)(s)| \leq \gamma \max\nolimits_{s \in \mathcal{S}} |V'(s) - V(s)| \\
             V(s) \leq V'(s) \implies (\mathcal{T}V)(s) \leq (\mathcal{T}V')(s).
         \end{gather*}
         The optimal value function $V^\star$ is the fixed-point of $\mathcal{T}$.
 
         \textbf{Value iteration}: Iteratively apply $\mathcal{T}$. Linear convergence: \[
-            \max_{s \in \mathcal{S}} |V_t(s) - V^\star(s)| \leq \gamma^t \max_{s \in \mathcal{S}} |V_0(s) - V^\star(s)|.
+            \max\nolimits_{s \in \mathcal{S}} |V_t(s) - V^\star(s)| \leq \gamma^t \max\nolimits_{s \in \mathcal{S}} |V_0(s) - V^\star(s)|.
         \]
         After convergence, we can get the optimal policy by acting greedily: \[
-            \pi^\star(s) \in \argmax_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) V^\star(s') \rgt\}.
+            \pi^\star(s) \in \argmax\nolimits_{a \in \mathcal{A}} \lft\{ r(s,a) + \gamma \sum\nolimits_{s' \in \mathcal{S}} P(s' \mid s, a) V^\star(s') \rgt\}.
         \]
 
         \textbf{Policy iteration}: Alternates between computing the greedy policy and the value
@@ -572,11 +588,11 @@
         Can learn from any data.
 
         \textbf{Monte Carlo}: On-policy method that learns from full trajectory and estimates the value function empirically: \[
-            V^\pi(s) \approx \frac{1}{n} \sum_{i=1}^{n} G(s)^i,
+            V^\pi(s) \approx \frac{1}{n} \sum\nolimits_{i=1}^{n} G(s)^i,
         \]
         where $G(s)^i$ is the return of episode $i$, starting from $s$.
 
-        \textbf{TD learning}: Learn from transitions $(s, a, r, s')$ using bootstrapping: \[
+        \textbf{TD-learning}: Learn from transitions $(s, a, r, s')$ using bootstrapping: \[
             V(s) \gets \alpha V(s) + (1- \alpha) (r + \gamma V(s')).
         \]
         % This can also be interpreted as updating the value by the TD error:
@@ -592,12 +608,12 @@
         \]
 
         \textbf{Q-learning}: Learns optimal Q-values (off-policy): \[
-            Q(s,a) \gets (1-\alpha) Q(s,a) + \alpha (r + \gamma Q(s',a')), \quad a' \in \argmax_{a \in \mathcal{A}} Q(s', a).
+            Q(s,a) \gets (1-\alpha) Q(s,a) + \alpha (r + \gamma Q(s',a')), \quad a' \in \argmax\nolimits_{a \in \mathcal{A}} Q(s', a).
         \]
 
         \textbf{DQN}: Large or infinite state spaces $\Rightarrow$ Function approximation. DQN learns
         the Q-values for states. Loss function: \[
-            \ell(\vec{\theta}) = (Q_{\vec{\theta}}(s,a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s', a')))^2, \quad a' \in \argmax_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
+            \ell(\vec{\theta}) = (Q_{\vec{\theta}}(s,a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s', a')))^2, \quad a' \in \argmax\nolimits_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
         \]
         We train as in supervised learning. Data is not i.i.d. $\Rightarrow$ Replay buffer.
 
@@ -613,12 +629,12 @@
         \]
         Want trajectories with high return more likely $\Rightarrow$ Training objective:
         \begin{align*}
-            J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]                  \\
+            J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum\nolimits_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]         \\
             % & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) ]                                                      \\
                             & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) ],
         \end{align*}
         using chain rule $\nabla \log f(\vec{x}) = \nicefrac{\nabla f(\vec{x})}{f(\vec{x})}$. We have \[
-            \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) = \sum_{t=0}^{T} \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(a_t \mid s_t).
+            \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) = \sum\nolimits_{t=0}^{T} \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(a_t \mid s_t).
         \]
         Thus, the gradient does not depend on the MDP.
 
@@ -648,14 +664,14 @@
         regression of distance to mesh of the sampled points.
 
         \textbf{Training with point clouds}: Train to make sure distance is 0 at points. However, this will result in trivial model that always outputs zero $\Rightarrow$ Eikonal term: \[
-            \mathcal{L}(\vec{\theta}) = \sum_{i=1}^{n} |f_{\vec{\theta}}(\vec{x}_i)|^2  + \lambda \E_{\vec{x}} \lft[ (\| \nabla_{\vec{x}} f_{\vec{\theta}}(\vec{x}) \| - 1)^2 \rgt].
+            \mathcal{L}(\vec{\theta}) = \sum\nolimits_{i=1}^{n} |f_{\vec{\theta}}(\vec{x}_i)|^2  + \lambda \E_{\vec{x}} \lft[ (\| \nabla_{\vec{x}} f_{\vec{\theta}}(\vec{x}) \| - 1)^2 \rgt].
         \]
         This makes sense from a ``distance'' perspective, since we want to increase the distance by 1 when
         we move 1 unit away.
 
         \textbf{Training with images}: Exponentially more data. High-level idea: Render model in same
         view as image and use photometric loss: \[
-            \ell(\hat{\tens{I}}, \tens{I}) = \sum_{\vec{u}} \| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \| .
+            \ell(\hat{\tens{I}}, \tens{I}) = \sum\nolimits_{\vec{u}} \| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \| .
         \]
         For this, we need a texture network $\vec{t}_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R^3$ that
         outputs color. This requires the rendering pipeline to be differentiable.
@@ -666,9 +682,15 @@
             \vec{t}_{\vec{\theta}}(\hat{\vec{p}})$.
 
         \textit{Backward pass}: Compute gradients (using implicit differentiation) \[
-            \pdv{\ell(\vec{\theta})}{\vec{\theta}} = \sum_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} - \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \lft( \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \rgt)^{-1} \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} \rgt),
+            \pdv{\ell(\vec{\theta})}{\vec{\theta}} = \sum\nolimits_{\vec{u}} \pdv{\ell(\vec{\theta})}{\hat{\tens{I}}_{\vec{u}}} \lft( \pdv{^+ \vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} - \pdv{\vec{t}_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \lft( \pdv{f_{\vec{\theta}}(\hat{\vec{p}})}{\hat{\vec{p}}} \vec{w} \rgt)^{-1} \pdv{^+ f_{\vec{\theta}}(\hat{\vec{p}})}{\vec{\theta}} \rgt),
         \]
-        where $\vec{r}(d) = \vec{r}_0 + d \vec{w}$ is the ray connecting camera origin to $\vec{u}$.
+        where $\vec{r}(d) = \vec{r}_0 + d \vec{w}$ is the ray connecting camera origin to $\vec{u}$.\\
+        $\blacksquare:$ $\sum_{\vec{u}}$ $\Rightarrow$ $\hat{\tens{I}}_{\vec{u}} =
+            \vec{t}_{\vec{\theta}}(\hat{\vec{p}})$ through $\vec{\theta}$ and $\hat{\vec{p}}$ $\Rightarrow$
+        $\vec{\theta}$ through $\hat{\vec{p}}$ $\Rightarrow$ $\hat{\vec{p}} = \vec{r}_0 + \hat{d}\vec{w} =:
+            \vec{r}(\hat{d})$ $\Rightarrow$ CR: $\vec{w} \nicefrac{\partial \hat{d}}{\partial \vec{\theta}}$
+        $\Rightarrow$ Implicit diff. on $f_{\vec{\theta}}(\hat{\vec{p}}) = \tau$ to get $\nicefrac{\partial
+                \hat{d}}{\partial \vec{\theta}}$.
 
         \textbf{NERF}: Problem: Implicit surfaces are not good at complex scenes, especially with
         transparency or thin structures. NERF takes as input $(x,y,z,\theta,\phi)$ and outputs
@@ -684,7 +706,7 @@
         with $\delta_i = t_{i+1} - t_i$ be the prob. of light stopping at point $i$. Then, we can compute
         the prob. of light reaching $i$ by $T_i = \prod_{j=1}^{i-1} 1 - \alpha_j$. Then, we compute
         the final color: \[
-            \vec{c} = \sum_{i=1}^{n} T_i \alpha_i \vec{c}_i.
+            \vec{c} = \sum\nolimits_{i=1}^{n} T_i \alpha_i \vec{c}_i.
         \]
         The fundamental difference with differentiable rendering is that we backpropagate through multiple
         points rather than a single point.
@@ -713,7 +735,7 @@
         \textbf{2D poses}: Body modeling: Use the pictorial structure model, which models the body
         as a graph. Given an image $\tens{I}$ and vertex locations $L = [\ell_1, \ldots, \ell_k]$, we want
         to minimize score: \[
-            S(\tens{I}, L) = \sum_{i\in V} \alpha_i \cdot \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij} \psi(\ell_i, \ell_j).
+            S(\tens{I}, L) = \sum\nolimits_{i\in V} \alpha_i \cdot \phi(\tens{I}, \ell_i) + \sum\nolimits_{i,j \in E} \beta_{ij} \psi(\ell_i, \ell_j).
         \]
         Generalize by assigning mixture components $m_i$: \[
             S(\tens{I}, L, M) = \sum_{i\in V} \alpha_i^{m_i} \phi(\tens{I}, \ell_i) + \sum_{i,j \in E} \beta_{ij}^{m_im_j} \psi(\ell_i,\ell_j) + \sum_{i,j \in E} b_{ij}^{m_im_j}.
@@ -730,11 +752,11 @@
         The two can also be combined by first using feature learning and then refining with body modeling.
 
         \textbf{Linear-blend skinning}: Simplest method that transforms vertices as a weighted linear combination of global joint transformations: \[
-            \bar{\vec{t}}_i' = \lft( \sum_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}) \rgt) \bar{\vec{t}}_i, \quad \mat{G}'_k(\vec{\theta}, \mat{J}) = \mat{G}_k(\vec{\theta}, \mat{J}) \mat{G}_k(\vec{\theta}^\star, \mat{J})^{-1},
+            \bar{\vec{t}}_i' = \lft( \sum\nolimits_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}) \rgt) \bar{\vec{t}}_i, \quad \mat{G}'_k(\vec{\theta}, \mat{J}) = \mat{G}_k(\vec{\theta}, \mat{J}) \mat{G}_k(\vec{\theta}_0, \mat{J})^{-1},
         \]
         where $k$ are bones and $i$ are vertices, $\mat{G}_k(\vec{\theta})$ is the rigid bone
-        transformation for bone $k$, which is weighted by $w_{ki}$ which determines the influence of bone
-        $k$ on vertex $i$.
+        transformation for bone $k$. % , which is weighted by $w_{ki}$ which determines the influence of bone
+        % $k$ on vertex $i$.
 
         \textbf{Skinned multi-person linear model}: Problem with LBS: Does not account for variation
         in body shape and poses often result in unwanted deformations. SMPL solves this by encoding a
@@ -745,20 +767,20 @@
             \item Correct for future deformations: $\bar{\mat{T}} + \mat{B}_S(\vec{\beta}) +
                       \mat{B}_P(\vec{\theta})$.
             \item Linear-blend skinning: \[
-                      \bar{\vec{t}}_i' = \lft( \sum_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) \lft(\bar{\vec{t}}_i + \vec{b}_{S,i}(\vec{\beta}) + \vec{b}_{P,i}(\vec{\theta})\rgt).
+                      \bar{\vec{t}}_i' = \lft( \sum\nolimits_{k} w_{ki} \mat{G}'_k(\vec{\theta}, \mat{J}(\vec{\beta})) \rgt) \lft(\bar{\vec{t}}_i + \vec{b}_{S,i}(\vec{\beta}) + \vec{b}_{P,i}(\vec{\theta})\rgt).
                   \]
         \end{enumerate}
 
         We learn $\mat{B}_S(\vec{\beta})$ by PCA on a body shape dataset. $\vec{\beta}$ are the linear
         weights of the largest principal components: \[
-            \mat{B}_S(\vec{\beta}; \mathcal{S}) = \sum_{n=1}^{|\vec{\beta}|} \beta_n \mat{S}_n.
+            \mat{B}_S(\vec{\beta}; \mathcal{S}) = \sum\nolimits_{n=1}^{|\vec{\beta}|} \beta_n \mat{S}_n.
         \]
 
         We learn $\mat{B}_P(\vec{\theta})$ from a body pose dataset: \[
-            \mat{B}_P(\vec{\theta}; \mathcal{P}) = \sum_{n=1}^{9K} (\mat{R}_n(\vec{\theta}) - \mat{R}_n(\vec{\theta}^\star)) \mat{P}_n,
+            \mat{B}_P(\vec{\theta}; \mathcal{P}) = \sum\nolimits_{n=1}^{9K} (\mat{R}_n(\vec{\theta}) - \mat{R}_n(\vec{\theta}_0)) \mat{P}_n,
         \]
-        where $\vec{\theta}^\star$ is the template pose, $\mat{R}(\vec{\theta})$ maps pose vectors to
-        vectors of rotation matrices, and $\mat{P}_n \in \R^{3N}$ is a vector of vertex displacements
+        where $\vec{\theta}_0$ is the template pose, $\mat{R}(\vec{\theta})$ maps pose vectors to vectors
+        of rotation matrices, and $\mat{P}_n \in \R^{3N}$ is a vector of vertex displacements
 
         \textbf{Learned gradient descent}: Method for fitting 3D human shapes to images by combining
         gradient-based optimization with NNs. It leverages a NN to predict
