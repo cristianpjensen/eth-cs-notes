@@ -15,8 +15,8 @@
 \usepackage{color,soul}
 \usepackage{xcolor}
 
-\DeclareMathOperator*{\argmax}{argmax}
-\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{amax}
+\DeclareMathOperator*{\argmin}{amin}
 
 \newcommand{\lft}{\mathopen{}\mathclose\bgroup\left}
 \newcommand{\rgt}{\aftergroup\egroup\right}
@@ -51,16 +51,12 @@
         \item $\sigma(x) = \nicefrac{1}{1 + e^{-x}}$, $\tanh(x) = \nicefrac{e^x - e^{-x}}{e^x + e^{-x}}$, $\mathrm{ReLU}(x) = \max\{ 0,x \}$.
         \item \textbf{Derivatives}:
               \begin{align*}
-                  \vec{y} = \sigma(\vec{x})        & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathrm{diag}(\vec{y} \odot (1 - \vec{y})) \\
-                  \vec{y} = \tanh(\vec{x})         & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathrm{diag}(1 - \vec{y}^2)               \\
-                  \vec{y} = \mathrm{ReLU}(\vec{x}) & \Rightarrow \pdv{\vec{y}}{\vec{x}} = \mathds{1}\{ \vec{x} \geq 0 \}             \\
-                  |x|'                             & = \frac{x}{|x|}.
+                  \vec{y} = \sigma(\vec{x})           & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\vec{y} \odot (1 - \vec{y}))    \\
+                  \vec{y} = \tanh(\vec{x})            & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(1 - \vec{y}^2)                  \\
+                  \vec{y} = \mathrm{ReLU}(\vec{x})    & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\mathds{1}\{ \vec{x} \geq 0 \}) \\
+                  \vec{y} = \mathrm{softmax}(\vec{y}) & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\vec{y}) - \vec{y} \vec{y}^\top \\
+                  |x|'                                & = \nicefrac{x}{|x|}                                                                                       \\
               \end{align*}
-
-              % $\vec{y} = \sigma(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\vec{y} \odot (1 - \vec{y}))$,
-              %   $\vec{y} = \tanh(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(1 - \vec{y}^2)$,
-              %   $\vec{y} = \mathrm{ReLU}(\vec{x}) \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathds{1}\{ \vec{x} \geq 0 \}$,
-              %   $|x|' = \nicefrac{x}{|x|}$.
         \item \textbf{Chain rule}: \[
                   \vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \pdv{\vec{z}}{\vec{x}} = \pdv{\vec{z}}{\vec{y}} \pdv{\vec{y}}{\vec{x}}.
               \]
@@ -188,7 +184,7 @@
             \pdv{\ell_t}{\mat{W}_h} = \sum\nolimits_{k=1}^{t} \pdv{\ell_t}{\hat{\vec{y}}_t} \pdv{\hat{\vec{y}}_t}{\vec{h}_t} \pdv{\vec{h}_t}{\vec{h}_k} \pdv{^+ \vec{h}_k}{\mat{W}_h}.
         \]
         We have \[
-            \pdv{\vec{h}_t}{\vec{h}_k} = \prod_{i=k+1}^t \pdv{\vec{h}_i}{\vec{h}_{i-1}}.
+            \pdv{\vec{h}_t}{\vec{h}_k} = \prod\nolimits_{i=k+1}^t \pdv{\vec{h}_i}{\vec{h}_{i-1}} \overset{\text{Elman RNN}}{=} \prod\nolimits_{i=k+1}^{t} \mathrm{diag}(1 - \vec{h}_i^2) \mat{W}_h.
         \]
         Suffers from exploding or vanishing gradient because of the many multiplications of $\mat{W}_h$
         with itself in the gradient. If the largest eigenvalue of this matrix is greater than the upper
@@ -258,8 +254,8 @@
 
         We want to maximize the likelihood $p(\vec{x}) = \int p_{\vec{\theta}}(\vec{x} \mid \vec{z})
             p(\vec{z}) \mathrm{d}\vec{z}$. However, this is intractable. The best we can do is optimize the
-        ELBO: \[
-            \log p(\vec{x}) \geq \E_{\vec{z} \sim q_{\vec{\theta}}(\cdot \mid \vec{x})} [\log p_{\vec{\theta}}(\vec{x} \mid \vec{z})] - \mathrm{KL}(q_{\vec{\theta}}(\vec{z} \mid \vec{x}) \lVert p(\vec{z})).
+        \textbf{ELBO}: \[
+            \log p(\vec{x}) \geq \E_{q_{\vec{\phi}}(\vec{z} \mid \vec{x})} [\log p_{\vec{\theta}}(\vec{x} \mid \vec{z})] - \mathrm{KL}(q_{\vec{\phi}}(\vec{z} \mid \vec{x}) \lVert p(\vec{z})).
         \]
         We need to use the reparametrization trick to take the gradient of the expectation, which means
         that instead of sampling $\vec{z} \sim \mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$, we
@@ -279,7 +275,7 @@
     \begin{topic}{Autoregressive models}
 
         Autoregressive models can compute the likelihood $p(\vec{x})$ in a tractable way by the chain rule: \[
-            p(\vec{x}) = \prod_{i=1}^n p(x_i \mid \vec{x}_{1:i-1}).
+            p(\vec{x}) = \prod\nolimits_{i=1}^n p(x_i \mid \vec{x}_{1:i-1}).
         \]
         The hard part of this approach is that we must parametrize all possible conditional distributions
         $p(x_{k+1} | \vec{x}_{1:k})$.
@@ -343,7 +339,7 @@
 
         \textbf{Change of variables}: Best of both worlds: latent space and a tractable likelihood by
         leveraging change of variables: \[
-            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) | \det(\mat{J}_{\vec{x}} f^{-1}(\vec{x})) | = p_Z(\vec{z}) |\det(\mat{J}_{\vec{z}} f(\vec{z}))|^{-1}.
+            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) \lft| \det\lft( \pdv{f^{-1}(\vec{x})}{\vec{x}} \rgt) \rgt| = p_Z(\vec{z}) \lft| \det\lft( \pdv{f(\vec{z})}{\vec{z}} \rgt) \rgt|^{-1}.
         \]
         Downside is that $f$ must be invertible, which means that we must preserve dimensionality between
         latent space and data space. Furthermore the determinant of the Jacobian must be efficiently
@@ -372,7 +368,7 @@
             \end{bmatrix}.
         \]
         Jacobian: \[
-            \mat{J}_{\vec{x}} f(\vec{x}) = \begin{bmatrix}
+            \pdv{f(\vec{x})}{\vec{x}} = \begin{bmatrix}
                 \pdv{\vec{y}_A}{\vec{x}_A} & \pdv{\vec{y}_A}{\vec{x}_B} \\
                 \pdv{\vec{y}_B}{\vec{x}_A} & \pdv{\vec{y}_B}{\vec{x}_B}
             \end{bmatrix}
@@ -381,7 +377,8 @@
                 \mat{0}                         & \mat{I}
             \end{bmatrix}.
         \]
-        To compute the det, we need the upper left and lower right matrices.
+        To compute the determinant, we need only $\pdv{\vec{y}_A}{\vec{x}_A}$ and
+        $\pdv{\vec{y}_B}{\vec{x}_B}$.
 
         This layer leaves part of its input unchanged, thus we must make sure to alternate what parts of
         the input get transformed.
@@ -390,11 +387,11 @@
             \vec{x} = f(\vec{z}) = (f_m \circ \cdots \circ f_1)(\vec{z}).
         \]
         Using change of variables: \[
-            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) \prod_{k=1}^m |\det(\mat{J}_{\vec{x}} f_k(\vec{x}))|^{-1}.
+            p_X(\vec{x}) = p_Z(f^{-1}(\vec{x})) \prod\nolimits_{k=1}^m \lft| \det\lft( \pdv{f_k(\vec{x})}{\vec{x}} \rgt) \rgt|^{-1}.
         \]
 
         \textbf{Training}: Maximize the log-likelihood: \[
-            \log p_{X}(\mat{X}) = \sum\nolimits_{i=1}^{n} \log p_Z(f^{-1}(\vec{x}_i)) + \sum\nolimits_{k=1}^{m} \log |\det(\mat{J}_{\vec{x}} f_k(\vec{x}_i))|^{-1}.
+            \log p_{X}(\mat{X}) = \sum\nolimits_{i=1}^{n} \log p_Z(f^{-1}(\vec{x}_i)) - \sum\nolimits_{k=1}^{m} \log \lft| \det\lft( \pdv{f_k(\vec{x}_i)}{\vec{x}_i} \rgt) \rgt|.
         \]
 
         \textbf{NICE}: Split data by partitioning into two subsets and randomly alternating which is given to the NN. Additive coupling network: \[
@@ -428,14 +425,14 @@
 
         \textbf{Problem with optimizing likelihood}: Optimizing likelihood does not necessarily give good results. Two possible cases:
         \begin{itemize}
-            \item Good likelihood with bad sample quality. Let $p$ be a good model and $q$ a model that only outputs
+            \item Good likelihood with bad sample quality: Let $p$ be a good model and $q$ a model that only outputs
                   noise. $0.01p + 0.99q$ has log-likelihood: \[
                       \log(0.01p(\vec{x}) + 0.99q(\vec{x})) \geq \log(p(\vec{x})) - \log 100.
                   \]
                   The $\log p(\vec{x})$ is proportional to the dimensionality of the input. Thus, will be high for
                   high-dimensional data.
 
-            \item Low likelihood with high sample quality, which occurs when he model overfits on the training data.
+            \item Bad likelihood with high sample quality: Occurs when he model overfits on the training data.
                   Results in bad likelihood on test set.
 
         \end{itemize}
@@ -443,21 +440,13 @@
         \textbf{GAN}: Solve the above problem by introducing a discriminator. The objective of the
         generator is then to maximize the discriminator's classification loss by generating images
         similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function (derived from BCE): \[
-            V(D, G) = \E_{\vec{x} \sim p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})} [\log (1 - D(G(\vec{z})))].
-        \]
-        Then, we have the following two-player zero-sum game: \[
-            \argmin\nolimits_G \argmax\nolimits_D V(D,G).
+            \argmin\nolimits_{G} \argmin\nolimits_{D} V(D, G) := \E_{p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{p_{\mathrm{prior}}} [\log (1 - D(G(\vec{z})))].
         \]
 
-        \textbf{Optimal discriminator}: $D^\star(\vec{x}) = \nicefrac{p_{\mathrm{data}}(\vec{x})}{p_{\mathrm{data}}(\vec{x}) + p_{\mathrm{model}}(\vec{x})}$.
+        \textbf{Optimal discriminator}: $D^\star(\vec{x}) = \nicefrac{p_{\mathrm{data}}(\vec{x})}{p_{\mathrm{data}}(\vec{x}) + p_{\mathrm{model}}(\vec{x})}$. \\
+        $\blacksquare:$ $V(D,G)$ def. $\Rightarrow$ $\E \to \int$ $\Rightarrow$ $p_{\mathrm{prior}} \to p_{\mathrm{model}}$ $\Rightarrow$ Combine $\int$ $\Rightarrow$ $\max_y a \log(y) + b \log(1-y) = \nicefrac{a}{a+b}$ for $a,b > 0$.
 
-        $\blacksquare:$ $V(G,D)$ def. $\Rightarrow$ $\int$ $\Rightarrow$ $p_{\mathrm{model}}$ $\Rightarrow$ Combine $\int$ $\Rightarrow$ $\max_y a \log(y) + b \log(1-y) = \nicefrac{a}{a+b}$ for $a,b > 0$.
-
-        \textbf{Global optimality}: The generator is optimal if $p_{\mathrm{model}} = p_{\mathrm{data}}$ and at optimum, we have \[
-            V(D^\star, G^\star) = -\log 4.
-        \]
-        The generator implicitly optimizes the Jensen-Shannon divergence.
-
+        \textbf{Global optimality}: The generator is optimal if $p_{\mathrm{model}} = p_{\mathrm{data}}$ and at optimum, we have $V(D^\star, G^\star) = -\log 4$. $G$ implicitly optimizes JS div. \\
         $\blacksquare:$ $D^\star$ $\Rightarrow$ $\times \nicefrac{2}{2}$ in $\E$s $\Rightarrow$ Take
         out $-\log 2$ of $\E$s $\Rightarrow$ $2 \mathrm{JS}(p \| q) - \log 4$.
 
@@ -469,12 +458,11 @@
         Then, $p_{\mathrm{model}}$ converges to $p_{\mathrm{data}}$, because $V(D^\star,
             p_{\mathrm{model}})$ is convex in $p_{\mathrm{model}}$ and supremum preserves convexity.
 
-        Weak result: $G$ and $D$ have finite capacity, $D$ does not necessarily converge to $D^\star$, and
-        due to the NN parametrization of $G$, the objective is no longer convex.
+        \textit{Weak result}: $G$ and $D$ have finite capacity, $D$ does not necessarily converge to $D^\star$, and
+        due to $G$ being NN, the obj is no longer convex.
 
-        \textbf{Generator loss saturates}: Early in training, $G$ is poor, which results in $\log (1
-            - D(G(\vec{z})))$ saturating, i.e., going to $-\infty$. Instead, we should train $G$ to
-        maximize $\log D(G(\vec{z}))$.
+        \textbf{Saturation}: Early in training, $G$ is poor ($D(G(\vec{z})) \approx 0$), which
+        results in $\log (1 - D(G(\vec{z})))$ saturating (small gradient) $\Rightarrow$ $\argmax_G \log D(G(\vec{z}))$.
 
         \textbf{Mode collapse}: The generator learns to produce high-quality samples with low
         variability. Solution: Unrolled GAN, which optimizes the generator w.r.t. the last $k$
@@ -491,7 +479,7 @@
         GAN, which optimizes the Wasserstein distance. In this case, the loss does not fall to zero
         for disjoint supports, because it measures divergence by how different they are horizontally,
         rather than vertically. Intuitively, it measures how much “work” it takes to turn one
-        distribution into the other.
+        dist. into the other.
 
         \textbf{Gradient penalty}: To stabilize training, add a gradient penalty: \[
             \E_{\vec{x} \sim p_d} \lft[ \log D(\vec{x}) + \lambda \| \nabla D(\vec{x}) \|^2 \rgt] + \E_{\vec{x} \sim p_m} [\log (1 - D(\vec{x}))].
@@ -501,12 +489,15 @@
 
     \begin{topic}{Diffusion models}
 
+        Compared to GANs, DMs offer high quality generations with better diversity and a more stable
+        training process.
+
         \textbf{Diffusion}: Governed by a noise schedule $\{ \beta_t \}_{t=1}^T$: $q(\vec{x}_t \mid \vec{x}_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t} \vec{x}_{t-1}, \beta_t \mat{I})$.
         Closed-form solution: $\vec{x}_t = \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$,
         where $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$. \\
-        \textbf{Denoising}: Learn $p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) \approx
+        \textbf{Denoising}: $q(\vec{x}_{t-1} \mid \vec{x}_t)$ intractable $\Rightarrow$ Learn $p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) \approx
             q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0)$. For small steps, $q(\vec{x}_{t-1} \mid \vec{x}_t)$
-        is Gaussian, so we parametrize Gaussian \[
+        is Gaussian: \[
             p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t) = \mathcal{N}(\vec{x}_{t-1} ; \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t), \sigma_t^2 \mat{I}).
         \]
         In practice, parametrize network to predict noise $\vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t)$.
@@ -516,16 +507,17 @@
             \vec{x}_{t-1} & = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sigma_t \vec{z}.
         \end{align*}
 
-        \textbf{Training}: \textit{ELBO}: $\E_{q(\vec{x}_1\mid \vec{x}_0)}[\log p_{\vec{\theta}}(\vec{x}_0 \mid \vec{x}_1)] - \mathrm{KL}(q(\vec{x}_T \mid \vec{x}_0) \| p(\vec{x}_T)) - \sum_{t=2}^{T} \E_{q(\vec{x}_t \mid \vec{x}_0)} [\mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t))]$ (reconstruction term, prior matching term, denoising matching term).
-        \textit{Closed-form}: \[
-            \argmin\nolimits_{\vec{\theta}} \mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) = \argmin\nolimits_{\vec{\theta}} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|_2^2,
-        \]
+        \textbf{Training}: \textbf{ELBO}: $\E_{q(\vec{x}_1\mid \vec{x}_0)}[\log p_{\vec{\theta}}(\vec{x}_0 \mid \vec{x}_1)] - \mathrm{KL}(q(\vec{x}_T \mid \vec{x}_0) \| p(\vec{x}_T)) - \sum_{t=2}^{T} \E_{q(\vec{x}_t \mid \vec{x}_0)} [\mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t))]$ (reconstruction term, prior matching term, denoising matching term). \\
+        $\blacksquare$: $\log p(\vec{x}_0)$ $\Rightarrow$ $ \int \mathrm{d}\vec{x}_{1:T}$ $\Rightarrow$ $\times \nicefrac{q(\vec{x}_{1:T} \mid \vec{x}_0)}{q(\vec{x}_{1:T} \mid \vec{x}_0)}$ $\Rightarrow$ $\E_{q(\vec{x}_{1:T} \mid \vec{x}_0)}$ $\Rightarrow$ Jensen $\Rightarrow$ Prob. CR: $\sum_{t=2}^{T} \log \nicefrac{p(\vec{x}_{t-1} \mid \vec{x}_t)}{q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0)}$ $\Rightarrow$ Bayes in $\sum$: $\log \nicefrac{q(\vec{x}_1 \mid \vec{x}_0)}{q(\vec{x}_T \mid \vec{x}_0)}$ out $\Rightarrow$ Lin. and marginalize $\E$ $\Rightarrow$ In $\sum$: 2 nested $\E$.
+
+        \textbf{Closed-form}: $\argmin\nolimits_{\vec{\theta}} \mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) = \argmin\nolimits_{\vec{\theta}} \nicefrac{1}{2 \sigma_q^2(t)} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|_2^2$,
         with
         \begin{align*}
             \vec{\mu}_q(\vec{x}_t, \vec{x}_0)      & = \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon}                                 \\
             \vec{\mu}_{\vec{\theta}}(\vec{x}_t, t) & = \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1 - \alpha_t}{\sqrt{1-\bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t).
         \end{align*}
-        \textit{Loss function}: $\lft\| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}\lft(
+        \textbf{Cosine theorem}: $\| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 -2 \langle \vec{x}, \vec{y} \rangle$. \\
+        \textbf{Loss function}: $\lft\| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}\lft(
             \sqrt{\bar{\alpha}_t} \vec{x}_0 + \sqrt{1 - \bar{\alpha}_t} \vec{\epsilon}, t \rgt) \rgt\|^2,
             \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$.
 
@@ -611,8 +603,7 @@
             Q(s,a) \gets (1-\alpha) Q(s,a) + \alpha (r + \gamma Q(s',a')), \quad a' \in \argmax\nolimits_{a \in \mathcal{A}} Q(s', a).
         \]
 
-        \textbf{DQN}: Large or infinite state spaces $\Rightarrow$ Function approximation. DQN learns
-        the Q-values for states. Loss function: \[
+        \textbf{DQN}: Large state spaces $\Rightarrow$ Function approximation with loss: \[
             \ell(\vec{\theta}) = (Q_{\vec{\theta}}(s,a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s', a')))^2, \quad a' \in \argmax\nolimits_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
         \]
         We train as in supervised learning. Data is not i.i.d. $\Rightarrow$ Replay buffer.
@@ -620,13 +611,8 @@
         \textbf{Sample inefficiency of deep RL}: As the policy improves, we can collect better data.
         So, we have to keep training on new better data.
 
-        \textbf{Policy search}: Large or infinite action spaces $\Rightarrow$ Parametrize
-        $\pi_{\vec{\theta}}$: \[
-            \pi_{\vec{\theta}}(\cdot \mid s) = \mathcal{N}(\vec{\mu}_{\vec{\theta}}(s), \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(s))).
-        \]
-        Probability of trajectory $\tau$ can be computed by \[
-            \pi_{\vec{\theta}}(\tau) = P(s_0) \prod_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) P(s_{t+1} \mid s_t, a_t).
-        \]
+        \textbf{Policy search}: Large or infinite action spaces $\Rightarrow$ Parametrize $\pi_{\vec{\theta}}(\cdot \mid s) = \mathcal{N}(\vec{\mu}_{\vec{\theta}}(s), \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(s)))$.
+        Probability of trajectory $\tau$ can be computed by $\pi_{\vec{\theta}}(\tau) = P(s_0) \prod\nolimits_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) P(s_{t+1} \mid s_t, a_t)$.
         Want trajectories with high return more likely $\Rightarrow$ Training objective:
         \begin{align*}
             J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum\nolimits_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]         \\
@@ -726,7 +712,7 @@
         \]
         where $o_i$ is the opacity, and $\vec{\mu}_i', \mat{\Sigma}'$ are the parameters of the 2D
         projection of the $i$-th 3D Gaussian. Simple covariance matrix: \[
-            \mat{\Sigma} = \mat{R} \mat{S} \mat{S}^\top \mat{R}^\top, \quad \mat{R} \in \R^{3\times 3}, \mat{S} \in \R^3.
+            \mat{\Sigma} = \mat{R} \mat{S} \mat{S}^\top \mat{R}^\top, \quad \mat{R} \text{ as quaternion (4 numbers)}, \mat{S} \in \R^3.
         \]
 
     \end{topic}
