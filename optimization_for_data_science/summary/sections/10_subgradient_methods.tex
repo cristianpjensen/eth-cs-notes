@@ -1,0 +1,177 @@
+\section{Subgradient methods}
+
+Until now, we have mostly assumed all functions to be smooth and hence differentiable. However, in
+general this is not the case. In machine learning, non-smoothness arises everywhere:
+\begin{itemize}
+    \item Loss functions, such as the Hinge loss, $\max\{ 0, 1-x \}$ (SVM);
+    \item Regularization, such as the $\ell_1$-norm (LASSO);
+    \item Activation functions, such as ReLU.
+\end{itemize}
+
+This motivates the need for a more general notion of the gradient that can be applied to more
+functions.
+
+\begin{marginfigure}[3.5cm]
+    \centering
+    \incfig{subgradient}
+    \caption{$\vec{g}$ is a subgradient of $f$ at $\vec{x}$ if the whole graph is above $\vec{x}$'s supporting hyperplane, parametrized by $\vec{g}$.}
+    \label{fig:subgradient}
+\end{marginfigure}
+
+\begin{definition}[Subgradient]
+    $\vec{g} \in \R^d$ is a subgradient of $f$ at $\vec{x}$ if \[
+        f(\vec{y}) \geq f(\vec{x}) + \transpose{\vec{g}}(\vec{y} - \vec{x}), \quad \forall \vec{y} \in \dom{f}.
+    \]
+    We call $\partial f(\vec{x}) \subseteq \R^d$ the subdifferential, which is the set of subgradients
+    of $f$ at $\vec{x}$.
+\end{definition}
+
+\begin{example}
+    Consider $f(x) = |x|$, then $\partial f(0) = [-1, 1]$.
+\end{example}
+
+\begin{lemma}
+    \label{lem:diff-subdiff}
+
+    If $f$ is differentiable at $\vec{x} \in \dom{f}$, then $\partial f(\vec{x}) \subseteq \{
+        \grad{f(\vec{x})}{} \}$.
+\end{lemma}
+
+\Cref{lem:diff-subdiff} means that if $f$ is differentiable at $\vec{x}$, then this is either the
+only subgradient or there is no subgradient at all. There might not be any subgradient at all in this
+case because it might be that the hyperplane is not below the entire function if the function is
+non-convex.
+
+\begin{lemma}
+    The following characterizes convexity with the subgradient:
+    \begin{itemize}
+        \item If $f$ is convex, then $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x}$ in the relative
+              interior of $\dom{f}$;
+        \item If $\dom{f}$ is convex and $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x} \in \dom{f}$, then
+              $f$ is convex.
+    \end{itemize}
+\end{lemma}
+
+\begin{lemma}[Subgradient optimality condition]
+    Let $f: \dom{f} \to \R$ and $\vec{x} \in \dom{f}$. If $\vec{0} \in \partial f(\vec{x})$, then $\vec{x}$ is a global minimum.
+\end{lemma}
+
+\begin{proof}
+    By definition of the subgradient with $\vec{g} = \vec{0} \in \partial f(\vec{x})$ gives \[
+        f(\vec{y}) \geq f(\vec{x}) + \transpose{\vec{g}} (\vec{y} - \vec{x}) = f(\vec{x}), \quad \forall \vec{y} \in \dom{f}.
+    \]
+    Thus, $\vec{x}$ is a global minimum.
+\end{proof}
+
+\begin{lemma}[Subgradient calculus]
+    We can use the following operations to work with subgradients:
+    \begin{itemize}
+        \item Conic combination: Let $h(\vec{x}) = \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha,\beta \geq
+                  0$, then \[
+                  \partial h(\vec{x}) = \alpha \partial f(\vec{x}) + \beta \partial g(\vec{x});
+              \]
+        \item Affine transformation: Let $h(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$, then \[
+                  \partial h(\vec{x}) = \transpose{\mat{A}} \partial f(\mat{A} \vec{x} + \vec{b});
+              \]
+        \item Pointwise maximum: Let $h(\vec{x}) = \max_{i\in [m]} f_i(\vec{x})$, then \[
+                  \partial h(\vec{x}) = \mathrm{conv}(\{ \partial f_i(\vec{x}) \mid f_i(\vec{x}) = h(\vec{x}) \}).
+              \]
+              Thus, at each point where we transition from one function to another, we get the convex hull of
+              subgradients of the functions that transition. At all other points, we take the maximum function's
+              subgradient.
+    \end{itemize}
+\end{lemma}
+
+\subsection{Subgradient method}
+
+In the subgradient method, the general update rule becomes \[
+    \vec{x}_{t+1} \doteq \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t).
+\]
+If $\vec{f}$ is differentiable, gradient descent and projected gradient descent are special cases
+of this update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively.
+However, if $f$ is non-differentiable, we will see that this is technically not a descent method,
+because the subgradient is not a descent direction in general.
+
+\begin{lemma}[Subgradient method ``descent'' lemma]
+    \label{lem:subgrad-descent}
+
+    If $f$ is convex, then for any optimal solution $\vec{x}^\star$, \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2.
+    \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 & = \| \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t) - \vec{x}^\star \|^2 \margintag{Subgradient descent update rule.}                                                                                                                                       \\
+                                              & = \| \vec{x}_t - \gamma_t \vec{g}_t - \vec{x}^\star \|^2 \margintag{$\mathcal{X}$ is convex, so we get closer to $\vec{x}^\star$ after projection.}                                                                                                            \\
+                                              & = \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star) + \gamma_t^2 \| \vec{g}_t \|^2 \margintag{Cosine theorem: $\| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2 \transpose{\vec{x}} \vec{y}$.} \\
+                                              & \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2. \margintag{Convexity: $f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star)$.}
+    \end{align*}
+\end{proof}
+
+\begin{theorem}[Convergence of the subgradient method]
+    If $f$ is convex, then the subgradient method satisfies \[
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|^2 + \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|^2}{2 \sum_{t=0}^{T-1} \gamma_t}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    This can easily be shown by telescoping sum of \Cref{lem:subgrad-descent} and invoking convexity.
+\end{proof}
+
+Assuming bounded subgradient $\| \vec{g}_t \| \leq B$ for all steps $t$, we get the following
+convergence rates under various stepsizes,
+\begin{itemize}
+    \item Constant stepsize ($\gamma_t = \gamma$): \[
+              \lim_{t\to \infty} f(\vec{x}_t^{\mathrm{best}}) \leq f(\vec{x}^\star) + \frac{B^2 \gamma}{2};
+          \]
+    \item Scaled stepsize ($\gamma_t = \nicefrac{\gamma}{\| \vec{g}_t \|}$): \[
+              \lim_{t \to \infty} f(\vec{x}_t^{\mathrm{best}}) \leq f(\vec{x}^\star) + \frac{B \gamma}{2};
+          \]
+    \item Square-summable stepsize ($\sum_{t=0}^{\infty} \gamma_t^2 < +\infty$, $\sum_{t=0}^{\infty} \gamma_t
+              = +\infty$): \[
+              \lim_{t \to \infty} f(\vec{x}_t^{\mathrm{best}}) = f(\vec{x}^\star);
+          \]
+    \item Diminishing stepsize ($\gamma_t \to 0$ and $\sum_{t=0}^{\infty} \gamma_t = +\infty$): \[
+              \lim_{t \to \infty} f(\vec{x}_t^{\mathrm{best}}) = f(\vec{x}^\star).
+          \]
+\end{itemize}
+
+\begin{corollary}
+    Let $f$ be convex and $B$-Lipschitz continuous. Let $\mathcal{X}$ be convex compact with $R^2 = \max_{\vec{x},\vec{y} \in \mathcal{X}} \| \vec{x} - \vec{y} \|_2 < +\infty$. Setting \[
+        \gamma \doteq \frac{R}{B \sqrt{T}},
+    \]
+    then the subgradient method satisfies \[
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \frac{BR}{\sqrt{T}}.
+    \]
+\end{corollary}
+
+To achieve $\epsilon$-optimality, the subgradient method requires
+$\bigo{\frac{B^2R^2}{\epsilon^2}}$ iterations.
+
+\subsection{Strong convexity}
+
+\begin{theorem}
+    Let $f$ be $\mu$-strongly convex and $B$-Lipschitz continuous on $\mathcal{X}$. Setting \[
+        \gamma_t \doteq \frac{2}{\mu (t+1)},
+    \]
+    then the subgradient method satisfies \[
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \frac{2B^2}{\mu (T+1)}.
+    \]
+\end{theorem}
+
+In the case of strong convexity, to achieve $\epsilon$-optimality, the subgradient method requires
+$\bigo{\frac{B^2}{\mu \epsilon}}$ iterations.
+
+\begin{proof}
+    Adapting the proof of \Cref{lem:subgrad-descent} to use strong convexity in its last step, we
+    get \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq (1-\mu \gamma_t) \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2.
+    \]
+    Using this, we get the following,
+    \begin{align*}
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \frac{1 - \mu \gamma_t}{2 \gamma_t} \|\vec{x}_t - \vec{x}^\star\|^2 - \frac{1}{2 \gamma_t} \|\vec{x}_{t+1} - \vec{x}^\star \|^2 + \frac{\gamma_t}{2} \|\vec{g}_t\|^2                                    \\
+                                        & = \frac{\mu(t-1)}{4} \| \vec{x}_t - \vec{x}^\star \|^2 - \frac{\mu(t+1)}{4} \|\vec{x}_{t+1} - \vec{x}^\star\|^2 + \frac{1}{\mu(t+1)} \| \vec{g}_t \|^2 \margintag{$\gamma_t \doteq \nicefrac{2}{\mu(t+1)}$}.
+    \end{align*}
+    Now, it is easy to show the result by a telescoping sum.
+\end{proof}

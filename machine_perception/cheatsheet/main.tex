@@ -1,14 +1,12 @@
 \documentclass{article}
 
-\usepackage[a4paper, margin=0.15cm]{geometry}
+\usepackage[a4paper, margin=0.25cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[most]{tcolorbox}
 \usepackage{multicol}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
-\usepackage{blindtext}
 \usepackage{derivative}
-\usepackage{parskip}
+\usepackage[skip=.5\baselineskip-0.5pt]{parskip}
 \usepackage[extreme, mathspacing=normal, leadingfraction=0.85]{savetrees}
 \usepackage[document]{ragged2e}
 
@@ -42,9 +40,6 @@
 
 \setlength{\columnsep}{0.15cm}
 
-% \textbf{\LARGE Machine Perception Cheatsheet} \\
-% \hrulefill
-
 \begin{multicols*}{2}
 
     \begin{itemize}
@@ -55,13 +50,12 @@
                   \vec{y} = \tanh(\vec{x})            & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(1 - \vec{y}^2)                  \\
                   \vec{y} = \mathrm{ReLU}(\vec{x})    & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\mathds{1}\{ \vec{x} \geq 0 \}) \\
                   \vec{y} = \mathrm{softmax}(\vec{y}) & \Rightarrow \nicefrac{\partial \vec{y}}{\partial \vec{x}} = \mathrm{diag}(\vec{y}) - \vec{y} \vec{y}^\top \\
-                  |x|'                                & = \nicefrac{x}{|x|}                                                                                       \\
+                  |x|'                                & = \nicefrac{x}{|x|}.
               \end{align*}
-        \item \textbf{Chain rule}: \[
-                  \vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \pdv{\vec{z}}{\vec{x}} = \pdv{\vec{z}}{\vec{y}} \pdv{\vec{y}}{\vec{x}}.
-              \]
+        \item When using $\mat{I}$, specify dimensionality $\mat{I}_d$.
+        \item \textbf{Chain rule}: $\vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \pdv{\vec{z}}{\vec{x}} = \pdv{\vec{z}}{\vec{y}} \pdv{\vec{y}}{\vec{x}}$.
+        \item \textbf{Sparsity}: $\mathrm{diag}(\vec{x}) \mathrm{vec}_i(y) = \mathrm{vec}_i(x_i y)$.
 
-              % $\vec{y} = g(\vec{x}), \vec{z} = f(\vec{y}) \Rightarrow \nicefrac{\partial \vec{z}}{\partial \vec{x}} = \nicefrac{\partial \vec{z}}{\partial \vec{y}} \nicefrac{\partial \vec{y}}{\partial \vec{x}}$.
         \item If $\vec{x} \in \R^{m}$ and $\vec{y} \in \R^{n}$, then $\nicefrac{\partial \vec{x}}{\partial
                       \vec{y}} \in \R^{m\times n}$.
         \item Gradient computation: Look at effect of changing param. on output.
@@ -78,16 +72,16 @@
     \begin{topic}{Neural networks}
 
         \textbf{Perceptron}: The original perceptron was a single-layer perceptron with non-linearity
-        $\mathds{1}\{ x > 0 \}$. Classification is then done by $\hat{y} = \mathds{1}\{ \vec{w}^\top
+        $\mathds{1}\{ x > 0 \}$. Classification is done by $\hat{y} = \mathds{1}\{ \vec{w}^\top
             \vec{x} + b > 0 \}$. Learning: iteratively apply $\vec{\theta} \gets
             \vec{\theta} + \eta(y_i - \hat{y}_i) \vec{x}_i$. GD with Hinge loss.
-        If the data is linearly separable, the perceptron converges in linear time.
+        If the data is linearly separable, the perceptron converges in finite time.
 
         \textbf{MLP}: $\hat{y} = \sigma (\mat{W}_k \sigma( \mat{W}_{k-1} \cdots \sigma( \mat{W}_1 \vec{x} + \vec{b}_1 ) \cdots + \vec{b}_{k-1} ) + \vec{b}_k )$.
 
         Do not forget biases!
 
-        \textbf{Loss functions}: MLE: $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
+        \textbf{Loss functions}: MLE (=NLL): $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
         BCE (MLE with Bern.): $\argmin_{\vec{\theta}} - \sum_{i=1}^{n} y_i \log \hat{y}_i + (1-y_i) \log (1 - \hat{y}_i)$.
         MAP: $\argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i \mid \vec{\theta})$.
 
@@ -96,7 +90,7 @@
         which the loss decreases at a point. \textbf{Gradient descent}: If we have to increase the
         output value, we can (1) increase the weight connected to a neuron with strong activation, or
         (2) increase the activation that is connected to a strong weight by recursion. The gradient
-        tells us how to do this. Update: $\vec{\theta} \gets \vec{\theta} - \eta \nabla_{\vec{\theta}} \mathcal{L}(\hat{\vec{y}}, \vec{y})$.
+        tells us how to do this. Update: $\vec{\theta} \gets \vec{\theta} - \eta \nabla_{\vec{\theta}} \mathcal{L}(\hat{\vec{y}}, \vec{y}; \vec{\theta})$.
 
         \textbf{Universal approximation theorem}: Let $g$ be any function on unit hypercube. Let
         $\epsilon > 0$, then there exists a NN $f_{\vec{\theta}}$ with a single hidden layer that can
@@ -143,19 +137,20 @@
             \mat{\Delta}^{(\ell-1)} = \mat{\Delta}^{(\ell)} * \mathrm{Rot}_{180}(\mat{W}^{(\ell)}), \quad \pdv{\mathcal{L}}{\mat{W}^{(\ell)}} = \mat{\Delta}^{(\ell)} * \mat{Z}^{(\ell - 1)}.
         \end{gather*}
         $D_{\mathrm{out}} = \lft\lfloor \frac{D_{\mathrm{in}} + 2 \times p - d \times (k - 1) - 1}{s} + 1 \rgt\rfloor$.
-        Params: $(C_{\mathrm{in}} \times H \times W + 1) \times C_{\mathrm{out}}$.
+        Params: $(C_{\mathrm{in}} \times K \times K + 1) \times C_{\mathrm{out}}$.
 
-        \textbf{Max-pooling layer}:
+        \textbf{Max-pooling layer}: Increase RF exponentially:
         \begin{align*}
-            z^{(\ell)}[i,j]                                & = \max \lft\{ z^{(\ell-1)}[i',j'] \mid i' \in [i : i + k], j' \in [j : j+k] \rgt\} \\
+            z^{(\ell)}[i,j]                                & = \max \lft\{ z^{(\ell-1)}[i',j'] \mid i' \in [si : si + k], j' \in [sj : sj+k] \rgt\} \\
             \pdv{z^{(\ell)}[i{,}j]}{z^{(\ell-1)}[i'{,}j']} & = \mathds{1}\{ [i',j'] = [i^\star,j^\star] \}.
         \end{align*}
         No learnable parameters, only propagation of the error.
-
     \end{topic}
 
     \begin{topic}{Fully convolutional neural networks}
-        Downsample, then upsample. \textit{Examples}: Semantic segmentation, Image-to-image translation, Human pose estimation.
+        \textit{Applications}: Semantic segmentation, Image-to-image translation, Human pose
+        estimation. Naive: Classifier on every pixel. Naive: No downsampling (expensive).
+        \textbf{FCNN}: Downsample, then upsample.
 
         \textbf{Upsampling methods}: \textit{Nearest neighbor}: Put value into all corresponding cells.
         \textit{Bed of nails}: Only put value into the top-left cell.
@@ -170,14 +165,16 @@
     \begin{topic}{Recurrent neural networks}
 
         Processes sequential data and is able to take variable-length input. At each timestep, use the same
-        network: \[
+        network (behaves like a dynamical system): \[
             \vec{h}_t = f_{\vec{\theta}} \lft( \vec{h}_{t-1}, \vec{x}_t \rgt).
         \]
-        This behaves like a dynamical system.
-
-        \textbf{Elman RNN}: $f_{\vec{\theta}}(\vec{h}_{t-1}, \vec{x}_t) = \tanh \lft( \mat{W}_h \vec{h}_{t-1} + \mat{W}_x \vec{x}_t \rgt)$.
         $\vec{h}_t$ represents the sequence until timestep $t$, which we can use as input into an
         MLP for further processing.
+
+        \textbf{Use-cases}: $1\to 1$: POS tagging. $1 \to N$: Image captioning. $N \to 1$: Sentiment
+        classification. $N \to N$: Machine translation.
+
+        \textbf{Elman RNN}: $f_{\vec{\theta}}(\vec{h}_{t-1}, \vec{x}_t) = \tanh \lft( \mat{W}_h \vec{h}_{t-1} + \mat{W}_x \vec{x}_t \rgt)$.
 
         \textbf{Backpropagation through time} (BPTT) to optimize by unrolling the RNN and applying backpropagation
         on the computational graph: \[
@@ -186,11 +183,13 @@
         We have \[
             \pdv{\vec{h}_t}{\vec{h}_k} = \prod\nolimits_{i=k+1}^t \pdv{\vec{h}_i}{\vec{h}_{i-1}} \overset{\text{Elman RNN}}{=} \prod\nolimits_{i=k+1}^{t} \mathrm{diag}(1 - \vec{h}_i^2) \mat{W}_h.
         \]
-        Suffers from exploding or vanishing gradient because of the many multiplications of $\mat{W}_h$
-        with itself in the gradient. If the largest eigenvalue of this matrix is greater than the upper
-        bound of the non-linearity, the gradient will explode. If it is smaller, it will vanish.
+        Suffers from \textbf{exploding or vanishing gradient} because of the many multiplications of
+        $\mat{W}_h$ with itself in the gradient. If the largest eigenvalue of this matrix is greater than
+        the upper bound of the non-linearity, the gradient will explode. If it is smaller, it will vanish.
+        Problems: (1) Instability due to NaN/$\infty$, (2) Hard to capture long-term dependencies, (3)
+        Jumps over local minima.
 
-        \textbf{Leaky unit}: Make sure there is constant error flow to solve vanishing gradient problem:
+        \textbf{Leaky unit}: Constant error flow to solve vanishing gradient:
         \begin{align*}
             \hat{\vec{h}}_t & = f_{\vec{\theta}}\lft( \vec{h}_{t-1}, \vec{x}_t \rgt) \\
             \vec{h}_t       & = \alpha \vec{h}_{t-1} + (1-\alpha) \hat{\vec{h}}_t.
@@ -216,7 +215,7 @@
         The gates form an ``information highway'' that can easily propagate errors through the cell state
         due to the minimal modifications made to it.
 
-        \textbf{Gradient clipping}: Solve exploding gradient by limiting the norm of the gradient, \[
+        \textbf{Gradient clipping}: Solve exploding gradient by limiting gradient norm: \[
             \vec{\theta} \gets \begin{cases}
                 \vec{\theta} - \eta \vec{g},                         & \| \vec{g} \| \leq k \\
                 \vec{\theta} - \eta \frac{k}{\| \vec{g} \|} \vec{g}, & \text{otherwise}.
@@ -235,7 +234,7 @@
         identity function. The assumption is that if the decoder is able to reconstruct the original input
         from the latent representation, this representation must be meaningful.
 
-        \textbf{Linear autoencoder}: Principal component analysis.
+        \textbf{Linear autoencoder}: PCA ($+$ Closed form solution. $-$ Not powerful).
 
         \textbf{Non-linear}: Parametrize $f$ and $g$ as NNs to gain performance.
 
@@ -244,13 +243,14 @@
         that there are large regions in the latent space where there are no observations.
 
         The solution is to make the generator output a distribution over latents. Specifically, it outputs
-        a Gaussian distribution $\mathcal{N}(\vec{\mu}_{\vec{\theta}}(\vec{x}),
-            \mathrm{diag}(\vec{\sigma}_{\vec{\theta}}^2(\vec{x})))$ over latent vectors. However, naively using
+        a Gaussian distribution $\mathcal{N}(\vec{\mu}_{\vec{\phi}}(\vec{x}),
+            \mathrm{diag}(\vec{\sigma}_{\vec{\phi}}^2(\vec{x})))$ over latent vectors. However, naively using
         this method will result in very different $\vec{\mu}$ with very low $\vec{\sigma}^2$ for the
         different data points, which is essentially the same as outputting points.
 
         To solve this, we must minimize the KL-divergence between the output distribution and the standard
-        Gaussian. This encourages the encoder to distribute the encodings evenly around the origin.
+        Gaussian. This encourages the encoder to distribute the encodings evenly around the center of the
+        latent space.
 
         We want to maximize the likelihood $p(\vec{x}) = \int p_{\vec{\theta}}(\vec{x} \mid \vec{z})
             p(\vec{z}) \mathrm{d}\vec{z}$. However, this is intractable. The best we can do is optimize the
@@ -267,8 +267,9 @@
         latent space is disentangled if each dimensions changes a single feature of the output. We
         solve this by introducing a hyperparameter $\beta$ which gives more weight to the KL term. The
         intuition behind this is that if factors are in practice independent from each other, the
-        model should benefit from disentangling them. This can be derived theoretically as a
-        Lagrangian.
+        model should benefit from disentangling them. This can be derived as a
+        Lagrangian: $\max_{\vec{\phi},\vec{\theta}} \E_{p_{\mathrm{d}}}[\E_{\vec{z}\mid \vec{x}}]$ s.t. $\mathrm{KL} < \delta$ $\Rightarrow$
+        $\mathcal{L} = \E_{\vec{z}\mid \vec{x}} - \beta(\mathrm{KL} - \delta) \geq \E_{\vec{z}\mid \vec{x}} - \beta \mathrm{KL}$.
 
     \end{topic}
 
@@ -280,17 +281,18 @@
         The hard part of this approach is that we must parametrize all possible conditional distributions
         $p(x_{k+1} | \vec{x}_{1:k})$.
 
-        \textbf{FVSBN}: Fully visible sigmoid belief networks parametrize each timestep by its own function: \[
-            f_i(\vec{x}_{1:i-1}) = \sigma \lft( \alpha_0^{(i)} + \alpha_1^{(i)} x_1 + \cdots + \alpha_{i-1}^{(i)} x_{i-1} \rgt),
+        \textbf{FVSBN}: Fully visible sigmoid belief networks parametrize each timestep by its own
+        function ($\mathcal{O}(n^2)$ parameters): \[
+            f_i(\vec{x}_{1:i-1}) = \sigma \lft( \alpha_0^{(i)} + \alpha_1^{(i)} x_1 + \cdots + \alpha_{i-1}^{(i)} x_{i-1} \rgt).
         \]
-        which has $\mathcal{O}(n^2)$ parameters.
 
         \textbf{NADE}: Problem with FVSBN is that they only have a single hidden layer, making them
         not expressive. NADE uses MLPs: \[
             \vec{h}_i = \sigma(\mat{W}_{:,1:i-1} \vec{x}_{1:i-1} + \vec{b}), \quad \hat{x}_i = \sigma(\mat{V}_{i,:} \vec{h}_i + c_i).
         \]
         This model shares the parameters of $\mat{W}$ between timesteps, which means that it has
-        $\mathcal{O}(nd)$ parameters.
+        $\mathcal{O}(nd)$ parameters and evaluated in $\mathcal{O}(nd)$ by recursion. \textbf{Teacher
+            forcing}: Condition on ground truth when training.
 
         \textbf{MADE}: Constructs an autoencoder which fulfills the autoregressive property. For this,
         we must ensure that there is no computational path between output unit $\hat{x}_{k+1}$ and
@@ -301,8 +303,8 @@
         we allow connections between the last hidden layer and the output only to units with value
         that is strictly greater.
 
-        The problem with this approach is that it requires very large networks. And, while it is possible
-        to train efficiently, sampling still requires $n$ passes through the network.
+        Problem: Requires very large networks. And, while it is possible to train efficiently, sampling
+        still requires $n$ passes through the network.
 
         \textbf{Pixel-RNN}: The idea is to generate image pixels starting from the corner and
         modeling the dependency on previous pixels using an RNN. This is slow, because of its
@@ -313,12 +315,12 @@
         During training we need to make sure only previous pixels are used, thus we use a masked
         convolution. Blind spot $\Rightarrow$ Horizontal and vertical stacks of
         convolutions. To enforce the autoregressive property, we need to go over the color channels
-        autoregressively.
+        autoregressively. Problem: Still slow during inference.
 
         \textbf{WaveNet}: Pixel-CNN (audio) with dilated convs for an exponential RF.
 
         \textbf{VRNN}: RNNs are deterministic $\Rightarrow$ Add stoch. by sampling $\vec{h}_t$ from VAE:
-        $\vec{z}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}), \vec{x}_t \sim q_{\vec{\phi}}(\cdot \mid \vec{z}_t, \vec{h}_{t-1}), \vec{h}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}, \vec{z}_t, \vec{x}_t)$. This is for generation. For encoding, $\vec{z}_t$ depends on $\vec{x}_t$. Prior is learned.
+        $\vec{z}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}), \vec{x}_t \sim q_{\vec{\phi}}(\cdot \mid \vec{z}_t, \vec{h}_{t-1}), \vec{h}_t \sim p_{\vec{\theta}}(\cdot \mid \vec{h}_{t-1}, \vec{z}_t, \vec{x}_t)$. This is for generation. For encoding, $\vec{z}_t$ depends on $\vec{x}_t$.
 
         \textbf{Transformers}: Stack normalization, MLPs, and self-attention: \[
             \mat{Y} = \mathrm{softmax}\lft( \nicefrac{\mat{X} \mat{W}_Q \mat{W}_K^\top \mat{X}^\top}{\sqrt{d}} + \mat{M} \rgt) \mat{X} \mat{W}_V,
@@ -331,7 +333,7 @@
 
     \begin{topic}{Normalizing flow}
         \begin{align*}
-            \log |\det(\mat{A})^{-1}|                          & = \log |\det(\mat{A})|^{-1} = -\log |\det(\mat{A})|                \\
+            \log |\det(\mat{A}^{-1})|                          & = \log |\det(\mat{A})|^{-1} = -\log |\det(\mat{A})|                \\
             \det \lft( \mat{I} + \vec{u} h' \vec{w}^\top \rgt) & = 1 + h' \vec{u}^\top \vec{w}                                      \\
             \vec{x} \odot \vec{y}                              & = \mathrm{diag}(\vec{x}) \vec{y} = \mathrm{diag}(\vec{y}) \vec{x}.
         \end{align*}
@@ -344,6 +346,8 @@
         Downside is that $f$ must be invertible, which means that we must preserve dimensionality between
         latent space and data space. Furthermore the determinant of the Jacobian must be efficiently
         computed, thus we must design $f$ such that its Jacobian is triangular.
+
+        \textbf{Volume-preserving} means $\det\lft(\pdv{f^{-1}(\vec{x})}{\vec{x}}\rgt) = \det\lft(\pdv{f(\vec{x})}{\vec{x}}\rgt)^{-1} = 1$.
 
         \textbf{Coupling layer}: \[
             f: \begin{bmatrix}
@@ -367,7 +371,7 @@
                 \vec{y}_B
             \end{bmatrix}.
         \]
-        Jacobian: \[
+        \[
             \pdv{f(\vec{x})}{\vec{x}} = \begin{bmatrix}
                 \pdv{\vec{y}_A}{\vec{x}_A} & \pdv{\vec{y}_A}{\vec{x}_B} \\
                 \pdv{\vec{y}_B}{\vec{x}_A} & \pdv{\vec{y}_B}{\vec{x}_B}
@@ -403,9 +407,9 @@
         \textbf{RealNVP}: Splits data by partitioning using a checkerboard and a channel-wise
         masking. The channel-wise masking is used after a squeezing operation to go from $C\times H
             \times W$ to $4C \times \nicefrac{H}{2} \times \nicefrac{W}{2}$. This ensures all data can interact with each other. Affine mapping: \[
-            \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} = \begin{bmatrix} \vec{x}_A \odot \exp(s(\vec{x}_B)) + t(\vec{x}_B) \\ \vec{x}_B \end{bmatrix},
+            \begin{bmatrix} \vec{y}_A \\ \vec{y}_B \end{bmatrix} = \begin{bmatrix} \vec{x}_A \odot \exp(\vec{s}(\vec{x}_B)) + \vec{t}(\vec{x}_B) \\ \vec{x}_B \end{bmatrix},
         \]
-        where $s$ and $t$ can be arbitrarily complex.
+        where $\vec{s}$ and $\vec{t}$ can be arbitrarily complex.
 
         \textbf{GLOW}: Uses invertible $1\times 1$ convolutions to split the data, meaning that it
         learns how to split. It consists of $L$ levels, consisting of $K$ steps of flow, which apply
@@ -419,20 +423,21 @@
         \begin{itemize}
             \item KL div: $\mathrm{KL}(p \lVert q) = \E_{\vec{x} \sim p} \lft[ \log \nicefrac{p(\vec{x})}{q(\vec{x})}
                           \rgt] = - \E_{\vec{x} \sim p} \lft[ \log \nicefrac{q(\vec{x})}{p(\vec{x})} \rgt]$.
-            \item JS div: $\mathrm{JS}(p \lVert q) = \nicefrac{1}{2} \mathrm{KL}\lft(p \middle\lVert \nicefrac{(p +
-                              q)}{2} \rgt) + \nicefrac{1}{2} \mathrm{KL}\lft( q \middle\lVert \nicefrac{(p + q)}{2} \rgt)$.
+            \item JS div: $\mathrm{JS}(p \lVert q) = \nicefrac{1}{2} \cdot \mathrm{KL}\lft(p \middle\lVert
+                      \nicefrac{(p + q)}{2} \rgt) + \nicefrac{1}{2} \cdot \mathrm{KL}\lft( q \middle\lVert \nicefrac{(p +
+                              q)}{2} \rgt)$.
         \end{itemize}
 
         \textbf{Problem with optimizing likelihood}: Optimizing likelihood does not necessarily give good results. Two possible cases:
         \begin{itemize}
-            \item Good likelihood with bad sample quality: Let $p$ be a good model and $q$ a model that only outputs
+            \item \textit{Good likelihood with bad sample quality}: Let $p$ be a good model and $q$ a model that only outputs
                   noise. $0.01p + 0.99q$ has log-likelihood: \[
                       \log(0.01p(\vec{x}) + 0.99q(\vec{x})) \geq \log(p(\vec{x})) - \log 100.
                   \]
                   The $\log p(\vec{x})$ is proportional to the dimensionality of the input. Thus, will be high for
                   high-dimensional data.
 
-            \item Bad likelihood with high sample quality: Occurs when he model overfits on the training data.
+            \item \textit{Bad likelihood with high sample quality}: Occurs when he model overfits on the training data.
                   Results in bad likelihood on test set.
 
         \end{itemize}
@@ -440,14 +445,14 @@
         \textbf{GAN}: Solve the above problem by introducing a discriminator. The objective of the
         generator is then to maximize the discriminator's classification loss by generating images
         similar to the training set, implicitly inducing $p_{\mathrm{model}}$. Value function (derived from BCE): \[
-            \argmin\nolimits_{G} \argmin\nolimits_{D} V(D, G) := \E_{p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{p_{\mathrm{prior}}} [\log (1 - D(G(\vec{z})))].
+            \argmin\nolimits_{G} \argmax\nolimits_{D} V(D, G) := \E_{p_{\mathrm{data}}}[\log D(\vec{x})] + \E_{p_{\mathrm{prior}}} [\log (1 - D(G(\vec{z})))].
         \]
 
         \textbf{Optimal discriminator}: $D^\star(\vec{x}) = \nicefrac{p_{\mathrm{data}}(\vec{x})}{p_{\mathrm{data}}(\vec{x}) + p_{\mathrm{model}}(\vec{x})}$. \\
-        $\blacksquare:$ $V(D,G)$ def. $\Rightarrow$ $\E \to \int$ $\Rightarrow$ $p_{\mathrm{prior}} \to p_{\mathrm{model}}$ $\Rightarrow$ Combine $\int$ $\Rightarrow$ $\max_y a \log(y) + b \log(1-y) = \nicefrac{a}{a+b}$ for $a,b > 0$.
+        $\blacksquare:$ $\argmax_{D} V(D,G)$ $\Rightarrow$ $\E \to \int$ $\Rightarrow$ $p_{\mathrm{prior}} \to p_{\mathrm{model}}$ $\Rightarrow$ Combine $\int$ $\Rightarrow$ $\max_y a \log(y) + b \log(1-y) = \nicefrac{a}{a+b}$ for $a,b > 0$.
 
         \textbf{Global optimality}: The generator is optimal if $p_{\mathrm{model}} = p_{\mathrm{data}}$ and at optimum, we have $V(D^\star, G^\star) = -\log 4$. $G$ implicitly optimizes JS div. \\
-        $\blacksquare:$ $D^\star$ $\Rightarrow$ $\times \nicefrac{2}{2}$ in $\E$s $\Rightarrow$ Take
+        $\blacksquare:$ $V(D^\star,G)$ $\Rightarrow$ $\times \nicefrac{2}{2}$ in $\E$s $\Rightarrow$ Take
         out $-\log 2$ of $\E$s $\Rightarrow$ $2 \mathrm{JS}(p \| q) - \log 4$.
 
         \textbf{Convergence guarantee}: Assuming that $D$ and $G$ have sufficient capacity, at each update step $D \to D^\star$, and $p_{\mathrm{model}}$ is updated to improve
@@ -475,11 +480,11 @@
         \textbf{Optimizing JS divergence}: If the supports of
         $p_{\mathrm{model}}$ and $p_{\mathrm{data}}$ are disjoint, it is always possible to find a
         perfect discriminator. This results in the loss function equaling zero, meaning that there
-        will be no gradient to update the generator's parameters. The solution is use the Wasserstein
+        will be no gradient to update the generator's parameters. The solution is the Wasserstein
         GAN, which optimizes the Wasserstein distance. In this case, the loss does not fall to zero
         for disjoint supports, because it measures divergence by how different they are horizontally,
         rather than vertically. Intuitively, it measures how much “work” it takes to turn one
-        dist. into the other.
+        distribution into the other.
 
         \textbf{Gradient penalty}: To stabilize training, add a gradient penalty: \[
             \E_{\vec{x} \sim p_d} \lft[ \log D(\vec{x}) + \lambda \| \nabla D(\vec{x}) \|^2 \rgt] + \E_{\vec{x} \sim p_m} [\log (1 - D(\vec{x}))].
@@ -510,7 +515,7 @@
         \textbf{Training}: \textbf{ELBO}: $\E_{q(\vec{x}_1\mid \vec{x}_0)}[\log p_{\vec{\theta}}(\vec{x}_0 \mid \vec{x}_1)] - \mathrm{KL}(q(\vec{x}_T \mid \vec{x}_0) \| p(\vec{x}_T)) - \sum_{t=2}^{T} \E_{q(\vec{x}_t \mid \vec{x}_0)} [\mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t))]$ (reconstruction term, prior matching term, denoising matching term). \\
         $\blacksquare$: $\log p(\vec{x}_0)$ $\Rightarrow$ $ \int \mathrm{d}\vec{x}_{1:T}$ $\Rightarrow$ $\times \nicefrac{q(\vec{x}_{1:T} \mid \vec{x}_0)}{q(\vec{x}_{1:T} \mid \vec{x}_0)}$ $\Rightarrow$ $\E_{q(\vec{x}_{1:T} \mid \vec{x}_0)}$ $\Rightarrow$ Jensen $\Rightarrow$ Prob. CR: $\sum_{t=2}^{T} \log \nicefrac{p(\vec{x}_{t-1} \mid \vec{x}_t)}{q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0)}$ $\Rightarrow$ Bayes in $\sum$: $\log \nicefrac{q(\vec{x}_1 \mid \vec{x}_0)}{q(\vec{x}_T \mid \vec{x}_0)}$ out $\Rightarrow$ Lin. and marginalize $\E$ $\Rightarrow$ In $\sum$: 2 nested $\E$.
 
-        \textbf{Closed-form}: $\argmin\nolimits_{\vec{\theta}} \mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) = \argmin\nolimits_{\vec{\theta}} \nicefrac{1}{2 \sigma_q^2(t)} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|_2^2$,
+        \textbf{Closed-form denoising matching term}: $\argmin\nolimits_{\vec{\theta}} \mathrm{KL}(q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) \| p_{\vec{\theta}}(\vec{x}_{t-1} \mid \vec{x}_t)) = \argmin\nolimits_{\vec{\theta}} \nicefrac{1}{2 \sigma_q^2(t)} \| \vec{\mu}_{\vec{\theta}} - \vec{\mu}_q \|_2^2$,
         with
         \begin{align*}
             \vec{\mu}_q(\vec{x}_t, \vec{x}_0)      & = \frac{1}{\sqrt{\alpha_t}} \vec{x}_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t} \sqrt{\alpha_t}} \vec{\epsilon}                                 \\
@@ -533,8 +538,8 @@
             \vec{\epsilon}^\star(\vec{x}, y; t) = (1 + \rho) \vec{\epsilon}_{\vec{\theta}}(\vec{x}, y; t) - \rho \vec{\epsilon}_{\vec{\theta}}(\vec{x}; t)
         \]
         In practice, we usually train a single model and just set the conditioning variable to all zero for
-        the unconditional generation. Overall, guidance improves the quality, but reduces the diversity of
-        outputs.
+        the unconditional generation. Guidance improves the quality, but reduces the diversity of outputs
+        ($\rho \uparrow$: more guidance).
 
         \textbf{Latent diffusion models}: Train VAE and perform diffusion on latent space for
         efficiency. The diffusion model then only needs to focus on the ``semantic'' aspect of
@@ -615,18 +620,18 @@
         Probability of trajectory $\tau$ can be computed by $\pi_{\vec{\theta}}(\tau) = P(s_0) \prod\nolimits_{t=0}^T \pi_{\vec{\theta}}(a_t \mid s_t) P(s_{t+1} \mid s_t, a_t)$.
         Want trajectories with high return more likely $\Rightarrow$ Training objective:
         \begin{align*}
-            J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum\nolimits_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]         \\
+            J(\vec{\theta}) & = \E_{\tau \sim \pi_{\vec{\theta}}} \lft[ \sum\nolimits_{t=0}^{T} \gamma^t r(s_t, a_t) \rgt]                     \\
             % & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) ]                                                      \\
-                            & = \E_{\tau \sim \pi_{\vec{\theta}}} [ r(\tau) \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) ],
+                            & = \E_{\tau \sim \pi_{\vec{\theta}}} [ (r(\tau) - b(\tau)) \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) ],
         \end{align*}
         using chain rule $\nabla \log f(\vec{x}) = \nicefrac{\nabla f(\vec{x})}{f(\vec{x})}$. We have \[
             \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(\tau) = \sum\nolimits_{t=0}^{T} \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}}(a_t \mid s_t).
         \]
-        Thus, the gradient does not depend on the MDP.
+        Thus, the gradient does not depend on the MDP. This is on-policy.
 
         \textbf{REINFORCE}: The above is unbiased, but has high variance. We can reduce variance by
         introducing a baseline $b_t(\tau) = \sum_{t'=0}^{t-1} \gamma^{t'} r(s_{t'}, a_{t'})$, which
-        turns $r(\tau)$ into $G_t$. This is on-policy.
+        turns $r(\tau) - b_t(\tau)$ into $G_t$. This is on-policy.
 
         \textbf{Actor-critic}: We can make it off-policy by estimating $G_t$ by bootstrapping using a value network. This introduces bias, but reduces variance: \[
             \nabla_{\vec{\theta}} J(\vec{\theta}) = \nabla_{\vec{\theta}} \log \pi_{\vec{\theta}} (a_t \mid s_t) (V(s_t, a_t) - (r(s_t, a_t) + \gamma V(s_{t+1}))).
@@ -635,7 +640,7 @@
     \end{topic}
 
     \begin{topic}{Implicit surfaces and neural radiance fields}
-        Voxels are bad because of $\mathcal{O}(n^3)$ memory cost. 3D points is bad because it does not
+        Voxels are bad because of $\mathcal{O}(n^3)$ memory cost. 3D points are bad because they do not
         model connectivity. Meshes are bad because of approximation error. We use learned implicit
         functions:
         \begin{itemize}
@@ -643,20 +648,24 @@
                   being inside mesh.
             \item \textit{DeepSDF}: $f_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R$ outputting distance to surface.
         \end{itemize}
-        Implicit surfaces can do non-rigid transformations.
+        \textbf{(Dis)Advantages}: $+$ Non-rigid transformation, Normal vectors defined both
+        continuously and correctly, Easily derive from point clouds, Infinite precision, Learnable,
+        Less storage. $-$ Computing intersections is expensive, Requires root-finding algos, UV
+        space is ill-defined.
 
-        \textbf{Training with watertight meshes}: Simplest case. Sample $n$ points that are either
-        inside or outside the mesh. Train occupancy network by binary cross entropy. Train DeepSDF by
-        regression of distance to mesh of the sampled points.
+        \textbf{Training with watertight meshes}: Simplest case. Sample $n$ points that are
+        inside/outside the mesh. Train occupancy network by BCE. Train DeepSDF by
+        regression of dist. to mesh of the sampled points.
 
-        \textbf{Training with point clouds}: Train to make sure distance is 0 at points. However, this will result in trivial model that always outputs zero $\Rightarrow$ Eikonal term: \[
+        \textbf{Training with point clouds}: Train to make sure distance is 0 at points. Problem:
+        Model that always outputs 0 is optimal $\Rightarrow$ Eikonal term: \[
             \mathcal{L}(\vec{\theta}) = \sum\nolimits_{i=1}^{n} |f_{\vec{\theta}}(\vec{x}_i)|^2  + \lambda \E_{\vec{x}} \lft[ (\| \nabla_{\vec{x}} f_{\vec{\theta}}(\vec{x}) \| - 1)^2 \rgt].
         \]
         This makes sense from a ``distance'' perspective, since we want to increase the distance by 1 when
         we move 1 unit away.
 
         \textbf{Training with images}: Exponentially more data. High-level idea: Render model in same
-        view as image and use photometric loss: \[
+        view as image and use photometric loss (e.g. $\ell_1$): \[
             \ell(\hat{\tens{I}}, \tens{I}) = \sum\nolimits_{\vec{u}} \| \hat{\tens{I}}_{\vec{u}} - \tens{I}_{\vec{u}} \| .
         \]
         For this, we need a texture network $\vec{t}_{\vec{\theta}}: \R^3 \times \mathcal{Z} \to \R^3$ that
@@ -699,7 +708,8 @@
 
         In general, NNs are biased toward low frequency functions, while we need high frequency functions.
         The solution is positional encodings. The low frequency function w.r.t. the encoding is then a high
-        frequency function w.r.t. $(x,y,z,\theta,\phi)$.
+        frequency function w.r.t. $(x,y,z,\theta,\phi)$. $\gamma(t) = [\sin(t\cdot 2^0 \pi), \ldots, \cos(t
+            \cdot 2^{L-1} \pi)]$.
 
         \textbf{Gaussian splatting}: Problem with NERF: Slow, because of the high number of samples.
         We can reduce by estimating a set of primitives around the object boundary and only sampling
