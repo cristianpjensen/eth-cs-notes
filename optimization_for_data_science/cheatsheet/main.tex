@@ -1,16 +1,13 @@
 \documentclass{article}
 
-\usepackage[landscape, a4paper, margin=0.5cm]{geometry}
+\usepackage[a4paper, margin=0.25cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[most]{tcolorbox}
 \usepackage{multicol}
-\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac,colonequals}
-\usepackage{blindtext}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
 \usepackage{derivative}
-\usepackage{nicefrac}
-\usepackage{parskip}
-% \usepackage{savetrees}
+\usepackage[skip=.5\baselineskip-0.5pt]{parskip}
+% \usepackage[extreme, mathspacing=normal, leadingfraction=0.85]{savetrees}
 \usepackage[document]{ragged2e}
 
 \usepackage{color,soul}
@@ -32,17 +29,19 @@
 
 \renewcommand{\familydefault}{\sfdefault}
 
+\setlength{\columnseprule}{0.4pt}
+
 \title{Optimization for Data Science Cheatsheet}
 
 \newenvironment{topic}[1]
-{\textbf{\sffamily \colorbox{black}{\textcolor{white}{#1}}} \\ \vspace{0.2cm}}
+{\textbf{\sffamily \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}} \\ \vspace{0.2cm}}
 {}
 
 \begin{document}
 
 \setlength{\columnsep}{0.2cm}
 
-\begin{multicols*}{3}
+\begin{multicols*}{2}
     \textbf{Cauchy-Schwarz}: $|\transpose{\vec{u}} \vec{v}| \leq \| \vec{u} \| \| \vec{v} \|$.
 
     \textbf{Spectral norm}: $\| \mat{A} \| \colonequals \max_{\| \vec{v} \| = 1} \| \mat{A} \vec{v} \|$.
@@ -68,6 +67,10 @@
     \]
     $\mat{A}$ is then the Jacobian of $f$ at $\vec{x}$.
 
+    \[
+        \frac{1}{y} - \frac{1}{x} = \frac{x-y}{x\cdot y}.
+    \]
+
     \textbf{B-Lipschitz}: $f$ is $B$-Lipschitz if \[
         \| f(\vec{x}) - f(\vec{y}) \| \leq B \| \vec{x} - \vec{y} \|,
     \]
@@ -75,6 +78,8 @@
     holds) \[
         \| \nabla f(\vec{x}) \| \leq B.
     \]
+
+    \textbf{H\"older's inequality}: TODO
 
     \textbf{Cosine theorem}: $2 \transpose{\vec{v}}\vec{w} = \| \vec{v} \|^2 + \| \vec{w} \|^2 - \| \vec{v} - \vec{w} \|^2$.
 
@@ -341,7 +346,7 @@
         convexity.
 
         \textbf{Descent} (Lemma 7.4): For a step $\vec{x}_{t+1} \colonequals \vec{x}_t - \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize $\gamma_t \in [0,1]$, it holds that \[
-            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t f(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
+            f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
         \]
         with $\vec{s} \colonequals \mathrm{LMO}_X(\nabla f(\vec{x}))$. \underline{Proof} by first
         definition of smoothness and duality gap.
@@ -362,6 +367,66 @@
         TODO: Affine invariance.
 
         TODO: Curvature constant.
+
+    \end{topic}
+
+    \begin{topic}{Subgradient method}
+        More general notion of the gradient for functions that are non-smooth.
+
+        \textbf{Subgradient}: $\vec{g}$ is a subgradient of $f$ at $\vec{x}$ if \[
+            f(\vec{y}) \geq f(\vec{x}) \transpose{\vec{g}} (\vec{y} - \vec{x}), \quad \forall \vec{y} \in \dom{f}.
+        \]
+        $\partial f(\vec{x}) \subseteq \R^d$ is called the subdifferential and $\vec{g} \in \partial f(\vec{x})$.
+
+        If $f$ is differentiable at $\vec{x}$, then $\partial f(\vec{x}) \subseteq \{ \nabla f(\vec{x})
+            \}$.
+
+        \textbf{Convexity characterization}:
+        \begin{itemize}
+            \item If $f$ is convex, then $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x}$ in the relative
+                  interior of $\dom{f}$.
+            \item If $\dom{f}$ is convex and $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x} \in \dom{f}$, then
+                  $f$ is convex.
+        \end{itemize}
+
+        \textbf{Optimality condition}: If $\vec{0} \in \partial f(\vec{x})$, then $\vec{x}$ is a global minimum.
+
+        \textbf{Subgradient calculus}:
+        \begin{itemize}
+            \item Conic combination: Let $h(\vec{x}) = \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha, \beta >
+                      0$, then \[
+                      \partial h(\vec{x}) = \alpha \partial f(\vec{x}) + \beta \partial g(\vec{x}).
+                  \]
+            \item Affine transformation: Let $h(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$, then \[
+                      \partial h(\vec{x}) = \transpose{\mat{A}} \partial f(\mat{A} \vec{x} + \vec{b}).
+                  \]
+            \item Pointwise maximum: Let $h(\vec{x}) = \max_{i \in [m]} f_i(\vec{x})$, then \[
+                      \partial h(\vec{x}) = \mathrm{conv}(\{ \partial f_i(\vec{x}) \mid f_i(\vec{x}) = h(\vec{x}) \}).
+                  \]
+        \end{itemize}
+
+        \textbf{Subgradient method update rule}: $\vec{x}_{t+1} = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \gamma_t), \vec{g}_t \in \partial f(\vec{x}_t)$.
+
+        \textbf{``Descent'' lemma}: If $f$ is convex, then for any optimal solution $\vec{x}^\star$, we have \[
+            \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f^\star) + \gamma_t^2 \| \vec{g}_t \|^2.
+        \]
+        \underline{Proof}: Update rule, remove projection, cosine theorem, convexity.
+
+        \textbf{Convergence}: \[
+            \min_{t \in [T]} f(\vec{x}_t) - f^\star \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|^2 + \sum_{t=0}^{T-1} \gamma_t^2 \|\vec{g}_t\|^2}{2 \sum_{t=0}^{T-1} \gamma_t}.
+        \]
+        \begin{itemize}
+            \item If $\gamma \colonequals \nicefrac{R}{B \sqrt{T}}$, then the subgradient method satisfies \[
+                      \min_{t \in [T]} f(\vec{x}_t) - f^\star \leq \frac{BR}{\sqrt{T}}.
+                  \]
+                  To achieve $\epsilon$-optimality, need $\mathcal{O}(\nicefrac{B^2 R^2}{\epsilon^2})$ iterations.
+            \item If $\mu$-strongly convex and $\gamma \colonequals \nicefrac{2}{\mu(t+1)}$, then the subgradient
+                  method satisfies \[
+                      \min_{t \in [T]} f(\vec{x}_t) - f^\star \leq \frac{2B^2}{\mu(T+1)}.
+                  \]
+                  To achieve $\epsilon$-optimality, need $\mathcal{O}(\nicefrac{B^2}{\mu \epsilon})$ iterations.
+        \end{itemize}
+        The above is much worse than gradient descent and cannot be improved.
 
     \end{topic}
 
