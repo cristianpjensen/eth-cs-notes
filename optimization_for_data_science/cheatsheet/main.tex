@@ -83,6 +83,10 @@
 
     \textbf{Cosine theorem}: $2 \transpose{\vec{v}}\vec{w} = \| \vec{v} \|^2 + \| \vec{w} \|^2 - \| \vec{v} - \vec{w} \|^2$.
 
+    \textbf{Parallelogram law}: $2 \| \vec{x} \|^2 + 2 \| \vec{y} \|^2 = \| \vec{x} + \vec{y} \|^2 + \| \vec{x} - \vec{y} \|^2$.
+
+    \textbf{Titu's lemma}: $\frac{\lft( \sum_{i=1}^{d} u_i \rgt)^2}{\sum_{i=1}^{d} v_i} \leq \sum_{i=1}^{d} \frac{u_i^2}{v_i}, \forall \vec{u} \in \R^d, \vec{v} \in \R^d_{>0}$.
+
     \begin{topic}{2 Convexity}
         Domain must be convex. Strict convexity if inequalities become strict inequalities.
         Equivalent definitions $\forall \vec{x},\vec{y} \in \dom{f}$:
@@ -146,6 +150,7 @@
             \item Lemma 3.3: $\frac{L}{2} \transpose{\vec{x}} \vec{x} - f(\vec{x})$ is convex.
             \item Lemma 3.5: $\| \nabla f(\vec{x}) - \nabla f(\vec{y}) \| \leq L \| \vec{x} - \vec{y} \|$.
             \item Lemma 6.1: $\| \nabla^2 f(\vec{x}) \| \leq L$ ($\Leftarrow$ only if $X$ is open).
+            \item TODO: Add more definitions/implications.
         \end{itemize}
         Intuition: $f$ is below a not-too-steep tangential paraboloid at $(\vec{x}, f(\vec{x}))$.
 
@@ -173,6 +178,7 @@
         \begin{itemize}
             \item $f(\vec{y}) \geq f(\vec{x}) + \transpose{\nabla f(\vec{x})} (\vec{y} - \vec{x}) + \frac{\mu}{2} \| \vec{x} - \vec{y} \|^2$.
             \item Lemma 3.11: $f(\vec{x}) - \frac{\mu}{2} \transpose{\vec{x}} \vec{x}$ is convex.
+            \item TODO: Add more definitions/implications.
         \end{itemize}
         Intuition: $f$ is above a not-too-flat tangential paraboloid at $(\vec{x}, f(\vec{x}))$.
 
@@ -428,6 +434,118 @@
         \end{itemize}
         The above is much worse than gradient descent and cannot be improved.
 
+    \end{topic}
+
+    \begin{topic}{Mirror descent}
+        \textbf{Norm} $\| \cdot \|$ definition:
+        \begin{enumerate}
+            \item (Positive definiteness) $\| \vec{x} \| = 0$ if and only if $\vec{x} = \vec{0}$.
+            \item (Positive homogeneity) $\| \alpha \vec{x} \| = |\alpha| \| \vec{x} \|$.
+            \item (Subadditivity) $\| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|$.
+        \end{enumerate}
+
+        \textbf{Dual norm} $\| \cdot \|_*$ definition: Satisfies the properties of a norm and \[
+            \| \vec{y} \|_* \colonequals \max_{\| \vec{x} \| \leq 1} \langle \vec{x}, \vec{y} \rangle.
+        \]
+        For $p \geq 1$ and $\nicefrac{1}{p} + \nicefrac{1}{q} = 1$, we have the following norms with their
+        dual norms: \[
+            \| \vec{x} \|_p = \lft( \sum_{i=1}^{d} |x_i|^p \rgt)^{\nicefrac{1}{p}}, \quad \| \cdot \|_{p,*} = \| \cdot \|_q.
+        \]
+        We have the following inequalities between norms: \[
+            \frac{1}{\sqrt{d}} \| \vec{x} \|_2 \leq \| \vec{x} \|_\infty \leq \| \vec{x} \|_2 \leq \| \vec{x} \|_1 \leq \sqrt{d} \| \vec{x} \|_2.
+        \]
+
+        \textbf{Bregman divergence} definition: Let $\omega$ be continuously differentiable and 1-strongly convex
+        w.r.t. some norm $\| \cdot \|$. The Bregman divergence $V_{\omega}$ is then defined as: \[
+            V_{\omega}(\vec{x}, \vec{y}) \colonequals \omega(\vec{x}) - \omega(\vec{y}) - \nabla \omega(\vec{y})^\top (\vec{x} - \vec{y}).
+        \]
+        Properties:
+        \begin{enumerate}
+            \item (Non-negativity) $V_{\omega}(\vec{x}, \vec{y}) \geq 0$.
+            \item (Convexity) $V_{\omega}(\vec{x}, \vec{y})$ is convex in $\vec{x}$.
+            \item (Positivity) $V_{\omega}(\vec{x}, \vec{y}) = 0$ if and only if $\vec{x} = \vec{y}$.
+            \item $V_{\omega}(\vec{x}, \vec{y}) \geq \frac{1}{2} \| \vec{x} - \vec{y} \|^2$.
+            \item (Three-point identity) $V_{\omega}(\vec{x}, \vec{z}) = V_{\omega}(\vec{x}, \vec{y}) + V_{\omega}(\vec{y}, \vec{z}) - \langle \nabla \omega(\vec{z}), \nabla \omega(\vec{y}), \vec{x} - \vec{y} \rangle$.
+        \end{enumerate}
+
+        \textbf{Mirror descent}: Update rule: \[
+            \vec{x}_{t+1} = \argmin_{\vec{x} \in X} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}, \quad \vec{g}_t \in \partial f(\vec{x}_t).
+        \]
+        Lemma (TODO): Let $f$ be convex, then: \[
+            \gamma_t (f(\vec{x}_t) - f^\star) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|^2_*.
+        \]
+        \textbf{Convergence}: \[
+            \min_{t \in [T]} f(\vec{x}_t) - f^\star \leq \frac{V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2}{\sum_{t=0}^{T-1} \gamma_t}.
+        \]
+        Suppose $f$ is $B$-Lipschitz continuous such that $|f(\vec{x}) - f(\vec{y})| \leq B \| \vec{x} -
+            \vec{y} \|, \forall \vec{x}, \vec{y} \in X$. Namely, $\| \vec{g} \|_* \leq B, \forall \vec{g} \in
+            \partial f(\vec{x}), \vec{x} \in X$. Furthermore, let $R^2 = \sup_{\vec{x}} V_{\omega}(\vec{x},
+            \vec{x}_0)$ and set \[
+            \gamma = \frac{\sqrt{2} R}{B \sqrt{T}}.
+        \]
+        Then, we have convergence rate \[
+            \min_{t \in [T]} f(\vec{x}_t) - f^\star \leq \mathcal{O}\lft( \frac{BR}{\sqrt{T}} \rgt).
+        \]
+        This is equivalent to the convergence rate of subgradient descent, but for a more general notion of
+        norm. Thus, in special cases, it will result in faster convergence.
+    \end{topic}
+
+    \begin{topic}{Smoothing}
+        \textbf{Conjugate function}: \[
+            f^*(\vec{y}) = \sup_{\vec{x} \in \dom{f}} \lft\{ \vec{x}^\top \vec{y} - f(\vec{x}) \rgt\}.
+        \]
+        Properties:
+        \begin{enumerate}
+            \item (Duality) If $f$ is continuous and convex, then $f^{**} = f$.
+            \item (Fenchel's inequality) $f(\vec{x}) + f^*(\vec{y}) \geq \vec{x}^\top \vec{y}$.
+            \item If $f$ and $g$ are continuous and convex, then $(f+g)^*(\vec{x}) = \inf_{\vec{y}} \lft\{
+                      f^*(\vec{y}) + g^*(\vec{x} - \vec{y}) \rgt\}$.
+            \item If $f$ is $\mu$-strongly convex, then $f^*$ is differentiable and $\nicefrac{1}{\mu}$-smooth.
+        \end{enumerate}
+
+        \textbf{Nesterov smoothing}: Approximate non-smooth $f$ by \[
+            f_{\mu}(\vec{x}) = \max{\vec{y} \in \dom{f^*}} \lft\{ \vec{x}^\top \vec{y} - f^*(\vec{y}) - \mu \cdot d(\vec{y}) \rgt\},
+        \]
+        where $d$ is a proximity function (1-strongly convex and non-negative). $f_{\mu}$ is
+        $\nicefrac{1}{\mu}$-smooth and approximates $f$ by \[
+            f(\vec{x}) - \mu D^2 \leq f_{\mu}(\vec{x}) \leq f(\vec{x}), \quad D^2 = \max_{\vec{y}} d(\vec{y}).
+        \]
+        Applying accelerated gradient descent to optimize the smoothed problem, we get the following
+        convergence rate: \[
+            f(\vec{x}_t) - f^\star \leq \mathcal{O}\lft( \mu D^2 + \frac{R^2}{\mu t^2} \rgt).
+        \]
+        This is faster than applying subgradient descent.
+
+        \textbf{Moreau-Yosida smoothing}: Approximate non-smooth $f$ by \[
+            f_{\mu}(\vec{x}) = \min_{\vec{y}} \lft\{ f(\vec{y}) + \frac{1}{2 \mu} \| \vec{x} - \vec{y} \|_2^2 \rgt\}.
+        \]
+        $f_{\mu}$ is the Moreau envelope of $f$. $f_{\mu}$ is $\nicefrac{1}{\mu}$-smooth and
+        minimizes exactly, i.e., $\min_{\vec{x}} f(\vec{x}) = \min_{\vec{x}} f_{\mu}(\vec{x})$.
+    \end{topic}
+
+    \begin{topic}{Proximal algorithms}
+        \textbf{Proximal operator}: $f$ is convex: \[
+            \mathrm{prox}_f(\vec{x}) \colonequals \argmin_{\vec{y}} \lft\{ f(\vec{y}) + \frac{1}{2} \| \vec{x} - \vec{y} \|_2^2 \rgt\}.
+        \]
+
+        \textbf{Proximal point algorithm}: \[
+            \vec{x}_{t+1} = \mathrm{prox}_{\lambda_t f}(\vec{x}_t).
+        \]
+        \textbf{Convergence}: \[
+            f(\vec{x}_{T+1}) - f^\star \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|_2^2}{2 \sum_{t=0}^{T} \lambda_t}.
+        \]
+        If $\lambda_t$ is constant, PPA achieves $\mathcal{O}(\nicefrac{1}{t})$ convergence.
+
+        \textbf{Proximal gradient method}: Assume convex composite optimization problem, where $f$ and $g$ are convex: \[
+            \min_{\vec{x}} F(\vec{x}) \colonequals f(\vec{x}) + g(\vec{x}).
+        \]
+        Update rule: \[
+            \vec{x}_{t+1} = \mathrm{prox}_{\gamma_t g} (\vec{x}_t - \gamma_t \nabla f(\vec{x}_t)).
+        \]
+        \textbf{Convergence}: Let $f$ be $L$-smooth and convex and $g$ convex. Let $\gamma_t = \nicefrac{1}{L}$, then \[
+            F(\vec{x}_t) - F^\star \leq \frac{L \| \vec{x}_0 - \vec{x}^\star \|_2^2}{2t}.
+        \]
+        This is nearly the same convergence rate as GD, despite $F$ being possibly non-smooth.
     \end{topic}
 
 \end{multicols*}
