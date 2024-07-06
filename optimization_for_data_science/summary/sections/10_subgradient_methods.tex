@@ -84,13 +84,20 @@ non-convex.
 
 \subsection{Subgradient method}
 
-In the subgradient method, the general update rule becomes \[
-    \vec{x}_{t+1} \doteq \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t).
-\]
-If $\vec{f}$ is differentiable, gradient descent and projected gradient descent are special cases
-of this update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively.
-However, if $f$ is non-differentiable, we will see that this is technically not a descent method,
-because the subgradient is not a descent direction in general.
+In the subgradient method, the general update rule becomes
+\begin{align*}
+    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t),                                                                                                              \\
+    \intertext{which can be rewritten as an optimization problem,}
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - (\vec{x}_t - \gamma_t \vec{g}_t) \|^2                                                                                                           \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - \vec{x}_t - (-\gamma_t \vec{g}_t) \|^2                                                                                                          \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \lft( \| \vec{x} - \vec{x}_t \|^2 + \| \gamma_t \vec{g}_t \|^2 + 2 \langle \gamma_t \vec{g}_t, \vec{x} - \vec{x}_t \rangle \rgt) \margintag{Cosine theorem.} \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ \frac{1}{2} \| \vec{x} - \vec{x}_t \|^2 + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}. \margintag{Remove terms that do not depend on $\vec{x}$.}
+\end{align*}
+
+If $f$ is differentiable, gradient descent and projected gradient descent are special cases of this
+update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively. However, if
+$f$ is non-differentiable, we will see that this is technically not a descent method, because the
+subgradient is not a descent direction in general.
 
 \begin{lemma}[Subgradient method ``descent'' lemma]
     \label{lem:subgrad-descent}

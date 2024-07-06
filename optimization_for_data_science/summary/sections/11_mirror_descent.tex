@@ -1,0 +1,168 @@
+\section{Mirror descent}
+
+Like in subgradient descent, we continue to assume that $f$ is non-smooth. In practice, we often
+have additional information about set $\mathcal{X}$ that we might be able to exploit. Specifically,
+we will explore how we can exploit non-Euclidean geometry of a convex set
+$\mathcal{X}$.\sidenote{Until this point, we have only made use of Euclidean geometry by way of
+    using the $\| \cdot \|_2$-norm.}
+
+\subsection{Norm and Bregman divergence}
+
+\begin{definition}[Norm]
+    A function $\| \cdot \|: \mathcal{X} \to \R_+$ is a norm if it satisfies the following properties,
+    \begin{enumerate}
+        \item (Positive definiteness) $\| \vec{x} \| = 0$ if and only if $\vec{x} = \vec{0}$;
+        \item (Positive homogeneity) $\| \alpha \vec{x} \| = |\alpha| \| \vec{x} \|$;
+        \item (Subadditivity): $\| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Dual norm]
+    The dual norm $\| \cdot \|_*$ of a norm $\| \cdot \|$ satisfies the properties of a norm and \[
+        \| \vec{y} \|_* \doteq \max_{\| \vec{x} \| \leq 1} \langle \vec{x}, \vec{y} \rangle.
+    \]
+\end{definition}
+
+\begin{example}
+    For $p \geq 1$ and $\nicefrac{1}{p} + \nicefrac{1}{q} = 1$, we have the following norms with their dual norms, \[
+        \| \vec{x} \|_p \doteq \lft( \sum_{i=1}^{d} |x_i|^p \rgt)^{\nicefrac{1}{p}}, \quad \| \cdot \|_{p,*} = \| \cdot \|_q.
+    \]
+\end{example}
+
+\begin{lemma}
+    \[
+        \frac{1}{\sqrt{d}} \| \vec{x} \|_2 \leq \| \vec{x} \|_\infty \leq \| \vec{x} \|_2 \leq \| \vec{x} \|_1 \leq \sqrt{d} \| \vec{x} \|_2.
+    \]
+\end{lemma}
+
+The nice thing about smoothness, Lipschitz continuity, and strong convexity is that they can be
+defined for any norm.
+
+\begin{definition}[Bregman divergence]
+    Let $\omega: \Omega \to \R$ be continuously differentiable on $\Omega$ and $1$-strongly
+    convex \wrt some norm $\| \cdot \|$, \[
+        \omega(\vec{x}) \geq \omega(\vec{y}) + \transpose{\grad{\omega(\vec{y})}{}}(\vec{x} - \vec{y}) + \frac{1}{2} \| \vec{x} - \vec{y} \|^2, \quad \forall \vec{x},\vec{y} \in \Omega.
+    \]
+    The Bregman divergence $V_{\omega}$ is defined as \[
+        V_{\omega}(\vec{x}, \vec{y}) \doteq \omega(\vec{x}) - \omega(\vec{y}) - \transpose{\grad{\omega(\vec{y})}{}}(\vec{x} - \vec{y}), \quad \forall \vec{x}, \vec{y} \in \Omega.
+    \]
+\end{definition}
+
+Note that the Bregman divergence $V_{\omega}$ is thus the first-order Taylor approximation of
+$\omega$, evaluated at $\vec{x}$.
+
+\begin{example}
+    \label{ex:bregman}
+    We have the following examples of Bregman divergences,
+    \begin{enumerate}
+        \item \label{item:euc} (Euclidean distance) $\Omega = \R^d$, $\omega(\vec{x}) = \frac{1}{2} \| \vec{x} \|_2^2$, and $\|
+                  \cdot \| = \| \cdot \|_2$. Then \[
+                  V_{\omega}(\vec{x}, \vec{y}) = \frac{1}{2} \| \vec{x} - \vec{y} \|_2^2.
+              \]
+        \item (Mahalanobis distance) $\Omega = \R^d$, $\omega(\vec{x}) = \frac{1}{2} \transpose{\vec{x}} \mat{Q}
+                  \vec{x}$ with $\mat{Q} \succeq \mat{I}$, and $\| \cdot \| = \| \cdot \|_2$. Then, \[
+                  V_{\omega}(\vec{x}, \vec{y}) = \frac{1}{2} \transpose{(\vec{x} - \vec{y})} \mat{Q} (\vec{x} - \vec{y}).
+              \]
+        \item \label{item:kl} (Kullback-Leibler divergence) $\Omega = \Delta^{d-1}$, $\omega(\vec{x}) = \sum_{i=1}^{d} x_i \log
+                  x_i$, and $\| \cdot \| = \| \cdot \|_1$. Then, \[
+                  V_{\omega}(\vec{x}, \vec{y}) = \mathrm{KL}(\vec{x}; \vec{y}) \doteq \sum_{i=1}^{d} x_i \log \frac{x_i}{y_i}.
+              \]
+    \end{enumerate}
+\end{example}
+
+\begin{lemma}
+    Any Bregman divergence satisfies the following properties:
+    \begin{enumerate}
+        \item (Non-negativity) $V_{\omega}(\vec{x}, \vec{y}) \geq 0$;
+        \item (Convexity) $V_{\omega}(\vec{x}, \vec{y})$ is convex in $\vec{x}$;
+        \item (Positivity) $V_{\omega}(\vec{x}, \vec{y}) = 0$ if and only if $\vec{x} = \vec{y}$;
+        \item $V_{\omega}(\vec{x}, \vec{y}) \geq \frac{1}{2} \| \vec{x} - \vec{y} \|^2$.
+    \end{enumerate}
+\end{lemma}
+
+The following Lemma is a key property of the Bregman divergence and is used extensively in this
+course.
+
+\begin{lemma}[Three-point identity]
+    $\forall \vec{x}, \vec{y}, \vec{z} \in \Omega$: \[
+        V_{\omega}(\vec{x}, \vec{z}) = V_{\omega}(\vec{x}, \vec{y}) + V_{\omega}(\vec{y}, \vec{z}) - \langle \grad{\omega(\vec{z})}{} - \grad{\omega(\vec{y})}{}, \vec{x} - \vec{y} \rangle.
+    \]
+\end{lemma}
+
+\begin{marginfigure}
+    \centering
+    \incfig{three-point-identity}
+    \caption{Illustration of the three-point identity of a non-Euclidean Bregman divergence.}
+    \label{fig:three-point-identity}
+\end{marginfigure}
+
+\subsection{Mirror descent algorithm}
+
+The mirror descent algorithm is a generalization of the subgradient method, where the norm is
+replaced by a Bregman divergence,\sidenote{Using \Cref{item:euc} of \Cref{ex:bregman} recovers the
+    subgradient method, and \Cref{item:kl} recovers Entropic descent, \[
+        \vec{x}_{t+1} \propto \vec{x}_t \odot \exp(-\gamma_t \vec{g}_t).
+    \]} \[
+    \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}, \quad \vec{g}_t \in \partial f(\vec{x}_t).
+\]
+
+\begin{lemma}
+    Let $f$ be convex and $\omega$ be $1$-strongly convex on $\mathcal{X}$ \wrt norm $\| \cdot \|$.
+    Then, the following inequality holds, \[
+        \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
+    \]
+\end{lemma}
+
+\begin{proof}
+    We have the following update rule, \[
+        \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}.
+    \]
+    Thus, by the optimality condition, we have \[
+        \langle \grad{\omega(\vec{x}_{t+1})}{} + \gamma_t \vec{g}_t - \grad{\omega(\vec{x}_t)}{}, \vec{x} - \vec{x}_{t+1} \rangle \geq 0, \quad \forall \vec{x} \in \mathcal{X},
+    \]
+    which can be equivalently written as $\forall \vec{x} \in \mathcal{X}:$
+    \begin{align*}
+        \langle \gamma_t \vec{g}_t, \vec{x}_{t+1} - \vec{x} \rangle & \leq \langle \grad{\omega(\vec{x}_{t+1})}{} - \grad{\omega(\vec{x}_t)}{}, \vec{x} - \vec{x}_{t+1} \rangle                                                                    \\
+                                                                    & = V_{\omega}(\vec{x}, \vec{x}_t) - V_{\omega}(\vec{x}, \vec{x}_{t+1}) - V_{\omega}(\vec{x}_{t+1}, \vec{x}_t) \margintag{Three-point identity.}                               \\
+                                                                    & \leq V_{\omega}(\vec{x}, \vec{x}_t) - V_{\omega}(\vec{x}, \vec{x}_{t+1}) - \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2. \margintag{Fourth property of Bregman divergence.}
+    \end{align*}
+    As a result,
+    \begin{align*}
+        \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \langle \gamma_t \vec{g}_t, \vec{x}_t - \vec{x}^\star \rangle \margintag{By definition of the subgradient.}                     \\
+                                                   & = \langle \gamma_t \vec{g}_t, \vec{x}_{t+1} - \vec{x}^\star \rangle + \langle \gamma_t \vec{g}_t, \vec{x}_t - \vec{x}_{t+1} \rangle  \\
+                                                   & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) - \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \\
+                                                   & \qquad + \langle \gamma_t \vec{g}_t, \vec{x}_t - \vec{x}_{t+1} \rangle                                                               \\
+                                                   & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) - \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \\
+                                                   & \qquad + \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 + \frac{1}{2} \| \gamma_t \vec{g}_t \|_*^2 \margintag{Young's inequality.}    \\
+                                                   & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
+    \end{align*}
+\end{proof}
+
+\begin{theorem}[Convergence of mirror descent]
+    Let $f$ be convex and $\omega$ be $1$-strongly convex on $\mathcal{X}$ \wrt norm $\| \cdot \|$.
+    Then, mirror descent satisfies \[
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \frac{V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2}{\sum_{t=0}^{T-1} \gamma_t}.
+    \]
+\end{theorem}
+
+Note that this generalizes the convergence result of the subgradient method.
+
+Suppose $f$ is $B$-Lipschitz continuous such that $| f(\vec{x}) - f(\vec{y}) | \leq B \| \vec{x} -
+    \vec{y} \|, \forall \vec{x}, \vec{y} \in \mathcal{X}$. Namely, we then have $\| \vec{g} \|_* \leq
+    B, \forall \vec{g} \in \partial f(\vec{x}), \vec{x} \in \mathcal{X}$. Furthermore, let $R^2 \doteq
+    \sup_{\vec{x} \in \mathcal{X}} V_{\omega}(\vec{x}, \vec{x}_0)$ and set \[
+    \gamma_t \doteq \frac{\sqrt{2} R}{B \sqrt{T}}.
+\]
+Then, we have the following convergence rate, \[
+    \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \bigo{\frac{BR}{\sqrt{T}}}.
+\]
+This is equivalent to the convergence rate of the subgradient method, but then for a more general
+notions of norm.
+
+In practice, if we optimize over the simplex $\Delta^{d-1}$ with $\| \vec{g} \|_\infty \leq 1,
+    \forall \vec{g} \in \partial f(\vec{x})$ and $\vec{x}_0 = [\nicefrac{1}{d}, \ldots,
+    \nicefrac{1}{d}]$. Then, we have the following convergence rate for the subgradient method,
+$\bigo{\frac{\sqrt{d}}{\sqrt{T}}}$, because $B \in \bigo{\sqrt{d}}$ and $R \in \bigo{1}$. On the
+other hand, we have the following convergence rate for mirror descent, $\bigo{\frac{\sqrt{\log
+                d}}{\sqrt{T}}}$, since $B \in \bigo{1}$ and $R \in \bigo{\sqrt{\log d}}$. This is a considerable
+speedup.
