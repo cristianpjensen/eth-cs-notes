@@ -1,0 +1,254 @@
+\section{Stochastic optimization}
+
+Stochastic optimization involves decision-making in the presence of randomness. The optimization
+problem is formalized by a random vector $\vec{\xi} \sim P$, \[
+    \min_{\vec{x} \in \R^d} F(\vec{x}) \doteq \E_{\vec{\xi}}[f(\vec{x}, \vec{\xi})].
+\]
+$P$ is unknown and can only be accessed through data, which make $F$ and $\grad{F}{}$ hard to
+compute. Furthermore, we assume unbiasedness of the stochastic gradient, \[
+    \E_{\vec{\xi}_t}[\grad{f(\vec{x}_t, \vec{\xi}_t)}{} \mid \vec{x}_t] = \grad{F(\vec{x}_t)}{}.
+\]
+
+In this setting, we use stochastic gradient descent (SGD), which has the following update rule,
+\begin{align*}
+    \vec{\xi}_t   & \sampleiid P                                               \\
+    \vec{x}_{t+1} & = \vec{x}_t - \gamma_t \grad{f(\vec{x}_t, \vec{\xi}_t)}{}.
+\end{align*}
+
+\subsection{Convergence analysis}
+
+In the non-convex case, we can show that SGD finds a stationary point with $\E \|
+    \grad{F(\overline{\vec{x}})}{} \| \leq \epsilon$ in $\bigo{\nicefrac{1}{\epsilon^4}}$ gradient
+evaluations.
+
+\begin{theorem}[Non-convex, random output]
+    Suppose $F$ is $L$-smooth and the stochastic gradient has bounded variance, \ie, $\E \|
+        \grad{f(\vec{x}, \vec{\xi})}{} - \grad{F(\vec{x})}{} \|_2^2 \leq \sigma^2$. Then, SGD with
+    $\gamma \doteq \min \lft\{ \nicefrac{1}{L}, \nicefrac{\gamma_0}{\sigma \sqrt{T}} \rgt\}$ achieves
+    \begin{align*}
+        \E \| \grad{F(\hat{\vec{x}}_T)}{} \|^2 & \leq \frac{\sigma}{\sqrt{T}} \lft( \frac{2 (F(\vec{x}_1) - F(\vec{x}^\star))}{\gamma_0} + L \gamma_0 \rgt) \\
+                                               & \qquad + \frac{2L(F(\vec{x}_1) - F(\vec{x}^\star))}{T},
+    \end{align*}
+    where $\hat{\vec{x}}_T \sim \mathrm{Unif}(\{ \vec{x}_1, \ldots, \vec{x}_T \})$.
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+        \E[F(\vec{x}_{t+1}) - F(\vec{x}_t)] & \leq \E \lft[ \transpose{\grad{F(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \rgt] \margintag{Smoothness of $F$.}                                  \\
+                                            & = \E \lft[ -\gamma_t \transpose{\grad{F(\vec{x}_t)}{}} \grad{f(\vec{x}_t, \vec{\xi}_t)}{} + \frac{L \gamma_t^2}{2} \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 \rgt] \margintag{SGD update rule.} \\
+                                            & = -(\gamma_t - \frac{L \gamma_t^2}{2}) \E \| \grad{F(\vec{x}_t)}{} \|^2 + \frac{L \sigma^2 \gamma_t^2}{2} \margintag{$\E[X^2] = \E[X]^2 + \mathbb{V}[X]$.}                                       \\
+                                            & \leq -\frac{\gamma_t}{2} \E \| \grad{F(\vec{x}_t)}{} \|^2 + \frac{L \sigma^2 \gamma_t^2}{2}. \margintag{$\gamma_t \leq \nicefrac{1}{L}$.}
+    \end{align*}
+    We can rewrite this as \[
+        \E \| \grad{F(\vec{x}_t)}{} \|^2 \leq \frac{2\E[F(\vec{x}_t) - F(\vec{x}_{t+1})]}{\gamma_t} + \gamma_t \sigma^2 L.
+    \]
+    By definition of $\hat{\vec{x}}_T$, we have
+    \begin{align*}
+        \E \| \grad{F(\hat{\vec{x}}_T)}{} \|^2 & = \frac{1}{T} \sum_{t=1}^{T} \E \| \grad{F(\vec{x}_t)}{} \|^2                                                                                                 \\
+                                               & \leq \frac{1}{T} \lft( \sum_{t=1}^{T} \frac{2\E[F(\vec{x}_t) - F(\vec{x}_{t+1})]}{\gamma_t} + \gamma_t \sigma^2 L \rgt)                                       \\
+                                               & = \frac{2}{\gamma T} \lft( \sum_{t=1}^{T} F(\vec{x}_t) - F(\vec{x}_{t+1}) \rgt) + \gamma \sigma^2 L \margintag{Constant stepsize.}                            \\
+                                               & = \frac{2(F(\vec{x}_1) - F(\vec{x}_{T+1}))}{\gamma T} + \gamma \sigma^2 L \margintag{Telescoping sum.}                                                        \\
+                                               & \leq \frac{2(F(\vec{x}_1) - F(\vec{x}^\star))}{\gamma T} + \gamma \sigma^2 L                                                                                  \\
+                                               & \leq \frac{2(F(\vec{x}_1)) - F(\vec{x}^\star)}{T} \max \lft\{ L, \frac{\sigma \sqrt{T}}{\gamma_0} \rgt\} + \frac{\gamma_0 \sigma L}{\sqrt{T}}                 \\
+                                               & \leq \frac{2 L (F(\vec{x}_1) - F(\vec{x}^\star))}{T} + \frac{\sigma}{\sqrt{T}} \lft( \frac{2 (F(\vec{x}_1) - F(\vec{x}^\star))}{\gamma_0} + L \gamma_0 \rgt).
+    \end{align*}
+\end{proof}
+
+In the convex case, we can show that SGD finds an $\epsilon$-optimal solution with
+$\bigo{\nicefrac{1}{\epsilon^2}}$ sample complexity.
+
+\begin{theorem}[Convex, weighted averaging]
+    Suppose $F$ is convex and $\E \| \grad{f(\vec{x}, \vec{\xi})}{} \|^2 \leq B^2, \forall \vec{x}$. Then, SGD satisfies \[
+        \E \lft[ F(\hat{\vec{x}}_T) - F(\vec{x}^\star) \rgt] \leq \frac{R^2 + B^2 \sum_{t=0}^{T} \gamma_t^2}{2 \sum_{t=0}^{T} \gamma_t},
+    \]
+    where \[
+        \hat{\vec{x}}_T \doteq \frac{\sum_{t=0}^{T} \gamma_t \vec{x}_t}{\sum_{t=0}^{T} \gamma_t}, \quad \| \vec{x}_0 - \vec{x}^\star \| \leq R.
+    \]
+\end{theorem}
+
+\begin{proof}
+    First, we have
+    \begin{align*}
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 & = \| \vec{x}_t - \gamma_t \grad{f(\vec{x}_t, \vec{\xi}_t)}{} - \vec{x}^\star \|^2                                                                                                                     \\
+                                              & = \| \vec{x}_t - \vec{x}^\star \| + \gamma_t^2 \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 - 2 \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star). \margintag{Cosine theorem.}
+    \end{align*}
+    Furthermore, by the law of total expectation ($\E[X] = \E_Y[\E_X[X\mid Y]]$),
+    \begin{align*}
+        \E_{\vec{\xi}_{1:t}} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt] & = \E_{\vec{\xi}_{1:t-1}} \lft[ \E_{\vec{\xi}_t} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \;\middle|\; \vec{x}_t \rgt] \rgt]                                                                   \\
+                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\E_{\vec{\xi}_t} \lft[ \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \;\middle|\; \vec{x}_t \rgt]} (\vec{x}_t - \vec{x}^\star) \rgt] \margintag{$\vec{x}_t$ can be computed from $\vec{\xi}_{1:t-1}$.} \\
+                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\grad{F(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt]                                                                                                                                    \\
+                                                                                                                    & \geq \E[F(\vec{x}_t) - F(\vec{x}^\star)]. \margintag{Convexity of $F$.}
+    \end{align*}
+    This gives us the following recursion, \[
+        \gamma_t \E[F(\vec{x}_t) - F(\vec{x}^\star)] \leq \frac{1}{2} \E \| \vec{x}_t - \vec{x}^\star \|^2 - \frac{1}{2} \E \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \frac{1}{2} \gamma_t^2 B^2,
+    \]
+    and the result follows by telescoping the sum from $t=1$ to $T$.
+\end{proof}
+
+In the strongly convex case, we can show that SGD finds an $\epsilon$-optimal solution with
+$\bigo{\nicefrac{1}{\epsilon}}$ complexity.
+
+\begin{theorem}[Strongly convex, diminishing stepsize]
+    Suppose $F$ is $\mu$-strongly convex and $\E \| \grad{f(\vec{x}, \vec{\xi})}{} \|^2 \leq B^2, \forall \vec{x}$, then SGD with $\gamma_t = \frac{\gamma}{t}$ and $\gamma > \nicefrac{1}{2 \mu}$ satisfies \[
+        \E \| \vec{x}_t - \vec{x}^\star \|^2 \leq \frac{C(\gamma)}{t},
+    \]
+    where \[
+        C(\gamma) = \max \lft\{ \frac{\gamma^2 B^2}{2 \mu \gamma - 1}, \| \vec{x}_0 - \vec{x}^\star \|^2 \rgt\}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    Like in the proof of the previous case, we have \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 = \| \vec{x}_t - \vec{x}^\star \| + \gamma_t^2 \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 - 2 \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star).
+    \]
+    Also like in the previous proof and further using strong convexity of $F$, we have \[
+        \E \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt] = \E \lft[ \transpose{\grad{F(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt] \geq \mu \E \| \vec{x}_t - \vec{x}^\star \|^2.
+    \]
+    This gives the following recursion, \[
+        \E \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \lft( 1 - \frac{2 \mu \gamma}{t} \rgt) \E \| \vec{x}_t - \vec{x}^\star \|^2 + \frac{\gamma^2 B^2}{t^2}.
+    \]
+    The results follows by induction.
+\end{proof}
+
+Thus, in theory, we see that a diminishing stepsize is necessary for SGD to converge to an optimal
+solution. However, in practice, constant stepsizes are often used with great success.
+
+\subsection{Adaptive methods}
+
+Often we do not know whether the problem is convex, $L$-smooth, or $\mu$-strongly convex. Thus, we
+want the stepsize to adapt to the landscape of the function. The generic adaptive scheme looks like
+the following,
+\begin{align*}
+    \vec{g}_t       & = \grad{f(\vec{x}_t, \vec{\xi}_t)}{}                                                                                                     \\
+    \vec{m}_t       & = \phi_t(\vec{g}_1, \ldots, \vec{g}_t) \margintag{Momentum.}                                                                             \\
+    \mat{V}_t       & = \psi_t(\vec{g}_1, \ldots, \vec{g}_t)                                                                                                   \\
+    \hat{\vec{x}}_t & = \vec{x}_t - \alpha_t \mat{V}_t^{-\nicefrac{1}{2}} \vec{m}_t                                                                            \\
+    \vec{x}_{t+1}   & = \argmin_{\vec{x} \in X} \lft\{ \transpose{(\vec{x} - \hat{\vec{x}}_t)} \mat{V}_t^{\nicefrac{1}{2}} (\vec{x} - \hat{\vec{x}}_t) \rgt\}.
+\end{align*}
+
+The most popular stochastic gradient descent methods are special cases of this scheme,
+\begin{itemize}
+    \item Stochastic gradient descent: \[
+              \vec{m}_t = \vec{g}_t, \quad \mat{V}_t = \mat{I}.
+          \]
+    \item AdaGrad: \[
+              \vec{m}_t = \vec{g}_t, \quad \mat{V}_t = \frac{\mathrm{diag}\lft( \sum_{\tau=1}^{t} \vec{g}_{\tau}^2 \rgt)}{t}.
+          \]
+    \item Adam: \[
+              \vec{m}_t = (1-\alpha) \sum_{\tau=1}^{t} \alpha^{t-\tau} \vec{g}_{\tau}, \quad \mat{V}_t = (1 - \beta) \mathrm{diag} \lft( \sum_{\tau=1}^{t} \beta^{t-\tau} \vec{g}_{\tau}^2 \rgt).
+          \]
+          Or, recursively: \[
+              \vec{m}_t = \alpha \vec{m}_{t-1} + (1 - \alpha) \vec{g}_t, \quad \mat{V}_t = \beta \mat{V}_{t-1} + (1 - \beta) \mathrm{diag} \lft( \vec{g}_t^2 \rgt).
+          \]
+\end{itemize}
+
+\subsection{Variance reduction}
+
+Despite having a cheaper iteration cost than gradient descent,\sidenote{$\bigo{1}$ for SGD \vs
+    $\bigo{n}$ for GD.} SGD requires more iterations,\sidenote{$\bigo{\nicefrac{\kappa}{\epsilon}}$ for
+    SGD \vs $\bigo{\kappa \log \nicefrac{1}{\epsilon}}$ for GD, where $\kappa = \nicefrac{L}{\mu}$.}
+due to high variance. Stochastic variance-reduced (VR) methods try to achieve the best of both
+worlds by reducing the variance of SGD.\sidenote{Classically, one can reduce variance by
+    mini-batching, which reduces variance by $\bigo{\nicefrac{1}{|B_t|}}$, where $B_t$ is the batch,
+    but computational complexity increases by $\bigo{|B_t|}$. Variance can also be reduced by
+    introducing momentum to the gradient step. However, this requires access to past stochastic
+    gradients, which can be expensive in memory.
+
+    We will consider a more modern approach.} We will present VR methods in the context of finite-sum
+optimization, which is a special case of stochastic optimization, \[
+    \min_{\vec{x} \in \R^d} F(\vec{x}) \doteq \frac{1}{n} \sum_{i=1}^{n} f_i(\vec{x}).
+\]
+In the context of deep learning, we can see $n$ as the number of data points and $f_i$ the function
+\wrt the $i$-th data point, where we wish to minimize the objective function \wrt every data point
+with equal weight.
+
+Suppose we want to estimate $\theta = \E[X]$, where $X$ is a random variable. Let $Y$ be another
+random variable. We can estimate $\theta$ as $\E[X-Y]$ if and only if $\E[Y] = 0$. Furthermore,
+$\mathbb{V}[X - Y] \leq \mathbb{V}[X]$ if $Y$ is highly positively correlated with $X$.
+Specifically, if $\mathrm{Cov}(X, Y) > \frac{1}{2} \mathbb{V}[Y]$, the variance will be
+reduced.\sidenote{This is because $\mathbb{V}[X - Y] = \mathbb{V}[X] + \mathbb{V}[Y] - 2
+        \mathrm{Cov}(X, Y)$.}
+
+Let $\alpha \in [0,1]$. Using the following point estimator introduces a trade-off between variance
+and biasedness, \[
+    \hat{\theta}_{\alpha} = \alpha(X - Y) + \E[Y].
+\]
+We then have the following expected value and variance,
+\begin{align*}
+    \E[\hat{\theta}_{\alpha}]         & = \alpha \E[X] + (1 - \alpha) \E[Y]                                \\
+    \mathbb{V}[\hat{\theta}_{\alpha}] & = \alpha^2 (\mathbb{V}[X] + \mathbb{V}[Y] - 2 \mathrm{Cov}(X, Y)).
+\end{align*}
+Note that the estimator is unbiased if $\alpha=1$, but the variance decreases when $\alpha$ decreases.
+
+While SGD estimates the full gradient by $\grad{f_{i_t}(\vec{x}_t)}{}$, VR methods estimate
+$\grad{F(\vec{x}_t)}{}$ by \[
+    \vec{g}_t \doteq \alpha (\grad{f_{i_t}(\vec{x}_t)}{} - Y) + \E[Y],
+\]
+such that \[
+    \E \| \vec{g}_t - \grad{F(\vec{x}_t)}{} \|^2 \overset{t \to \infty}{\to} 0. \margintag{VR property.}
+\]
+The key idea is that if $\vec{x}_t$ is not too far away from previous iterates $\vec{x}_{1:t-1}$,
+then we can leverage previous gradient information to construct positively correlated control
+variates $Y$. The question is thus how to design $Y$, given previous gradient information, such
+that it has low computational and space complexity.
+
+\paragraph{Stochastic average gradient.}
+
+The idea behind stochastic average gradient (SAG) is to keep track of the latest gradients for all
+points $i \in [n]$. Then, we estimate the full gradient by the average of these recent gradients, \[
+    \vec{g}_t = \frac{1}{n} \sum_{i=1}^{n} \vec{v}_i^t \quad\approx\quad \frac{1}{n} \sum_{i=1}^{n} \grad{f_i(\vec{x}_t)}{} = \grad{F(\vec{x}_t)}{}.
+\]
+Thus, we update the past gradients as \[
+    \vec{v}_i^t = \begin{cases}
+        \grad{f_{i_t}(\vec{x}_t)}{} & i = i_t     \\
+        \vec{v}_i^{t-1}             & i \neq i_t.
+    \end{cases}
+\]
+Equivalently, we thus have the following update rule,
+\begin{align*}
+    \vec{g}_t & = \vec{g}_{t-1} - \frac{1}{n} \vec{v}_{i_t}^{t-1} + \frac{1}{n} \grad{f_{i_t}(\vec{x}_t)}{}  \\
+              & = \frac{1}{n} \lft( \grad{f_{i_t}(\vec{x}_t)}{} - \vec{v}_{i_t}^{t-1} \rgt) + \vec{g}_{t-1}.
+\end{align*}
+Thus, we have $\alpha = \nicefrac{1}{n}$ and $Y = \vec{v}_{i_t}^{t-1}$ with $\E[Y] = \vec{g}_{t-1}$.
+
+The downside of this approach is that it has a biased gradient, a large $\bigo{nd}$ memory cost,
+and it is hard to analyze. But, we gain a total complexity of $\bigo{(n + \kappa_{\max}) \log
+        \nicefrac{1}{\epsilon}}$, where $\kappa_{\max} = \min_{i \in [n]} \nicefrac{L_i}{\mu}$, where $L_i$
+is the smoothness parameter of $f_i$.
+
+SAGA is an unbiased version of SAG, because it sets $\alpha=1$, but still enjoys the same benefits
+as SAG with a much simpler proof. However, we still have a higher memory cost than SGD, which we
+would like to get rid of.
+
+\paragraph{Stochastic variance reduced gradient.}
+
+The key idea behind stochastic variance reduced gradient (SVRG) is to build covariates based on a
+fixed reference point $\tilde{\vec{x}}$. We then need to balance the frequency of updating this
+reference point and variance reduction.\sidenote{More updates cause lower variance, but increased
+    complexity.} The intuition behind this method is the closer $\tilde{\vec{x}}$ is to $\vec{x}_t$,
+the smaller the variance is of the gradient estimator.
+
+The algorithm works by updating $\tilde{\vec{x}}$ every $m$-th update and estimates the gradient by \[
+    \grad{f_{i_t}(\vec{x}_t)}{} - \grad{f_{i_t}(\tilde{\vec{x}})}{} + \grad{F(\tilde{\vec{x}})}{}.
+\]
+Thus, we have $\alpha=1$ and $Y=\grad{f_{i_t}(\tilde{\vec{x}})}{}$ with $\E[Y] =
+    \grad{F(\tilde{\vec{x}})}{}$.
+
+While we gain the low memory cost of $\bigo{d}$, we now need to do $\bigo{n+2m}$ gradient
+evaluations per epoch, where the $n$ comes from computing $\E[Y]$ and $2m$ comes from computing
+$\grad{f_{i_t}(\vec{x}_t)}{}$ and $\grad{f_{i_t}(\tilde{\vec{x}})}{}$. This method has the same
+complexity as SAG and SAGA.
+
+\begin{table}[t]
+    \centering
+    \caption{Complexity of $\mu$-strongly convex and $L$-smooth finite-sum optimization, where $n$ is the number of functions, $\kappa = \nicefrac{L}{\mu}$, and $\kappa_{\max} = \max_{i \in [n]} \nicefrac{L_i}{\mu}$, where $L_i$ is the smoothness parameter of $f_i$.}
+    \label{tab:vr}
+    \begin{tabular}{lll} \toprule
+        \textbf{Algorithm}          & \textbf{Iterations}                                      & \textbf{Iteration cost} \\
+        \midrule
+        Gradient descent            & $\bigo{\kappa \log \nicefrac{1}{\epsilon}}$              & $\bigo{n}$              \\
+        Stochastic gradient descent & $\bigo{\nicefrac{\kappa_{\max}}{\epsilon}}$              & $\bigo{1}$              \\
+        Variance-reduced method     & $\bigo{(n + \kappa_{\max}) \log \nicefrac{1}{\epsilon}}$ & $\bigo{1}$              \\
+        \bottomrule                                                                                                      \\
+    \end{tabular}
+\end{table}
