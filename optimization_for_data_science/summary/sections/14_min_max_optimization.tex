@@ -1,0 +1,207 @@
+\section{Min-max optimization}
+
+In min-max optimization, we have the following problem that we wish to solve,\sidenote{What it
+    means to solve such a problem will be introduced later.} \[
+    \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}).
+\]
+This general problem has many applications, such as solving zero-sum matrix games, \[
+    \min_{\vec{x} \in \Delta(I)} \max_{\vec{y} \in \Delta(J)} \transpose{\vec{x}} \mat{A} \vec{y}.
+\]
+This problem is convex-concave. Furthermore, generative adversarial networks are also a special
+case of this scheme, \[
+    \min_{G} \max_{D} \E_{\vec{\xi} \in p_{\mathrm{data}}} [D(\vec{\xi})] - \E_{\vec{\zeta} \in p_{\vec{\zeta}}} [D(G(\vec{\zeta}))].
+\]
+This problem is nonconvex-nonconcave.
+
+\subsection{Notion of solution}
+
+\begin{definition}[Saddle point]
+    $(\vec{x}^\star, \vec{y}^\star)$ is a saddle point if \[
+        \phi(\vec{x}^\star, \vec{y}) \leq \phi(\vec{x}^\star, \vec{y}^\star) \leq \phi(\vec{x}, \vec{y}^\star), \quad \forall \vec{x} \in \mathcal{X}, \vec{y} \in \mathcal{Y}.
+    \]
+\end{definition}
+
+Intuitively, no player has the incentive to make a unilateral change at the saddle point, because
+it can only get worse if the other player makes no change. In game theory, this is called a Nash
+equilibrium.
+
+\begin{definition}[Global minimax point]
+    $(\vec{x}^\star, \vec{y}^\star)$ is a global minimax point if \[
+        \phi(\vec{x}^\star, \vec{y}) \leq \phi(\vec{x}^\star, \vec{y}^\star) \leq \max_{\vec{y}' \in \mathcal{Y}} \phi(\vec{x}, \vec{y}'), \quad \forall \vec{x} \in \mathcal{X}, \vec{y} \in \mathcal{Y}.
+    \]
+\end{definition}
+
+Intuitively, this means that $\vec{x}^\star$ is the minimizer of $\bar{\phi}(\vec{x}) =
+    \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y})$. It is the best response to the best
+response. In game theory, this is called the Stackelberg equilibrium, which is a notion of
+equilibrium in a game where one player is the leader and another is the follower. The response of
+$\vec{x}$ must be the best response to the best response $\vec{y}$ could ever make.
+
+The min-max optimization problem induces a primal problem, \[
+    \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}) \doteq \min_{\vec{x} \in \mathcal{X}} \bar{\phi}(\vec{x}),
+\]
+and a dual problem, \[
+    \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) \doteq \max_{\vec{y} \in \mathcal{Y}} \underline{\phi}(\vec{y}).
+\]
+Note that we have the following relationship between the two, \[
+    \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) \leq \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}).
+\]
+
+\begin{lemma}[Characterization of saddle point]
+    $(\vec{x}^\star, \vec{y}^\star)$ is a saddle point if and only if \[
+        \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) = \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}),
+    \]
+    and \[
+        \vec{x}^\star \in \argmin_{\vec{x} \in \mathcal{X}} \bar{\phi}(\vec{x}), \quad \vec{y}^\star \in \argmax_{\vec{y} \in \mathcal{Y}} \underline{\phi}(\vec{y}).
+    \]
+\end{lemma}
+
+\subsection{Convex-concave min-max optimization}
+
+\begin{definition}[Convex-concave (C-C) function]
+    A function $\phi: \mathcal{X} \times \mathcal{Y} \to \R$ is convex-concave if
+    \begin{itemize}
+        \item $\phi$ is convex in $\vec{x} \in \mathcal{X}$ for every fixed $\vec{y} \in \mathcal{Y}$;
+        \item $\phi$ is concave in $\vec{y} \in \mathcal{Y}$ for every fixed $\vec{x} \in \mathcal{X}$.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Strongly convex-strongly convcave (SC-SC) function]
+    A function $\phi: \mathcal{X} \times \mathcal{Y} \to \R$ is strongly convex-strongly concave if
+    there exists constants $\mu_1, \mu_2 > 0$ such that
+    \begin{itemize}
+        \item $\phi$ is $\mu_1$-strongly convex in $\vec{x} \in \mathcal{X}$ for every fixed $\vec{y} \in \mathcal{Y}$;
+        \item $\phi$ is $\mu_2$-strongly convex in $\vec{y} \in \mathcal{Y}$ for every fixed $\vec{x} \in \mathcal{X}$.
+    \end{itemize}
+\end{definition}
+
+\begin{theorem}[Minimax theorem]
+    If $\mathcal{X}$ and $\mathcal{Y}$ are closed convex sets and one of them is bounded, and $\phi: \mathcal{X} \times \mathcal{Y} \to \R$ is a continuous convex-concave function, then there exists a saddle point on $\mathcal{X} \times \mathcal{Y}$ and \[
+        \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) = \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}).
+    \]
+\end{theorem}
+
+Thus, for convex-concave minimax optimization problems, a saddle point always exists.
+
+We measure optimality via the duality gap, \[
+    \epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \doteq \max_{\vec{y} \in \mathcal{Y}} \phi(\hat{\vec{x}}, \vec{y}) - \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \hat{\vec{y}}) \geq 0.
+\]
+If $\epsilon(\hat{\vec{x}}, \hat{\vec{y}}) = 0$, then $(\hat{\vec{x}}, \hat{\vec{y}})$ is a saddle
+point, and if $\epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \leq \epsilon$, then $(\hat{\vec{x}},
+    \hat{\vec{y}})$ is an $\epsilon$-saddle point.
+
+\subsection{Algorithms}
+
+\begin{table}[t]
+    \centering
+    \caption{Convergence rates of various algorithms, where $\kappa = \nicefrac{L}{\mu}$. C-C stands for convex-concave and SC-SC stands for strongly convex-strongly concave.}
+    \label{tab:mmo}
+    \begin{tabular}{lll} \toprule
+        \textbf{Algorithm}       & \textbf{C-C, Smooth}     & \textbf{SC-SC, Smooth}                        \\
+        \midrule
+        Gradient descent ascent  & Non-convergent           & $\bigo{\kappa^2 \log \nicefrac{1}{\epsilon}}$ \\
+        Extragradient            & $\bigo{\nicefrac{L}{T}}$ & $\bigo{\kappa \log \nicefrac{1}{\epsilon}}$   \\
+        Proximal point algorithm & $\bigo{\nicefrac{1}{T}}$ & $\bigo{\kappa \log \nicefrac{1}{\epsilon}}$   \\
+        \bottomrule                                                                                         \\
+    \end{tabular}
+\end{table}
+
+\paragraph{Gradient descent ascent.}
+
+Gradient descent ascent (GDA) is the simplest gradient-based algorithm for solving min-max
+optimization problems. It simply does a single gradient step in both gradient directions \wrt
+$\vec{x}$ and $\vec{y}$,
+\begin{align*}
+    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}})  \\
+    \vec{t}_{t+1} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}).
+\end{align*}
+
+However, this is not guaranteed to converge in the C-C setting. Intuitively, this is because the
+two updates can ``pull'' in opposite directions, resulting in no update. To guarantee convergence,
+we need the stronger SC-SC assumption.
+
+\begin{theorem}[Convergence of GDA, SC-SC]
+    In the SC-SC setting, GDA with stepsize $\gamma < \frac{\mu}{2L^2}$ converges linearly,
+    \begin{align*}
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2 & \leq \lft( 1 + 4 \gamma^2 L^2 - 2 \gamma \mu \rgt)                                              \\
+                                                                                      & \qquad \cdot \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt).
+    \end{align*}
+    When $\gamma = \nicefrac{\mu}{4 L^2}$, GDA satisfies \[
+        \| \vec{x}_T - \vec{x}^\star \|^2 + \| \vec{y}_T - \vec{y}^\star \|^2 \leq \lft( 1 - \nicefrac{\mu^2}{4L^2} \rgt)^T \lft( \| \vec{x}_0 - \vec{x}^\star \|^2 + \| \vec{y}_0 - \vec{y}^\star \|^2 \rgt).
+    \]
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+This implies a convergence complexity of $\bigo{\kappa^2 \log \nicefrac{1}{\epsilon}}$, where
+$\kappa = \nicefrac{L}{\mu}$ is the condition number.
+
+\paragraph{Extragradient method.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{extragradient-method}
+    \caption{Illustration of a single step of the extragradient method.}
+    \label{fig:extragradient-method}
+\end{marginfigure}
+
+The extragradient (EG) method fixes GDA by making use of a look ahead step, such that the two
+gradients do not ``pull'' in opposite directions,
+\begin{align*}
+    \vec{x}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}})                                      \\
+    \vec{y}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}})                                      \\
+    \vec{x}_{t+1}               & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})}{\vec{x}})  \\
+    \vec{y}_{t+1}               & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})}{\vec{y}}).
+\end{align*}
+
+\begin{theorem}[Convergence of EG, C-C]
+    Let $\phi$ be convex-concave, $L$-smooth. Furthermore, $\mathcal{X}$ has diameter $D_{\mathcal{X}}$ and $\mathcal{Y}$ has diameter $D_{\mathcal{Y}}$. Then, EG with stepsize $\gamma \leq \nicefrac{1}{2L}$ satisfies \[
+        \epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \leq \frac{D_{\mathcal{X}}^2 + D_{\mathcal{Y}}^2}{2 \gamma T},
+    \]
+    where \[
+        \hat{\vec{x}} = \frac{1}{T} \sum_{t=1}^{T} \vec{x}_{t+\nicefrac{1}{2}}, \quad \hat{\vec{y}} = \frac{1}{T} \sum_{t=1}^{T} \vec{y}_{t+\nicefrac{1}{2}}.
+    \]
+\end{theorem}
+
+\begin{theorem}[Convergence of EG, SC-SC]
+    In the SC-SC setting, EG with stepsize $\gamma = \nicefrac{1}{8L}$ converges linearly, \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2 \leq \lft( 1 - \frac{\mu}{4L} \rgt) \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt).
+    \]
+\end{theorem}
+
+This implies a convergence rate of $\bigo{\kappa \log \nicefrac{1}{\epsilon}}$, which is much
+faster than the convergence rate of GDA.
+
+\paragraph{Optimistic gradient descent ascent.}
+
+Optimistic GDA (OGDA) is formalized by
+\begin{align*}
+    \vec{x}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_{t-\nicefrac{1}{2}}, \vec{y}_{t-\nicefrac{1}{2}})}{\vec{x}})  \\
+    \vec{y}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_{t-\nicefrac{1}{2}}, \vec{y}_{t-\nicefrac{1}{2}})}{\vec{y}})  \\
+    \vec{x}_{t+1}               & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})}{\vec{x}})  \\
+    \vec{y}_{t+1}               & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})}{\vec{y}}).
+\end{align*}
+This algorithm enjoys the same convergence guarantees as the extragradient method.
+
+In the special case of $\mathcal{X} = \R^{d_x}, \mathcal{Y} = \R^{d_y}$, the following is an
+equivalent formulation,
+\begin{align*}
+    \vec{x}_{t+1} & = \vec{x}_t - 2 \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}} + \gamma \grad{\phi(\vec{x}_{t-1}, \vec{y}_{t-1})}{\vec{x}}  \\
+    \vec{y}_{t+1} & = \vec{y}_t + 2 \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}} - \gamma \grad{\phi(\vec{x}_{t-1}, \vec{y}_{t-1})}{\vec{y}}.
+\end{align*}
+This can be seen as negative momentum.
+
+\paragraph{Proximal point algorithm.}
+
+Like in normal optimization, we can also define the proximal point algorithm (PPA) for min-max
+optimization, \[
+    (\vec{x}_{t+1}, \vec{y}_{t+1}) = \argmax_{\vec{x} \in \mathcal{X}} \argmin_{\vec{y} \in \mathcal{Y}} \lft\{ \phi(\vec{x}, \vec{y}) + \frac{1}{2 \gamma} \| \vec{x} - \vec{x}_t \|^2 - \frac{1}{2 \gamma} \| \vec{y} - \vec{y}_t \|^2 \rgt\}.
+\]
+Solving the above optimization problem results in the following implicit update,
+\begin{align*}
+    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_{t+1}, \vec{y}_{t+1})}{\vec{x}})  \\
+    \vec{y}_{t+1} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_{t+1}, \vec{y}_{t+1})}{\vec{y}}).
+\end{align*}
+This algorithm has similar guarantees to the extragradient method and OGDA.

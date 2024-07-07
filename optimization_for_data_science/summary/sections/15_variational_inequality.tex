@@ -1,0 +1,68 @@
+\section{Variational inequality problems}
+
+Let $\mathcal{Z} \subset \R^d$ be a non-empty subset and consider a mapping $F: \mathcal{Z} \to
+    \R^d$. In a variational inequality (VI) problem, we wish to find $\vec{z}^\star \in \mathcal{Z}$,
+such that $\langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0$ for all $\vec{z} \in
+    \mathcal{Z}$.
+
+\begin{definition}[Monotone operator]
+    An operator $F: \mathcal{Z} \to \R^d$ is monotone if \[
+        \langle F(\vec{x}) - F(\vec{y}), \vec{x} - \vec{y} \rangle \geq 0, \quad \forall \vec{x}, \vec{y} \in \mathcal{Z}.
+    \]
+\end{definition}
+
+\begin{definition}[$\mu$-strongly monotone operator]
+    An operator $F: \mathcal{Z} \to \R^d$ is $\mu$-strongly monotone if \[
+        \langle F(\vec{x}) - F(\vec{y}), \vec{x} - \vec{y} \rangle \geq \mu \| \vec{x} - \vec{y} \|^2, \quad \forall \vec{x}, \vec{y} \in \mathcal{Z}.
+    \]
+\end{definition}
+
+\begin{definition}[VI strong solution]
+    A solution $\vec{z}^\star \in \mathcal{Z}$ is a strong solution if it satisfies \[
+        \langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}.
+    \]
+\end{definition}
+
+\begin{definition}[VI weak solution]
+    A solution $\vec{z}^\star \in \mathcal{Z}$ is a weak solution if it satisfies \[
+        \langle F(\vec{z}), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}.
+    \]
+\end{definition}
+
+If $F$ is monotone, then a strong solution is also a weak solution. If $F$ is continuous, then a
+weak solution is also a strong solution. Furthermore, we use \[
+    \epsilon_{\mathrm{VI}}(\hat{\vec{z}}) \doteq \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \hat{\vec{z}}, \vec{z} \rangle
+\]
+to measure the inaccuracy of a solution $\hat{\vec{z}}$.
+
+Convex minimization problems can be cast as a VI problem by defining $F = \grad{f}{}$ for a convex
+function $f$ that we wish to minimize. The VI solutions are the minimizers of the function $f$.
+Furthermore, min-max problems can be cast as a VI problem by defining $F = [\grad{\phi}{\vec{x}},
+    -\grad{\phi}{\vec{y}}]$ for a convex-concave function $\phi$. The VI solutions are the global
+saddle points of $\phi$.
+
+Like in min-max optimization, we can define a more general extragradient algorithm for VIs, where
+the update rule is
+\begin{align*}
+    \tilde{\vec{z}}_t & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_t))          \\
+    \vec{z}_{t+1}     & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\tilde{\vec{z}}_t)).
+\end{align*}
+
+\begin{theorem}
+    Let $F$ be monotone and $L$-smooth. Set $\gamma_t = \nicefrac{1}{\sqrt{2L}}$, then EG satisfies \[
+        \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \hat{\vec{z}} - \vec{z} \rangle \leq \frac{\sqrt{2} L D_{\mathcal{Z}}^2}{T},
+    \]
+    where \[
+        \hat{\vec{z}} = \frac{1}{T} \sum_{t=1}^{T} \tilde{\vec{z}}_t.
+    \]
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+We can do the same for other algorithms, such as GDA, PPA, and OGDA.
+
+Thus, as we have seen, VI provides a unified framework to analyze a broad class of optimization
+problems. However, it might not fully exploit the underlying fine-grained structure of the problem
+of interest.
