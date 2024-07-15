@@ -39,7 +39,7 @@ $\mat{V} \in \R^{m \times k}$, \[
     \mat{A} \approx \mat{U} \transpose{\mat{V}}.
 \]
 Then, we get the following loss function that we wish to minimize, \[
-    (\mat{U}, \mat{V}) \in \argmin_{\mat{U}, \mat{V}} \ell(\mat{U}, \mat{V}) \doteq \frac{1}{2} \lft\| \Pi_{\mat{\Omega}} \lft( \mat{A} - \mat{U}\transpose{\mat{V}} \rgt) \rgt\|_F^2,
+    \mat{U}, \mat{V} \in \argmin_{\mat{U}, \mat{V}} \ell(\mat{U}, \mat{V}) \doteq \frac{1}{2} \lft\| \Pi_{\mat{\Omega}} \lft( \mat{A} - \mat{U}\transpose{\mat{V}} \rgt) \rgt\|_F^2,
 \]
 where $\Pi_{\mat{\Omega}}(\mat{M}) = \mat{M} \odot \mat{\Omega}$ and $\| \cdot \|_F$ is the
 Frobenius norm, \[
@@ -146,12 +146,12 @@ will converge $uv$ to $a$.
 
 Now consider the fully observed rank-1 model,
 \begin{align*}
-    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \| \mat{A} - \vec{u}\transpose{\vec{v}} \|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m                                                                                                               \\
+    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \| \mat{A} - \vec{u}\transpose{\vec{v}} \|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m                                                                                                                           \\
     \intertext{Rewriting,}
-                           & = \frac{1}{2} \tr{\transpose{\lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \margintag{Identity: $\| \mat{M} \|_F^2 = \tr{\transpose{\mat{M}}\mat{M}}$.}                                     \\
-                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A} - \vec{v}\transpose{\vec{u}} \mat{A} - \transpose{\mat{A}}\vec{u}\vec{v} + \vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}}                                                                     \\
-                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A}} - \tr{\vec{v}\transpose{\vec{u}} \mat{A}} - \tr{\transpose{\mat{A}}\vec{u} \vec{v}} + \tr{\vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}} \margintag{Linearity of trace.}                     \\
-                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A}} - \tr{\transpose{\vec{u}} \mat{A} \vec{v}} - \tr{\transpose{\vec{v}} \transpose{\mat{A}} \vec{u}} + \tr{\transpose{\vec{v}}\vec{v}\transpose{\vec{u}}\vec{u}} \margintag{Cyclic property of trace.} \\
+                           & = \frac{1}{2} \tr{\transpose{\lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \margintag{Identity: $\| \mat{M} \|_F^2 = \tr{\transpose{\mat{M}}\mat{M}}$.}                                                 \\
+                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A} - \vec{v}\transpose{\vec{u}} \mat{A} - \transpose{\mat{A}}\vec{u}\vec{v} + \vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}}                                                                                 \\
+                           & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - \tr{\vec{v}\transpose{\vec{u}} \mat{A}} - \tr{\transpose{\mat{A}}\vec{u} \vec{v}} + \tr{\vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}} \rgt) \margintag{Linearity of trace.}                     \\
+                           & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - \tr{\transpose{\vec{u}} \mat{A} \vec{v}} - \tr{\transpose{\vec{v}} \transpose{\mat{A}} \vec{u}} + \tr{\transpose{\vec{v}}\vec{v}\transpose{\vec{u}}\vec{u}} \rgt) \margintag{Cyclic property of trace.} \\
                            & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A}} + \frac{1}{2} \| \vec{u} \|^2 \| \vec{v} \|^2 - \transpose{\vec{u}} \mat{A} \vec{v}.
 \end{align*}
 The first term is a constant, thus we have the following effective loss function, \[
@@ -169,7 +169,7 @@ following loss function with an additional parameter $c$, \[
 Thus, we first maximize $\transpose{\tilde{\vec{u}}} \mat{A} \tilde{\vec{v}}$ under the constraint
 that $\vec{u}$ and $\vec{v}$ are unit vectors, and then decide which $c$ minimizes the loss
 function. Thus, first we have the following problem \[
-    (\vec{u}, \vec{v}) \in \argmax_{\| \vec{u} \| = \| \vec{v} \| = 1} \transpose{\vec{u}} \mat{A} \vec{v}.
+    \vec{u}, \vec{v} \in \argmax_{\| \vec{u} \| = \| \vec{v} \| = 1} \transpose{\vec{u}} \mat{A} \vec{v}.
 \]
 We can solve this problem with its constraints by using Lagrangian multipliers, \[
     \mathcal{L} = \transpose{\vec{u}} \mat{A} \vec{v} - \alpha (\| \vec{u} \|^2 - 1) - \beta (\| \vec{v} \|^2 - 1).
@@ -219,6 +219,7 @@ We can generalize the previous result by making use of the singular value decomp
 \end{theorem}
 
 \begin{lemma}
+    \label{lem:svd-frob}
     Let the SVD of $\mat{A} \in \R^{n \times m}$ be given by $\mat{A} = \mat{U} \mat{\Sigma} \transpose{\mat{V}}$, then \[
         \| \mat{A} \|_F^2 = \sum_{i=1}^{\min\{n,m\}} \sigma_i^2.
     \]
@@ -227,7 +228,7 @@ We can generalize the previous result by making use of the singular value decomp
 \begin{proof}
     This can be shown by the properties of the trace operator,
     \begin{align*}
-        \| \mat{A} \|_F^2 & = \tr{\transpose{\mat{A}} \mat{A}} = \tr{\mat{V} \transpose{\mat{\Sigma}} \transpose{\mat{U}} \mat{U} \mat{\Sigma} \transpose{\mat{V}}} = \tr{\mat{V} \transpose{\mat{\Sigma}} \transpose{\mat{V}}} \\
+        \| \mat{A} \|_F^2 & = \tr{\transpose{\mat{A}} \mat{A}} = \tr{\mat{V} \transpose{\mat{\Sigma}} \transpose{\mat{U}} \mat{U} \mat{\Sigma} \transpose{\mat{V}}} = \tr{\mat{V} \transpose{\mat{\Sigma}} \mat{\Sigma} \transpose{\mat{V}}} \\
                           & = \tr{\transpose{\mat{V}} \mat{V} \transpose{\mat{\Sigma}} \mat{\Sigma}} = \tr{\transpose{\mat{\Sigma}} \mat{\Sigma}} = \sum_{i=1}^{\min \{ n,m \}} \sigma_i^2.
     \end{align*}
 \end{proof}
@@ -247,7 +248,7 @@ We can generalize the previous result by making use of the singular value decomp
 \end{proof}
 
 The Eckart-Young theorem is widely used for linear matrix approximation. It states that if we prune
-the singular values below $\sigma_k$ in the SVD representation, we get an optimal rank $k$
+the singular values below $\sigma_k$ in the SVD representation, we get an optimal rank-$k$
 approximation of a matrix.
 
 \begin{theorem}[Eckart-Young theorem]
@@ -280,7 +281,7 @@ $\mat{U} \in \R^{n \times k}$ and $\mat{V} \in \R^{m \times k}$, \[
     \mat{A} \approx \mat{U} \transpose{\mat{V}}.
 \]
 Since we cannot solve the problem exactly, we want to add regularization to the loss function to
-increase numerical stability of the solution, \[
+increase numerical stability of the solution (this will also be very important later), \[
     \ell(\mat{U}, \mat{V}) = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|^2_F + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt), \quad \lambda > 0.
 \]
 If we fully expand the norms, we will find that this objective is a 4-th degree polynomial in the
@@ -299,7 +300,7 @@ function depending on a row $\vec{v}_j$, where we treat $\mat{U}$ as fixed,
 \begin{align*}
     \ell_{\mat{U}}(\vec{v}_j) & = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|_F^2 + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt)                                                                                                                                             \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \sum_{j'=1}^{m} \omega_{ij'} \lft| a_{ij'} - \lft( \mat{U} \transpose{\mat{V}} \rgt)_{ij'} \rgt|^2 + \frac{\lambda}{2} \sum_{j'=1}^{m} \sum_{r=1}^{k} |v_{j'r}|^2 \margintag{Expand norms and remove $\| \mat{U} \|_F^2$, because it does not depend on $\vec{v}_j$.}              \\
-                              & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \lft( a_{ij} - \transpose{\vec{u}_i}\vec{v}_j \rgt)^2 + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j \margintag{Remove all terms that do not contain entries of $\vec{v}_j$.}                                                                                      \\
+                              & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \lft( a_{ij} - \transpose{\vec{u}_i}\vec{v}_j \rgt)^2 + \frac{\lambda}{2} \sum_{r=1}^{k} v_{jr}^2 \margintag{Remove all terms that do not contain entries of $\vec{v}_j$.}                                                                                             \\
                               & = \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} a_{ij}^2 + \omega_{ij} \transpose{\vec{u}_i} \vec{v}_j \transpose{\vec{u}_i} \vec{v}_j - 2 \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j                                                                              \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \transpose{\vec{v}_j} \vec{u}_i \transpose{\vec{u}_i} \vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j - \sum_{i=1}^{n} \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j \margintag{$\transpose{\vec{u}_i} \vec{v}_j = \transpose{\vec{v}_j} \vec{u}_i$.} \\
                               & = \frac{1}{2} \lft( \transpose{\vec{v}_j} \lft( \sum_{i=1}^{n} \omega_{ij} \vec{u}_i \transpose{\vec{u}_i} \rgt) \vec{v}_j + \lambda \transpose{\vec{v}_j} \vec{v}_j \rgt) - \lft( \sum_{i=1}^{n} \omega_{ij} a_{ij} \transpose{\vec{u}_i} \rgt) \vec{v}_j                                                            \\
@@ -309,14 +310,14 @@ Analogously, we can construct the following objective \wrt $\vec{u}_i$, \[
     \ell_{\mat{V}}(\vec{u}_i) = \frac{1}{2} \transpose{\vec{u}_i} \lft( \sum_{j=1}^{m} \omega_{ij} \vec{v}_j \transpose{\vec{v}_j} + \lambda \mat{I}_k \rgt) \vec{u}_i - \lft( \sum_{j=1}^{m} \omega_{ij} a_{ij} \transpose{\vec{v}_j} \rgt) \vec{u}_i.
 \]
 Since the matrix in the first term is rank-$k$,\sidenote{This is because of the identity matrix,
-    which is a result of the regularization.} we can invert it, and thus we have the following
-solutions to the separable loss functions,
+    which is a result of the regularization.} we can invert it. We have the following first-order
+optimal solution to the above loss function,
 \begin{align*}
     \vec{v}_j^\star & = \inv{\lft( \sum_{i=1}^{n} \omega_{ij} \vec{u}_i \transpose{\vec{u}_i} + \lambda \mat{I}_k \rgt)} \lft( \sum_{i=1}^{n} \omega_{ij} a_{ij} \vec{u}_i \rgt)  \\
     \vec{u}_i^\star & = \inv{\lft( \sum_{j=1}^{m} \omega_{ij} \vec{v}_j \transpose{\vec{v}_j} + \lambda \mat{I}_k \rgt)} \lft( \sum_{j=1}^{m} \omega_{ij} a_{ij} \vec{v}_j \rgt).
 \end{align*}
 This involves taking the inverse of a $k\times k$ matrix, thus computing $\vec{u}_i^\star$ and
-$\vec{v}_i^\star$ has $\bigo{k^3}$ complexity.
+$\vec{v}_i^\star$ has $\bigo{k^3}$ complexity, which is generally quite fast.
 
 Alternating least squares (ALS) makes use of these subproblems by alternating between optimizing
 $\mat{U}$ given $\mat{V}$ and $\mat{V}$ given $\mat{U}$,
@@ -327,22 +328,28 @@ $\mat{U}$ given $\mat{V}$ and $\mat{V}$ given $\mat{U}$,
 An iteration of ALS has complexity $\bigo{(n+m)\cdot k^3}$. However, since each row of both matrices can be
 optimized in parallel, this can be done much faster in practice. Furthermore, since we are optimizing
 the objective fully over one half of the parameter space, the objective monotonically decreases.
-Thus, it converges to a first-order optimal fixed point, which may be a saddle point. Moreover, we
-have the advantage that we can easily augment the model by adding additional dimensions, which may be
+Hence, it converges to a first-order optimal fixed point, which may be a saddle point. Moreover, we
+have the advantage that we can easily augment the model by adding additional dimensions and minimizing \wrt the existing dimensions, which may be
 useful when new users enter the system or new items become available.
 
 \paragraph{Projection methods.}
 
-We will now consider optimizing the objective by gradient descent. However, gradient descent does
-not constrain its iterates to be rank-$k$ matrices. Projected gradient descent solves this by
-projecting to the constrained space in between every gradient step. In general, it is hard to
-project to a space of rank-$k$ matrices, but SVD makes it possible because of the Eckart-Young
-theorem. The update rule is the following,
+We will now consider optimizing the objective by gradient descent, where the gradient is
 \begin{align*}
-    \mat{A}^{(t+1)} & = \mat{A}^{(t)} + \eta \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{A}^{(t)} \rgt) \margintag{Step in direction of gradient.} \\
-    \mat{A}^{(t+1)} & = \lft[ \mat{A}^{(t+1)} \rgt]_k. \margintag{Project to space of rank-$k$ matrices by SVD.}
+    \pdv*{\frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2}{\mat{B}} & = \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \odot \pdv*{\Pi_{\mat{\Omega}}(\mat{A} - \mat{B})}{\mat{B}} \margintag{$\pdv*{\| \mat{X} \|_F^2}{\mat{X}} = 2\mat{X}$.} \\
+                                                                                & = \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \odot \Pi_{\mat{\Omega}}(-\mat{1}_{n\times m})                                                                          \\
+                                                                                & = -\Pi_{\mat{\Omega}}(\mat{A} - \mat{B}).
 \end{align*}
-This converges to a first-order optimal solution if $\eta$ is small enough.
+However, gradient descent does not constrain its iterates to be rank-$k$ matrices. Projected
+gradient descent solves this by projecting to the constrained space in between every gradient step.
+In general, it is hard to project to a space of rank-$k$ matrices, but SVD makes it possible by
+making use of the Eckart-Young theorem. We will denote $[\mat{M}]_k$ as the projection to the space
+of rank-$k$ matrices, which is computed by pruning all singular values below $\sigma_k$, as shown
+by the Eckart-Young theorem. Hence, the update rule is the following, \[
+    \mat{A}^{(t+1)} = \lft[ \mat{A}^{(t)} + \eta \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{A}^{(t)} \rgt) \rgt]_k.
+\]
+This converges to a first-order optimal solution if $\eta$ is small enough as a general result of
+projected gradient descent.
 
 \begin{marginfigure}[5cm]
     \centering
@@ -352,14 +359,14 @@ This converges to a first-order optimal solution if $\eta$ is small enough.
 \end{marginfigure}
 
 The problem with this approach is that the space of rank-$k$ matrices is non-convex. Thus, the next
-idea is to find the tightest convex relaxation of this space. \Ie, we want to find a space that
-contains all rank-$k$ matrices, but not too many more. For this, we use the nuclear norm, \[
+idea is to find the tightest convex relaxation of this space. \Ie, we want to find a convex space
+that contains all rank-$k$ matrices, but not too many more. For this, we use the nuclear norm, \[
     \| \mat{M} \|_* \doteq \sum_{i=1}^{\mathrm{rank}(\mat{M})} \sigma_i,
 \]
 where $\sigma_i$ is the $i$-th singular value of $\mat{M}$.
 
-Let $\vec{\sigma}(\mat{M})$ be the vector of singular values of $\mat{M}$, then the Frobenius norm
-can be computed by \[
+Let $\vec{\sigma}(\mat{M})$ be the vector of singular values of $\mat{M}$, then, as shown by
+\Cref{lem:svd-frob}, the Frobenius norm can be computed by \[
     \| \mat{M} \|_F = \| \vec{\sigma}(\mat{M}) \|_2.
 \]
 Similarly, the nuclear norm can be computed by \[
@@ -373,22 +380,22 @@ Similarly, the nuclear norm can be computed by \[
 \end{definition}
 
 \begin{theorem}
+    \label{thm:rank-env}
     The convex envelope of $\mathrm{rank}(\cdot)$ on $\{ \mat{M} \mid \| \mat{M} \|_2 \leq 1 \}$ is
-    $\| \cdot \|_*$.
+    the nuclear norm $\| \cdot \|_*$.
 \end{theorem}
 
 We will use this to approximate the objective by a convex function. We have the following
 objective, \[
-    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}} (\mat{A} - \mat{B}) \|_F^2, \quad \mathrm{rank}(\mat{B}) \leq k, \| \mat{B} \|_2 \leq c.
+    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}} (\mat{A} - \mat{B}) \|_F^2, \quad \mathrm{rank}(\mat{B}) \leq k, \| \mat{B} \|_2 \leq c. \margintag{The second constraint comes from the condition of the space of \Cref{thm:rank-env}.}
 \]
-This can be rewritten using Lagrange multipliers as a non-convex objective, \[
-    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + r \mathrm{rank}(\mat{B}) + \mu \| \mat{B} \|_2,
-\]
-and approximated using the convex envelope of the nuclear norm and the equivalence between the
-Frobenius and spectral norms, \[
-    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + \tau \| \mat{B} \|_* + \gamma \| \mat{B} \|_F.
-\]
-This final objective function is convex.
+This can be rewritten using Lagrange multipliers as a non-convex objective,
+\begin{align*}
+    \ell(\mat{B}) & = \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + r \cdot \mathrm{rank}(\mat{B}) + \mu \| \mat{B} \|_2                                                                                                                                 \\
+                  & \approx \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + \tau \| \mat{B} \|_* + \gamma \| \mat{B} \|_F. \margintag{The nuclear norm is the convex envelope of the rank function and the Frobenius norm upper bounds the spectral norm.}
+\end{align*}
+This approximation of the objective is convex, so, using gradient descent and correct $\eta$, we can
+solve it.
 
 \begin{theorem}
     Let $\mat{A}$ with SVD $\mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ be given, then
@@ -401,16 +408,19 @@ This final objective function is convex.
 Note that the rank of $\mathrm{shrink}_{\tau}(\mat{A})$ decreases monotonically with $\tau$, because
 more singular values are zeroed out as $\tau$ increases.
 
-Using the shrink operator, we can define a new update rule, \[
-    \mat{A}^{(t+1)} = \mat{A}^{(t)} + \epsilon_t \Pi_{\mat{\Omega}}\lft( \mat{A} \mathrm{shrink}_{\tau}(\mat{A}^{(t)}) \rgt).
+Using the shrink operator, we can define a new update rule, starting from $\mat{A}^{(0)} =
+    \mat{0}$, \[
+    \mat{A}^{(t+1)} = \mat{A}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \mat{A} - \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \rgt).
 \]
 With a suitable schedule $\eta_t > 0$, this algorithm will converge to
 \begin{align*}
-    \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \xrightarrow{t\to \infty} \mat{A}^\star = & \argmin_{\mat{B}} \lft\{ \tau \| \mat{B} \|_* + \frac{1}{2} \| \mat{B} \|_F^2 \rgt\} \\
+    \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \xrightarrow{t\to \infty} \mat{A}^\star = & \argmin_{\mat{B}} \lft\{ \tau \| \mat{B} \|_* + \frac{1}{2\tau} \| \mat{B} \|_F^2 \rgt\} \\
                                                                                               & \mathrm{s.t.} \quad \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) = \mat{0}.
 \end{align*}
-In words, it will agree on the observed entries and have a minimal mixed Frobenius and nuclear
-norm.
+The result of this algorithm will be exactly reproducing the observed entries, which the non-relaxed
+problem cannot guarantee, as there may be no rank-$k$ algorithm with a projected residual that is
+zero. However, the convex relaxation approach does not define a low-rank sequence of matrices.
+Rather, the shrinkage operator is used to implicitly encourage low-rank approximations.
 
 In conclusion, the singular value projection approach maintains a rank-$k$ matrix, while the convex
 relaxation approach maintains a sparse iterate sequence. Both are beneficial relative to a dense
@@ -463,6 +473,9 @@ high probability, under the assumption that the entries have been uniformly samp
         \mat{A} = \argmin_{\mat{B}} \| \mat{B} \|_*, \quad \mathrm{s.t.}\; \Pi_{\mat{\Omega}}(\mat{B}) = \Pi_{\mat{\Omega}}(\mat{A}).
     \]
 \end{theorem}
+
+This says that if the matrix is recoverable from its sampled entries, then it can be recovered via
+nuclear norm minimization.
 
 \subsection{Randomized methods for SVD}
 
