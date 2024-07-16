@@ -359,3 +359,44 @@ Hence, in the case of balanced classes $\pi = \nicefrac{1}{2}$ (equivalent to $r
     h^\star_{vw} = \log \frac{p(v,w)}{p(w)p(v)},
 \]
 which is the pointwise mutual information.
+
+\paragraph{GloVe.} Global word vectors (GloVe) considers word embedding models in terms of matrix factorization. It
+maximizes a different objective, \[
+    \ell(\vec{\theta}, \mat{N}) = \sum_{\substack{v,w \in \Sigma \\ N_{vw} > 0}} f(N_{vw}) \lft( \log N_{vw} - \log \hat{N}_{vw} \rgt)^2, \quad \hat{N}_{vw} = p(v,w; \vec{\theta}),
+\]
+which is a weighted square loss on the log-scale. In practice, the following weighting function is
+used, \[
+    f(N) = \min \lft\{ 1, \lft( \frac{N}{N_{\max}} \rgt)^{\alpha} \rgt\},
+\]
+where often $\alpha = \nicefrac{3}{4}$.
+
+The idea of this objective is that the we can work with an unnormalized conditional probability
+distribution and simply choose \[
+    \log p(v,w) = \langle \vec{\zeta}_w, \vec{z}_v \rangle.
+\]
+The reason for this is that the squared objective is two-sided, whereas a likelihood objective will
+always increase if we increase probabilities and the balancing effect comes purely from the
+normalization.
+
+GloVe can be interpreted as a low-rank matrix factorization with \[
+    \mat{U} \doteq \transpose{[\vec{\zeta}_1, \ldots, \vec{\zeta}_n]}, \quad \mat{V} \doteq \transpose{[\vec{z}_1, \ldots, \vec{z}_n]}.
+\]
+Then, we have the following matrix of unnormalized probabilities, \[
+    \log \hat{\mat{N}} = \mat{U} \transpose{\mat{V}}.
+\]
+The GloVe objective is a weighted Frobenius norm of the approximation residual between the observed
+log-count matrix and a low-rank factorization of embedding matrices. As a special case, consider \[
+    f(N) = \min \{ 1, N \},
+\]
+which results in a matrix completion problem,
+\begin{align*}
+    \mat{U}, \mat{V} \in \argmin_{\mat{U}, \mat{V}} & \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbb{1}\{ N_{ij} > 0 \} \lft( \log N_{ij} - \lft( \mat{U} \transpose{\mat{V}} \rgt)_{ij} \rgt)                                                                                                             \\
+                                                    & = \lft\| \Pi_{\mathbb{1}\{ \mat{N} > 0 \}} \lft( \log \mat{N} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|_F^2. \margintag{This is a matrix completion problem with $\mat{A} = \log \mat{N}$ and $\omega_{ij} = \mathbb{1}\{ N_{ij} > 0 \}$.}
+\end{align*}
+
+We can optimize $\mat{U}$ and $\mat{V}$ by stochastic gradient descent,
+\begin{align*}
+    \vec{\zeta}_w & \gets \vec{\zeta}_w + 2 \eta f(N_{vw}) (\log N_{vw} - \langle \vec{\zeta}_w, \vec{z}_v \rangle) \vec{z}_v  \\
+    \vec{z}_v     & \gets \vec{z}_v + 2 \eta f(N_{vw}) (\log N_{vw} - \langle \vec{\zeta}_w, \vec{z}_v \rangle) \vec{\zeta}_w,
+\end{align*}
+where we sample $(v,w)$ at random.

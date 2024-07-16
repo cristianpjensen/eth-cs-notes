@@ -1,0 +1,263 @@
+\section{Deep neural networks}
+
+Generally, deep learning models consist of a function $H: \R^n \to \R^p$ that extracts
+$p$-dimensional features from $n$-dimensional data and a linear map $g$ that makes the final
+prediction. The final learned function is then formalized by $\psi = g \circ H$. Machine learning
+philosophies differ in the way that they extract features from the data. There are three main
+philosophies,
+\begin{itemize}
+    \item Feature engineering: $H$ is hand-crafted to extract intuitive features that have good predictive
+          power of the label. The problem with this approach is that it requires domain expertise;
+    \item Feature expansion: $H$ maps to a high-dimensional feature space using kernels and implicit models;
+    \item Compositionality: The feature extraction function $H$ is learned through the composition of $L$
+          simple building blocks, \[
+              H = H_L \circ H_{L-1} \circ \cdots \circ H_2 \circ H_1, \quad H_l : \R^{n_{l-1}} \to \R^{n_l}.
+          \]
+\end{itemize}
+
+In compositional models, the partial maps $H_{1:l} \doteq H_l \circ \cdots \circ H_1$ produce
+intermediate representations. These satisfy the Markov property and, as such, need to preserve
+task-relevant information. Once information is lost, it cannot be recovered. The idea of the layers
+is to make relevant information more accessible and explicit with increasing depth, such that $g$
+can easily make a prediction.\sidenote{For example, the early layers of CNN typically learn
+    low-level features, whereas the later layers will learn higher level features that make use of the
+    low-level features.}
+
+The key question is how to define the basic building blocks such that their composition is more
+powerful than any one block can be. Consider two linear layers, \[
+    F(\vec{x}; \mat{W}_2) = \mat{W}_2 \vec{x}, \quad G(\vec{x}; \mat{W}_1) = \mat{W}_1 \vec{x}.
+\]
+Their composition is again a linear layer, \[
+    (F \circ G)(\vec{x}) = \mat{W}_2 \mat{W}_1 \vec{x} = \mat{W} \vec{x}, \quad \mat{W} = \mat{W}_2 \mat{W}_1.
+\]
+So, linear layers are not appropriate building blocks.
+
+The key idea is to combine a linear map with a non-linearity, \[
+    H(\vec{x}; \mat{W}) = \Phi(\mat{W} \vec{x}),
+\]
+where $\Phi$ is a non-linear element-wise activation function, \[
+    \Phi(\vec{z}) = [\phi(z_1), \ldots, \phi(z_m)], \quad \phi: \R\to\R.
+\]
+Theoretically, a neural network with one hidden layer and a non-polynomial activation function is a
+universal function approximator. This means that any function can be represented using a single
+hidden layer and a non-linear activation function.\sidenote[][-2cm]{The following are commonly used
+    activation functions,
+    \begin{itemize}
+        \item Sigmoid, $\sigma: \R \to (0,1)$, \[
+                  \sigma(z) \doteq \frac{1}{1 + e^{-z}};
+              \]
+        \item Hyperbolic tangent, $\tanh: \R \to (-1, 1)$, \[
+                  \tanh(z) \doteq \frac{e^z - e^{-z}}{e^z + e^{-z}} = 2 \sigma(2z) - 1;
+              \]
+        \item Rectified linear unit, $\mathrm{ReLU}: \R \to \R_{\geq 0}$, \[
+                  \mathrm{ReLU}(z) \doteq \max \{ 0, z \}.
+              \]
+    \end{itemize}} However, in practice, this single hidden layer may need to be infinitely large. A
+single hidden layer multi-layer perceptron (MLP) is formalized by the following function, \[
+    \psi(\vec{x}; \vec{\beta}, \mat{W}) = \transpose{\vec{\beta}} \sigma(\mat{W} \vec{x}) = \sum_{j=1}^{m} \beta_j \sigma(\transpose{\vec{w}_j} \vec{x}) = \sum_{j=1}^{m} \frac{\beta_j}{1 + \exp\lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}. \margintag{In this case, $g(\vec{y}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{y}$ and $H(\vec{x}; \mat{W}) = \mat{W} \vec{x}$.}
+\]
+In order to tune this model, we need to be able to compute its gradients, which tell us how to
+locally optimize a loss function $\ell$. In this case, we choose a squared loss, $\ell(\hat{y}, y)
+    = \frac{1}{2} (\hat{y} - y)^2$. The gradients are computed by
+\begin{align*}
+    \pdv*{\frac{1}{2} (\psi(\vec{x}) - y)^2}{\beta_j} & = (\psi(\vec{x}) - y) \pdv*{\psi(\vec{x})}{\beta_j}                                                                                                                                                                                                         \\
+                                                      & = \frac{\psi(\vec{x}) - y}{1 + \exp \lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}                                                                                                                                                                             \\
+    \pdv*{\frac{1}{2} (\psi(\vec{x}) - y)^2}{w_{ji}}  & = (\psi(\vec{x}) - y) \pdv*{\psi(\vec{x})}{w_{ji}}                                                                                                                                                                                                          \\
+                                                      & = (\psi(\vec{x}) - y) \beta_j \pdv*{\sigma\lft(\transpose{\vec{w}_j} \vec{x}\rgt)}{w_{ji}}                                                                                                                                                                  \\
+                                                      & = (\psi(\vec{x}) - y) \beta_j \sigma \lft( \transpose{\vec{w}_j} \vec{x} \rgt) \sigma \lft( - \transpose{\vec{w}_j} \vec{x} \rgt) \pdv*{\transpose{\vec{w}_j} \vec{x}}{w_{ji}} \margintag{$\sigma'(z) = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)$.} \\
+                                                      & = \frac{\psi(\vec{x}) - y}{1 + \exp \lft( - \transpose{\vec{w}_j} \vec{x} \rgt)} \frac{\beta_j x_i}{1 + \exp \lft( \transpose{\vec{w}_j} \vec{x} \rgt)}.
+\end{align*}
+Learning then typically involves by stochastic gradient descent, which iteratively selects a random
+mini-batch $\mathcal{S}_t \subseteq \mathcal{S} = \{ (\vec{x}_i, y_i) \}_{i=1}^n$. The update rule is
+then \[
+    \vec{\theta}_{t+1} = \vec{\theta}_t - \eta \sum_{(\vec{x}, y) \in \mathcal{S}_t} \pdv{\ell(\psi(\vec{x}; \vec{\theta}), y)}{\vec{\theta}}.
+\]
+
+\subsection{Backpropagation}
+
+Calculating the gradient by hand for every model is very tedious and time consuming.
+Backpropagation is an algorithm that can compute the gradient of any function, which consists of
+building blocks with known gradients, in linear time. This algorithm makes use of dynamic
+programming, which means that it breaks the problem down into smaller subproblems and re-uses
+solutions to previously seen subproblems. In this case, the solution to the subproblems are the
+gradients, which can be re-used in later gradients by the chain rule and sum rule. In short,
+backpropagation exploits compositionality to efficiently compute the gradient.
+
+Let $H_k: \R^n \to \R^m$ be an intermediate layer of a compositional model. It's Jacobi map is
+defined as \[
+    [\mat{J}_k]_{ij} \doteq \pdv{h_{ki}}{z_j}, \margintag{$h_{ki}$ is the $i$-th output of layer $k$ and $z_j$ is its $j$-th input.}
+\]
+which is an implicit function of the input $\vec{z} \in \R^n$ to $H_k$. Furthermore, define the
+error signal as \[
+    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]}.
+\]
+Using the chain rule, we can find a recurrence relation between error signals, \[
+    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]} = \transpose{\lft[ \pdv{\ell}{H_{k+1}} \pdv{H_{k+1}}{H_k} \rgt]} \doteq \transpose{\mat{J}_{k+1}} \vec{\delta}_{k+1}.
+\]
+Lastly, in order to compute the gradient \wrt the parameters, we use the chain rule again,
+\begin{align*}
+    \pdv{\ell}{[\mat{W}_k]_{ij}} & = \pdv{\ell}{H_k} \pdv{H_k}{[\mat{W}_k]_{ij}}                                                                                                               \\
+                                 & = \pdv{\ell}{H_k} \lft[ \lft. \pdv{\phi(\vec{y})}{\vec{y}} \rgt|_{\vec{y} = \mat{W}_k \vec{z}_{k-1}} \rgt] \pdv*{\mat{W}_k \vec{z}_{k-1}}{[\mat{W}_k]_{ij}} \\
+                                 & = \transpose{\vec{\delta}_k} \mathrm{diag} \lft( \phi'(\mat{W}_k \vec{z}_{k-1}) \rgt) \mathrm{vec}_i([\vec{z}_{k-1}]_j)                                     \\
+                                 & = [\vec{\delta}_k]_i \cdot \phi'\lft(\transpose{[\mat{W}_k]_i} \vec{z}_{k-1}\rgt) \cdot [\vec{z}_{k-1}]_j.
+\end{align*}
+Intuitively, the local parameter gradient $\pdv{\ell}{\mat{W}_k}$ is the product of an upstream
+vector $\vec{z}_{k-1}$, a downstream error signal $\vec{\delta}_k$, and the local sensitivity of
+the unit $\phi'(\mat{W}_k \vec{z}_{k-1})$. Note that we first need to perform a forward pass in
+order to compute these gradients in the backward pass.
+
+Moreover, we have the following Jacobi maps for different activation functions,
+\begin{itemize}
+    \item Linear activation, $\mat{J}_k = \mat{W}$;
+    \item ReLU layer, $\mat{J}_k = \mathrm{diag}(\mathbb{1}\{ \mat{W}\vec{z} > 0 \}) \mat{W}$;
+    \item Sigmoid layer, $\mat{J}_k = \mathrm{diag}(\sigma'(\mat{W} \vec{z})) \mat{W}$.
+\end{itemize}
+
+\subsection{Gradient methods}
+
+In gradient descent, we iteratively update the parameters by \[
+    \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \grad{\ell(\vec{\theta}_k)}{}, \quad \eta > 0.
+\]
+A fundamental question is whether gradient descent will converge to an optimal solution. The key
+intuition is that gradient descent can only work if gradient does not change too much relative to
+the step size. The gradient information must remain informative in a neighborhood around a point.
+
+\begin{definition}[Smoothness]
+    A differentiable function $\ell: \R^d \to \R$ is $L$-smooth for some $L > 0$ if \[
+        \| \grad{\ell(\vec{\theta})}{} - \grad{\ell(\vec{\theta}')}{} \| \leq L \| \vec{\theta} - \vec{\theta}' \|, \quad \forall \vec{\theta}, \vec{\theta}'.
+    \]
+    This is equivalent to the gradient being $L$-Lipschitz continuous.
+\end{definition}
+
+Smoothness implies a bound on the Hessian, \[
+    \| \hess{\ell(\vec{\theta})}{} \| \leq L, \quad \forall \vec{\theta}.
+\]
+As a consequence, this means that smoothness bounds the largest eigenvalue of the Hessian. A large
+$L$ means that the gradient can change quickly, making it more unstable, thus we need to lower the
+stepsize. This is intuitively why the stepsize $\eta = \nicefrac{1}{L}$ works well.
+
+\begin{definition}[$\epsilon$-critical point]
+    Let $\ell$ be differentiable at $\vec{\theta}$, then $\vec{\theta}$ is an $\epsilon$-critical point if \[
+        \| \grad{\ell(\vec{\theta})}{} \| \leq \epsilon.
+    \]
+\end{definition}
+
+\begin{lemma}
+    Gradient descent on an $L$-smooth, differentiable function $\ell: \R^d \to \R$ with step size $\eta = \nicefrac{1}{L}$ finds an $\epsilon$-critical point in at most \[
+        k = \frac{2L\lft(\ell\lft(\vec{\theta}_0\rgt) - \ell^\star\rgt)}{\epsilon^2}
+    \]
+    steps.
+\end{lemma}
+
+Thus, smoothness is sufficient to find local minima. The question is what properties of $\ell$ will
+ensure convergence to a global minimum.
+
+\begin{definition}[Polyak-Lojasiewicz condition]
+    A differentiable function $\ell: \R^d \to \R$ satisfies the Polyak-Lojasiewicz (PL) condition with parameter $\mu > 0$ if \[
+        \frac{1}{2} \| \grad{\ell(\vec{\theta})}{} \|^2 \geq \mu (\ell(\vec{\theta}) - \ell^\star), \quad \forall \vec{\theta}.
+    \]
+\end{definition}
+
+\begin{lemma}
+    Let $\ell$ be differentiable, $L$-smooth, and $\mu$-PL. Then, gradient descent with stepsize $\eta = \nicefrac{1}{L}$ converges at a geometric rate, \[
+        \ell\lft( \vec{\theta}^{(k)} \rgt) - \ell^\star \leq \lft( 1 - \frac{\mu}{L} \rgt)^k \lft( \ell(\vec{\theta}_0) - \ell^\star \rgt).
+    \]
+\end{lemma}
+
+\begin{definition}[Strong convexity]
+    A differentiable function $\ell: \R^d \to \R$ is $\mu$-strongly convex for some $\mu > 0$ if \[
+        \ell(\vec{\theta}') \geq \ell(\vec{\theta}) + \langle \grad{\ell(\vec{\theta})}{}, \vec{\theta}' - \vec{\theta} \rangle + \frac{\mu}{2} \| \vec{\theta}' - \vec{\theta} \|^2, \quad \forall \vec{\theta}, \vec{\theta}'.
+    \]
+\end{definition}
+
+Intuitively, strong convexity bounds the smallest eigenvalue of a locally quadratic approximation
+of $\ell$.
+
+\begin{lemma}[Strong convexity $\Rightarrow$ PL]
+    Let $\ell$ be $\mu$-strongly convex, then it fulfills the PL condition with the same $\mu$.
+\end{lemma}
+
+Thus, strong convexity ensures convergence to a global optimum.
+
+\paragraph{Momentum.}
+
+The heavy ball method is an optimization algorithm with momentum, \[
+    \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \grad{\ell(\vec{\theta}_k)}{} + \beta (\vec{\theta}_k - \vec{\theta}_{k-1}), \quad \beta \in (0,1).
+\]
+Intuitively, we are acting as if the iterates have mass. As a consequence, we will pass small
+gradient areas faster, and thus overcomes converging to local minima.
+
+\paragraph{Adaptivity.}
+
+AdaGrad uses the gradient history to adapt the stepsize per dimension, \[
+    [\vec{\theta}_{k+1}]_i = [\vec{\theta}_k]_i - \eta_i^k \grad{\ell(\vec{\theta}_k)}{i}, \quad \eta_i^k \doteq \frac{\eta}{\sqrt{\gamma_i^k} + \delta},
+\]
+where \[
+    \gamma_i^k = \gamma_i^{k-1} + \lft( \grad{\ell(\vec{\theta}_k)}{i} \rgt)^2.
+\]
+
+\paragraph{Acceleration.}
+
+Nesterov's accelerated gradient descent has the following update rule,
+\begin{align*}
+    \vec{\theta}_{k+1}' & = \vec{\theta}_k + \beta (\vec{\theta}_k - \vec{\theta}_{k-1})   \\
+    \vec{\theta}_{k+1}  & = \vec{\theta}_{k+1}' - \eta \grad{\ell(\vec{\theta}_{k+1}')}{}.
+\end{align*}
+While it is not intuitive why this works, it provides a faster convergence rate than vanilla gradient
+descent.
+
+\paragraph{Adam.}
+
+Adam combines momentum and adaptivity to increase convergence speed. It defines the following
+variables,
+\begin{align*}
+    \vec{g}_k & = \beta \vec{g}_{k-1} + (1- \beta) \grad{\ell(\vec{\theta}_k)}{}, \quad \beta \in [0,1]              \\
+    \vec{h}_k & = \alpha \vec{h}_{k-1} + (1-\alpha) \grad{\ell(\vec{\theta}_k)}{}^{\odot 2}, \quad \alpha \in [0,1].
+\end{align*}
+The update rule is then \[
+    \vec{\theta}_{k+1} = \vec{\theta}_k - \vec{\eta}_k \odot \vec{g}_k, \quad \vec{\eta}_k = \frac{\eta}{\sqrt{\vec{h}_k} + \delta}.
+\]
+
+\subsection{Convolutional neural networks}
+
+Images and audio have an extremely high dimensionality, which means that a single linear layer
+would have an extremely high parameter count. However, we can exploit the locality, scale, and
+shift invariance of these types of data to define a new operator; the convolution.
+
+\begin{definition}[Convolution]
+    Given two functions $f,h$, their convolution is defined as \[
+        (f*h)(u) \doteq \int_{-\infty}^{\infty} h(u-t)f(t) \mathrm{d}t = \int_{-\infty}^{\infty} f(u-t)h(t) \mathrm{d}t.
+    \]
+\end{definition}
+
+The convolution operator is shift invariant, meaning that if we shift and then apply the operator,
+we get the same result as if we were to first apply the operator and then shift. Formally, \[
+    (f*h)(u + \Delta) = (f*h)(u) + \Delta.
+\]
+The converse is also true: any linear shift-invariant transformation can be written as a
+convolution.
+
+In practice, we have discrete data, which means that we have to define a discrete convolution
+operator, \[
+    (f*h)[u] \doteq \sum_{t=-\infty}^{\infty} f[t] h[u-t].
+\]
+This easily extends to two dimensions, \[
+    (f*h)[x,y] = \sum_{u=-\infty}^{\infty} \sum_{v=-\infty}^{\infty} f[u,v] h[x-u, y-v].
+\]
+Typically, $f$ and $h$ are defined over a finite domain.
+
+The cross-correlation operator is equal to a convolution with a flipped kernel, \[
+    (f\star h)[u] \doteq \sum_{t=-\infty}^{\infty} h[t] f[u+t].
+\]
+
+Convolutional neural networks (CNN) learn the kernel of convolutional layers and stacks them in a
+compositional way to extract features from images. In this way, these layers exploit the shift
+invariance, locality, and scale of the data. Furthermore, it increases the statistical efficiency
+\wrt MLPs, because of the shared parameters.
+
+As MLPs, CNNs alternate between (linear) convolutional layers and non-linear element-wise functions
+to increase model capacity. Moreover, it employs max-pooling layers to decrease the dimensionality
+of the input. It does so by taking only the maximum in every $k \times k$ patch. This has the
+effect that the input is subsampled $k$ times. After many max-pooling layers, the data will no
+longer be location dependent, which allows us to throw away spatial information by flattening the
+data. From there, linear layers can be used to make the final prediction.
