@@ -215,7 +215,7 @@ variables,
     \vec{h}_k & = \alpha \vec{h}_{k-1} + (1-\alpha) \grad{\ell(\vec{\theta}_k)}{}^{\odot 2}, \quad \alpha \in [0,1].
 \end{align*}
 The update rule is then \[
-    \vec{\theta}_{k+1} = \vec{\theta}_k - \vec{\eta}_k \odot \vec{g}_k, \quad \vec{\eta}_k = \frac{\eta}{\sqrt{\vec{h}_k} + \delta}.
+    \vec{\theta}_{k+1} = \vec{\theta}_k - \vec{\eta}_k \odot \vec{g}_k, \quad \vec{\eta}_k = \eta \oslash \lft( \sqrt{\vec{h}_k} + \delta \rgt).
 \]
 
 \subsection{Convolutional neural networks}

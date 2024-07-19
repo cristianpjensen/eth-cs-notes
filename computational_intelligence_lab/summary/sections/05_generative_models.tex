@@ -1,0 +1,225 @@
+\section{Generative models}
+
+Generally, a dataset has a true generative process $p(\vec{x})$ that we can sample from by querying
+the dataset. Considering that collecting data is often expensive, we wish to parametrize a
+generative model $p(\vec{x}; \vec{\theta})$ that is indistinguishable from $p(\vec{x})$.
+
+We want the models to not generate unnatural patterns, so we do not want the following, \[
+    p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \gtrapprox 0.
+\]
+Furthermore, we want the model to generate natural patterns with approximately correct
+probabilities, so we also do not want the following situation, \[
+    p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \gtrapprox 0,
+\]
+
+Moreover, we want to train generative models such that they give high probabilistic mass to samples
+from the dataset. Thus, a good objective function is to maximize the log-likelihood of the dataset
+(maximum likelihood estimation), \[
+    \ell(\vec{\theta}) = \E_{\vec{x} \sim p(\vec{x})}[\log p(\vec{x}; \vec{\theta})].
+\]
+However, we will see that some models cannot tractably compute the likelihood and must thus resort
+to approximations. We will also see that the likelihood might not be the best measure of success,
+which will lead to alternative loss functions.
+
+\subsection{Autoregressive models}
+
+Autoregressive models make use of a sequential ordering of variables and define the model directly
+on these observables. There are data types that have an inherent temporal ordering, such as text
+and audio, while other data types require defining an ordering. For example, in order to generate
+images pixel-by-pixel, a consistent ordering of the pixels must be defined. Empirically, it has
+been found that any ordering, even random, works well.
+
+In order to compute the likelihood, autoregressive models make use of the chain rule, \[
+    p(\vec{x}; \vec{\theta}) = \sum_{t=1}^{m} p(x_t \mid x_1, \ldots, x_{t-1}; \vec{\theta}).
+\]
+Typically, autoregressive models are modeled by modeling the conditional distribution $p(x_t \mid
+    \vec{x}_{1:t-1}; \vec{\theta})$ as a neural network. Specifically, the history is first mapped to a
+latent variable (embedding), \[
+    \vec{x}_{1:t-1} \mapsto \vec{z} \in \R^d,
+\]
+which is used to predict the probability distribution over next observables $x_t$ by applying the
+softmax operator, \[
+    p(x \mid \vec{x}_{1:t-1}) = \frac{\exp \langle \vec{z}, \vec{w}_x \rangle}{\sum_{x' \in \mathcal{X}} \exp \langle \vec{z}, \vec{w}_{x'} \rangle}.
+\]
+
+\paragraph{Pixel CNN.}
+
+Pixel CNN is used to generate $n \times m$ images, \[
+    p(\vec{x}) = \prod_{t=1}^{n\times m} p(x_i \mid x_1, \ldots, x_{t-1}).
+\]
+However, it only conditions on the pixels within a predefined context window. Since it is only
+allowed to use information about pixels above and to the left of the current pixel, we have to use
+a masked kernel window that zeroes out all pixels below and to the left of the current pixel. This
+enables the model to learn much faster than other autoregressive models, because it does not have
+to wait for all previous pixels to be generated, because we already have access to them, and the
+latent representation depends only on the pixels within the context window. But, generation is
+still slow, because all pixels in the context window need to be generated first.
+
+\paragraph{Transformers.}
+
+Recently, transformers have been used to power state-of-the-art language models. They make use of
+multi-headed self-attention (MHSA), layer normalization, and an MLP. Let $\mat{X} \in \R^{d \times
+        T}$ contain the $T$ $d$-dimensional embeddings in the current context window. MHSA introduces a
+query matrix $\mat{W}_Q \in \R^{k \times d}$, a key matrix $\mat{W}_K \in \R^{k \times d}$, and a
+value matrix $\mat{W}_V \in \R^{r \times d}$. We then use $\mat{X}$ to compute queries, and values, \[
+    \mat{Q} = \mat{W}_Q \mat{X} \in \R^k, \quad \mat{K} = \mat{W}_K \mat{X} \in \R^k, \quad \mat{V} = \mat{W}_V \mat{X} \in \R^r.
+\]
+These interact like a soft mapping, where the queries and keys decide how much from the values
+should be taken, \[
+    \mat{\Xi} = \mathrm{softmax}\lft( \frac{\transpose{\mat{Q}} \mat{K}}{\sqrt{k}} \rgt) \mat{V},
+\]
+where $\mathrm{softmax}$ is applied row-wise. Intuitively, the queries say what information they
+want, the keys say what information they have, and the values contain the actual information.
+
+Transformers also make use of layer normalization, which normalizes the data by \[
+    \vec{x}' = \gamma \lft( \frac{\vec{x} - \mu}{\sigma} \rgt) + \beta, \quad \mu = \frac{1}{d} \sum_{i=1}^{d} x_i, \quad \sigma^2 = \frac{1}{d} \sum_{i=1}^{d} (x_i - \mu)^2,
+\]
+where $\gamma$ and $\beta$ are parameters. This normalization block is applied in order to balance
+activation magnitudes across tokens and dimensions.
+
+A single layer in the transformer architecture consists of sequentially applying MHSA, layer norm,
+MLP, and another layer norm. Furthermore, it uses residual connections for the MHSA layer and the
+MLP layer. Since the output of this layer can be defined to have the same dimensionality as the
+input, these layers are stacked.
+
+\subsection{Variational autoencoders}
+
+The variational autoencoder (VAE) is a latent variable model, where $\vec{x}$ is first mapped to an
+instantiation of an elementary distribution $p(\vec{z} \mid \vec{x})$ by an encoder, from which we
+sample the latent variable $\vec{z}$. Then, a decoder reconstructs the original input
+$\hat{\vec{x}}$ from this latent variable $\vec{z}$. During training, we make sure that the output
+distributions of the encoder do not deviate too far from a prior distribution $p(\vec{z})$. After
+training, we can then generate new data points by sampling $\vec{z}$ from the prior and passing it
+through the decoder.
+
+The log-likelihood is computed by \[
+    \log p(\vec{x}; \vec{\theta}) = \log \int p(\vec{z}) p(\vec{x} \mid \vec{z}; \vec{\theta}) \mathrm{d}\vec{z},
+\]
+which is intractable, because we cannot integrate over all latent variables. Thus, we must derive
+an ELBO using a variational distribution $q$,
+\begin{align*}
+    \log p(\vec{x}; \vec{\theta})  & = \log \int p(\vec{z}) p(\vec{x} \mid \vec{z}; \vec{\theta}) \mathrm{d}\vec{z}                                                                               \\
+                                   & = \log \int q(\vec{z}) \frac{p(\vec{z})}{q(\vec{z})} p(\vec{x} \mid \vec{z}; \vec{\theta}) \mathrm{d}\vec{z}                                                 \\
+                                   & \geq \int q(\vec{z}) \log \frac{p(\vec{z})}{q(\vec{z})} p(\vec{x} \mid \vec{z}; \vec{\theta}) \mathrm{d}\vec{z}                                              \\
+                                   & = \int q(\vec{z}) \log p(\vec{x} \mid \vec{z}; \vec{\theta}) \mathrm{d}\vec{z} - \int q(\vec{z}) \log \frac{q(\vec{z})}{p(\vec{z})}                          \\
+                                   & = \E_{q(\vec{z})}[\log p(\vec{x} \mid \vec{z}; \vec{\theta})] - D_{\mathrm{KL}}(q(\vec{z}) \| p(\vec{z}))                                                    \\
+    \intertext{We parameterize $q$ as the encoder with parameters $\vec{\psi}$ (instead of choosing $q$ for every $\vec{x}$ like in the case of mixture models), which results in the final loss function,}
+    \ell(\vec{\theta}, \vec{\psi}) & = \E_{q(\vec{z} \mid \vec{x}; \vec{\psi})}[\log p(\vec{x} \mid \vec{z}; \vec{\theta})] - D_{\mathrm{KL}}(q(\vec{z} \mid \vec{x}; \vec{\psi}) \| p(\vec{z})).
+\end{align*}
+Thus, the ELBO encourages good reconstruction by the first term and makes sure that the distributions
+produced by the encoder do not deviate too far from the prior by the second term.
+
+Computing the derivative of the first term \wrt $\vec{\psi}$ is hard. However, we can make a Monte
+Carlo approximation of the expectation by using the reparametrization trick. This involves sampling
+an instance from a fixed distribution and using this to compute an instance of the desired
+distribution with the same probability. In the case of $q$ as a Gaussian, where the encoder outputs
+means $\vec{\mu}$ and variances $\vec{\sigma}$, we can obtain a sample from this distribution by
+only sampling from $\mathcal{N}(\vec{0}, \mat{I})$ as follows,
+\begin{align*}
+    \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, \mathrm{I})            \\
+    \vec{z}        & = \vec{\mu} + \vec{\sigma} \odot \vec{\epsilon}.
+\end{align*}
+$\vec{z}$ is a sample from $\mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$. The second term
+of the ELBO is analytically computable if we further assume define the prior to be Gaussian
+$\mathcal{N}(\vec{0}, \mat{I})$.
+
+\subsection{Generative adversarial networks}
+
+In practice, the log-likelihood may not be the best to optimize for. The next idea views generative
+models in terms of a classification problem, \[
+    p(\vec{x}, Y; \vec{\theta}) = \frac{Y}{2} p(\vec{x}) + \frac{1 - Y}{2} p(\vec{x}; \vec{\theta}), \quad Y \in \{ 0,1 \},
+\]
+where $Y$ indicates from which distribution $\vec{x}$ is sampled.
+
+Assume that we have access to a classifier (or discriminator) that can distinguish between samples
+from the true data distribution and samples from the model's distribution, \[
+    \pi: \R^n \to [0, 1], \quad \pi(\vec{x}) \approx \mathbb{P}(Y = 1 \mid \vec{x}).
+\]
+We then have the following logistic loss,
+\begin{align*}
+    \ell(\vec{\theta}; \pi) & = \E[Y \log \pi(\vec{x}) + (1-Y) \log(1-\pi(\vec{x}))]                                                                           \\
+                            & = \int p(\vec{x}) \log \pi(\vec{x}) \mathrm{d}\vec{x} + \int p(\vec{x}; \vec{\theta}) \log (1 - \pi(\vec{x})) \mathrm{d}\vec{x}.
+\end{align*}
+
+The Bayes-optimal classifier for this loss is
+\begin{align*}
+    \pi^\star(\vec{x}) & = \mathbb{P}(Y = 1 \mid \vec{x})                                                                                             \\
+                       & = \frac{p(\vec{x} \mid Y = 1) p(Y=1)}{p(\vec{x} \mid Y = 1) p(Y = 1) + p(\vec{x} \mid Y = 0) p(Y = 0)}                       \\
+                       & = \frac{p(\vec{x}) \cdot \nicefrac{1}{2}}{p(\vec{x}) \cdot \nicefrac{1}{2} + p(\vec{x}; \vec{\theta}) \cdot \nicefrac{1}{2}} \\
+                       & = \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})}.
+\end{align*}
+Furthermore, by using the Bayes-optimal classifier, we can rewrite the logistic loss function as
+optimizing the Jensen-Shannon divergence between $p(\vec{x})$ and $p(\vec{x}; \vec{\theta})$,
+\begin{align*}
+    \ell(\vec{\theta}) & = \int p(\vec{x}) \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x} + \int p(\vec{x}; \vec{\theta}) \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x}                       \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt]                                   \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{2 \cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{2\cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] - \log 4           \\
+                       & = D_{\mathrm{KL}}\lft(p(\vec{x}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) + D_{\mathrm{KL}} \lft( p(\vec{x}; \vec{\theta}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) - \log 4                            \\
+                       & = 2 D_{\mathrm{JS}}(p(\vec{x}) \| p(\vec{x}; \vec{\theta})) - \log 4.
+\end{align*}
+
+In practice, we do not have access to $p(\vec{x})$ and $p(\vec{x}; \vec{\theta})$ to compute the
+optimal discriminator $\pi^\star$. Despite this, it is not a hard job, so we can expect a neural
+network, parametrized by $\vec{\phi}$, to perform well on this task. This results in an adversarial
+loss function, \[
+    \vec{\theta}^\star = \argmin_{\vec{\theta}} \max_{\vec{\phi}} \ell(\vec{\theta}, \vec{\phi}), \quad \vec{\phi}^\star = \argmax_{\vec{\phi}} \ell(\vec{\theta}^\star, \vec{\phi}).
+\]
+This can be optimized by gradient descent where every step involves optimizing both ``players''.
+However, that is often non-converging. The extragradient method usually performs better.
+
+\subsection{Diffusion models}
+
+Diffusion models represent the new state-of-the-art in generative models. Instead of generating a
+full sample in one forward pass, it breaks it down into many small iterative steps. It does so by
+starting from pure noise, $\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$, and iteratively working
+toward a sample from the data distribution, $\vec{x}_0 \sim p(\vec{x})$.
+
+The forward diffusion process forms a Markov chain, \[
+    \vec{x}_t = \alpha_t \vec{x}_{t-1} + \beta_t \vec{\epsilon}_t, \quad \vec{\epsilon}_t \sim \mathcal{N}(\vec{0}, \mat{I}),
+\]
+where $\alpha_t, \beta_t \in (0,1)$. Typically, $\alpha_t$ and $\beta_t$ are chosen to preserve
+signal variance, \ie, \[
+    \alpha_t^2 + \beta_t^2 = 1, \quad \beta_t = \sqrt{1 - \alpha_t^2}.
+\]
+Given $\vec{x}_0$, we can directly compute $\vec{x}_t$ for any $t$, \[
+    \vec{x}_t = \bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}_t, \quad \vec{\epsilon}_t \sim \mathcal{N}(\vec{0}, \mat{I}),
+\]
+where \[
+    \bar{\alpha}_t = \prod_{\tau=1}^{t} \alpha_\tau, \quad \bar{\beta}_t = \sqrt{1 - \bar{\alpha}_t^2}.
+\]
+Because $\lim_{t \to \infty} \bar{\alpha}_t = 0$, we iteratively remove information in the
+diffusion process. In the limit, all information of $\vec{x}_0$ is lost, \[
+    \vec{x}_{\infty} \mid \vec{x}_0 \sim \mathcal{N}(\vec{0}, \mat{I}).
+\]
+
+The idea of diffusion models is to learn the time-reversed Markov chain, \[
+    p(\vec{x}_{t-1} \mid \vec{x}_t; \vec{\theta}).
+\]
+Provided that $\lim_{t\to \infty} \beta_t = 0$, then we can approximate this distribution by a
+Gaussian, \[
+    \vec{x}_{t-1} \mid \vec{x}_t \sim \mathcal{N}(\vec{\mu}(\vec{x}_t, t; \vec{\theta}), \mat{\Sigma}(\vec{x}_t, t; \vec{\theta})),
+\]
+which we can simplify to only learn the mean, \[
+    \vec{x}_{t-1} \mid \vec{x}_t \sim \mathcal{N}(\vec{\mu}(\vec{x}_t, t; \vec{\theta}), \sigma_t^2 \mat{I}), \quad \sigma_t^2 \in \{ \beta_t, \bar{\beta}_t \}.
+\]
+Optimizing the log-likelihood with this model reduces to optimizing the squared error criterion
+between $\vec{x}_{t-1}$ and $\vec{\mu}$, which is easy to optimize. This is effectively the same as
+training a model to output the added noise and optimizing \wrt the squared error on the noise.
+
+More specifically, a step of the learning algorithm of a diffusion model involves the following,
+\begin{align*}
+    \vec{x}_0      & \sim p(\vec{x}_0)                                                                                                                                                 \\
+    t              & \sim \mathrm{Unif}([T])                                                                                                                                           \\
+    \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, \mat{I})                                                                                                                                \\
+    \vec{\theta}   & \gets \vec{\theta} - \eta \grad{\| \vec{\epsilon} - \vec{\epsilon}(\bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}, t; \vec{\theta}) \|^2}{\vec{\theta}}.
+\end{align*}
+
+After training the diffusion model, it can be sampled by iteratively denoising, starting from
+$\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$,
+\begin{align*}
+    \vec{z}       & \sim \mathcal{N}(\vec{0}, \mat{I}) \text{ if $t > 1$ else } \vec{z}_0 = \vec{0}                                                           \\
+    \vec{x}_{t-1} & = \frac{1}{\alpha_t} \lft( \vec{x}_t - \frac{\beta_t}{\bar{\beta}_t} \vec{\epsilon}(\vec{x}_t, t; \vec{\theta}) \rgt) + \sigma_t \vec{z}.
+\end{align*}
+
+For image generation, $\vec{\epsilon}(\vec{x}_t, t; \vec{\theta})$ is typically modeled as a U-net.
