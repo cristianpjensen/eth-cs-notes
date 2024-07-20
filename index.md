@@ -2,13 +2,12 @@
 
 ## Optimization for Data Science, S24
 
-- [Summary](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-summary.pdf)
-- [Cheatsheet](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-cheatsheet.pdf)
+- [Summary (WIP)](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-summary.pdf)
+- [Cheatsheet (WIP)](https://cristianpjensen.github.io/eth-cs-notes/optimization_for_data_science-cheatsheet.pdf)
 
 ## Computational Intelligence Lab, S24
 
-- [Recap](https://cristianpjensen.github.io/eth-cs-notes/computational_intelligence_lab-recap.pdf)
-- [Summary](https://cristianpjensen.github.io/eth-cs-notes/computational_intelligence_lab-summary.pdf)
+- [Summary (WIP)](https://cristianpjensen.github.io/eth-cs-notes/computational_intelligence_lab-summary.pdf)
 
 ## Machine Perception, S24
 
