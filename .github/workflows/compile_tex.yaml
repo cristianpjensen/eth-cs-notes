@@ -66,13 +66,6 @@ jobs:
         latexmk_shell_escape: true
         working_directory: machine_perception/cheatsheet
 
-    - name: Compile computational intelligence lab recap
-      uses: xu-cheng/latex-action@v3
-      with:
-        root_file: main.tex
-        latexmk_shell_escape: true
-        working_directory: computational_intelligence_lab/recap
-
     - name: Compile computational intelligence lab summary
       uses: xu-cheng/latex-action@v3
       with:
@@ -91,7 +84,6 @@ jobs:
         file optimization_for_data_science/cheatsheet/main.pdf | grep -q ' PDF '
         file machine_perception/summary/main.pdf | grep -q ' PDF '
         file machine_perception/cheatsheet/main.pdf | grep -q ' PDF '
-        file computational_intelligence_lab/recap/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
@@ -116,7 +108,6 @@ jobs:
         cp -f optimization_for_data_science/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-cheatsheet.pdf"
         cp -f machine_perception/summary/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
         cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-cheatsheet.pdf"
-        cp -f computational_intelligence_lab/recap/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-recap.pdf"
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
@@ -130,7 +121,6 @@ jobs:
         git add optimization_for_data_science-cheatsheet.pdf
         git add machine_perception-summary.pdf
         git add machine_perception-cheatsheet.pdf
-        git add computational_intelligence_lab-recap.pdf
         git add computational_intelligence_lab-summary.pdf
 
         git commit -m "[github actions] deploy"
