@@ -40,21 +40,28 @@ where $\Phi$ is a non-linear element-wise activation function, \[
 \]
 Theoretically, a neural network with one hidden layer and a non-polynomial activation function is a
 universal function approximator. This means that any function can be represented using a single
-hidden layer and a non-linear activation function.\sidenote[][-2cm]{The following are commonly used
-    activation functions,
+hidden layer and a non-linear activation function.\sidenote[][-3cm]{The following are commonly used
+    activation functions with their derivatives,
     \begin{itemize}
-        \item Sigmoid, $\sigma: \R \to (0,1)$, \[
-                  \sigma(z) \doteq \frac{1}{1 + e^{-z}};
-              \]
-        \item Hyperbolic tangent, $\tanh: \R \to (-1, 1)$, \[
-                  \tanh(z) \doteq \frac{e^z - e^{-z}}{e^z + e^{-z}} = 2 \sigma(2z) - 1;
-              \]
-        \item Rectified linear unit, $\mathrm{ReLU}: \R \to \R_{\geq 0}$, \[
-                  \mathrm{ReLU}(z) \doteq \max \{ 0, z \}.
-              \]
+        \item Sigmoid, $\sigma: \R \to (0,1)$,
+              \begin{align*}
+                  \sigma(z)  & \doteq \frac{1}{1 + e^{-z}} \\
+                  \sigma'(z) & = \sigma(z) (1 - \sigma(z)) \\
+                             & = \sigma(z) \sigma(-z);
+              \end{align*}
+        \item Hyperbolic tangent, $\tanh: \R \to (-1, 1)$,
+              \begin{align*}
+                  \tanh(z)  & \doteq \frac{e^z - e^{-z}}{e^z + e^{-z}} \\
+                  \tanh'(z) & = 1 - \tanh^2(z);
+              \end{align*}
+        \item Rectified linear unit, $\mathrm{ReLU}: \R \to \R_{\geq 0}$,
+              \begin{align*}
+                  \mathrm{ReLU}(z)  & \doteq \max \{ 0, z \}   \\
+                  \mathrm{ReLU}'(z) & = \mathbb{1}\{ z > 0 \}.
+              \end{align*}
     \end{itemize}} However, in practice, this single hidden layer may need to be infinitely large. A
 single hidden layer multi-layer perceptron (MLP) is formalized by the following function, \[
-    \psi(\vec{x}; \vec{\beta}, \mat{W}) = \transpose{\vec{\beta}} \sigma(\mat{W} \vec{x}) = \sum_{j=1}^{m} \beta_j \sigma(\transpose{\vec{w}_j} \vec{x}) = \sum_{j=1}^{m} \frac{\beta_j}{1 + \exp\lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}. \margintag{In this case, $g(\vec{y}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{y}$ and $H(\vec{x}; \mat{W}) = \mat{W} \vec{x}$.}
+    \psi(\vec{x}; \vec{\beta}, \mat{W}) = \transpose{\vec{\beta}} \sigma(\mat{W} \vec{x}) = \sum_{j=1}^{m} \beta_j \sigma\lft(\transpose{\vec{w}_j} \vec{x}\rgt) = \sum_{j=1}^{m} \frac{\beta_j}{1 + \exp\lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}. \margintag{In this case, $g(\vec{y}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{y}$ and $H(\vec{x}; \mat{W}) = \mat{W} \vec{x}$.}
 \]
 In order to tune this model, we need to be able to compute its gradients, which tell us how to
 locally optimize a loss function $\ell$. In this case, we choose a squared loss, $\ell(\hat{y}, y)
@@ -67,10 +74,10 @@ locally optimize a loss function $\ell$. In this case, we choose a squared loss,
                                                       & = (\psi(\vec{x}) - y) \beta_j \sigma \lft( \transpose{\vec{w}_j} \vec{x} \rgt) \sigma \lft( - \transpose{\vec{w}_j} \vec{x} \rgt) \pdv*{\transpose{\vec{w}_j} \vec{x}}{w_{ji}} \margintag{$\sigma'(z) = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)$.} \\
                                                       & = \frac{\psi(\vec{x}) - y}{1 + \exp \lft( - \transpose{\vec{w}_j} \vec{x} \rgt)} \frac{\beta_j x_i}{1 + \exp \lft( \transpose{\vec{w}_j} \vec{x} \rgt)}.
 \end{align*}
-Learning then typically involves by stochastic gradient descent, which iteratively selects a random
+Learning is typically carried out through stochastic gradient descent, which iteratively selects a random
 mini-batch $\mathcal{S}_t \subseteq \mathcal{S} = \{ (\vec{x}_i, y_i) \}_{i=1}^n$. The update rule is
 then \[
-    \vec{\theta}_{t+1} = \vec{\theta}_t - \eta \sum_{(\vec{x}, y) \in \mathcal{S}_t} \pdv{\ell(\psi(\vec{x}; \vec{\theta}), y)}{\vec{\theta}}.
+    \vec{\theta}_{t+1} = \vec{\theta}_t - \eta \sum_{(\vec{x}, y) \in \mathcal{S}_t} \grad{\ell(\psi(\vec{x}; \vec{\theta}), y)}{\vec{\theta}}.
 \]
 
 \subsection{Backpropagation}
@@ -110,7 +117,8 @@ Moreover, we have the following Jacobi maps for different activation functions,
 \begin{itemize}
     \item Linear activation, $\mat{J}_k = \mat{W}$;
     \item ReLU layer, $\mat{J}_k = \mathrm{diag}(\mathbb{1}\{ \mat{W}\vec{z} > 0 \}) \mat{W}$;
-    \item Sigmoid layer, $\mat{J}_k = \mathrm{diag}(\sigma'(\mat{W} \vec{z})) \mat{W}$.
+    \item Sigmoid layer, $\mat{J}_k = \mathrm{diag}(\sigma(\mat{W} \vec{z}) \odot \sigma(-\mat{W} \vec{z}))
+              \mat{W}$.
 \end{itemize}
 
 \subsection{Gradient methods}
@@ -119,8 +127,9 @@ In gradient descent, we iteratively update the parameters by \[
     \vec{\theta}_{k+1} = \vec{\theta}_k - \eta \grad{\ell(\vec{\theta}_k)}{}, \quad \eta > 0.
 \]
 A fundamental question is whether gradient descent will converge to an optimal solution. The key
-intuition is that gradient descent can only work if gradient does not change too much relative to
-the step size. The gradient information must remain informative in a neighborhood around a point.
+intuition is that gradient descent can only work if the gradient does not change too much relative
+to the step size. The gradient information must remain informative in a neighborhood around a
+point.
 
 \begin{definition}[Smoothness]
     A differentiable function $\ell: \R^d \to \R$ is $L$-smooth for some $L > 0$ if \[
@@ -128,6 +137,16 @@ the step size. The gradient information must remain informative in a neighborhoo
     \]
     This is equivalent to the gradient being $L$-Lipschitz continuous.
 \end{definition}
+
+\begin{marginfigure}
+    \centering
+    \incfig{smoothness}
+    \caption{Graph of the gradient of an $L$-smooth 1-dimensional function. Due to smoothness, the
+        gradient may only stay within the grey area for every point. Higher $L$ makes the area larger, which means that
+        the current gradient is less informative about its surroundings. Thus, we have to be more
+        careful when applying gradient descent.}
+    \label{fig:smoothness}
+\end{marginfigure}
 
 Smoothness implies a bound on the Hessian, \[
     \| \hess{\ell(\vec{\theta})}{} \| \leq L, \quad \forall \vec{\theta}.
@@ -169,6 +188,14 @@ ensure convergence to a global minimum.
         \ell(\vec{\theta}') \geq \ell(\vec{\theta}) + \langle \grad{\ell(\vec{\theta})}{}, \vec{\theta}' - \vec{\theta} \rangle + \frac{\mu}{2} \| \vec{\theta}' - \vec{\theta} \|^2, \quad \forall \vec{\theta}, \vec{\theta}'.
     \]
 \end{definition}
+
+\begin{marginfigure}
+    \centering
+    \incfig{strong-convexity}
+    \caption{Graph of the gradient of a $\mu$-strongly convex 1-dimensional function. Due to strong convexity, the
+        gradient may only stay within the grey area for every point.}
+    \label{fig:strong-convexity}
+\end{marginfigure}
 
 Intuitively, strong convexity bounds the smallest eigenvalue of a locally quadratic approximation
 of $\ell$.
@@ -220,9 +247,9 @@ The update rule is then \[
 
 \subsection{Convolutional neural networks}
 
-Images and audio have an extremely high dimensionality, which means that a single linear layer
+Images and audio have an extremely high dimensionality, which means that a fully connected layer
 would have an extremely high parameter count. However, we can exploit the locality, scale, and
-shift invariance of these types of data to define a new operator; the convolution.
+shift invariance of these types of data using a new operator; the convolution.
 
 \begin{definition}[Convolution]
     Given two functions $f,h$, their convolution is defined as \[
@@ -232,7 +259,7 @@ shift invariance of these types of data to define a new operator; the convolutio
 
 The convolution operator is shift invariant, meaning that if we shift and then apply the operator,
 we get the same result as if we were to first apply the operator and then shift. Formally, \[
-    (f*h)(u + \Delta) = (f*h)(u) + \Delta.
+    f_{\Delta} * h = (f * h)_{\Delta}
 \]
 The converse is also true: any linear shift-invariant transformation can be written as a
 convolution.

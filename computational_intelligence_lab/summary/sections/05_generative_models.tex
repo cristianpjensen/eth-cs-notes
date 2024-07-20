@@ -5,11 +5,11 @@ the dataset. Considering that collecting data is often expensive, we wish to par
 generative model $p(\vec{x}; \vec{\theta})$ that is indistinguishable from $p(\vec{x})$.
 
 We want the models to not generate unnatural patterns, so we do not want the following, \[
-    p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \gtrapprox 0.
+    p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \approx 0.
 \]
 Furthermore, we want the model to generate natural patterns with approximately correct
 probabilities, so we also do not want the following situation, \[
-    p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \gtrapprox 0,
+    p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \approx 0,
 \]
 
 Moreover, we want to train generative models such that they give high probabilistic mass to samples
@@ -41,6 +41,8 @@ which is used to predict the probability distribution over next observables $x_t
 softmax operator, \[
     p(x \mid \vec{x}_{1:t-1}) = \frac{\exp \langle \vec{z}, \vec{w}_x \rangle}{\sum_{x' \in \mathcal{X}} \exp \langle \vec{z}, \vec{w}_{x'} \rangle}.
 \]
+We sample from $p(\vec{x}; \vec{\theta})$ by iteratively sampling $p(x_t \mid \vec{x}_{1:t-1})$ and
+appending it to the history.
 
 \paragraph{Pixel CNN.}
 

@@ -12,55 +12,57 @@ $p(\mat{Z})$, \[
 
 \subsection{Probabilistic clustering models}
 
-Assume we are given a dataset of $s$ patterns $\{ \vec{x}_t \mid t \in [s] \}$. The conceptually
-simplest family of latent variable models associates a $k$-class categorical random variable $Z_t$
-with each pattern. The latent information tags a pattern as a member of a group or class.
+Assume we are given a dataset of $s$ observables $\{ \vec{x}_t \mid t \in [s] \}$. The conceptually
+simplest family of latent variable models assigns a $k$-class categorical random variable $Z_t$ to
+each observable. The latent information tags an observable as a member of that class.
 
-Specifically, we have \[
+Specifically, we have the following prior categorical distribution, \[
     Z_t \sim \mathrm{Categorical}(\pi_1, \ldots, \pi_k), \quad P(Z_t = z) = \pi_z,
 \]
-where $\vec{\pi} \in \Delta^{k-1}$ is an unknown parameter that encodes the prior probabilities for
-each class.\sidenote{$\Delta^{k-1}$ is the $k$-dimensional probability simplex, which is the space
-    of vectors where all elements are non-negative and sum to 1.} To fully parametrize the latent
-variable model, we need a class conditional distribution for each class, $p(\vec{x} \mid z)$. By
-parametrizing the class-conditional distribution of $z$ by $\vec{\theta}_z$, we have the following
-parametrized distribution over $\vec{X}$, \[
-    p(\vec{x}; \vec{\theta}) = \sum_{z=1}^{k} \pi_z p(\vec{x}; \vec{\theta}_z).
+where $\vec{\pi} \in \Delta^{k-1}$ is an unknown parameter.\sidenote{$\Delta^{k-1}$ is the
+    $k$-dimensional probability simplex, which is the space of vectors where all elements are
+    non-negative and sum to 1.} To fully parametrize the latent variable model, we need a class
+conditional distribution for each class, $p(\vec{x} \mid z)$. By parametrizing the
+class-conditional distribution of $z$ by $\vec{\theta}_z$, we have the following parametrized
+distribution over $\vec{X}$, \[
+    p(\vec{x}; \vec{\theta}) = \sum_{z=1}^{k} p(z) p(\vec{x} \mid z) = \sum_{z=1}^{k} \pi_z p(\vec{x}; \vec{\theta}_z).
 \]
-We observe that mixture distributions are convex combinations of class-specific distributions.
-Moreover, this model is fully parametrized by \[
+We interpret this as a mixture distribution; convex combinations of class-specific distributions.
+Moreover, this model is fully parametrized by the prior and class-conditional distribution
+parameters, \[
     \vec{\theta} = [\vec{\pi}, \vec{\theta}_1, \ldots, \vec{\theta}_k].
 \]
 For given parameters $\vec{\theta}$, we can use Bayes' rule to compute the latent posteriors, \[
     p(z \mid \vec{x}; \vec{\theta}) = \frac{\pi_z p(\vec{x}; \vec{\theta}_z)}{\sum_{\zeta=1}^{k} \pi_{\zeta} p(\vec{x}; \vec{\theta}_{\zeta})}.
 \]
-We can interpret these probabilities as probabilistic cluster memberships.
+We can interpret these probabilities as observable-specific probabilistic cluster memberships.
 
 \paragraph{Learning the parameters.}
 
 A common approach to learn the best parameters is to maximize the likelihood of the data, which is
 called maximum likelihood estimation (MLE). In other words, we choose the model parameters that
-maximize the probability of the observed data. It works by maximizing the log-likelihood, \[
-    \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}) = \sum_{t=1}^{s} \log p(\vec{x}_t; \vec{\theta}) = \sum_{t=1}^{s} \log \sum_{z=1}^{k} \pi_z p(\vec{x}_t; \vec{\theta}_z).
+maximize the probability of the observed data, \[
+    \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}) = \sum_{t=1}^{s} \log p(\vec{x}_t; \vec{\theta}) = \sum_{t=1}^{s} \log \sum_{z=1}^{k} \pi_z p(\vec{x}_t; \vec{\theta}_z). \margintag{We take the log-likelihood for improved numerical stability.}
 \]
 This gives us the following optimization problem, \[
-    \vec{\theta}^{\mathrm{MLE}} = \argmax_{\vec{\theta}} \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}),
+    \vec{\theta}^{\mathrm{MLE}} \in \argmax_{\vec{\theta}} \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}),
 \]
 which we optimize by the expectation-maximization (EM) algorithm. The EM algorithm is a general
 tool for learning in latent variable models, but we will introduce it in the context of mixture
 models.
 
-Let $\vec{q}_t \in \Delta^{k-1}, \forall t \in [s]$. Using this we can get the evidence lower bound
-(ELBO),
+Let $\vec{q}_t \in \Delta^{k-1}, \forall t \in [s]$ be the variational parameters. Using this we
+can derive the evidence lower bound (ELBO),
 \begin{align*}
     \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}) & = \sum_{t=1}^{s} \log \sum_{z=1}^{k} q_{tz} \frac{\pi_z}{q_{tz}} p(\vec{x}; \vec{\theta}_z)                                                 \\
                                                            & \geq \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log \lft( \frac{\pi_z}{q_{tz}} p(\vec{x}; \vec{\theta}_z) \rgt) \margintag{Jensen's inequality.} \\
                                                            & = \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - \sum_{z=1}^{k} q_{tz} \log \frac{q_{tz}}{\pi_z}                    \\
                                                            & = \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - D_{\mathrm{KL}}(\vec{q}_t \| \vec{\pi}).
 \end{align*}
-Since this lower bounds the MLE, we can use the ELBO as an objective to be maximized. Maximizing \wrt
-$\vec{q}$ increases the tightness of the bound of ELBO on the MLE, while maximizing \wrt
-$\vec{\theta}$ improves the model fit.
+Since this lower bounds the MLE, we can use the ELBO as an objective to implicitly maximize the log-likelihood. Maximizing \wrt
+$\vec{q}$ increases the tightness of the bound of ELBO on the MLE,\sidenote{$\vec{q}$ does not affect
+    the likelihood, so an increase can only tighten the bound.} while maximizing \wrt $\vec{\theta}$
+improves the model fit.
 
 Firstly, we will solve for the optimal choice of $\vec{q}_t$, \[
     \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - D_{\mathrm{KL}}(\vec{q}_t \| \vec{\pi}), \quad \sum_{z=1}^{k} q_{tz} = 1, \forall t \in [s].
@@ -68,9 +70,9 @@ Firstly, we will solve for the optimal choice of $\vec{q}_t$, \[
 We can solve for every $\vec{q}_t$ independently, because the ELBO is separable \wrt $\vec{q}_t$.
 Furthermore, we enforce the normalization constraint on $\vec{q}$ by introducing a Lagrange
 multiplier $\lambda$. This results in the following objective to maximize per $\vec{q}_t$, \[
-    \vec{q}_t^\star \in \argmax_{\vec{q}_t} \ell(\vec{q}_t) \doteq \sum_{z=1}^{k} q_z \lft( \log p(\vec{x}_t; \vec{\theta}_z) - \log \frac{q_z}{\pi_z} \rgt) - \lambda \lft( \sum_{z=1}^{k} q_z - 1 \rgt).
+    \vec{q}_t^\star \in \argmax_{\vec{q}_t} \ell(\vec{q}_t) \doteq \sum_{z=1}^{k} q_{tz} \lft( \log p(\vec{x}_t; \vec{\theta}_z) - \log \frac{q_{tz}}{\pi_z} \rgt) - \lambda \lft( \sum_{z=1}^{k} q_{tz} - 1 \rgt).
 \]
-The derivative \wrt $q_z$ of this function is
+The derivative \wrt $q_{tz}$ of this function is
 \begin{align*}
     \pdv{\ell(\vec{q}_t)}{q_{tz}} & = \pdv*{\sum_{z'=1}^{k} q_{tz'} \lft( \log p(\vec{x}_t; \vec{\theta}_{z'}) + \log \pi_{z'} - \log q_{tz'} \rgt)}{q_{tz}} \\
                                   & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \pdv*{q_{tz} \log q_{tz}}{q_{tz}} - \lambda                           \\
@@ -84,15 +86,15 @@ Exponentiating both sides yields \[
     q_{tz} \overset{!}{=} \frac{\pi_z p(\vec{x}_t; \vec{\theta}_z)}{e^{\lambda+1}}.
 \]
 Enforcing the constraint of $\vec{q}_t \in \Delta^{k-1}$, we get \[
-    q_{tz} \overset{!}{=} \frac{\pi_z p(\vec{x}_t; \vec{\theta}_z)}{\sum_{\zeta=1}^{k} \pi_{\zeta}p(\vec{x}_t; \vec{\theta}_{\zeta})}.
+    q_{tz} = \frac{\pi_z p(\vec{x}_t; \vec{\theta}_z)}{\sum_{\zeta=1}^{k} \pi_{\zeta}p(\vec{x}_t; \vec{\theta}_{\zeta})}.
 \]
 As we saw before, this is the posterior of the latent class variable $p(z \mid \vec{x}_t;
-    \vec{\theta})$. Note that the optima choice of the variational parameters depend on the parameters
-$\vec{\theta}$. Thus, it is only a partial step, called the expectation (E) step.
+    \vec{\theta})$. Note that the optimal choice of the variational parameters $\vec{q}_t$ depends on
+the parameters $\vec{\theta}$. Hence, it is only a partial step, called the expectation (E) step.
 
 Now we also need a step to maximize the model parameters $\vec{\theta}$. We can easily solve for
 $\vec{\pi}$ by \[
-    \pi^{\star}_z = \frac{1}{s} \sum_{t=1}^{s} q_{tz}.
+    \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(\vec{x}_t) p(\vec{x}_t \mid z) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}.
 \]
 Moreover, the solution for $\vec{\theta}_z$ depends on the choice of the model distribution, but we
 can generally get to separable problems, \[
@@ -106,10 +108,10 @@ is often possible to do analytically. This partial step is called the maximizati
 
 We will consider a common special case of the above framework, where we specify the component
 models $p(\vec{X} \mid Z)$ by Gaussians with unit variance, \[
-    p(\vec{x}; \vec{\pi}, \{ \vec{\mu}_1, \ldots, \vec{\mu}_k \}) = \sum_{z=1}^{k} \pi_z p(\vec{x}; \vec{\mu}_z),
+    p(\vec{x}; \vec{\pi}, \{ \vec{\mu}_1, \ldots, \vec{\mu}_k \}) = \sum_{z=1}^{k} \pi_z \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}),
 \]
 where \[
-    p(\vec{x}; \vec{\mu}_z) = (2\pi)^{-\nicefrac{d}{2}} \exp \lft( -\frac{1}{2} \| \vec{x} - \vec{\mu}_z \|^2 \rgt).
+    \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}) = (2\pi)^{-\nicefrac{d}{2}} \exp \lft( -\frac{1}{2} \| \vec{x} - \vec{\mu}_z \|^2 \rgt).
 \]
 The EM algorithm then consists of the following alternating equations,
 \begin{gather*}
@@ -126,17 +128,17 @@ content is the information that the words of a document carry about what the doc
 
 Let $\Sigma$ be the word vocabulary with $|\Sigma|=m$ words. A document $\vec{X}_i$ of length $s_i$
 is part of a collection of $n$ documents and is a field of random variables $X_{it}$, whose
-realizations are words $x_{it} \in \Sigma, \forall t \in [s]$. We will assume that topical content
-is invariant to word order. Mathematically, this is known as exchangeability, which says that the
-distribution of a sequence of random variables does not change under any permutation of their
-order. As a consequence, the sufficient statistics of a document are the frequencies of occurrence
-of words in the documents. Hence, we can reduce the data to a bag-of-words representation of
-occurrence counts, \[
+realizations are words $x_{it} \in \Sigma, \forall t \in [s_i]$. We will assume that topical
+content is invariant to word order. \sidenote{Mathematically, this is known as
+    \textit{exchangeability}, which says that the distribution of a sequence of random variables does
+    not change under any permutation of their order.} As a consequence, the sufficient statistics of a
+document are the frequencies of word occurrences within it. Hence, we can reduce the data to a
+bag-of-words representation of occurrence counts, \[
     N_{ij} = | \{ x_{it} = w_j \mid t \in [s_i] \} |.
 \]
 In words, $N_{ij}$ denotes how often word $w_j$ occurred in document $\vec{x}_i$. We can thus
 summarize the full document corpus in an occurrence matrix, \[
-    \mat{N} = (N_{ij}) \in \mathbb{N}^{n \times m}.
+    \mat{N} = [N_{ij}] \in \mathbb{N}^{n \times m}.
 \]
 
 Moreover, we have to conceptualize what we mean by ``topic''. Generally, topics refer to things
@@ -145,18 +147,16 @@ variables $Z \in [k]$, akin to what we saw in mixture models. We will then assoc
 with word occurrences, which induce topics of entire documents.\sidenote{If we were to associate
     the topic variables with documents, we would effectively be performing document clustering.
     However, in this case, we want the topics of documents to be induced by the words that they
-    contain.} Thus, the complete data will be a sequence of word-topic pairs for each document, \[
-    (X_{it}, Z_{it}) \in \Sigma \times [k].
-\]
-Note that topics are not mutually exclusive, since documents can concern multiple.
+    contain.} Note that topics are not mutually exclusive, since documents can concern multiple.
 
 We will assume that the documents in the corpus were created according to the following generative
-process.\sidenote{This is important so we can infer/reverse engineer a model from it.} For each
-word, we sample a topic from $p(z \mid d)$, and then sample the word from $p(w \mid z)$. Thus, in
-order to define the latent variable data model, we need a distribution over latent variables, $p(z
-    \mid d)$, and a topic-conditional distribution over words, $p(w \mid z)$. We can then define a
+process.\sidenote{This is important so we can infer/reverse engineer a model from it. Also, it is
+    important to make assumptions about the data explicit.} For each word, we sample a topic from $p(z
+    \mid d)$, and then sample the words from $p(w \mid z)$. Thus, in order to define the latent
+variable data model, we need a document-conditional distribution over latent variables, $p(z \mid
+    d)$, and a topic-conditional distribution over words, $p(w \mid z)$. We can then define a
 document-conditional word distribution, \[
-    p(w_j \mid d_i) = \sum_{z=1}^{k} p(w_j \mid z) p(z \mid d_i).
+    p(w \mid d) = \sum_{z=1}^{k} p(w \mid z) p(z \mid d).
 \]
 From this, we define the log-likelihood objective as \[
     \ell(\vec{\theta}; \mat{N}) = \log p(\mat{N}; \vec{\theta}) = \sum_{i=1}^{n} \sum_{j=1}^{m} N_{ij} \log p(w_j \mid d_i).
@@ -165,7 +165,7 @@ From this, we define the log-likelihood objective as \[
 \paragraph{Learning.}
 
 We can equivalently write the log-likelihood objective in terms of the raw data, \[
-    \ell(\vec{\theta}) = \sum_{i=1}^{n} \sum_{t=1}^{s_i} \log p(x_{it}; \vec{\theta}), \quad p(x_{it}; \vec{\theta}) = \sum_{z=1}^{k} p(x_{it} \mid z) p(z \mid d_i).
+    \ell(\vec{\theta}) = \sum_{i=1}^{n} \sum_{t=1}^{s_i} \log \sum_{z=1}^{k} p(x_{it} \mid z) p(z \mid d_i).
 \]
 Similarly to the mixture models, we define an ELBO, \[
     \ell(\vec{\theta}) \geq \hat{\ell}(\vec{\theta}; \vec{q}) \doteq \sum_{i=1}^{n} \sum_{t=1}^{s_i} \sum_{z=1}^{k} q_{itz} \lft( \log p(x_{it} \mid z) + \log p(z \mid d_i) - \log q_{itz} \rgt).
@@ -175,26 +175,26 @@ Moreover, following the same steps, we can derive the EM equations,
     q_{itz} = \frac{p(x_{it} \mid z) p(z \mid d_i)}{\sum_{\zeta=1}^{k} p(x_{it} \mid \zeta) p(\zeta \mid d_i)} \margintag{E-step.} \\
     p(w_j \mid z) = \frac{\sum_{i=1}^{n} \sum_{t=1}^{s_i} q_{itz} \cdot \mathbb{1}\{ x_{it} = w_j \}}{\sum_{i=1}^{n} \sum_{t=1}^{s_i} q_{itz}}, \quad p(z \mid d_i) = \frac{1}{s_i} \sum_{t=1}^{s_i} q_{itz}. \margintag{M-step.}
 \end{gather*}
-Intuitively, the E-step computes the posterior probabilities, where $p(z \mid d_i)$ acts as a prior.
-This yields a probabilistic clustering of word occurrences. The M-step computes the MLE for a
-$\vec{q}$-weighted multinomial sample. This algorithm will converge, but not necessarily to the
-global maximizer.
+Intuitively, the E-step computes the posterior probabilities, $q_{itz} = p(z \mid x_{it}, d_i)$, where
+$p(z \mid d_i)$ acts as a prior. This yields a probabilistic clustering of word occurrences. The
+M-step computes the MLE for a $\vec{q}$-weighted multinomial sample. This algorithm will converge,
+but not necessarily to the global maximizer.
 
-As a result, we can use the class-conditional word distribution, $p(w \mid z)$, to find similar
-words that are connected by a common topic.
+\begin{important}
+    We can use the class-conditional word distribution, $p(w \mid z)$, to find similar
+    words that are connected by a common topic.
+\end{important}
 
 \paragraph{Latent Dirichlet allocation.}
 
 The problem with the above topic model is that it assumes a fixed set of documents and selects the
 parameters to maximize the predictability of words within these. The natural next step is to extend
-the above in a way that accounts for modeling unseen documents.
+the above in a way that accounts for modeling unseen documents. The generative process of this
+model is that we first choose a distribution over topics, $p(z\mid \vec{\alpha})$. Then, for each
+word, sample a topic from $p(z \mid \vec{\alpha})$ and sample the word from $p(w \mid z)$.
 
-The generative process of this model is that we first choose a distribution over topics, $p(z\mid
-    \vec{\alpha})$. Then, for each word, sample a topic from $p(z \mid \vec{\alpha})$ and sample the
-word from $p(w \mid z)$.
-
-The latent Dirichlet allocation (LDA) model takes a ``Bayesian step up'' from latent variable
-modeling. Its main idea is that it defines a distribution over mixture vectors, \[
+Effectively, the latent Dirichlet allocation (LDA) model takes a ``Bayesian step up'' from latent
+variable modeling. Its main idea is that it defines a distribution over mixture vectors, \[
     \vec{v} \in \Delta^{k-1},
 \]
 as a prior over topics. This parameter is distributed according to a Dirichlet distribution, and
@@ -210,7 +210,7 @@ Let $\mat{U} = [p(w_j \mid z)] \in [0,1]^{m \times k}$, then we have the followi
     p(\mat{X}=[x_1, \ldots, x_s] \mid \mat{U}) & = \int \prod_{t=1}^{s} p(x_t \mid \mat{U}, \vec{v}) p(\vec{v}; \vec{\alpha}) \mathrm{d}\vec{v} \\
     p(w_j \mid \mat{U}, \vec{v})               & = \sum_{z=1}^{k} u_{jz} v_z.
 \end{align*}
-As can be seen, the probabilities are not conditioned on the document. As a result, when a
+As can be seen, the probabilities are not conditioned on the observed documents. As a result, when a
 new document is introduced, we can use the same distributions, whose parameters were learned from an
 existing document collection. In this sense, the LDA model is more robust than the topic model that
 was initially introduced.
@@ -234,11 +234,11 @@ was initially introduced.
 The topic model introduced above is intimately related to matrix decomposition, where we see that
 the topic variable $z \in [k]$ plays the role of a rank constraint. More specifically, we define
 the following matrices, \[
-    \mat{U} \doteq [p(w_j \mid z)] \in [0,1]^{m \times k}, \quad \mat{V} \doteq [p(z \mid d_i)] \in [0,1]^{k \times n}.
+    \mat{U} \doteq [p(w_j \mid z)] \in [0,1]^{m \times k}, \quad \mat{V} \doteq [p(z \mid d_i)] \in [0,1]^{n \times k}.
 \]
-We then form $\hat{\mat{N}} = \mat{U} \mat{V}$, which is a rank-$k$ matrix. We interpret the
-entries of this new matrix $\hat{\mat{N}}$ as \[
-    \hat{N}_{ji} = \sum_{z=1}^{k} p(w_j \mid z) p(z \mid d_i) = p(w_j \mid d_i).
+We then form $\hat{\mat{N}} = \mat{U} \transpose{\mat{V}}$, which is a rank-$k$ matrix. We
+interpret the entries of this new matrix $\hat{\mat{N}}$ as \[
+    \hat{N}_{ji} = \transpose{\vec{u}_j} \vec{v}_i = \sum_{z=1}^{k} p(w_j \mid z) p(z \mid d_i) = p(w_j \mid d_i).
 \]
 Note that $\hat{\mat{N}}$ is a relative version of $\mat{N}$, where $N_{ij} \approx s_i
     \hat{N}_{ij}$. Thus, we have a matrix decomposition with additional constraints, \[
@@ -253,7 +253,7 @@ This is known as non-negative matrix factorization (NMF).\sidenote{For NMF, we c
     because there is no way of removing added features, due to the non-negativity constraint. In
     other words, NMF models must be careful in what they add.} The objective follows from the maximum
 likelihood principle, \[
-    \ell(\mat{U}, \mat{V}; \mat{N}) = \sum_{i=1}^{n} \sum_{j=1}^{m} N_{ij} \log \hat{N}_{ij}, \quad \hat{\mat{N}} = \mat{U} \mat{V}.
+    \ell(\mat{U}, \mat{V}; \mat{N}) = \sum_{i=1}^{n} \sum_{j=1}^{m} N_{ij} \log \hat{N}_{ij}, \quad \hat{\mat{N}} = \mat{U} \transpose{\mat{V}}.
 \]
 Further, we have normalization constraints on the row and column level, namely \[
     \sum_{j=1}^{m} u_{jz} = 1, \forall z \in [k], \quad \sum_{z=1}^{k} v_{zi} = 1, \forall i \in [n].
@@ -263,7 +263,7 @@ Thus, we have a special case of non-negative matrix decomposition with a log-lik
 \subsection{Embeddings}
 
 In natural language, the atomic units of meaning are symbols, such as words. Generally, these
-symbols do not carry their meaning with them. Rather their meaning come from their use within its
+symbols do not carry their meaning with them. Rather, their meaning come from their use within its
 language. The idea of embeddings is to learn representations that capture semantics by embedding
 symbols in vector space. Specifically, we want to learn a mapping from words to vectors such that
 the vectors represent word semantics.
@@ -274,8 +274,8 @@ must have some form of semantics to be able to perform the task well. In the ski
 use the task of predicting whether a word is in the context of another.\sidenote{Rupert Firth:
     ``You shall know a word by the company it keeps.''} Effectively, we are treating the embedding of
 each word as a latent variable that predicts the co-occurring of context words. After the model has
-converged, we do not care about the performing the task itself well, but rather the parameters (the
-embeddings) of the model that lead to the task being performed well.
+converged, we do not care about performing the task well, but rather the parameters (embeddings) of
+the model that lead to the task being performed well.
 
 This task has the following likelihood function that we wish to maximize, \[
     \ell(\vec{\theta}; \vec{x}) = \sum_{t=1}^{T} \sum_{\delta \in \mathcal{I}} \log p(x_{t+\delta} \mid x_t; \vec{\theta}),
@@ -310,7 +310,7 @@ And, additionally we need negative samples, which we randomly sample, \[
     \mathcal{S}^- = [(x_t, v_{tj}) \mid t \in [T], v_{tj} \sampleiid q, j \in [r]],
 \]
 where $q$ is a probability over words and $r$ is the sampling factor (how many more negative
-samples we have than positive samples). Generally, $q$ is chosen to satisfy \[
+samples we sample than positive samples). Generally, $q$ is chosen to satisfy \[
     q(w) \propto p(w)^{\alpha},
 \]
 where typically $\alpha = \nicefrac{3}{4}$. The intuition behind this is that what matters most in
