@@ -60,29 +60,61 @@ still slow, because all pixels in the context window need to be generated first.
 \paragraph{Transformers.}
 
 Recently, transformers have been used to power state-of-the-art language models. They make use of
-multi-headed self-attention (MHSA), layer normalization, and an MLP. Let $\mat{X} \in \R^{d \times
-        T}$ contain the $T$ $d$-dimensional embeddings in the current context window. MHSA introduces a
-query matrix $\mat{W}_Q \in \R^{k \times d}$, a key matrix $\mat{W}_K \in \R^{k \times d}$, and a
-value matrix $\mat{W}_V \in \R^{r \times d}$. We then use $\mat{X}$ to compute queries, and values, \[
-    \mat{Q} = \mat{W}_Q \mat{X} \in \R^k, \quad \mat{K} = \mat{W}_K \mat{X} \in \R^k, \quad \mat{V} = \mat{W}_V \mat{X} \in \R^r.
+multi-headed self-attention (MHSA), layer normalization, and an MLP. Let $\mat{X} \in \R^{T \times
+        d}$ contain the $T$ $d$-dimensional embeddings in the current context window. MHSA introduces a
+query matrix $\mat{W}_Q \in \R^{d \times k}$, a key matrix $\mat{W}_K \in \R^{d \times k}$, and a
+value matrix $\mat{W}_V \in \R^{d \times r}$. We multiply these with $\mat{X}$ to compute query,
+key, and value representations for every timestep, \[
+    \mat{Q} = \mat{X} \mat{W}_Q \in \R^{T\times k}, \quad \mat{K} = \mat{X} \mat{W}_K \in \R^{T\times k}, \quad \mat{V} = \mat{X} \mat{W}_V \in \R^{T\times r}.
 \]
 These interact like a soft mapping, where the queries and keys decide how much from the values
 should be taken, \[
-    \mat{\Xi} = \mathrm{softmax}\lft( \frac{\transpose{\mat{Q}} \mat{K}}{\sqrt{k}} \rgt) \mat{V},
+    \mat{\Xi} = \mat{A} \mat{V} \in \R^{T \times r}, \quad \mat{A} = \mathrm{softmax}\lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{k}} \rgt) \in \R^{T \times T},
 \]
-where $\mathrm{softmax}$ is applied row-wise. Intuitively, the queries say what information they
-want, the keys say what information they have, and the values contain the actual information.
+where $\mathrm{softmax}$ is applied row-wise. Intuitively, the queries broadcast what information
+the timesteps want, the keys broadcast what information they have to be compatible with the
+queries, and the values contain the actual information. The outputs $\vec{\xi}_i$ are convex
+combinations of the values $\vec{v}_t$, where the query $\vec{q}_i$ and keys $\vec{k}_t$ decide the
+attention weights $a_{it}$, \[
+    \vec{\xi}_i = \sum_{t=1}^{T} a_{it} \vec{v}_t, \quad a_{it} \propto \transpose{\vec{q}_i} \vec{k}_t.
+\]
+Setting $d = k = r$, makes the output shape equal the input shape, which means that we can stack
+self-attention layers easily. Furthermore, we can add ``heads'' that are each smaller
+self-attention operations that are combined. Let $h$ be the number of heads, then we first project
+$\mat{X}$ to $h$ $\nicefrac{d}{h}$-dimensional representations, \[
+    \mat{X} \mat{W}_i \in \R^{T \times \nicefrac{d}{h}}, \quad \mat{W}_i \in \R^{d \times \nicefrac{d}{h}}, i \in [h].
+\]
+Afterwards, we apply self-attention to each head. Finally, we concatenate them and project them to
+the output, \[
+    \mat{\Xi} = \mathrm{concat}(\mathrm{head}_1, \ldots, \mathrm{head}_h) \mat{W}_O \in \R^{T \times d}, \quad \mat{W}_O \in \R^{h\cdot r \times d}.
+\]
+These can efficiently be computed by parallelizing the self-attention operators of the heads.
+
+\begin{marginfigure}
+    \centering
+    \incfig{transformer-layer}
+    \caption{Layer in the transformer architecture.}
+    \label{fig:transformer-layer}
+\end{marginfigure}
+
+In order to satisfy the autoregressive property, we need to mask out future timesteps. This is
+easily done by adding a mask matrix to the attention matrix, resulting in \[
+    \mat{A} = \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{k}} + \mat{M} \rgt), \quad \mat{M} =
+    \begin{bmatrix}
+        -\infty & -\infty & \cdots & -\infty \\
+        0       & -\infty & \cdots & -\infty \\
+        \vdots  & \vdots  & \ddots & \vdots  \\
+        0       & 0       & \cdots & -\infty
+    \end{bmatrix}.
+\]
+The result is that $a_{it} = 0$ for $t \geq i$, so the $i$-th timestep is only a function of the
+timesteps before it.
 
 Transformers also make use of layer normalization, which normalizes the data by \[
     \vec{x}' = \gamma \lft( \frac{\vec{x} - \mu}{\sigma} \rgt) + \beta, \quad \mu = \frac{1}{d} \sum_{i=1}^{d} x_i, \quad \sigma^2 = \frac{1}{d} \sum_{i=1}^{d} (x_i - \mu)^2,
 \]
-where $\gamma$ and $\beta$ are parameters. This normalization block is applied in order to balance
-activation magnitudes across tokens and dimensions.
-
-A single layer in the transformer architecture consists of sequentially applying MHSA, layer norm,
-MLP, and another layer norm. Furthermore, it uses residual connections for the MHSA layer and the
-MLP layer. Since the output of this layer can be defined to have the same dimensionality as the
-input, these layers are stacked.
+where $\gamma, \beta \in \R$ are parameters. This normalization block is applied in order to
+balance activation magnitudes across tokens and dimensions.
 
 \subsection{Variational autoencoders}
 
@@ -109,11 +141,9 @@ an ELBO using a variational distribution $q$,
     \ell(\vec{\theta}, \vec{\psi}) & = \E_{q(\vec{z} \mid \vec{x}; \vec{\psi})}[\log p(\vec{x} \mid \vec{z}; \vec{\theta})] - D_{\mathrm{KL}}(q(\vec{z} \mid \vec{x}; \vec{\psi}) \| p(\vec{z})).
 \end{align*}
 Thus, the ELBO encourages good reconstruction by the first term and makes sure that the distributions
-produced by the encoder do not deviate too far from the prior by the second term.
-
-Computing the derivative of the first term \wrt $\vec{\psi}$ is hard. However, we can make a Monte
-Carlo approximation of the expectation by using the reparametrization trick. This involves sampling
-an instance from a fixed distribution and using this to compute an instance of the desired
+produced by the encoder do not deviate too far from the prior by the second term. However, we can
+make a Monte Carlo approximation of the expectation by using the reparametrization trick. This
+involves sampling an instance from a fixed distribution and using this to compute an instance of the desired
 distribution with the same probability. In the case of $q$ as a Gaussian, where the encoder outputs
 means $\vec{\mu}$ and variances $\vec{\sigma}$, we can obtain a sample from this distribution by
 only sampling from $\mathcal{N}(\vec{0}, \mat{I})$ as follows,
@@ -206,22 +236,38 @@ which we can simplify to only learn the mean, \[
     \vec{x}_{t-1} \mid \vec{x}_t \sim \mathcal{N}(\vec{\mu}(\vec{x}_t, t; \vec{\theta}), \sigma_t^2 \mat{I}), \quad \sigma_t^2 \in \{ \beta_t, \bar{\beta}_t \}.
 \]
 Optimizing the log-likelihood with this model reduces to optimizing the squared error criterion
-between $\vec{x}_{t-1}$ and $\vec{\mu}$, which is easy to optimize. This is effectively the same as
-training a model to output the added noise and optimizing \wrt the squared error on the noise.
+between $\vec{x}_{t-1}$ and $\vec{\mu}$, which is easy to optimize. Because the next step
+$\vec{x}_{t-1}$ can be computed from the noise $\vec{\epsilon}_t$, this is effectively the same as
+training a model to output the added noise and optimizing \wrt the squared error on the noise. The
+learning algorithm can be found in \Cref{alg:dm-training} and the sampling algorithm can be found
+in \Cref{alg:dm-sampling}. For image generation, $\vec{\epsilon}(\vec{x}_t, t; \vec{\theta})$ is
+typically modeled as a U-net.
 
-More specifically, a step of the learning algorithm of a diffusion model involves the following,
-\begin{align*}
-    \vec{x}_0      & \sim p(\vec{x}_0)                                                                                                                                                 \\
-    t              & \sim \mathrm{Unif}([T])                                                                                                                                           \\
-    \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, \mat{I})                                                                                                                                \\
-    \vec{\theta}   & \gets \vec{\theta} - \eta \grad{\| \vec{\epsilon} - \vec{\epsilon}(\bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}, t; \vec{\theta}) \|^2}{\vec{\theta}}.
-\end{align*}
+\begin{algorithm}[t]
+    \begin{algorithmic}[1]
+        \Require{$\{ \beta_t \}_{t=1}^T$}
+        \While{not converged}
+        \State $\vec{x}_0 \sim q$
+        \State $t \sim \mathrm{Unif}([T])$
+        \State $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$
+        \State $\mathcal{L} = \lft\| \vec{\epsilon} - \vec{\epsilon}\lft( \bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}, t; \vec{\theta} \rgt) \rgt\|^2$
+        \State {perform a gradient descent step on $\mathcal{L}$}
+        \EndWhile
+    \end{algorithmic}
+    \label{alg:dm-training}
+    \caption{Diffusion model training algorithm.}
+\end{algorithm}
 
-After training the diffusion model, it can be sampled by iteratively denoising, starting from
-$\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$,
-\begin{align*}
-    \vec{z}       & \sim \mathcal{N}(\vec{0}, \mat{I}) \text{ if $t > 1$ else } \vec{z}_0 = \vec{0}                                                           \\
-    \vec{x}_{t-1} & = \frac{1}{\alpha_t} \lft( \vec{x}_t - \frac{\beta_t}{\bar{\beta}_t} \vec{\epsilon}(\vec{x}_t, t; \vec{\theta}) \rgt) + \sigma_t \vec{z}.
-\end{align*}
-
-For image generation, $\vec{\epsilon}(\vec{x}_t, t; \vec{\theta})$ is typically modeled as a U-net.
+\begin{algorithm}[t]
+    \begin{algorithmic}[1]
+        \Require{$\{ \beta_t \}_{t=1}^T$, $\vec{\theta}$
+        \State $\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$
+        \For{$t = T, \ldots, 1$}
+        \State $\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})$ if $t > 1$ else $\vec{z} = \vec{0}$
+        \State $\vec{x}_{t-1} = \frac{1}{\alpha_t} \lft( \vec{x}_t - \frac{\beta_t^2}{\bar{\beta}_t} \vec{\epsilon}(\vec{x}_t, t; \vec{\theta}) \rgt) + \sigma_t \vec{z}$
+        \EndFor
+        \State \Return $\vec{x}_0$
+    \end{algorithmic}
+    \label{alg:dm-sampling}
+    \caption{Diffusion model sampling algorithm.}
+\end{algorithm}
