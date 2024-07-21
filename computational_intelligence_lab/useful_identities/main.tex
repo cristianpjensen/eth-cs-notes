@@ -1,0 +1,85 @@
+\documentclass[a4paper]{article}
+
+% Typesetting
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+
+% Math
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot}
+\usepackage{derivative}
+
+% Font
+\usepackage[osf,sc]{mathpazo}
+
+% Better left and right: https://tex.stackexchange.com/a/2610/217707
+\newcommand{\lft}{\mathopen{}\mathclose\bgroup\left}
+\newcommand{\rgt}{\aftergroup\egroup\right}
+
+% Common sets
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+% Expected value and variance
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+
+% Vector, matrix, and tensor
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\tens}[1]{\bm{\mathsf{#1}}}
+
+% Common functions
+\newcommand{\transpose}[1]{#1^\top}
+\renewcommand{\det}[1]{\mathrm{det}\lft(#1\rgt)}
+\newcommand{\trace}[1]{\mathrm{tr}\lft(#1\rgt)}
+\newcommand{\diag}[1]{\mathrm{diag}\lft(#1\rgt)}
+
+\title{\textsf{\textbf{Useful Identities}}}
+\author{\textsf{Cristian Perez Jensen}}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{\textsf{Linear algebra}}
+
+Generally, $\mat{A}, \mat{B} \in \R^{n \times m}$ and $\vec{x}, \vec{y} \in \R^n$. $\lambda_i$ and
+$\sigma_i$ denote the $i$-th eigenvalue and singular value, respectively.
+\begin{align*}
+    \lft( \mat{A} \transpose{\mat{B}} \rgt)_{ij} & = \transpose{\vec{a}}_i \vec{b}_j = \sum_{k=1}^{m} a_{ik} b_{jk}        \\
+    \trace{\mat{A} \mat{B} \mat{C}}              & = \trace{\mat{C} \mat{A} \mat{B}} = \trace{\mat{B} \mat{C} \mat{A}}     \\
+    \trace{\mat{A}}                              & = \trace{\transpose{\mat{A}}}                                           \\
+    \| \vec{x} - \vec{y} \|^2                    & = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x}, \vec{y} \rangle \\
+    \| \vec{x} + \vec{y} \|^2                    & = \| \vec{x} \|^2 + \| \vec{y} \|^2 + 2\langle \vec{x}, \vec{y} \rangle \\
+    \| \vec{x} + \vec{y} \|                      & \leq \| \vec{x} \| + \| \vec{y} \|                                      \\
+    | \langle \vec{x}, \vec{y} \rangle |         & \leq \| \vec{x} \| \| \vec{y} \|                                        \\
+    \| \mat{A} \|_F^2                            & = \trace{\transpose{\mat{A}} \mat{A}}                                   \\
+    \| \mat{A} \|_F^2                            & = \sum_{i=1}^{\min \{ n, m \}} \sigma_i^2                               \\
+    \| \mat{A} \|_*                              & = \sum_{i=1}^{\min \{ n, m \}} \sigma_i                                 \\
+    \| \mat{A} \|_2                              & = \sigma_1                                                              \\
+\end{align*}
+
+\section*{\textsf{Probability}}
+
+\begin{align*}
+    p(x)        & = \int p(x, y) \mathrm{d}y            \\
+    p(x, y)     & = p(x \mid y) p(y) = p(y \mid x) p(x) \\
+    p(x \mid y) & = \frac{p(y \mid x) p(x)}{p(y)}       \\
+\end{align*}
+
+\section*{\textsf{Machine learning}}
+
+\begin{align*}
+    \sigma(z)                 & \doteq \frac{1}{1 + \exp(-z)}                        \\
+    \odv{\sigma(z)}{z}        & = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)   \\
+    \tanh(z)                  & \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)} \\
+    \odv{\tanh(z)}{z}         & = 1 - \tanh^2(z)                                     \\
+    \mathrm{ReLU}(z)          & \doteq \max \{ 0, z \}                               \\
+    \odv{\mathrm{ReLU}(z)}{z} & = \mathbb{1}\{ z > 0 \}                              \\
+\end{align*}
+
+\end{document}
