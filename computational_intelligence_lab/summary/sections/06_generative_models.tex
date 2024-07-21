@@ -260,7 +260,7 @@ typically modeled as a U-net.
 
 \begin{algorithm}[t]
     \begin{algorithmic}[1]
-        \Require{$\{ \beta_t \}_{t=1}^T$, $\vec{\theta}$
+        \Require{$\{ \beta_t \}_{t=1}^T$, $\vec{\theta}$}
         \State $\vec{x}_T \sim \mathcal{N}(\vec{0}, \mat{I})$
         \For{$t = T, \ldots, 1$}
         \State $\vec{z} \sim \mathcal{N}(\vec{0}, \mat{I})$ if $t > 1$ else $\vec{z} = \vec{0}$

@@ -8,18 +8,18 @@ data, which is easier in low-dimensional space.
 
 Dimensionality reduction is often performed by an autoencoder, which typically has a bottleneck of
 low dimensionality and aims to predict its input; see \Cref{fig:auto-encoder}. Let the original
-data space be $n$-dimensional and the latent space be $m$-dimensional with $m \ll n$. Then, an
+data space be $d$-dimensional and the latent space be $k$-dimensional with $k \ll d$. Then, an
 autoencoder consists of an encoder $F$ and a decoder $G$, \[
-    F: \R^n \to \R^m, \quad G: \R^m \to \R^n.
+    F: \R^d \to \R^k, \quad G: \R^k \to \R^d.
 \]
-The idea is that $\vec{x}$ is mapped to a latent vector $\vec{z}$ by the encoder, which is mapped
-to a reconstruction $\hat{\vec{x}}$ by the decoder. The idea is that the encoder must compress the
-information well for the decoder to be able to reconstruct its input. The reconstruction function
-is then the following function, \[
-    G \circ F: \R^n \to \R^n,
+The idea is that $\vec{x} \in \R^d$ is mapped to a latent vector $\vec{z} \in \R^k$ by the encoder,
+which is mapped to a reconstruction $\hat{\vec{x}} \in \R^d$ by the decoder. The idea is that the
+encoder must compress the information well for the decoder to be able to reconstruct its input. The
+reconstruction function is then the following function, \[
+    G \circ F: \R^d \to \R^d,
 \]
-which aims to resemble the identity function $(g \circ F)(\vec{x}) = \vec{x}$. Generally, this is
-only possible if the data is intrinsically $m$-dimensional.
+which aims to resemble the identity function $(G \circ F)(\vec{x}) = \vec{x}$. Generally, this is
+only possible if the data is intrinsically $k$-dimensional.
 
 \subsection{Linear autoencoders}
 
@@ -34,8 +34,8 @@ In order to build a nice theory, we will only consider a single layer linear
 autoencoder.\sidenote{Considering non-linear parametrizations will result in a much more powerful
     autoencoder.} As a result, we have the following functions,
 \begin{align*}
-    F(\vec{x})           & = \mat{W}\vec{x}, \quad \mat{W} \in \R^{m\times n}  \\
-    G(\vec{z})           & = \mat{V} \vec{z}, \quad \mat{V} \in \R^{n\times m} \\
+    F(\vec{x})           & = \mat{W}\vec{x}, \quad \mat{W} \in \R^{k\times d}  \\
+    G(\vec{z})           & = \mat{V} \vec{z}, \quad \mat{V} \in \R^{d\times k} \\
     (G \circ F)(\vec{x}) & = \mat{V} \mat{W} \vec{x}.
 \end{align*}
 The objective to minimize of the linear encoder is the following, \[
@@ -66,7 +66,7 @@ centered by subtracting $\E[\vec{x}]$ from all data points.
 
 \begin{important}
     Note that while the optimal linear reconstruction map $\mat{P}$ is unique, its parametrization
-    $\mat{V} \mat{W}$ is not unique, since for any invertible matrix $\mat{A} \in \R^{m\times m}$, we
+    $\mat{V} \mat{W}$ is not unique, since for any invertible matrix $\mat{A} \in \R^{k \times k}$, we
     can construct an optimal parametrization, \[
         \mat{V}\mat{W} = \mat{V} \mat{I} \mat{W} = \mat{V} (\mat{A} \inv{\mat{A}}) \mat{W} = (\mat{V}\mat{A})(\inv{\mat{A}}\mat{W}),
     \]
@@ -75,19 +75,19 @@ centered by subtracting $\E[\vec{x}]$ from all data points.
 \end{important}
 
 \begin{important}
-    Since $\mat{P}$ cannot be any $n\times n$ matrix, we want to know how the composition of $\mat{V}
-        \in \R^{n\times m}$ and $\mat{W} \in \R^{m\times n}$ characterizes the matrix $\mat{P}$ and which
+    Since $\mat{P}$ cannot be any $d\times d$ matrix, we want to know how the composition of $\mat{V}
+        \in \R^{d\times k}$ and $\mat{W} \in \R^{k\times d}$ characterizes the matrix $\mat{P}$ and which
     constraints they impose. The answer to this is that the weight matrices impose a rank constraint on
     $\mat{P}$, \[
-        \mathrm{rank}(\mat{P}) = \min \{ \mathrm{rank}(\mat{V}), \mathrm{rank}(\mat{W}) \} \leq \min \{ m, n \} = m.
+        \mathrm{rank}(\mat{P}) = \min \{ \mathrm{rank}(\mat{V}), \mathrm{rank}(\mat{W}) \} \leq \min \{ k, d \} = k.
     \]
-    Thus, when optimizing for $\mat{P}$, we are constrained to matrices with rank less or equal to $m$.
+    Thus, when optimizing for $\mat{P}$, we are constrained to matrices with rank less or equal to $k$.
 \end{important}
 
 \subsection{Projection}
 
 The rank constraint and linearity of $\mat{P}$ means that the image (column space) of $\mat{P}$ is
-a linear subspace $\mathcal{U} \subseteq \R^n$ of dimension at most $m$. We will break the solution
+a linear subspace $\mathcal{U} \subseteq \R^d$ of dimension at most $k$. We will break the solution
 to our problem into two parts: (1) finding the optimal subspace $\mathcal{U}$, and (2) finding the
 optimal mapping to that subspace.\sidenote{We do not search for the weight matrices
     $\mat{W},\mat{V}$, since they are not unique, but $\mat{P}$ is unique.}
@@ -121,7 +121,7 @@ linear map $\mat{P}^\star$, such that \[
 
 \begin{lemma}
     The orthogonal projection to a linear subspace $\mathcal{U} \subseteq \R^n$ is defined as \[
-        \Pi_{\mathcal{U}}: \R^n \to \mathcal{U}, \quad \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|.
+        \Pi_{\mathcal{U}}: \R^d \to \mathcal{U}, \quad \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|.
     \]
 \end{lemma}
 
@@ -205,7 +205,7 @@ $\mat{P}$ representing that linear transformation.
 In general, we do not have an orthonormal basis of $\mathcal{U}$.
 
 \begin{lemma}
-    For a non-orthonormal basis $\mat{V} \in \R^{n \times m}$ for $\mathcal{U}$, we can recover the projection matrix, \[
+    For a non-orthonormal basis $\mat{V} \in \R^{d \times k}$ for $\mathcal{U}$, we can recover the projection matrix, \[
         \mat{P} = \mat{V}\mat{V}^+, \quad \mat{V}^+ \doteq \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}}. \margintag{$\mat{V}^+$ is the left Moore-Penrose pseudo-inverse of $\mat{V}$.}
     \]
 \end{lemma}
@@ -276,9 +276,9 @@ We can further simplify this expression to find a sufficient statistic for the o
 
 \begin{theorem}[Spectral theorem]
     Any symmetric and positive semidefinite matrix $\mat{\Sigma}$ can be non-negatively diagonalized with an orthogonal matrix, \[
-        \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}, \quad \mat{\Lambda} = \diag{\lambda_1, \ldots, \lambda_n},
+        \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}, \quad \mat{\Lambda} = \diag{\lambda_1, \ldots, \lambda_d},
     \]
-    where $\lambda \geq \cdots \geq \lambda_n \geq 0$ and $\mat{Q}$ is orthogonal.
+    where $\lambda \geq \cdots \geq \lambda_d \geq 0$ and $\mat{Q} \in \R^d$ is orthogonal.
 \end{theorem}
 
 \begin{remark}
@@ -288,24 +288,52 @@ We can further simplify this expression to find a sufficient statistic for the o
 
 \begin{theorem}[PCA theorem]
     The variance maximizing projection matrix $\mat{P}$ for a covariance matrix $\E[\vec{x}\transpose{\vec{x}}] = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}$ as in the spectral theorem is given by \[
-        \mat{P} = \mat{U} \transpose{\mat{U}}, \quad \mat{U} = \mat{Q} \begin{bmatrix} \mat{I}_m \\ \vec{0} \end{bmatrix}.
+        \mat{P} = \mat{U}_k \transpose{\mat{U}_k}, \quad \mat{U}_k = \mat{Q} \begin{bmatrix} \mat{I}_k \\ \vec{0} \end{bmatrix},
     \]
+    which means that $\mat{U}_k$ consists of the $k$ principal eigenvectors with padded zeroes at the
+    bottom.
 \end{theorem}
 
 \begin{proof}
     \begin{align*}
-        \mathrm{Var}[\mat{P}\vec{x}] & = \tr{\mat{P} \E[\vec{x}\transpose{\vec{x}}]}                                                                                                                                                               \\
-                                     & = \tr{\mat{U}\transpose{\mat{U}} \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}} \margintag{$\mat{P} = \mat{U}\transpose{\mat{U}}$, $\E[\vec{x}\transpose{\vec{x}}] = \mat{Q}\mat{\Lambda}\transpose{\mat{Q}}$.} \\
+        \mathrm{Var}[\mat{P}\vec{x}] & = \tr{\mat{P} \E[\vec{x}\transpose{\vec{x}}]}                                                                                                                                                                \\
+                                     & = \tr{\mat{U}\transpose{\mat{U}} \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}} \margintag{$\mat{P} = \mat{U} \transpose{\mat{U}}$, $\E[\vec{x}\transpose{\vec{x}}] = \mat{Q}\mat{\Lambda}\transpose{\mat{Q}}$.} \\
                                      & = \tr{\lft( \transpose{\mat{Q}} \mat{U} \rgt) \transpose{\lft( \transpose{\mat{Q}} \mat{U} \rgt)} \mat{\Lambda}}. \margintag{Cyclic property.}
     \end{align*}
-    This term is maximized by $\transpose{\mat{Q}} \mat{U} = \transpose{\begin{bmatrix} \mat{I}_m & \vec{0} \end{bmatrix}}$.
+    This term is maximized by $\transpose{\mat{Q}} \mat{U} = \transpose{\begin{bmatrix} \mat{I}_k & \vec{0} \end{bmatrix}}$.
 \end{proof}
+
+\begin{important}
+    In conclusion, given a dataset of $n$ points $\{ \vec{x}_1, \ldots, \vec{x}_n \}$, we perform
+    dimensionality reduction by first centering the data,
+    \begin{align*}
+        \vec{\mu}       & = \frac{1}{n} \sum_{i=1}^{n} \vec{x}_i \\
+        \bar{\vec{x}}_i & = \bar{\vec{x}}_i - \vec{\mu}.
+    \end{align*}
+    Then, we compute the covariance matrix $\mat{\Sigma} \in \R^{d \times d}$, \[
+        \mat{\Sigma} = \frac{1}{n} \sum_{i=1}^{n} \bar{\vec{x}}_i \transpose{\bar{\vec{x}}_i}.
+    \]
+    For that matrix, we compute the eigendecomposition, \[
+        \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}},
+    \]
+    where $\mat{Q} \in \R^{d \times d}$ is orthogonal and $\mat{\Lambda}$ is diagonal. We then discard
+    the $d-k$ last dimensions to obtain $\mat{U}_k \in \R^{d \times k}$, \[
+        \mat{U}_k = \mat{Q} \begin{bmatrix} \mat{I}_k \\ \mat{0} \end{bmatrix}.
+    \]
+    The latent vectors are then computed by \[
+        \vec{z}_i = \transpose{\mat{U}_k} \bar{\vec{x}}_i.
+    \]
+    Their reconstructions are computed by \[
+        \hat{\vec{x}}_i = \mat{U}_k \vec{z}_i.
+    \]
+    The squared reconstruction error is equal to the sum of the lower $d-k$ eigenvalues.
+\end{important}
 
 \subsection{Learning algorithms}
 
-Eigenvalue decomposition of the (symmetric) sample covariance matrix has $\bigo{n^3}$ complexity.
-Furthermore, the complexity of computing $\E[\vec{x}\transpose{\vec{x}}]$ is $\bigo{Nn^2}$, where
-$N$ is the number of data points.\sidenote{Typically, $N \gg n$.} This is quite costly, thus we
+Eigenvalue decomposition of the (symmetric) sample covariance matrix has $\bigo{d^3}$ complexity.
+Furthermore, the complexity of computing $\E[\vec{x}\transpose{\vec{x}}]$ is $\bigo{nd^2}$, where
+$n$ is the number of data points.\sidenote{Typically, $n \gg d$.} This is quite costly, thus we
 need to search for algorithms that have lower runtime complexity.
 
 \paragraph{Power method.}
@@ -315,7 +343,7 @@ vector at random $\vec{v}^{(0)} \sim \mathcal{N}(\vec{0}, \mat{I})$. Then, it it
 this guess, \[
     \vec{v}^{(t+1)} = \frac{\mat{A}\vec{v}^{(t)}}{\| \mat{A} \vec{v}^{(t)} \|}.
 \]
-The computational complexity of this algorithm is $\bigo{Tn^2}$.
+The computational complexity of this algorithm is $\bigo{Td^2}$.
 
 \begin{lemma}
     Let $\vec{u}_1$ be the unique principal eigenvector of a diagonalizable matrix $\mat{A}$ with eigenvalues $\lambda_1 > \lambda_2 \geq \cdots \geq \lambda_n \geq 0$. If $\ang{\vec{v}_0, \vec{u}_1} \neq 0$, then \[
@@ -327,19 +355,19 @@ The computational complexity of this algorithm is $\bigo{Tn^2}$.
     We can decompose vectors as a linear combination of eigenvectors, $\vec{v}^{(0)} = \sum_{i=1}^n
         \alpha_i \vec{u}_i$. Then,
     \begin{align*}
-        \vec{v}^{(k)} & \propto \mat{A}^k \vec{v}^{(0)}                                                                                                              \\
-                      & = \sum_{i=1}^{n} \alpha_i \lambda_i^k \vec{u}_i \margintag{$\mat{A}^k\vec{v}^{(0)} = \sum_{i=1}^{n} \alpha_i \mat{A}^k \vec{u}_i$.}          \\
-                      & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{n} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^k \vec{u}_i. \margintag{Divide by $\lambda_1$.}
+        \vec{v}^{(\ell)} & \propto \mat{A}^\ell \vec{v}^{(0)}                                                                                                              \\
+                         & = \sum_{i=1}^{d} \alpha_i \lambda_i^\ell \vec{u}_i \margintag{$\mat{A}^\ell \vec{v}^{(0)} = \sum_{i=1}^{d} \alpha_i \mat{A}^\ell \vec{u}_i$.}   \\
+                         & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{d} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^\ell \vec{u}_i. \margintag{Divide by $\lambda_1$.}
     \end{align*}
-    $\nicefrac{\lambda_i}{\lambda_1} < 1$ for $i > 1$, thus the sum goes to 0 and $\vec{v}^{(k)} \to \vec{u}_1$.
+    $\nicefrac{\lambda_i}{\lambda_1} < 1$ for $i > 1$, thus the sum goes to 0 and $\vec{v}^{(\ell)} \to \vec{u}_1$.
 \end{proof}
 
 We can use this algorithm to also compute the next principal eigenvectors by factoring out
 $\vec{u}_1$ and then doing the algorithm again to recover $\vec{u}_2$, and continue doing that
-until we have the $m$ principal eigenvectors.
+until we have the $k$ principal eigenvectors.
 
-Thus, the total complexity of finding the $m$ principal eigenvectors is $\bigo{Tmn^2}$. However,
-this does not get rid of the $\bigo{N n^2}$ complexity for computing the sample covariance matrix.
+Thus, the total complexity of finding the $k$ principal eigenvectors is $\bigo{Tkd^2}$. However,
+this does not get rid of the $\bigo{n d^2}$ complexity for computing the sample covariance matrix.
 
 \paragraph{Gradient descent.}
 
@@ -354,4 +382,4 @@ $\mat{V}$ and $\mat{W}$. Thus, by the chain rule for matrix derivatives,
     \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{W}} & = (\mat{V} \mat{W}  - \mat{I}) \vec{x} \transpose{\vec{x}} \transpose{\mat{W}} \\
     \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{V}} & = \transpose{\mat{V}} (\mat{V} \mat{W} - \mat{I}) \vec{x} \transpose{\vec{x}}.
 \end{align*}
-The complexity for $T$ iterations is then $\bigo{T(m+k)n^2}$, where $k$ is the batch size.
+The complexity for $T$ iterations is then $\bigo{T(k+b)d^2}$, where $b$ is the batch size.

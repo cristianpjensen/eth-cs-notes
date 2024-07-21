@@ -160,6 +160,50 @@ $\mathrm{col}(\mat{A}) + \mathrm{null}(\transpose{\mat{A}}) = \R^m$.
     Furthermore, $\tr{\mat{A}}$ is equal to the sum of the eigenvalues of $\mat{A}$.
 \end{properties}
 
+\subsection{Eigenvalues and eigenvectors}
+
+The eigenvector $\vec{v} \in \R^n$ of a matrix $\mat{A} \in \R^{n \times n}$ has its direction
+unchanged by its transformation, \[
+    \mat{A} \vec{v} = \lambda \vec{v},
+\]
+which is equivalent to \[
+    (\mat{A} - \lambda \mat{I}) \vec{v} = \vec{0}.
+\]
+This matrix must be singular, thus we get the characteristic polynomial, \[
+    \det{\mat{A} - \lambda \mat{I}} = 0.
+\]
+Any $\lambda$ that satisfies the characteristic polynomial is an eigenvalue of $\mat{A}$. Its
+corresponding eigenvector can then be found by solving the following linear system of equations for
+$\vec{v}$, \[
+    (\mat{A} - \lambda \mat{I}) \vec{v} = \vec{0}.
+\]
+
+The following lemmas are useful for computing the characteristic polynomial of different types of
+matrices.
+
+\begin{lemma}[Determinant of $2 \times 2$ matrix]
+    Let $\mat{A} \in \R^{2 \times 2}$ be the following matrix, \[
+        \mat{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}.
+    \]
+    Its determinant is computed by \[
+        \det{\mat{A}} = ad - bc.
+    \]
+\end{lemma}
+
+\begin{lemma}[Determinant of triangular matrices]
+    The determinant of a triangular matrix $\mat{A} \in \R^{n \times n}$ is equal to the product of
+    its diagonal, \[
+        \mat{A} = \prod_{i=1}^n a_{ii}.
+    \]
+    As a consequence the eigenvalues of a triangular matrix are its diagonal entries.
+\end{lemma}
+
+\begin{lemma}[Determinant of matrix products]
+    Let $\mat{A}, \mat{B} \in \R^{n \times n}$, then \[
+        \det{\mat{A} \mat{B}} = \det{\mat{A}} \det{\mat{B}}.
+    \]
+\end{lemma}
+
 \subsection{Convexity}
 
 \begin{definition}[Convexity]
