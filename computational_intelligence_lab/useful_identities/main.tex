@@ -4,7 +4,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
-\microtypecontext{spacing=nonfrench}
 
 % Margins
 \usepackage[a4paper, margin=3cm]{geometry}
@@ -18,10 +17,16 @@
 
 % Tables
 \usepackage{booktabs,array,tabularx}
+\usepackage{xltabular}
 \setlength\tabcolsep{0.5cm}
 \def\arraystretch{2.0}
 \newcolumntype{L}{>{$\displaystyle}l<{$}}
 \newcolumntype{R}{>{$\displaystyle}r<{$}}
+
+% Section titles
+\usepackage{titlesec} 
+\titlespacing{\section}{0pt}{8ex}{1ex}
+\titleformat{\section}{\Large\scshape}{}{}{}
 
 % Better left and right: https://tex.stackexchange.com/a/2610/217707
 \newcommand{\lft}{\mathopen{}\mathclose\bgroup\left}
@@ -56,35 +61,42 @@
 
 \maketitle
 
-\section*{\textit{Linear algebra}}
+\section*{Linear Algebra}
 
-\begin{tabularx}{\textwidth}{@{}lLXR@{}}
+\begin{xltabular}{\textwidth}{@{}lLXR@{}}
     \textbf{Subadditivity}   & \| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|                                                                                                                 \\
     \textbf{Cauchy-Schwarz}  & |\langle \vec{x}, \vec{y} \rangle| \leq \| \vec{x} \| \| \vec{y} \|                                                                                                        \\
     \textbf{Cosine theorem}  & \| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2 \langle \vec{x}, \vec{y} \rangle                                                                         \\
-                             & \| \mat{A} \|_F^2 = \trace{\transpose{\mat{A}} \mat{A}}                                                                                                                    \\
-                             & \| \mat{A} \|_F^2 = \sum_{i=1}^{\min \{ n,m \}} \sigma_i^2                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
-                             & \| \mat{A} \|_2 = \sigma_1                                                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
     \textbf{Cyclic property} & \trace{\mat{A} \mat{B} \mat{C}} = \trace{\mat{C} \mat{A} \mat{B}} = \trace{\mat{B} \mat{C} \mat{A}}                                                                        \\
-\end{tabularx}
+    & \| \mat{A} \|_F^2 = \trace{\transpose{\mat{A}} \mat{A}}                                                                                                                    \\
+    & \| \mat{A} \|_F = \| \vec{\sigma} \|_2                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
+    & \| \mat{A} \|_* = \| \vec{\sigma} \|_1                                                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
+    & \| \mat{A} \|_2 = \| \vec{\sigma} \|_\infty                                                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
+\end{xltabular}
 
-\section*{\textit{Probability}}
+\section*{Probability}
 
-\begin{tabularx}{\textwidth}{@{}lLXR@{}}
-    \textbf{Sum rule}     & p(x) = \int p(x, y) \mathrm{d}y               \\
-    \textbf{Product rule} & p(x, y) = p(x \mid y) p(y) = p(y \mid x) p(x) \\
-    \textbf{Bayes rule}   & p(x \mid y) = \frac{p(y \mid x) p(x)}{p(y)}   \\
-\end{tabularx}
+\begin{xltabular}{\textwidth}{@{}lLXR@{}}
+    \textbf{Sum rule}     & p(x) = \int p(x, y) \mathrm{d}y               & & \\
+    \textbf{Product rule} & p(x, y) = p(x \mid y) p(y) = p(y \mid x) p(x) & & \\
+    \textbf{Bayes rule}   & p(x \mid y) = \frac{p(y \mid x) p(x)}{p(y)}   & & \\
+\end{xltabular}
 
-\section*{\textit{Machine learning}}
+\section*{Machine Learning}
 
-\begin{tabularx}{\textwidth}{@{}lLXR@{}}
-    \textbf{Sigmoid}                          & \sigma(z) \doteq \frac{1}{1 + \exp(-z)}                               \\
-    \textbf{Sigmoid derivative}               & \odv{\sigma(z)}{z} = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z) \\
-    \textbf{Hyperbolic tangent}               & \tanh(z) \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)}         \\
-    \textbf{Hyperbolic tangent derivative}    & \odv{\tanh(z)}{z} = 1 - \tanh^2(z)                                    \\
-    \textbf{Rectified linear unit}            & \mathrm{ReLU}(z) \doteq \max \{ 0, z \}                               \\
-    \textbf{Rectified linear unit derivative} & \odv{\mathrm{ReLU}(z)}{z} = \mathbb{1} \{ z > 0 \}                    \\
-\end{tabularx}
+\begin{xltabular}{\textwidth}{@{}lLXR@{}}
+    \textbf{Sigmoid}                          & \sigma(z) \doteq \frac{1}{1 + \exp(-z)}                               & & \\
+    \textbf{Sigmoid derivative}               & \odv{\sigma(z)}{z} = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z) & & \\
+    \textbf{Hyperbolic tangent}               & \tanh(z) \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)}         & & \\
+    \textbf{Hyperbolic tangent derivative}    & \odv{\tanh(z)}{z} = 1 - \tanh^2(z)                                    & & \\
+    \textbf{Rectified linear unit}            & \mathrm{ReLU}(z) \doteq \max \{ 0, z \}                               & & \\
+    \textbf{Rectified linear unit derivative} & \odv{\mathrm{ReLU}(z)}{z} = \mathbb{1} \{ z > 0 \}                    & & \\
+\end{xltabular}
+
+\section*{Other}
+
+\begin{xltabular}{\textwidth}{@{}lLXR@{}}
+    \textbf{Geometric series} & \sum_{k=0}^{\infty} ar^k = \frac{a}{1-r} & & |r| < 1 \\
+\end{xltabular}
 
 \end{document}
