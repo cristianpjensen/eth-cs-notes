@@ -20,7 +20,7 @@
 \usepackage{booktabs,array,tabularx}
 \usepackage{xltabular}
 \setlength\tabcolsep{0.5cm}
-\def\arraystretch{2.0}
+\def\arraystretch{2.5}
 \everymath{\displaystyle}
 
 % Section titles
@@ -101,19 +101,26 @@
 
 \section*{Matrix Calculus}
 
-We use the \textit{numerator layout}. Let $\tens{X} \in \R^{d_1 \times \cdots \times d_n}, \tens{Y}
+We use the \textit{numerator layout}: Let $\tens{X} \in \R^{d_1 \times \cdots \times d_n}, \tens{Y}
     \in \R^{e_1 \times \cdots \times e_m}$, then \[
     \pdv{\tens{X}}{\tens{Y}} \in \R^{d_1 \times \cdots \times d_n \times e_1 \times \cdots \times e_m}.
 \]
-% In general, we ignore scalars in the dimensionality of the derivatives. This makes it much easier
-% to formulate derivatives as matrix products. For example, let $\ell \in \R, \vec{x} \in \R^d$, then \[
-%     \pdv{\ell}{\vec{x}} \not\in \R^{1 \times d}, \quad \pdv{\ell}{\vec{x}} \in \R^d.
-% \]
+As a consequence, the gradient is the transpose of the derivative, \[
+    \nabla f(\vec{x}) = \transpose{\lft[ \pdv{f(\vec{x})}{\vec{x}} \rgt]}.
+\]
 
 \begin{xltabular}{\textwidth}{@{}llXr@{}}
     \toprule
     \textbf{Chain rule} & $\pdv{\ell}{x_i} = \sum_{j=1}^{m} \pdv{\ell}{y_j} \pdv{y_j}{x_i}$ & & $f: \R^n \to \R^n, \vec{y} = f(\vec{x})$ \\
     & $\pdv{\tens{Z}}{\tens{X}} = \pdv{\tens{Z}}{\tens{Y}} \pdv{\tens{Y}}{\tens{X}}$ & & $\tens{Z} = f(\tens{Y}), \tens{Y} = g(\tens{X})$ \\
+    \textbf{Matrix-vector multiplication} & $\pdv{\mat{A} \vec{x}}{\vec{x}} = \mat{A}$ \\
+    \textbf{Inner product} & $\pdv{\transpose{\vec{x}} \vec{y}}{\vec{x}} = \vec{y}$ \\
+    & $\pdv{\transpose{\vec{x}} \mat{A} \vec{x}}{\mat{x}} = 2 \transpose{\vec{x}} \mat{A}$ \\
+    \textbf{Hadamard product} & $\pdv{\vec{x} \odot \vec{y}}{\vec{x}} = \mathrm{diag}(\vec{y})$ \\
+    & $\pdv{\transpose{\vec{x}} \mat{A} \vec{y}}{\mat{A}} = \vec{y} \transpose{\vec{x}}$ \\
+    \textbf{Trace} & $\pdv{\trace{\mat{A}}}{\mat{A}} = \mat{I}$ \\
+    & $\pdv{\trace{\mat{A} \mat{B}}}{\mat{A}} = \mat{B}$ \\
+    \textbf{Element-wise operators} & $\pdv{\sigma(\vec{x})}{\vec{x}} = \mathrm{diag}(\sigma'(\vec{x}))$ & & $\sigma: \R \to \R$ is applied element-wise \\
     \bottomrule
 \end{xltabular}
 
