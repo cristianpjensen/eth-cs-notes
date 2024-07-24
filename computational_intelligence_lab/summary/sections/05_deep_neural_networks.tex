@@ -96,12 +96,14 @@ defined as \[
 \]
 which is an implicit function of the input $\vec{z} \in \R^n$ to $H_k$. Furthermore, define the
 error signal as \[
-    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]}.
+    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]},
 \]
-Using the chain rule, we can find a recurrence relation between error signals, \[
+which quantifies how a change in loss is induced by a change in unit $k$'s activation. Using the
+chain rule, we can find a recurrence relation between error signals, \[
     \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]} = \transpose{\lft[ \pdv{\ell}{H_{k+1}} \pdv{H_{k+1}}{H_k} \rgt]} \doteq \transpose{\mat{J}_{k+1}} \vec{\delta}_{k+1}.
 \]
-Lastly, in order to compute the gradient \wrt the parameters, we use the chain rule again,
+Thus, we can use dynamic programming to compute all error signals efficiently. Lastly, in order to
+compute the gradient \wrt the parameters, we use the chain rule again,
 \begin{align*}
     \pdv{\ell}{[\mat{W}_k]_{ij}} & = \pdv{\ell}{H_k} \pdv{H_k}{[\mat{W}_k]_{ij}}                                                                                                               \\
                                  & = \pdv{\ell}{H_k} \lft[ \lft. \pdv{\phi(\vec{y})}{\vec{y}} \rgt|_{\vec{y} = \mat{W}_k \vec{z}_{k-1}} \rgt] \pdv*{\mat{W}_k \vec{z}_{k-1}}{[\mat{W}_k]_{ij}} \\

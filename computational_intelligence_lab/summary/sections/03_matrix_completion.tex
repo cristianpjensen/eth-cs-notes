@@ -1,10 +1,10 @@
 \section{Matrix completion}
 
-The goal of matrix completion is to fill in the missing entries of a sparse matrix $\mat{A}$. For
-example, Netflix might want to use matrix completion to predict which users will give which ratings
-to which movies, given the ratings given by all users of Netflix. However, not all users have rated
-all movies, thus the matrix is sparse and must thus be filled in. Netflix can use this prediction
-to decide which movies they should recommend to their users.
+The goal of matrix completion is to fill in the missing entries of a sparse matrix. \Eg, Netflix
+might want to use matrix completion to predict which users will give which ratings to which movies,
+given the ratings given by all users of Netflix. However, not all users have rated all movies, thus
+the matrix is sparse and must thus be filled in. Netflix can use this prediction to decide which
+movies they should recommend to their users.
 
 If we assume that all entries are independent, then no information is carried by one entry about
 another. Because of this, we cannot reconstruct the matrix. Thus, we need to make an assumption
@@ -22,39 +22,42 @@ about the dependency within the matrix.
     $a_{ij}$.
 \end{important}
 
-Formally, we have a rating matrix $\mat{A} \in \R^{n \times m}$ and an observation matrix
-$\mat{\Omega} \in \{ 0,1 \}^{n\times m}$, where $\omega_{ij}=1$ means that $a_{ij}$ is observed.
-The goal is to predict all values $a_{kl}$, where $\omega_{kl}=0$.
+Formally, we have an underlying rating matrix $\mat{A} \in \R^{n \times m}$ and an observation
+matrix $\mat{\Omega} \in \{ 0,1 \}^{n\times m}$, where $\omega_{ij}=1$ means that $a_{ij}$ is
+observed. The observed matrix will be denoted by $\tilde{\mat{A}}$ to differentiate between the
+underlying matrix and its observations. The goal is to predict all values $a_{kl}$, where
+$\omega_{kl}=0$.
 
 A possible issue with the values is that some users might generally give higher ratings than
-others.\sidenote{While it makes more sense intuitively that we should normalize ratings per user,
-    it has been shown to be more effective to normalize over item ratings.} Thus, we want to account
-for this by variance normalization. We can do this per row (user) or per column (item), where the
-two means can be computed by \[
-    \mu_i^{\mathrm{row}} = \frac{\sum_{j=1}^{m} \omega_{ij} a_{ij}}{\max \{ 1, \sum_{j=1}^{m} \omega_{ij} \}}, \quad \mu_j^{\mathrm{col}} = \frac{\sum_{i=1}^{n} \omega_{ij} a_{ij}}{\max \{ 1, \sum_{i=1}^{n} \omega_{ij} \}}.
-\]
-We then normalize by \[
+others. Thus, we want to account for this by variance normalization. We can do this per row (user)
+or per column (item).\sidenote{While it makes more sense intuitively that we should normalize
+    ratings per user, it has been shown to be more effective to normalize over item ratings.}
+Normalization yields a vector with zero mean and unit variance, \[
     Z = \frac{X - \mu}{\sigma}.
 \]
 
-To approximate $\mat{A} \in \R^{n \times m}$, we will make the assumption that $\mat{A}$ is a
-rank-$k$ matrix and approximate it by the product of two matrices $\mat{U} \in \R^{n \times k}$ and
-$\mat{V} \in \R^{m \times k}$, \[
+To approximate the underlying matrix $\mat{A} \in \R^{n \times m}$, we will make the assumption
+that it is a rank-$k$ matrix. This is enforced by approximating $\mat{A}$ as the product of two
+matrices $\mat{U} \in \R^{n \times k}$ and $\mat{V} \in \R^{m \times k}$, \[
     \mat{A} \approx \mat{U} \transpose{\mat{V}}.
 \]
 Then, we get the following loss function that we wish to minimize, \[
-    \mat{U}, \mat{V} \in \argmin_{\mat{U}, \mat{V}} \ell(\mat{U}, \mat{V}) \doteq \frac{1}{2} \lft\| \Pi_{\mat{\Omega}} \lft( \mat{A} - \mat{U}\transpose{\mat{V}} \rgt) \rgt\|_F^2,
+    \mat{U}, \mat{V} \in \argmin_{\mat{U}, \mat{V}} \ell(\mat{U}, \mat{V}) \doteq \frac{1}{2} \lft\| \Pi_{\mat{\Omega}} \lft( \tilde{\mat{A}} - \mat{U}\transpose{\mat{V}} \rgt) \rgt\|_F^2,
 \]
 where $\Pi_{\mat{\Omega}}(\mat{M}) = \mat{M} \odot \mat{\Omega}$ and $\| \cdot \|_F$ is the
 Frobenius norm. Rewriting as sums, we get the following loss function, \[
-    \ell(\mat{U}, \mat{V}) = \sum_{i=1}^{n} \sum_{j=1}^{m} \omega_{ij} \lft( a_ij - \transpose{\vec{u}_i} \vec{v}_j \rgt)^2.
+    \ell(\mat{U}, \mat{V}) = \sum_{i=1}^{n} \sum_{j=1}^{m} \omega_{ij} \lft( \tilde{a}_{ij} - \transpose{\vec{u}_i} \vec{v}_j \rgt)^2.
 \]
 
 \begin{important}
     We view $\vec{u}_i \in \R^k$ as representing each user and $\vec{v}_j \in \R^k$ as
-    representing each item. Their dot product is the predicted value of $a_{ij}$. Furthermore,
-    we have that $\mat{U}$ and $\mat{V}$ are fully determined by the observed values, but can be used
-    to extrapolate to a full matrix, achieving our objective.
+    representing each item. We estimate $a_{ij}$ to be their inner product, \[
+        a_{ij} \approx \transpose{\vec{u}_i} \vec{v}_i.
+    \]
+    Furthermore, we have that $\mat{U}$ and $\mat{V}$ are fully determined by the observed values
+    $\tilde{\mat{A}}$, but can be used to extrapolate to a full matrix $\mat{A}$, achieving our
+    objective. Moreover, we have that all rows and columns are coupled, which satisfies our dependence
+    assumption.
 \end{important}
 
 \subsection{Fully observed case}
@@ -79,6 +82,8 @@ Thus, we optimize \wrt the following loss function, \[
                 xlabel=$u$,
                 ylabel=$v$
             ]
+            \addplot [red, thick, samples=2, domain=-2:2] {-x};
+            \addplot [green, thick, samples=2, domain=-2:2] {x};
             \addplot3[
                 blue,
                 quiver={
@@ -90,10 +95,10 @@ Thus, we optimize \wrt the following loss function, \[
                 domain=-2:2,
                 domain y=-2:2,
             ] {0};
-            \addplot [red, thick, samples=100, domain=-2:2, restrict y to domain=-10:10] {1/x};
+            \addplot [black, thick, samples=100, domain=-2:2, restrict y to domain=-10:10] {1/x};
         \end{axis}
     \end{tikzpicture}
-    \caption{Negative gradient field for $a=1$ in the scalar case with minima indicated by red. As can be seen, $[0,0]$ is a 2-way saddle point and any vector $[-z,z]$ for $z\in\R$ moves toward it. We can start at any other point and use gradient-based optimization to converge to the minimum.}
+    \caption{Negative gradient field for $a=1$ in the scalar case with minima indicated by black. As can be seen, $[0,0]$ is a 2-way saddle point and any vector $[-z,z]$ for $z\in\R$ moves toward it. We can start at any other point and use gradient-based optimization to converge to the minimum.}
     \label{fig:grad-field}
 \end{marginfigure}
 
@@ -104,7 +109,7 @@ To observe the properties of the gradients, we will first consider the 1-dimensi
     \ell(u,v) = \frac{1}{2} (a - uv)^2
 \]
 with the following derivatives, \[
-    \pdv*{\ell(u,v)}{u} = \delta v, \quad \pdv*{\ell(u,v)}{v} = \delta u, \quad \delta = uv - a,
+    \pdv*{\ell(u,v)}{u} = v(uv - a), \quad \pdv*{\ell(u,v)}{v} = u(uv - a),
 \]
 which induces the negative gradient field shown in \Cref{fig:grad-field}. Furthermore, we have the
 following Hessian, \[
@@ -146,14 +151,14 @@ where $\eta$ is an arbitrarily small stepsize. We then have the following ODEs o
 \]
 Consider $x = uv = u^2 = v^2$ (because of balanced initialization and identical evolution), then we
 have the following ODE, \[
-    \odv{x}{t} = u \odv{v}{t} + v \odv{u}{t} = -u^2 (uv - a) - v^2 (uv - a) = -2x(x-a), \quad c \in \R.
+    \odv{x}{t} = u \odv{v}{t} + v \odv{u}{t} = -u^2 (uv - a) - v^2 (uv - a) = -2x(x-a).
 \]
 Solving this ODE yields the following solution for $x(t)$, \[
     x(t) = a + \frac{ac - a^2}{ce^{2at} + a - c} \overset{t\to\infty}{=} a.
 \]
 
 \begin{important}
-    Starting from a balanced initialization, gradient descent with a small enough $\eta$
+    Starting from a balanced initialization, gradient descent with a small enough $\eta > 0$
     will converge $uv$ to $a$.
 \end{important}
 
@@ -161,7 +166,7 @@ Solving this ODE yields the following solution for $x(t)$, \[
 
 Now consider the fully observed rank-1 model,
 \begin{align*}
-    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \| \mat{A} - \vec{u}\transpose{\vec{v}} \|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m                                                                                                                           \\
+    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \lft\| \mat{A} - \vec{u}\transpose{\vec{v}} \rgt\|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m                                                                                                                   \\
     \intertext{We can rewrite this to a more useful form,}
                            & = \frac{1}{2} \tr{\transpose{\lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \margintag{$\| \mat{M} \|_F^2 = \tr{\transpose{\mat{M}}\mat{M}}$.}                                                           \\
                            & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A} - \vec{v}\transpose{\vec{u}} \mat{A} - \transpose{\mat{A}}\vec{u}\vec{v} + \vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}}                                                                                 \\
@@ -202,11 +207,8 @@ As a result, we know that $\vec{u}$ is an eigenvector of $\mat{A} \transpose{\ma
 $\vec{v}$ is an eigenvector of $\transpose{\mat{A}} \mat{A}$. Using this fact, we can rewrite the
 intermediate objective as
 \begin{align*}
-    \transpose{\vec{u}} \mat{A} \vec{v} & = \frac{\transpose{\vec{u}} \mat{A}  \transpose{\mat{A}} \vec{u}}{\| \transpose{\mat{A}} \vec{u} \|}                                                                                                             \\
-                                        & = \frac{\transpose{\vec{u}} \lambda \vec{u}}{\sqrt{\transpose{\vec{u}} \mat{A} \transpose{\mat{A}} \vec{u}}} \margintag{$\lambda$ is the eigenvalue of $\mat{A}\transpose{\mat{A}}$ corresponding to $\vec{u}$.} \\
-                                        & = \frac{\transpose{\vec{u}} \lambda \vec{u}}{\sqrt{\transpose{\vec{u}} \lambda \vec{u}}}                                                                                                                         \\
-                                        & = \frac{\lambda \| \vec{u} \|^2}{\sqrt{\lambda} \| \vec{u} \|}                                                                                                                                                   \\
-                                        & = \sqrt{\lambda}. \margintag{$\vec{u}$ is a unit vector.}
+    \transpose{\vec{u}} \mat{A} \vec{v} & = \frac{\transpose{\vec{u}} \mat{A} \transpose{\mat{A}} \vec{u}}{\| \transpose{\mat{A}} \vec{u} \|} = \frac{\transpose{\vec{u}} \lambda \vec{u}}{\sqrt{\transpose{\vec{u}} \mat{A} \transpose{\mat{A}} \vec{u}}} \\
+                                        & = \frac{\transpose{\vec{u}} \lambda \vec{u}}{\sqrt{\transpose{\vec{u}} \lambda \vec{u}}} = \frac{\lambda \| \vec{u} \|^2}{\sqrt{\lambda} \| \vec{u} \|} = \sqrt{\lambda}.
 \end{align*}
 In order to maximize this term, we must thus select $\vec{u}$ and $\vec{v}$ to be the principal
 eigenvectors of their respective matrices. Furthermore, $\ell(\tilde{\vec{u}}, \tilde{\vec{v}}, c)$
@@ -219,13 +221,14 @@ and $\transpose{\mat{A}} \mat{A}$.
         \mat{A} = \sqrt{\lambda_1} \vec{u} \transpose{\vec{v}},
     \]
     where $\vec{u}$ and $\vec{v}$ are the principal eigenvectors of $\mat{A} \transpose{\mat{A}}$ and
-    $\transpose{\mat{A}} \mat{A}$, and $\lambda_1$ is the principal eigenvalue. We can compute these
-    vectors by the power iteration algorithm.
+    $\transpose{\mat{A}} \mat{A}$, respectively, and $\lambda_1$ is the principal eigenvalue of
+    $\mat{A} \transpose{\mat{A}}$ and $\transpose{\mat{A}} \mat{A}$. We can compute these vectors by
+    the power iteration algorithm.
 \end{important}
 
 \paragraph{Rank-$k$ model.}
 
-We can generalize the previous result by making use of the singular value decomposition.
+We can generalize the previous result by making use of the singular value decomposition (SVD).
 
 \begin{theorem}[SVD theorem]
     For each matrix $\mat{A} \in \R^{n \times m}$, there exists a diagonal matrix $\mat{\Sigma} \in
@@ -235,6 +238,14 @@ We can generalize the previous result by making use of the singular value decomp
         \mat{A} = \mat{U} \mat{\Sigma} \transpose{\mat{V}}.
     \]
 \end{theorem}
+
+The SVD of $\mat{A}$ is intimately is intimately related to the eigendecomposition of $\mat{A}
+    \transpose{\mat{A}}$ and $\transpose{\mat{A}} \mat{A}$,
+\begin{align*}
+    \mat{A} \transpose{\mat{A}} & = \mat{U} \mat{\Sigma} \transpose{\mat{\Sigma}} \transpose{\mat{U}}  \\
+    \transpose{\mat{A}} \mat{A} & = \transpose{\mat{V}} \transpose{\mat{\Sigma}} \mat{\Sigma} \mat{V}.
+\end{align*}
+Thus, $\mat{U}$ and $\transpose{\mat{V}}$ are the eigenvectors of $\mat{A}\transpose{\mat{A}}$ and $\transpose{\mat{A}}\mat{A}$, respectively. Furthermore, $\sigma_i^2$ is the $i$-th eigenvalue of both.
 
 \begin{lemma}
     \label{lem:svd-frob}
@@ -277,7 +288,7 @@ approximation of a matrix.
     \]
 \end{theorem}
 
-From this, we can easily find a rank-$k$ approximation by \[
+From this, we can easily find the optimal rank-$k$ approximation of $\mat{A}$ by \[
     \mat{A} \approx \mat{A}_k = \sum_{i=1}^{k} \sigma_i \vec{u}_i \transpose{\vec{v}}.
 \]
 Furthermore, we can directly compute the squared error of low rank approximations as \[
@@ -288,10 +299,10 @@ However, we cannot use this technique in the case of incomplete observations.
 
 \subsection{Incompletely observed case}
 
-In practice, the matrix $\mat{A}$ is often incompletely observed, meaning that we can only compute
-the loss function \wrt the observed entries. This task is called ``Matrix completion'', and we
-cannot use SVD in this case. Even worse, this problem is NP-hard, thus we have to resort to
-approximation algorithms.
+In practice, the matrix is often incompletely observed, meaning that we can only compute the loss
+function \wrt the observed entries. This task is called ``Matrix completion'', and we cannot use
+SVD in this case. Even worse, this problem is NP-hard, thus we have to resort to approximation
+algorithms.
 
 \paragraph{Alternating least squares.}
 
@@ -300,8 +311,8 @@ $\mat{U} \in \R^{n \times k}$ and $\mat{V} \in \R^{m \times k}$, \[
     \mat{A} \approx \mat{U} \transpose{\mat{V}}.
 \]
 Since we cannot solve the problem exactly, we want to add regularization to the loss function to
-increase numerical stability of the solution (this will also be very important later), \[
-    \ell(\mat{U}, \mat{V}) = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|^2_F + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt), \quad \lambda > 0.
+increase numerical stability of the solution,\sidenote{This will also be very important later.} \[
+    \ell(\mat{U}, \mat{V}) = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|^2_F + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt), \quad \lambda > 0.
 \]
 If we fully expand the norms, we will find that this objective is a 4-th degree polynomial in the
 parameters (entries of $\mat{U}$ and $\mat{V}$) with the following monomials,
@@ -317,8 +328,8 @@ other row of $\mat{U}$.\sidenote{The parameter dependencies form a bipartite gra
     $\mat{U}$ and $\mat{V}$.} Using this information, we can separate out part of the objective
 function depending on a row $\vec{v}_j$, where we treat $\mat{U}$ as fixed,
 \begin{align*}
-    \ell_{\mat{U}}(\vec{v}_j) & = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|_F^2 + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt)                                                                                                                                             \\
-                              & \propto \frac{1}{2} \sum_{i=1}^{n} \sum_{j'=1}^{m} \omega_{ij'} \lft| a_{ij'} - \transpose{\vec{u}_i} \vec{v}_{j'} \rgt|^2 + \frac{\lambda}{2} \sum_{j'=1}^{m} \sum_{r=1}^{k} |v_{j'r}|^2 \margintag{Expand norms and remove $\| \mat{U} \|_F^2$, because it does not depend on $\vec{v}_j$.}                         \\
+    \ell_{\mat{U}}(\vec{v}_j) & = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|_F^2 + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt)                                                                                                                                     \\
+                              & \propto \frac{1}{2} \sum_{i=1}^{n} \sum_{j'=1}^{m} \omega_{ij'} \lft( a_{ij'} - \transpose{\vec{u}_i} \vec{v}_{j'} \rgt)^2 + \frac{\lambda}{2} \sum_{j'=1}^{m} \sum_{r=1}^{k} (v_{j'r})^2 \margintag{Expand norms and remove $\| \mat{U} \|_F^2$, because it does not depend on $\vec{v}_j$.}                         \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \lft( a_{ij} - \transpose{\vec{u}_i}\vec{v}_j \rgt)^2 + \frac{\lambda}{2} \sum_{r=1}^{k} v_{jr}^2 \margintag{Remove all terms that do not contain entries of $\vec{v}_j$.}                                                                                             \\
                               & = \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} a_{ij}^2 + \omega_{ij} \transpose{\vec{u}_i} \vec{v}_j \transpose{\vec{u}_i} \vec{v}_j - 2 \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j                                                                              \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \transpose{\vec{v}_j} \vec{u}_i \transpose{\vec{u}_i} \vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j - \sum_{i=1}^{n} \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j \margintag{$\transpose{\vec{u}_i} \vec{v}_j = \transpose{\vec{v}_j} \vec{u}_i$.} \\
@@ -328,9 +339,9 @@ function depending on a row $\vec{v}_j$, where we treat $\mat{U}$ as fixed,
 Analogously, we can construct the following objective \wrt $\vec{u}_i$, \[
     \ell_{\mat{V}}(\vec{u}_i) = \frac{1}{2} \transpose{\vec{u}_i} \lft( \sum_{j=1}^{m} \omega_{ij} \vec{v}_j \transpose{\vec{v}_j} + \lambda \mat{I}_k \rgt) \vec{u}_i - \lft( \sum_{j=1}^{m} \omega_{ij} a_{ij} \transpose{\vec{v}_j} \rgt) \vec{u}_i.
 \]
-Since the matrix in the first term is rank-$k$,\sidenote{This is because of the identity matrix,
-    which is a result of the regularization.} we can invert it. We have the following first-order
-optimal solution to the above loss function,
+Since the matrix in the first term is rank-$k$, we can invert it.\sidenote{This is because of the
+    identity matrix, which is a result of the regularization.} We have the following first-order
+optimal solution to the above loss functions,
 \begin{align*}
     \vec{v}_j^\star & = \inv{\lft( \sum_{i=1}^{n} \omega_{ij} \vec{u}_i \transpose{\vec{u}_i} + \lambda \mat{I}_k \rgt)} \lft( \sum_{i=1}^{n} \omega_{ij} a_{ij} \vec{u}_i \rgt)  \\
     \vec{u}_i^\star & = \inv{\lft( \sum_{j=1}^{m} \omega_{ij} \vec{v}_j \transpose{\vec{v}_j} + \lambda \mat{I}_k \rgt)} \lft( \sum_{j=1}^{m} \omega_{ij} a_{ij} \vec{v}_j \rgt).
@@ -349,18 +360,20 @@ $\mat{U}$ given $\mat{V}$ and $\mat{V}$ given $\mat{U}$,
     An iteration of ALS has complexity $\bigo{(n+m)\cdot k^3}$. However, since each row of both matrices can be
     optimized in parallel, this can be done much faster in practice. Furthermore, since we are optimizing
     the objective fully over one half of the parameter space, the objective monotonically decreases.
-    Hence, it converges to a first-order optimal fixed point, which may be a saddle point. Moreover, we
-    have the advantage that we can easily augment the model by adding additional dimensions and minimizing \wrt the existing dimensions, which may be
-    useful when new users enter the system or new items become available.
+    Hence, it converges to a first-order optimal fixed point, which may be a saddle point.
+
+    Moreover, we have the advantage that we can easily augment the model by adding additional
+    dimensions and minimizing \wrt the existing dimensions, which may be useful when new users enter
+    the system or new items become available.
 \end{important}
 
 \paragraph{Projection methods.}
 
 We will now consider optimizing the objective by gradient descent, where the gradient is
 \begin{align*}
-    \pdv*{\frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2}{\mat{B}} & = \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \odot \pdv*{\Pi_{\mat{\Omega}}(\mat{A} - \mat{B})}{\mat{B}} \margintag{$\pdv*{\| \mat{X} \|_F^2}{\mat{X}} = 2\mat{X}$.} \\
-                                                                                & = \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \odot \Pi_{\mat{\Omega}}(-\mat{1}_{n\times m}) \margintag{Projection is linear.}                                        \\
-                                                                                & = -\Pi_{\mat{\Omega}}(\mat{A} - \mat{B}).
+    \pdv*{\frac{1}{2} \| \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) \|_F^2}{\mat{B}} & = \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) \odot \pdv*{\Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B})}{\mat{B}} \margintag{$\pdv*{\| \mat{X} \|_F^2}{\mat{X}} = 2\mat{X}$.} \\
+                                                                                        & = \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) \odot \Pi_{\mat{\Omega}}(-\mat{1}_{n\times m}) \margintag{Projection is linear.}                                                \\
+                                                                                        & = -\Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}).
 \end{align*}
 However, gradient descent does not constrain its iterates to be rank-$k$ matrices. Projected
 gradient descent solves this by projecting to the constrained space in between every gradient step.
@@ -368,32 +381,33 @@ In general, it is hard to project to a space of rank-$k$ matrices, but SVD makes
 making use of the Eckart-Young theorem. We will denote $[\mat{M}]_k$ as the projection to the space
 of rank-$k$ matrices, which is computed by pruning all singular values below $\sigma_k$, as shown
 by the Eckart-Young theorem. Hence, the update rule is the following, \[
-    \mat{A}^{(t+1)} = \lft[ \mat{A}^{(t)} + \eta \Pi_{\mat{\Omega}}\lft( \mat{A} - \mat{A}^{(t)} \rgt) \rgt]_k.
+    \mat{A}^{(t+1)} = \lft[ \mat{A}^{(t)} + \eta \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{A}^{(t)} \rgt) \rgt]_k.
 \]
 This converges to a first-order optimal solution if $\eta$ is small enough as a general result of
 projected gradient descent.
 
-\begin{marginfigure}[5cm]
+\begin{marginfigure}[-3cm]
     \centering
     \incfig{projected-gradient-descent}
     \caption{Illustration of projected gradient descent, where the dotted lines indicate projection steps.}
     \label{fig:projected-gradient-descent}
 \end{marginfigure}
 
-The problem with this approach is that the space of rank-$k$ matrices is non-convex. Thus, the next
-idea is to find the tightest convex relaxation of this space. \Ie, we want to find a convex space
-that contains all rank-$k$ matrices, but not too many more. For this, we use the nuclear norm, \[
+The problem with this approach is that the space of rank-$k$ matrices is non-convex and is thus not
+guaranteed to converge to a global optimum. Thus, the next idea is to find the tightest convex
+relaxation of this space. \Ie, we want to find a convex space that contains all rank-$k$ matrices,
+but not too many more. For this, we use the nuclear norm, \[
     \| \mat{M} \|_* \doteq \sum_{i=1}^{\mathrm{rank}(\mat{M})} \sigma_i,
 \]
 where $\sigma_i$ is the $i$-th singular value of $\mat{M}$.
 
-Let $\vec{\sigma}(\mat{M})$ be the vector of singular values of $\mat{M}$, then, as shown by
-\Cref{lem:svd-frob}, the Frobenius norm can be computed by \[
-    \| \mat{M} \|_F = \| \vec{\sigma}(\mat{M}) \|_2.
-\]
-Similarly, the nuclear norm can be computed by \[
-    \| \mat{M} \|_* = \| \vec{\sigma}(\mat{M}) \|_1.
-\]
+\marginnote{Let $\vec{\sigma}(\mat{M})$ be the vector of singular values of $\mat{M}$, then, as shown by
+    \Cref{lem:svd-frob}, the Frobenius norm can be computed by \[
+        \| \mat{M} \|_F = \| \vec{\sigma}(\mat{M}) \|_2.
+    \]
+    Similarly, the nuclear norm can be computed by \[
+        \| \mat{M} \|_* = \| \vec{\sigma}(\mat{M}) \|_1.
+    \]}
 
 \begin{definition}[Convex envelope]
     \label{def:convex-env}
@@ -417,35 +431,35 @@ Similarly, the nuclear norm can be computed by \[
 
 We will use this to approximate the objective by a convex function. We have the following
 objective, \[
-    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}} (\mat{A} - \mat{B}) \|_F^2, \quad \mathrm{rank}(\mat{B}) \leq k, \| \mat{B} \|_2 \leq c. \margintag{The second constraint adds regularization and is necessary due to the condition of the space of \Cref{thm:rank-env}.}
+    \ell(\mat{B}) = \frac{1}{2} \| \Pi_{\mat{\Omega}} (\tilde{\mat{A}} - \mat{B}) \|_F^2, \quad \mathrm{rank}(\mat{B}) \leq k, \| \mat{B} \|_2 \leq c. \margintag{The second constraint adds regularization and is necessary due to the condition of the space of \Cref{thm:rank-env}.}
 \]
 This can be rewritten using Lagrange multipliers as a non-convex objective,
 \begin{align*}
-    \ell(\mat{B}) & = \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + r \cdot \mathrm{rank}(\mat{B}) + \mu \| \mat{B} \|_2                                                                                                                                 \\
-                  & \approx \frac{1}{2} \| \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) \|_F^2 + \tau \| \mat{B} \|_* + \gamma \| \mat{B} \|_F. \margintag{The nuclear norm is the convex envelope of the rank function and the Frobenius norm upper bounds the spectral norm.}
+    \ell(\mat{B}) & = \frac{1}{2} \| \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) \|_F^2 + r \cdot \mathrm{rank}(\mat{B}) + \mu \| \mat{B} \|_2                                                                                                                                 \\
+                  & \approx \frac{1}{2} \| \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) \|_F^2 + \tau \| \mat{B} \|_* + \gamma \| \mat{B} \|_F. \margintag{The nuclear norm is the convex envelope of the rank function and the Frobenius norm upper bounds the spectral norm.}
 \end{align*}
-This approximation of the objective is convex, so, using gradient descent and correct $\eta$, we can
-solve it.
+This approximation of this objective is convex, so, using gradient descent and correct $\eta$, we can
+optimize it to a global optimum.
 
 \begin{theorem}
-    Let $\mat{A}$ with SVD $\mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ be given, then
+    Let $\mat{C} \in \R^{n\times m}$ with SVD $\mat{C} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ be given, then
     \begin{align*}
-        \mathrm{shrink}_{\tau}(\mat{A}) & \doteq \argmin_{\mat{B}} \frac{1}{2} \| \mat{A} - \mat{B} \|_F^2 + \tau \| \mat{B} \|_* \\
+        \mathrm{shrink}_{\tau}(\mat{C}) & \doteq \argmin_{\mat{B}} \frac{1}{2} \| \mat{C} - \mat{B} \|_F^2 + \tau \| \mat{B} \|_* \\
                                         & = \mat{U}\mathrm{diag}(\vec{\sigma} - \tau)_+ \transpose{\mat{V}},
     \end{align*}
     where $\mat{M}_+$ clips all entries of $\mat{M}$ at zero.
 \end{theorem}
-Note that the rank of $\mathrm{shrink}_{\tau}(\mat{A})$ decreases monotonically with $\tau$, because
+Note that the rank of $\mathrm{shrink}_{\tau}(\mat{C})$ decreases monotonically with $\tau$, because
 more singular values are zeroed out as $\tau$ increases.
 
 Using the shrink operator, we can define a new update rule, starting from $\mat{A}^{(0)} =
     \mat{0}$, \[
-    \mat{A}^{(t+1)} = \mat{A}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \mat{A} - \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \rgt).
+    \mat{A}^{(t+1)} = \mat{A}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \rgt).
 \]
 With a suitable schedule $\eta_t > 0$, this algorithm will converge to
 \begin{align*}
-    \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \xrightarrow{t\to \infty} \mat{A}^\star = & \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2\tau} \| \mat{B} \|_F^2 \\
-                                                                                              & \mathrm{s.t.} \quad \Pi_{\mat{\Omega}}(\mat{A} - \mat{B}) = \mat{0}.
+    \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \xrightarrow{t\to \infty} \mat{A}^\star = & \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2\tau} \| \mat{B} \|_F^2   \\
+                                                                                              & \mathrm{s.t.} \quad \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) = \mat{0}.
 \end{align*}
 The result of this algorithm will be exactly reproducing the observed entries, which the non-relaxed
 problem cannot guarantee, as there may be no rank-$k$ algorithm with a projected residual that is
@@ -461,8 +475,8 @@ Rather, the shrinkage operator is used to implicitly encourage low-rank approxim
 \paragraph{Exact recovery.}
 
 So far we have only been interested in how to find the ``best'' completed matrix, given an
-incomplete matrix $\mat{A}$. However, now we are interested in the conditions under which we can
-exactly recover the matrix, assuming that the underlying matrix $\mat{A}$ is of rank $k$.
+incomplete matrix $\tilde{\mat{A}}$. However, now we are interested in the conditions under which
+we can exactly recover the matrix, assuming that the underlying matrix $\mat{A}$ is of rank $k$.
 
 Assume $\mat{A} \in \R^{n \times n}$, then the degrees of freedom are the $k$ singular values and
 $k$ left and right singular vectors. The $i$-th singular vector has $n-i$ degrees of freedom due to
@@ -476,9 +490,13 @@ example. Let $\mat{A}$ have the SVD $\mat{A} = \mat{U} \mat{\Sigma} \transpose{\
     \mat{A} = \sigma_1 \vec{u}_1 \transpose{\vec{v}_1} + \sum_{i=2}^{k} \sigma_i \vec{u}_i \transpose{\vec{v}_i}.
 \]
 Let $\vec{u}_1 = \vec{e}_i$ and $\vec{v}_1 = \vec{e}_j$, then in order to recover $\sigma_1$, we
-need to have sampled $a_{ij}$. Thus, it does not only matter how many entries we have sampled, but
-also where we have sampled them. Intuitively, we need the information to be sufficiently
-distributed.
+need to have sampled $a_{ij}$.
+
+\begin{important}
+    For exact recovery, it does not only matter how many entries we have sampled, but
+    also where we have sampled them. Intuitively, we need the information to be sufficiently
+    distributed.
+\end{important}
 
 The following gives us conditions for which we can exactly reconstruct the underlying matrix with
 high probability, under the assumption that the entries have been uniformly sampled.

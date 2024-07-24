@@ -94,7 +94,7 @@ the parameters $\vec{\theta}$. Hence, it is only a partial step, called the expe
 
 Now we also need a step to maximize the model parameters $\vec{\theta}$. We can easily solve for
 $\vec{\pi}$ by \[
-    \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(\vec{x}_t) p(\vec{x}_t \mid z) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}.
+    \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(z \mid \vec{x}_t \mid z) p(z) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}. \margintag{This assumes that the data are distributed uniformly. It can also be derived by the first-order optimality condition.}
 \]
 Moreover, the solution for $\vec{\theta}_z$ depends on the choice of the model distribution, but we
 can generally get to separable problems, \[
@@ -111,7 +111,7 @@ models $p(\vec{X} \mid Z)$ by Gaussians with unit variance, \[
     p(\vec{x}; \vec{\pi}, \{ \vec{\mu}_1, \ldots, \vec{\mu}_k \}) = \sum_{z=1}^{k} \pi_z \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}),
 \]
 where \[
-    \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}) = (2\pi)^{-\nicefrac{d}{2}} \exp \lft( -\frac{1}{2} \| \vec{x} - \vec{\mu}_z \|^2 \rgt).
+    \mathcal{N}(\vec{x}; \vec{\mu}, \mat{\Sigma}) = (2\pi)^{-\nicefrac{d}{2}} \det{\mat{\Sigma}}^{-\nicefrac{1}{2}} \exp \lft( -\frac{1}{2} \transpose{(\vec{x} - \vec{\mu})} \mat{\Sigma}^{-1} (\vec{x} - \vec{\mu}) \rgt).
 \]
 The EM algorithm then consists of the following alternating equations,
 \begin{gather*}
@@ -123,21 +123,21 @@ Intuitively, the E-step (soft) clusters the data points and the M-step computes 
 \subsection{Topic models}
 
 We will now consider a class of latent variable models known as topic models. These are used to
-analyze document collections and to discover the topical content of document. Informally, topical
+analyze document collections and to discover the topical content of documents. Informally, topical
 content is the information that the words of a document carry about what the document is about.
 
-Let $\Sigma$ be the word vocabulary with $|\Sigma|=m$ words. A document $\vec{X}_i$ of length $s_i$
-is part of a collection of $n$ documents and is a field of random variables $X_{it}$, whose
+Let $\Sigma$ be the word vocabulary with $|\Sigma|=m$ words. A document $d_i$ of length $s_i$ is
+part of a collection of $n$ documents and is a field of random variables $X_{it}$, whose
 realizations are words $x_{it} \in \Sigma, \forall t \in [s_i]$. We will assume that topical
-content is invariant to word order. \sidenote{Mathematically, this is known as
-    \textit{exchangeability}, which says that the distribution of a sequence of random variables does
-    not change under any permutation of their order.} As a consequence, the sufficient statistics of a
-document are the frequencies of word occurrences within it. Hence, we can reduce the data to a
-bag-of-words representation of occurrence counts, \[
+content is invariant to word order.\sidenote{This is known as \textit{exchangeability}, which says
+    that the distribution of a sequence of random variables does not change under any permutation of
+    their order.} As a consequence, the sufficient statistics of a document are the frequencies of word
+occurrences within it. Hence, we can reduce the data to a bag-of-words representation of occurrence
+counts, \[
     N_{ij} = | \{ x_{it} = w_j \mid t \in [s_i] \} |.
 \]
-In words, $N_{ij}$ denotes how often word $w_j$ occurred in document $\vec{x}_i$. We can thus
-summarize the full document corpus in an occurrence matrix, \[
+In words, $N_{ij}$ denotes how often word $w_j$ occurred in document $d_i$. We can thus summarize
+the full document corpus in an occurrence matrix, \[
     \mat{N} = [N_{ij}] \in \mathbb{N}^{n \times m}.
 \]
 
@@ -168,7 +168,7 @@ We can equivalently write the log-likelihood objective in terms of the raw data,
     \ell(\vec{\theta}) = \sum_{i=1}^{n} \sum_{t=1}^{s_i} \log \sum_{z=1}^{k} p(x_{it} \mid z) p(z \mid d_i).
 \]
 Similarly to the mixture models, we define an ELBO, \[
-    \ell(\vec{\theta}) \geq \hat{\ell}(\vec{\theta}; \vec{q}) \doteq \sum_{i=1}^{n} \sum_{t=1}^{s_i} \sum_{z=1}^{k} q_{itz} \lft( \log p(x_{it} \mid z) + \log p(z \mid d_i) - \log q_{itz} \rgt).
+    \ell(\vec{\theta}) \geq \sum_{i=1}^{n} \sum_{t=1}^{s_i} \sum_{z=1}^{k} q_{itz} \lft( \log p(x_{it} \mid z) + \log p(z \mid d_i) - \log q_{itz} \rgt).
 \]
 Moreover, following the same steps, we can derive the EM equations,
 \begin{gather*}
@@ -309,8 +309,8 @@ this, we also need positive samples, \[
 And, additionally we need negative samples, which we randomly sample, \[
     \mathcal{S}^- = [(x_t, v_{tj}) \mid t \in [T], v_{tj} \sampleiid q, j \in [r]],
 \]
-where $q$ is a probability over words and $r$ is the sampling factor (how many more negative
-samples we sample than positive samples). Generally, $q$ is chosen to satisfy \[
+where $q$ is a distribution over $\Sigma$ and $r$ is the sampling factor. Generally, $q$ is chosen
+to satisfy \[
     q(w) \propto p(w)^{\alpha},
 \]
 where typically $\alpha = \nicefrac{3}{4}$. The intuition behind this is that what matters most in
@@ -340,12 +340,13 @@ likely to be sampled, as shown in \Cref{fig:alpha}.
 We can then define a logistic log-likelihood function that we wish to minimize, \[
     \ell(\vec{\theta}, \vec{x}) = \sum_{(w,v) \in \mathcal{S}^+} \log \sigma(v, w; \vec{\theta}) + \sum_{(w,u) \in \mathcal{S}^-} \log (1 - \sigma(u, w; \vec{\theta})).
 \]
+This does not require computing a normalization constant.
 
 \paragraph{Pointwise mutual information.}
 
 Let $p(v,w)$ denote the true distribution of co-occurring words and by $q(v,w) = p(w)p(v)$ the
 distribution used for negative sampling. The optimal Bayesian classifier would then be \[
-    \mathbb{P}((v,w) = \mathrm{true}) \frac{\pi p(v,w)}{\pi p(v,w) + (1-\pi) q(v,w)},
+    \mathbb{P}((v,w) = \mathrm{true}) = \frac{\pi p(v,w)}{\pi p(v,w) + (1-\pi) q(v,w)},
 \]
 where $\pi$ is the prior probability of a true pair. Considering the pre-image (logit) of the
 logistic function, we get

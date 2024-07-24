@@ -2,13 +2,13 @@
 
 The motivation behind dimensionality reduction is to find a low-dimensional representation of
 high-dimensional data.\sidenote{Often, the original raw representation is high-dimensional and
-    redundant, \eg, images, audio, time series.} This can be split into two goals: (1) compressing the
-data, while preserving as much as possible of the relevant information, and (2) interpreting the
-data, which is easier in low-dimensional space.
+    redundant, \eg, images, audio, time series.} Dimensionality reduction has two goals: (1)
+compressing the data, while preserving as much relevant information as possible, and (2)
+interpreting the data, which is easier in low-dimensional space.
 
 Dimensionality reduction is often performed by an autoencoder, which typically has a bottleneck of
 low dimensionality and aims to predict its input; see \Cref{fig:auto-encoder}. Let the original
-data space be $d$-dimensional and the latent space be $k$-dimensional with $k \ll d$. Then, an
+data space be $d$-dimensional and the latent space be $k$-dimensional with $k \ll d$. An
 autoencoder consists of an encoder $F$ and a decoder $G$, \[
     F: \R^d \to \R^k, \quad G: \R^k \to \R^d.
 \]
@@ -38,50 +38,56 @@ autoencoder.\sidenote{Considering non-linear parametrizations will result in a m
     G(\vec{z})           & = \mat{V} \vec{z}, \quad \mat{V} \in \R^{d\times k} \\
     (G \circ F)(\vec{x}) & = \mat{V} \mat{W} \vec{x}.
 \end{align*}
-The objective to minimize of the linear encoder is the following, \[
-    \mathcal{R}(\mat{W},\mat{V}) = \mathcal{R}(\mat{P} = \mat{V}\mat{W}) \doteq \frac{1}{2} \E \| \vec{x}-\mat{P}\vec{x} \|^2.
+The objective to minimize is the following, \[
+    \mathcal{R}(\mat{W},\mat{V}) = \mathcal{R}(\mat{P} = \mat{V}\mat{W}) \doteq \frac{1}{2} \E \| \vec{x}-\mat{P}\vec{x} \|^2,
 \]
+Intuitively, it is the difference between the identity function and $G \circ F$.
 
 \begin{corollary}
-    For centered data, \ie $E[\vec{x}] = 0$, optimal affine maps degenerate to linear ones.
+    For centered data (\ie $E[\vec{x}] = 0$), optimal affine maps degenerate to linear ones.
 \end{corollary}
 
 \begin{proof}
-    Proof by contradiction. Assume there exists an $\vec{a} \neq 0$ such that $\E \| \vec{x} -
-        (\mat{P}\vec{x} + \vec{a}) \|^2 \leq \E \| \vec{x} - \mat{P}\vec{x} \|^2$. Let $\vec{a} \neq
+    Let $F(\vec{x}) = \mat{W} \vec{x} + \vec{a}$ and $G(\vec{z}) = \mat{V} \vec{z} + \vec{b}$, then an affine model's function is computed by \[
+        (G \circ F)(\vec{x}) = \mat{V}\mat{W}\vec{x} + \vec{c}, \quad \vec{c} = \mat{V} \vec{a} + \vec{b}.
+    \]
+    Proof by contradiction. Assume there exists a $\vec{c} \neq 0$ such that $\E \| \vec{x} -
+        (\mat{P}\vec{x} + \vec{c}) \|^2 \leq \E \| \vec{x} - \mat{P}\vec{x} \|^2$. Let $\vec{c} \neq
         \vec{0}$, then
     \begin{align*}
-        \E\| \vec{x} - (\mat{P}\vec{x} + \vec{a}) \|^2 & = \E \| \vec{x} - \mat{P}\vec{x} - \vec{a} \|^2                                                                                                               \\
-                                                       & = \E \lft[ \| \vec{x} - \mat{P}\vec{x} \|^2 + \| \vec{a} \|^2 - 2 \langle \vec{x} - \mat{P}\vec{x}, \vec{a} \rangle \rgt] \margintag{Cosine theorem.}         \\
-                                                       & = \E \| \vec{x} - \mat{P} \vec{x} \|^2 + \| \vec{a} \|^2 - 2 \langle \E[\vec{x}] - \mat{P} \E[\vec{x}], \vec{a} \rangle \margintag{Linearity of expectation.} \\
-                                                       & = \E \| \vec{x} - \mat{P} \vec{x} \|^2 + \| \vec{a} \|^2 \margintag{Centered data: $\E[\vec{x}] = \vec{0}$}                                                   \\
-                                                       & > \E \| \vec{x} - \mat{P} \vec{x} \|^2. \margintag{$\vec{a} \neq \vec{0}$.}
+        \E\| \vec{x} - (\mat{P}\vec{x} + \vec{c}) \|^2 & = \E \| \vec{x} - \mat{P}\vec{x} - \vec{c} \|^2                                                                                                               \\
+                                                       & = \E \lft[ \| \vec{x} - \mat{P}\vec{x} \|^2 + \| \vec{c} \|^2 - 2 \langle \vec{x} - \mat{P}\vec{x}, \vec{c} \rangle \rgt] \margintag{Cosine theorem.}         \\
+                                                       & = \E \| \vec{x} - \mat{P} \vec{x} \|^2 + \| \vec{c} \|^2 - 2 \langle \E[\vec{x}] - \mat{P} \E[\vec{x}], \vec{c} \rangle \margintag{Linearity of expectation.} \\
+                                                       & = \E \| \vec{x} - \mat{P} \vec{x} \|^2 + \| \vec{c} \|^2 \margintag{Centered data: $\E[\vec{x}] = \vec{0}$}                                                   \\
+                                                       & > \E \| \vec{x} - \mat{P} \vec{x} \|^2. \margintag{$\vec{c} \neq \vec{0}$.}
     \end{align*}
-    This contradicts with the assumption.
+    This contradicts the assumption.
 \end{proof}
 
 Thus, we will assume that the data is centered, which makes the analysis easier, since we do not
 need to consider the affine case. This is a reasonable assumption, because data can always be
 centered by subtracting $\E[\vec{x}]$ from all data points.
 
-\begin{important}
-    Note that while the optimal linear reconstruction map $\mat{P}$ is unique, its parametrization
-    $\mat{V} \mat{W}$ is not unique, since for any invertible matrix $\mat{A} \in \R^{k \times k}$, we
-    can construct an optimal parametrization, \[
-        \mat{V}\mat{W} = \mat{V} \mat{I} \mat{W} = \mat{V} (\mat{A} \inv{\mat{A}}) \mat{W} = (\mat{V}\mat{A})(\inv{\mat{A}}\mat{W}),
-    \]
-    with $\inv{\mat{A}}\mat{W}, \mat{V}\mat{A}$. Thus, the weight matrices are
-    \textit{non-identifiable}.
-\end{important}
+Note that while the optimal linear reconstruction map $\mat{P}$ is unique, its parametrization
+$\mat{V} \mat{W}$ is not unique, since for any invertible matrix $\mat{A} \in \R^{k \times k}$, we
+can construct an optimal parametrization, \[
+    \mat{V}\mat{W} = \mat{V} \mat{I} \mat{W} = \mat{V} (\mat{A} \inv{\mat{A}}) \mat{W} = (\mat{V}\mat{A})(\inv{\mat{A}}\mat{W}),
+\]
+with $\inv{\mat{A}}\mat{W}, \mat{V}\mat{A}$.
 
 \begin{important}
-    Since $\mat{P}$ cannot be any $d\times d$ matrix, we want to know how the composition of $\mat{V}
-        \in \R^{d\times k}$ and $\mat{W} \in \R^{k\times d}$ characterizes the matrix $\mat{P}$ and which
-    constraints they impose. The answer to this is that the weight matrices impose a rank constraint on
-    $\mat{P}$, \[
-        \mathrm{rank}(\mat{P}) = \min \{ \mathrm{rank}(\mat{V}), \mathrm{rank}(\mat{W}) \} \leq \min \{ k, d \} = k.
-    \]
-    Thus, when optimizing for $\mat{P}$, we are constrained to matrices with rank less or equal to $k$.
+    The weight matrices $\mat{V}, \mat{W}$ are \textit{non-identifiable}. As a result, we must not over-interpret the found representation.
+\end{important}
+
+Since $\mat{P}$ cannot be any $d\times d$ matrix, we want to know how the composition of $\mat{V}
+    \in \R^{d\times k}$ and $\mat{W} \in \R^{k\times d}$ characterizes the matrix $\mat{P}$ and which
+constraints they impose. The answer to this is that the weight matrices impose a rank constraint on
+$\mat{P}$, \[
+    \mathrm{rank}(\mat{P}) = \min \{ \mathrm{rank}(\mat{V}), \mathrm{rank}(\mat{W}) \} \leq \min \{ k, d \} = k.
+\]
+
+\begin{important}
+    $\mat{P}$ is constrained to be, at most, a rank-$k$ matrix.
 \end{important}
 
 \subsection{Projection}
@@ -96,7 +102,7 @@ optimal mapping to that subspace.\sidenote{We do not search for the weight matri
 
 We will first focus on (2); given linear subspace $\mathcal{U}$, we need to determine the optimal
 linear map $\mat{P}^\star$, such that \[
-    \mat{P}^\star = \argmin_{\mathrm{col}(\mat{P}) = \mathcal{U}} \| \vec{x} - \mat{P}\vec{x} \|^2.
+    \mat{P}^\star = \argmin_{\mathrm{col}(\mat{P}) = \mathcal{U}} \| \vec{x} - \mat{P}\vec{x} \|^2, \quad \forall \vec{x}.
 \]
 
 \begin{definition}[Orthogonal projection]
@@ -106,9 +112,9 @@ linear map $\mat{P}^\star$, such that \[
     $\mathcal{U}$ if $\forall \vec{x}\in \mathcal{V}:$
     \begin{enumerate}
         \item \textit{Projection}: $P(\vec{x}) \in \mathcal{U}$;
+        \item \textit{Idempotency}: $P(P(\vec{x})) = P(\vec{x})$.
         \item \textit{Orthogonality}: $\mathrm{null}(P) \bot \mathrm{col}(P)$, which is equivalent to
               the following holding, $\ang{P(\vec{x}), \vec{y}} = \ang{\vec{x},P(\vec{y})}$ (self-adjointness);
-        \item \textit{Idempotency}: $P(P(\vec{x})) = P(\vec{x})$.
     \end{enumerate}
 \end{definition}
 
@@ -120,9 +126,10 @@ linear map $\mat{P}^\star$, such that \[
 \end{marginfigure}
 
 \begin{lemma}
-    The orthogonal projection to a linear subspace $\mathcal{U} \subseteq \R^n$ is defined as \[
-        \Pi_{\mathcal{U}}: \R^d \to \mathcal{U}, \quad \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|.
+    $\Pi_{\mathcal{U}}$ defined as \[
+        \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|
     \]
+    is an orthogonal projection of $\R^n$ onto $\mathcal{U}$.
 \end{lemma}
 
 \begin{proof}
@@ -152,6 +159,10 @@ linear map $\mat{P}^\star$, such that \[
 
         \item \textit{Projection}: This is true by definition of the values that the $\argmin$ are allowed to take on;
 
+        \item \textit{Idempotency}: For all $\vec{u}\in \mathcal{U}$, $\Pi_{\mathcal{U}}(\vec{u})
+                  = \argmin_{\vec{x}'\in \mathcal{U}} \| \vec{u} - \vec{x}' \| = \vec{u}$. Thus,
+              $\Pi_{\mathcal{U}} = \Pi_{\mathcal{U}} \circ \Pi_{\mathcal{U}}$;
+
         \item \textit{Orthogonality}: We need to show that $\Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \in
                   \mathcal{U}^\bot$. Firstly, we have
               \begin{equation}
@@ -166,11 +177,7 @@ linear map $\mat{P}^\star$, such that \[
                                                                & > \| \vec{u}^\bot \|^2 \margintag{$\vec{u} \neq \vec{0}$ and $\langle \vec{u}, \vec{u}^\bot \rangle = 0$.}     \\
                                                                & = \| \Pi_{\mathcal{U}}(\vec{x}) - \vec{u} - \vec{x} \|^2.
               \end{align*}
-              This contradicts with \Cref{eq:orth-proof}, because $\Pi_{\mathcal{U}}(\vec{x}) - \vec{u} \in \mathcal{U}$;
-
-        \item \textit{Idempotency}: For all $\vec{u}\in \mathcal{U}$, $\Pi_{\mathcal{U}}(\vec{u})
-                  = \argmin_{\vec{x}'\in \mathcal{U}} \| \vec{u} - \vec{x}' \| = \vec{u}$. Thus,
-              $\Pi_{\mathcal{U}} = \Pi_{\mathcal{U}} \circ \Pi_{\mathcal{U}}$.
+              This contradicts with \Cref{eq:orth-proof}, because $\Pi_{\mathcal{U}}(\vec{x}) - \vec{u} \in \mathcal{U}$.
     \end{enumerate}
 \end{proof}
 
@@ -178,6 +185,7 @@ So, we know that $\Pi_{\mathcal{U}}$ is a linear function. Now, we want to find 
 $\mat{P}$ representing that linear transformation.
 
 \begin{lemma}
+    \label{lem:orthonormal-basis-projection}
     Given an orthonormal basis $\mat{U}$ of $\mathcal{U}$ ($\vec{u}_i \in \mathcal{U}, \| \vec{u}_i \| = 1, \langle \vec{u}_i,
         \vec{u}_j \rangle = 0, \forall i \neq j$), we can compute the optimal projection matrix, \[
         \mat{P} = \mat{U}\transpose{\mat{U}}.
@@ -187,53 +195,45 @@ $\mat{P}$ representing that linear transformation.
 \end{lemma}
 
 \begin{proof}
-    The image of the projection matrix is $\mathcal{U}$: \[
-        \mat{P} \vec{x} = \lft( \sum_{i=1}^{m} \vec{u}_i \transpose{\vec{u}_i} \rgt) \vec{x} = \sum_{i=1}^{m} \vec{u}_i \transpose{\vec{u}_i} \vec{x} = \sum_{i=1}^{m} \ang{\vec{u}_i, \vec{x}} \vec{u}_i \in \mathcal{U}.
-    \]
-    Self-adjointness: \[
-        \transpose{\mat{P}} = \transpose{(\mat{U}\transpose{\mat{U}})} = \mat{U} \transpose{\mat{U}} = \mat{P}.
-    \]
-    Idempotency: \[
-        \mat{P} \mat{P} = \mat{U} \underbrace{\transpose{\mat{U}} \mat{U}}_{\mat{I}_m} \transpose{\mat{U}} = \mat{U} \transpose{\mat{U}} = \mat{P}.
-    \]
-    Orthogonality: \[
-        \langle \mat{P} \vec{x}, \vec{x} - \mat{P} \vec{x} \rangle = \langle \vec{x}, \mat{P} (\vec{x} - \mat{P} \vec{x}) \rangle = \langle \vec{x}, (\mat{P} - \mat{P}^2) \vec{x} \rangle = \langle \vec{x}, (\mat{P} - \mat{P}) \vec{x} \rangle = 0.
-    \]
-
+    We need to show that $\mat{P}$ is the orthogonal projection matrix onto $\mathcal{U}$:
+    \begin{enumerate}
+        \item \textit{Projection}: $\mat{P} \vec{x} = \sum_{i=1}^{m} \vec{u}_i \transpose{\vec{u}_i} \vec{x} = \sum_{i=1}^{m} \ang{\vec{u}_i, \vec{x}} \vec{u}_i \in \mathcal{U}$;
+        \item \textit{Self-adjointness}: $\transpose{\mat{P}} = \transpose{(\mat{U}\transpose{\mat{U}})} = \mat{U} \transpose{\mat{U}} = \mat{P}$;
+        \item \textit{Idempotency}: $\mat{P} \mat{P} = \mat{U} \transpose{\mat{U}} \mat{U} \transpose{\mat{U}} = \mat{U} \transpose{\mat{U}} = \mat{P}$;
+        \item \textit{Orthogonality}: $\langle \mat{P} \vec{x}, \vec{x} - \mat{P} \vec{x} \rangle = \langle \vec{x}, \mat{P} (\vec{x} - \mat{P} \vec{x}) \rangle = \langle \vec{x}, (\mat{P} - \mat{P}^2) \vec{x} \rangle = \langle \vec{x}, (\mat{P} - \mat{P}) \vec{x} \rangle = 0$.
+    \end{enumerate}
 \end{proof}
 
-In general, we do not have an orthonormal basis of $\mathcal{U}$.
+The problem is that we do not have an orthonormal basis of $\mathcal{U}$ in general. The next lemma
+gives a more general result for any basis.
 
 \begin{lemma}
-    For a non-orthonormal basis $\mat{V} \in \R^{d \times k}$ for $\mathcal{U}$, we can recover the projection matrix, \[
+    For a non-orthonormal basis $\mat{V} \in \R^{d \times k}$ of $\mathcal{U}$, we can recover the projection matrix, \[
         \mat{P} = \mat{V}\mat{V}^+, \quad \mat{V}^+ \doteq \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}}. \margintag{$\mat{V}^+$ is the left Moore-Penrose pseudo-inverse of $\mat{V}$.}
     \]
 \end{lemma}
 
 \begin{proof}
-    $\mat{P}$ is the projection matrix of $\mathcal{U}$, \[
-        \mat{P} \mat{V} = \mat{V} \mat{V}^+ \mat{V} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \mat{V} = \mat{V}.
-    \]
-    Together with the rank constraint, this yields $\mat{P} \vec{u}^\bot = \vec{0}$ for all
-    $\vec{u}^\bot \in \mathcal{U}^\bot$.
-
-    Self-adjointness: \[
-        \transpose{\mat{P}} = \transpose{\lft( \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \rgt)} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} = \mat{P}.
-    \]
-    Idempotency: \[
-        \mat{P} \mat{P} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \mat{V} \inv{\lft( \transpose{\mat{V}}\mat{V} \rgt)} \transpose{\mat{V}} = \mat{V} \mat{V}^+ = \mat{P}.
-    \]
+    We need to show that $\mat{P}$ is the orthogonal projection matrix of $\mathcal{U}$:
+    \begin{enumerate}
+        \item \textit{Projection}: $\mat{P} \mat{V} = \mat{V} \mat{V}^+ \mat{V} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \mat{V} = \mat{V}$. Together with the rank constraint, this yields $\mat{P} \vec{u}^\bot = \vec{0}$ for all $\vec{u}^\bot \in \mathcal{U}^\bot$;
+        \item \textit{Self-adjointness}: $\transpose{\mat{P}} = \transpose{\lft( \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \rgt)} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} = \mat{P}$;
+        \item \textit{Idempotency}: $\mat{P} \mat{P} = \mat{V} \inv{\lft( \transpose{\mat{V}} \mat{V} \rgt)} \transpose{\mat{V}} \mat{V} \inv{\lft( \transpose{\mat{V}}\mat{V} \rgt)} \transpose{\mat{V}} = \mat{V} \mat{V}^+ = \mat{P}$.
+    \end{enumerate}
 \end{proof}
+
+Note that we have not made any reference to the data $\vec{x} \sim \nu$ until now. This means that
+all of the above results are a priori by the structure of the model and choice of objective.
 
 \paragraph{Finding the optimal subspace.}
 
 Now we need to find out which subspace of dimension $m$ or less is optimal to project onto. First,
 we need to rewrite the objective function to find a new interpretation,
 \begin{align*}
-    \mathcal{R}(\mat{P}) & = \frac{1}{2} \E \| \vec{x}-\mat{P}\vec{x} \|^2                                                                                                                                         \\
-                         & = \frac{1}{2} \E \lft[ \| \vec{x} \|^2 + \| \mat{P} \vec{x} \|^2 - 2 \langle \vec{x}, \mat{P} \vec{x} \rangle \rgt] \margintag{Cosine theorem.}                                         \\
-                         & = \frac{1}{2} \E \|\vec{x}\|^2 + \frac{1}{2} \E \| \mat{P}\vec{x} \|^2 - \E \ang{\vec{x},\mat{P}^2\vec{x}} \margintag{Linearity of expectation and idempotency of projection matrices.} \\
-                         & = \frac{1}{2} \E \|\vec{x}\|^2 + \frac{1}{2} \E \| \mat{P}\vec{x} \|^2 - \E \|\mat{P}\vec{x}\|^2 \margintag{$\ang{\vec{x},\mat{P}^2 \vec{x}} = \ang{\mat{P}\vec{x},\mat{P}\vec{x}}$.}   \\
+    \mathcal{R}(\mat{P}) & = \frac{1}{2} \E \| \vec{x}-\mat{P}\vec{x} \|^2                                                                                                                                       \\
+                         & = \frac{1}{2} \E \lft[ \| \vec{x} \|^2 + \| \mat{P} \vec{x} \|^2 - 2 \langle \vec{x}, \mat{P} \vec{x} \rangle \rgt] \margintag{Cosine theorem.}                                       \\
+                         & = \frac{1}{2} \E \|\vec{x}\|^2 + \frac{1}{2} \E \| \mat{P}\vec{x} \|^2 - \E \ang{\vec{x},\mat{P}^2\vec{x}} \margintag{Linearity of expectation and idempotency.}                      \\
+                         & = \frac{1}{2} \E \|\vec{x}\|^2 + \frac{1}{2} \E \| \mat{P}\vec{x} \|^2 - \E \|\mat{P}\vec{x}\|^2 \margintag{$\ang{\vec{x},\mat{P}^2 \vec{x}} = \ang{\mat{P}\vec{x},\mat{P}\vec{x}}$.} \\
                          & = \frac{1}{2} \E \|\vec{x}\|^2 - \frac{1}{2} \E \| \mat{P}\vec{x} \|^2.
 \end{align*}
 Because our data is centered, we know the following,
@@ -245,16 +245,16 @@ Because our data is centered, we know the following,
 \begin{marginfigure}[3cm]
     \centering
     \incfig{variance-preservation}
-    \caption{Intuitively, the projection onto the horizontal line preserves the most information. This projection from $\R^2$ onto $\R$ maximizes variance.}
+    \caption{Intuitively, the projection onto the shown line preserves the most information. This projection from $\R^2$ onto $\R$ maximizes variance.}
     \label{fig:variance-preservation}
 \end{marginfigure}
 
 \begin{important}
     Assuming centered data, \[
-        \mathcal{R}(\mat{P}) = \frac{1}{2} (\mathrm{Var}[\vec{x}] - \mathrm{Var}[\mat{P}\vec{x}]) \propto -\frac{1}{2} \mathrm{Var}[\mat{P}\vec{x}].
+        \mathcal{R}(\mat{P}) = \frac{1}{2} (\mathrm{Var}[\vec{x}] - \mathrm{Var}[\mat{P}\vec{x}]) \propto -\mathrm{Var}[\mat{P}\vec{x}].
     \]
-    Hence, minimizing $\mathcal{R}(\mat{P})$ is equivalent to maximizing the variance after projection,
-    $\mathrm{Var}[\mat{P}\vec{x}]$.
+    Hence, minimizing $\mathcal{R}(\mat{P})$ is equivalent to maximizing the total variance of the
+    projected data, $\mathrm{Var}[\mat{P}\vec{x}]$.
 \end{important}
 
 We can further simplify this expression to find a sufficient statistic for the objective function,
@@ -274,6 +274,10 @@ We can further simplify this expression to find a sufficient statistic for the o
 
 \subsection{Principal component analysis}
 
+Intuitively, eigenvectors represent axes along which matrices have the largest variance. Thus, we
+want to project onto the $k$ eigenvectors of $\E[\vec{x}\transpose{\vec{x}}]$ that are associated
+with the $k$ largest eigenvalues.
+
 \begin{theorem}[Spectral theorem]
     Any symmetric and positive semidefinite matrix $\mat{\Sigma}$ can be non-negatively diagonalized with an orthogonal matrix, \[
         \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}, \quad \mat{\Lambda} = \diag{\lambda_1, \ldots, \lambda_d},
@@ -281,10 +285,10 @@ We can further simplify this expression to find a sufficient statistic for the o
     where $\lambda \geq \cdots \geq \lambda_d \geq 0$ and $\mat{Q} \in \R^d$ is orthogonal.
 \end{theorem}
 
-\begin{remark}
-    $\mat{Q}$ is composed of ordered eigenvectors of $\mat{\Sigma}$, and $\mat{\Lambda}$ is composed
-    of ordered eigenvalues of $\mat{\Sigma}$.
-\end{remark}
+The spectral theorem gives us the eigendecomposition of $\E[\vec{x}\transpose{\vec{x}}]$, because
+it is symmetric. The eigenvectors form an orthonormal basis, so the $k$ principal eigenvectors are
+also orthonormal. Hence, we can use \Cref{lem:orthonormal-basis-projection} to form the projection
+matrix, which is essentially what the PCA theorem tells us.
 
 \begin{theorem}[PCA theorem]
     The variance maximizing projection matrix $\mat{P}$ for a covariance matrix $\E[\vec{x}\transpose{\vec{x}}] = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}$ as in the spectral theorem is given by \[
@@ -308,12 +312,13 @@ We can further simplify this expression to find a sufficient statistic for the o
     dimensionality reduction by first centering the data,
     \begin{align*}
         \vec{\mu}       & = \frac{1}{n} \sum_{i=1}^{n} \vec{x}_i \\
-        \bar{\vec{x}}_i & = \bar{\vec{x}}_i - \vec{\mu}.
+        \bar{\vec{x}}_i & = \vec{x} - \vec{\mu}.
     \end{align*}
     Then, we compute the covariance matrix $\mat{\Sigma} \in \R^{d \times d}$, \[
         \mat{\Sigma} = \frac{1}{n} \sum_{i=1}^{n} \bar{\vec{x}}_i \transpose{\bar{\vec{x}}_i}.
     \]
-    For that matrix, we compute the eigendecomposition, \[
+    For that matrix, we compute the eigendecomposition (which exists because $\mat{\Sigma}$ is
+    symmetric), \[
         \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}},
     \]
     where $\mat{Q} \in \R^{d \times d}$ is orthogonal and $\mat{\Lambda}$ is diagonal. We then discard
@@ -355,19 +360,21 @@ The computational complexity of this algorithm is $\bigo{Td^2}$.
     We can decompose vectors as a linear combination of eigenvectors, $\vec{v}^{(0)} = \sum_{i=1}^n
         \alpha_i \vec{u}_i$. Then,
     \begin{align*}
-        \vec{v}^{(\ell)} & \propto \mat{A}^\ell \vec{v}^{(0)}                                                                                                              \\
-                         & = \sum_{i=1}^{d} \alpha_i \lambda_i^\ell \vec{u}_i \margintag{$\mat{A}^\ell \vec{v}^{(0)} = \sum_{i=1}^{d} \alpha_i \mat{A}^\ell \vec{u}_i$.}   \\
-                         & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{d} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^\ell \vec{u}_i. \margintag{Divide by $\lambda_1$.}
+        \vec{v}^{(k)} & \propto \mat{A}^k \vec{v}^{(0)}                                                                                                                                                      \\
+                      & = \sum_{i=1}^{d} \alpha_i \lambda_i^k \vec{u}_i \margintag{$\mat{A}^k \vec{v}^{(0)} = \sum_{i=1}^{d} \alpha_i \mat{A}^k \vec{u}_i = \sum_{i=1}^{d} \alpha_i \lambda_i^k \vec{u}_i$.} \\
+                      & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{d} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^k \vec{u}_i. \margintag{Divide by $\lambda_1$.}
     \end{align*}
-    $\nicefrac{\lambda_i}{\lambda_1} < 1$ for $i > 1$, thus the sum goes to 0 and $\vec{v}^{(\ell)} \to \vec{u}_1$.
+    $\nicefrac{\lambda_i}{\lambda_1} < 1$ for $i > 1$, thus the sum goes to 0 and $\vec{v}^{(k)} \to \vec{u}_1$.
 \end{proof}
 
 We can use this algorithm to also compute the next principal eigenvectors by factoring out
-$\vec{u}_1$ and then doing the algorithm again to recover $\vec{u}_2$, and continue doing that
-until we have the $k$ principal eigenvectors.
+$\vec{u}_1$ by $\mat{A}_2 = \mat{A} - \lambda_1 \vec{u}_1 \transpose{\vec{u}}_1$ and then applying
+the algorithm again to $\mat{A}_2$ to recover $\vec{u}_2$, and continue doing that until we have
+the $k$ principal eigenvectors.
 
-Thus, the total complexity of finding the $k$ principal eigenvectors is $\bigo{Tkd^2}$. However,
-this does not get rid of the $\bigo{n d^2}$ complexity for computing the sample covariance matrix.
+Thus, the total complexity of finding the $k$ principal eigenvectors is $\bigo{Tkd^2}$ instead of
+$\bigo{d^3}$. However, this does not get rid of the $\bigo{n d^2}$ complexity for computing the
+sample covariance matrix, which is a bigger problem.
 
 \paragraph{Gradient descent.}
 
@@ -379,7 +386,7 @@ The gradient is computed by $(\mat{P} - \mat{I})\vec{x}\transpose{\vec{x}}$. The
 is that we cannot constrain $\mat{P}$ to be a projection. Thus, we actually need to update
 $\mat{V}$ and $\mat{W}$. Thus, by the chain rule for matrix derivatives,
 \begin{align*}
-    \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{W}} & = (\mat{V} \mat{W}  - \mat{I}) \vec{x} \transpose{\vec{x}} \transpose{\mat{W}} \\
-    \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{V}} & = \transpose{\mat{V}} (\mat{V} \mat{W} - \mat{I}) \vec{x} \transpose{\vec{x}}.
+    \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{V}} & = (\mat{V} \mat{W}  - \mat{I}) \vec{x} \transpose{\vec{x}} \transpose{\mat{W}} \\
+    \grad{\mathcal{R}(\mat{W}, \mat{V})}{\mat{W}} & = \transpose{\mat{V}} (\mat{V} \mat{W} - \mat{I}) \vec{x} \transpose{\vec{x}}.
 \end{align*}
-The complexity for $T$ iterations is then $\bigo{T(k+b)d^2}$, where $b$ is the batch size.
+The complexity for $T$ iterations is then $\bigo{T(k+B)d^2}$, where $B$ is the batch size.
