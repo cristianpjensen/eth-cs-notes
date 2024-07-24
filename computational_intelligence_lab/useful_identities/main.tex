@@ -7,6 +7,7 @@
 
 % Margins
 \usepackage[a4paper, margin=3cm]{geometry}
+\setlength{\parindent}{0pt}
 
 % Math
 \usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot}
@@ -20,8 +21,7 @@
 \usepackage{xltabular}
 \setlength\tabcolsep{0.5cm}
 \def\arraystretch{2.0}
-\newcolumntype{L}{>{$\displaystyle}l<{$}}
-\newcolumntype{R}{>{$\displaystyle}r<{$}}
+\everymath{\displaystyle}
 
 % Section titles
 \usepackage{titlesec} 
@@ -63,40 +63,66 @@
 
 \section*{Linear Algebra}
 
-\begin{xltabular}{\textwidth}{@{}lLXR@{}}
-    \textbf{Subadditivity}   & \| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|                                                                                                                 \\
-    \textbf{Cauchy-Schwarz}  & |\langle \vec{x}, \vec{y} \rangle| \leq \| \vec{x} \| \| \vec{y} \|                                                                                                        \\
-    \textbf{Cosine theorem}  & \| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2 \langle \vec{x}, \vec{y} \rangle                                                                         \\
-    \textbf{Cyclic property} & \trace{\mat{A} \mat{B} \mat{C}} = \trace{\mat{C} \mat{A} \mat{B}} = \trace{\mat{B} \mat{C} \mat{A}}                                                                        \\
-    & \| \mat{A} \|_F^2 = \trace{\transpose{\mat{A}} \mat{A}}                                                                                                                    \\
-    & \| \mat{A} \|_F = \| \vec{\sigma} \|_2                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
-    & \| \mat{A} \|_* = \| \vec{\sigma} \|_1                                                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
-    & \| \mat{A} \|_2 = \| \vec{\sigma} \|_\infty                                                                          &  & \mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}} \\
+\begin{xltabular}{\textwidth}{@{}llXr@{}}
+    \toprule
+    \textbf{Subadditivity}   & $\| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|$ \\
+    \textbf{Cauchy-Schwarz}  & $|\langle \vec{x}, \vec{y} \rangle| \leq \| \vec{x} \| \| \vec{y} \|$ \\
+    \textbf{Cosine theorem}  & $\| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2 \langle \vec{x}, \vec{y} \rangle$ \\
+    \textbf{Cyclic property} & $\trace{\mat{A} \mat{B} \mat{C}} = \trace{\mat{C} \mat{A} \mat{B}} = \trace{\mat{B} \mat{C} \mat{A}}$ \\
+    & $\| \mat{A} \|_F^2 = \trace{\transpose{\mat{A}} \mat{A}}$ \\
+    & $\| \mat{A} \|_F = \| \vec{\sigma} \|_2$ & & $\mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ \\
+    & $\| \mat{A} \|_* = \| \vec{\sigma} \|_1$ & & $\mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ \\
+    & $\| \mat{A} \|_2 = \| \vec{\sigma} \|_\infty$ & & $\mat{A} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ \\
+    \bottomrule
 \end{xltabular}
 
 \section*{Probability}
 
-\begin{xltabular}{\textwidth}{@{}lLXR@{}}
-    \textbf{Sum rule}     & p(x) = \int p(x, y) \mathrm{d}y               & & \\
-    \textbf{Product rule} & p(x, y) = p(x \mid y) p(y) = p(y \mid x) p(x) & & \\
-    \textbf{Bayes rule}   & p(x \mid y) = \frac{p(y \mid x) p(x)}{p(y)}   & & \\
+\begin{xltabular}{\textwidth}{@{}llXr@{}}
+    \toprule
+    \textbf{Sum rule}     & $p(x) = \int p(x, y) \mathrm{d}y$               & & \\
+    \textbf{Product rule} & $p(x, y) = p(x \mid y) p(y) = p(y \mid x) p(x)$ & & \\
+    \textbf{Bayes rule}   & $p(x \mid y) = \frac{p(y \mid x) p(x)}{p(y)}$   & & \\
+    \bottomrule
 \end{xltabular}
 
 \section*{Machine Learning}
 
-\begin{xltabular}{\textwidth}{@{}lLXR@{}}
-    \textbf{Sigmoid}                          & \sigma(z) \doteq \frac{1}{1 + \exp(-z)}                               & & \\
-    \textbf{Sigmoid derivative}               & \odv{\sigma(z)}{z} = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z) & & \\
-    \textbf{Hyperbolic tangent}               & \tanh(z) \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)}         & & \\
-    \textbf{Hyperbolic tangent derivative}    & \odv{\tanh(z)}{z} = 1 - \tanh^2(z)                                    & & \\
-    \textbf{Rectified linear unit}            & \mathrm{ReLU}(z) \doteq \max \{ 0, z \}                               & & \\
-    \textbf{Rectified linear unit derivative} & \odv{\mathrm{ReLU}(z)}{z} = \mathbb{1} \{ z > 0 \}                    & & \\
+\begin{xltabular}{\textwidth}{@{}llXr@{}}
+    \toprule
+    \textbf{Sigmoid}                          & $\sigma(z) \doteq \frac{1}{1 + \exp(-z)}$                               & & \\
+    \textbf{Sigmoid derivative}               & $\odv{\sigma(z)}{z} = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)$ & & \\
+    \textbf{Hyperbolic tangent}               & $\tanh(z) \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)}$         & & \\
+    \textbf{Hyperbolic tangent derivative}    & $\odv{\tanh(z)}{z} = 1 - \tanh^2(z)$                                    & & \\
+    \textbf{Rectified linear unit}            & $\mathrm{ReLU}(z) \doteq \max \{ 0, z \}$                               & & \\
+    \textbf{Rectified linear unit derivative} & $\odv{\mathrm{ReLU}(z)}{z} = \mathbb{1} \{ z > 0 \}$                    & & \\
+    \bottomrule
+\end{xltabular}
+
+\section*{Matrix Calculus}
+
+We use the \textit{numerator layout}. Let $\tens{X} \in \R^{d_1 \times \cdots \times d_n}, \tens{Y}
+    \in \R^{e_1 \times \cdots \times e_m}$, then \[
+    \pdv{\tens{X}}{\tens{Y}} \in \R^{d_1 \times \cdots \times d_n \times e_1 \times \cdots \times e_m}.
+\]
+% In general, we ignore scalars in the dimensionality of the derivatives. This makes it much easier
+% to formulate derivatives as matrix products. For example, let $\ell \in \R, \vec{x} \in \R^d$, then \[
+%     \pdv{\ell}{\vec{x}} \not\in \R^{1 \times d}, \quad \pdv{\ell}{\vec{x}} \in \R^d.
+% \]
+
+\begin{xltabular}{\textwidth}{@{}llXr@{}}
+    \toprule
+    \textbf{Chain rule} & $\pdv{\ell}{x_i} = \sum_{j=1}^{m} \pdv{\ell}{y_j} \pdv{y_j}{x_i}$ & & $f: \R^n \to \R^n, \vec{y} = f(\vec{x})$ \\
+    & $\pdv{\tens{Z}}{\tens{X}} = \pdv{\tens{Z}}{\tens{Y}} \pdv{\tens{Y}}{\tens{X}}$ & & $\tens{Z} = f(\tens{Y}), \tens{Y} = g(\tens{X})$ \\
+    \bottomrule
 \end{xltabular}
 
 \section*{Other}
 
-\begin{xltabular}{\textwidth}{@{}lLXR@{}}
-    \textbf{Geometric series} & \sum_{k=0}^{\infty} ar^k = \frac{a}{1-r} & & |r| < 1 \\
+\begin{xltabular}{\textwidth}{@{}llXr@{}}
+    \toprule
+    \textbf{Geometric series} & $\sum_{k=0}^{\infty} ar^k = \frac{a}{1-r}$ & & $|r| < 1$ \\
+    \bottomrule
 \end{xltabular}
 
 \end{document}
