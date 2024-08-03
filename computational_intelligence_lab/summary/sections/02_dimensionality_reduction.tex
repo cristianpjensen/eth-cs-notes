@@ -113,8 +113,8 @@ linear map $\mat{P}^\star$, such that \[
     \begin{enumerate}
         \item \textit{Projection}: $P(\vec{x}) \in \mathcal{U}$;
         \item \textit{Idempotency}: $P(P(\vec{x})) = P(\vec{x})$.
-        \item \textit{Orthogonality}: $\mathrm{null}(P) \bot \mathrm{col}(P)$, which is equivalent to
-              the following holding, $\ang{P(\vec{x}), \vec{y}} = \ang{\vec{x},P(\vec{y})}$ (self-adjointness);
+        \item \textit{Orthogonality}: $\mathrm{null}(P) \bot \mathrm{col}(P)$, which is equivalent to the column space and row space of $P$ being equal.
+              It is also equivalent to self-adjointness holding, $\ang{P(\vec{x}), \vec{y}} = \ang{\vec{x},P(\vec{y})}$.
     \end{enumerate}
 \end{definition}
 
@@ -127,7 +127,7 @@ linear map $\mat{P}^\star$, such that \[
 
 \begin{lemma}
     $\Pi_{\mathcal{U}}$ defined as \[
-        \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|
+        \Pi_{\mathcal{U}}(\vec{x}) = \argmin_{\vec{x}'\in \mathcal{U}} \|\vec{x}-\vec{x}'\|^2
     \]
     is an orthogonal projection of $\R^n$ onto $\mathcal{U}$.
 \end{lemma}
@@ -143,31 +143,31 @@ linear map $\mat{P}^\star$, such that \[
               \]
               This can easily be shown for $\Pi_{\mathcal{U}}$,
               \begin{align*}
-                  \Pi_{\mathcal{U}}(\alpha \vec{x})    & = \argmin_{\vec{x}'' \in \mathcal{U}} \| \alpha \vec{x} - \vec{x}'' \|                                                                                                                                                                                                                                                      \\
-                                                       & = \argmin_{\alpha \vec{x}' \in \mathcal{U}} \| \alpha \vec{x} - \alpha \vec{x}' \|                                                                                                                                                                                                                                          \\
-                                                       & = \alpha \argmin_{\vec{x}' \in \mathcal{U}} |\alpha| \|\vec{x} - \vec{x}'\| \margintag{$\argmin_{\lambda \vec{x}} f(\vec{x}) = \lambda \argmin_{\vec{x}} f(\vec{x})$.}                                                                                                                                                      \\
-                                                       & = \alpha \argmin_{\vec{x}' \in \mathcal{U}} \|\vec{x} - \vec{x}'\|                                                                                                                                                                                                                                                          \\
+                  \Pi_{\mathcal{U}}(\alpha \vec{x})    & = \argmin_{\vec{x}'' \in \mathcal{U}} \| \alpha \vec{x} - \vec{x}'' \|^2                                                                                                                                                                                                                                                    \\
+                                                       & = \argmin_{\alpha \vec{x}' \in \mathcal{U}} \| \alpha \vec{x} - \alpha \vec{x}' \|^2                                                                                                                                                                                                                                        \\
+                                                       & = \alpha \argmin_{\vec{x}' \in \mathcal{U}} |\alpha| \|\vec{x} - \vec{x}'\|^2 \margintag{$\argmin_{\lambda \vec{x}} f(\vec{x}) = \lambda \argmin_{\vec{x}} f(\vec{x})$.}                                                                                                                                                    \\
+                                                       & = \alpha \argmin_{\vec{x}' \in \mathcal{U}} \|\vec{x} - \vec{x}'\|^2                                                                                                                                                                                                                                                        \\
                                                        & = \alpha \Pi_{\mathcal{U}}(\vec{x}).                                                                                                                                                                                                                                                                                        \\
-                  \Pi_{\mathcal{U}}(\vec{x} + \vec{y}) & = \argmin_{\vec{z} \in \mathcal{U}} \| \vec{z} - (\vec{x} + \vec{y}) \|                                                                                                                                                                                                                                                     \\
-                                                       & = \argmin_{\substack{\Pi_{\mathcal{U}}(\vec{x}) + \vec{y}'                                                                                                                                                                                                                                                                  \\ \vec{y}' \in \mathcal{U}}} \| \Pi_{\mathcal{U}}(\vec{x}) + \vec{y}' - \vec{x} - \vec{y} \| \margintag{$\vec{z} \doteq \Pi_{\mathcal{U}}(\vec{x}) + \vec{y}'$ for some $\vec{y}' \in \mathcal{U}$.}                                                                                                                 \\
+                  \Pi_{\mathcal{U}}(\vec{x} + \vec{y}) & = \argmin_{\vec{z} \in \mathcal{U}} \| \vec{z} - (\vec{x} + \vec{y}) \|^2                                                                                                                                                                                                                                                   \\
+                                                       & = \argmin_{\substack{\Pi_{\mathcal{U}}(\vec{x}) + \vec{y}'                                                                                                                                                                                                                                                                  \\ \vec{y}' \in \mathcal{U}}} \| \Pi_{\mathcal{U}}(\vec{x}) + \vec{y}' - \vec{x} - \vec{y} \|^2 \margintag{$\vec{z} \doteq \Pi_{\mathcal{U}}(\vec{x}) + \vec{y}'$ for some $\vec{y}' \in \mathcal{U}$.}                                                                                                                 \\
                                                        & = \Pi_{\mathcal{U}}(\vec{x}) + \argmin_{\vec{y}' \in \mathcal{U}} \| (\vec{y}' - \vec{y}) + (\Pi_{\mathcal{U}}(\vec{x}) - \vec{x}) \|^2 \margintag{$\argmin_{\vec{y} + \vec{x}} f(\vec{x}) = \vec{y} + \argmin_{\vec{x}} f(\vec{x})$.}                                                                                      \\
-                                                       & = \Pi_{\mathcal{U}}(\vec{x}) + \argmin_{\vec{y}' \in \mathcal{U}} \| \vec{y}' - \vec{y} \|^2 + \| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \|^2                                                                                                                                                                                 \\
-                                                       & \qquad \qquad \qquad + 2\ang{\Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y}' - \vec{y}} \margintag{Cosine theorem.}                                                                                                                                                                                                          \\
-                                                       & = \Pi_{\mathcal{U}}(\vec{x}) + \argmin_{\vec{y}' \in \mathcal{U}} \| \vec{y}' - \vec{y} \|^2 + 2 \langle \Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y}' \rangle \margintag{$\| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \|^2$ and $\langle \Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y} \rangle$ do not depend on $\vec{y}'$.} \\
+                                                       & = \Pi_{\mathcal{U}}(\vec{x}) + \argmin_{\vec{y}' \in \mathcal{U}} \| \vec{y}' - \vec{y} \|^2 + \| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \|^2 \margintag{Cosine theorem.}                                                                                                                                                     \\
+                                                       & \qquad \qquad \qquad - 2\ang{\Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y}' - \vec{y}}                                                                                                                                                                                                                                      \\
+                                                       & = \Pi_{\mathcal{U}}(\vec{x}) + \argmin_{\vec{y}' \in \mathcal{U}} \| \vec{y}' - \vec{y} \|^2 - 2 \langle \Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y}' \rangle \margintag{$\| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \|^2$ and $\langle \Pi_{\mathcal{U}}(\vec{x}) - \vec{x}, \vec{y} \rangle$ do not depend on $\vec{y}'$.} \\
                                                        & = \Pi_{\mathcal{U}}(\vec{x}) + \Pi_{\mathcal{U}}(\vec{y}); \margintag{$\Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \in \mathcal{U}^\bot$ and $\vec{y}' \in \mathcal{U}$, so their inner product is $0$.}
               \end{align*}
 
         \item \textit{Projection}: This is true by definition of the values that the $\argmin$ are allowed to take on;
 
         \item \textit{Idempotency}: For all $\vec{u}\in \mathcal{U}$, $\Pi_{\mathcal{U}}(\vec{u})
-                  = \argmin_{\vec{x}'\in \mathcal{U}} \| \vec{u} - \vec{x}' \| = \vec{u}$. Thus,
+                  = \argmin_{\vec{x}'\in \mathcal{U}} \| \vec{u} - \vec{x}' \|^2 = \vec{u}$. Thus,
               $\Pi_{\mathcal{U}} = \Pi_{\mathcal{U}} \circ \Pi_{\mathcal{U}}$;
 
         \item \textit{Orthogonality}: We need to show that $\Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \in
                   \mathcal{U}^\bot$. Firstly, we have
               \begin{equation}
                   \label{eq:orth-proof}
-                  \| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \| = \min_{\vec{u} \in \mathcal{U}} \| \vec{u} - \vec{x} \| \leq \| \tilde{\vec{u}} - \vec{x} \|, \quad \forall \tilde{\vec{u}} \in \mathcal{U}.
+                  \| \Pi_{\mathcal{U}}(\vec{x}) - \vec{x} \|^2 = \min_{\vec{u} \in \mathcal{U}} \| \vec{u} - \vec{x} \|^2 \leq \| \tilde{\vec{u}} - \vec{x} \|^2, \quad \forall \tilde{\vec{u}} \in \mathcal{U}.
               \end{equation}
               Decompose $\Pi_{\mathcal{U}}(\vec{x}) - \vec{x} = \vec{u} + \vec{u}^\bot$, where $\vec{u} \in
                   \mathcal{U}$ and $\vec{u}^\bot \in \mathcal{U}^\bot$. Then, we only need to show $\vec{u} =
@@ -197,7 +197,7 @@ $\mat{P}$ representing that linear transformation.
 \begin{proof}
     We need to show that $\mat{P}$ is the orthogonal projection matrix onto $\mathcal{U}$:
     \begin{enumerate}
-        \item \textit{Projection}: $\mat{P} \vec{x} = \sum_{i=1}^{m} \vec{u}_i \transpose{\vec{u}_i} \vec{x} = \sum_{i=1}^{m} \ang{\vec{u}_i, \vec{x}} \vec{u}_i \in \mathcal{U}$;
+        \item \textit{Projection}: $\mat{P} \vec{x} = \sum_{i=1}^{k} \vec{u}_i \transpose{\vec{u}_i} \vec{x} = \sum_{i=1}^{k} \ang{\vec{u}_i, \vec{x}} \vec{u}_i \in \mathcal{U}$;
         \item \textit{Self-adjointness}: $\transpose{\mat{P}} = \transpose{(\mat{U}\transpose{\mat{U}})} = \mat{U} \transpose{\mat{U}} = \mat{P}$;
         \item \textit{Idempotency}: $\mat{P} \mat{P} = \mat{U} \transpose{\mat{U}} \mat{U} \transpose{\mat{U}} = \mat{U} \transpose{\mat{U}} = \mat{P}$;
         \item \textit{Orthogonality}: $\langle \mat{P} \vec{x}, \vec{x} - \mat{P} \vec{x} \rangle = \langle \vec{x}, \mat{P} (\vec{x} - \mat{P} \vec{x}) \rangle = \langle \vec{x}, (\mat{P} - \mat{P}^2) \vec{x} \rangle = \langle \vec{x}, (\mat{P} - \mat{P}) \vec{x} \rangle = 0$.
@@ -261,7 +261,7 @@ We can further simplify this expression to find a sufficient statistic for the o
 \begin{align*}
     -\frac{1}{2} \mathrm{Var}[\mat{P}\vec{x}] & = -\frac{1}{2} \E \|\mat{P}\vec{x}\|^2                                                                                                                                                      \\
                                               & = -\frac{1}{2} \E \ang{\vec{x},\mat{P}\vec{x}} \margintag{$\| \mat{P}\vec{x} \|^2 = \ang{\mat{P}\vec{x},\mat{P}\vec{x}} = \ang{\vec{x},\mat{P}^2 \vec{x}} = \ang{\vec{x},\mat{P}\vec{x}}$.} \\
-                                              & = -\frac{1}{2} \E\lft[\tr{\transpose{\vec{x}}\mat{P}\vec{x}}\rgt]                                                                                                                           \\
+                                              & = -\frac{1}{2} \E\lft[\tr{\transpose{\vec{x}}\mat{P}\vec{x}}\rgt] \margintag{Trace of scalar is equal to scalar.}                                                                           \\
                                               & = -\frac{1}{2} \tr{\E\lft[\mat{P}\vec{x}\transpose{\vec{x}}\rgt]} \margintag{Cyclic property of trace.}                                                                                     \\
                                               & = -\frac{1}{2} \tr{\mat{P} \E\lft[\vec{x}\transpose{\vec{x}}\rgt]}.
 \end{align*}
@@ -294,8 +294,7 @@ matrix, which is essentially what the PCA theorem tells us.
     The variance maximizing projection matrix $\mat{P}$ for a covariance matrix $\E[\vec{x}\transpose{\vec{x}}] = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}$ as in the spectral theorem is given by \[
         \mat{P} = \mat{U}_k \transpose{\mat{U}_k}, \quad \mat{U}_k = \mat{Q} \begin{bmatrix} \mat{I}_k \\ \vec{0} \end{bmatrix},
     \]
-    which means that $\mat{U}_k$ consists of the $k$ principal eigenvectors with padded zeroes at the
-    bottom.
+    which means that $\mat{U}_k$ consists of the $k$ principal eigenvectors.
 \end{theorem}
 
 \begin{proof}

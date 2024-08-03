@@ -97,7 +97,7 @@ Now we also need a step to maximize the model parameters $\vec{\theta}$. We can 
 $\vec{\pi}$ by \[
     \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(z \mid \vec{x}_t) p(\vec{x}_t) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}. \margintag{This assumes that the data is distributed uniformly.}
 \]
-This solution can also be derived by the first-order optimality condition.
+This solution can also be derived by the first-order optimality condition with the Lagrangian.
 
 Moreover, the solution for $\vec{\theta}_z$ depends on the choice of the model distribution, but we
 can generally get to separable problems, \[
@@ -162,7 +162,7 @@ document-conditional word distribution, \[
     p(w \mid d) = \sum_{z=1}^{k} p(w \mid z) p(z \mid d).
 \]
 From this, we define the log-likelihood objective as \[
-    \ell(\vec{\theta}; \mat{N}) = \log p(\mat{N}; \vec{\theta}) = \sum_{i=1}^{n} \sum_{j=1}^{m} N_{ij} \log p(w_j \mid d_i).
+    \ell(\vec{\theta}; \mat{N}) = \log p(\mat{N}; \vec{\theta}) = \log \prod_{i=1}^n \prod_{j=1}^{m} p(w_j \mid d_i)^{N_{ij}} = \sum_{i=1}^{n} \sum_{j=1}^{m} N_{ij} \log p(w_j \mid d_i).
 \]
 
 \paragraph{Learning.}
@@ -197,11 +197,12 @@ model is that we first choose a distribution over topics, $p(z\mid \vec{\alpha})
 word, sample a topic from $p(z \mid \vec{\alpha})$ and sample the word from $p(w \mid z)$.
 
 Effectively, the latent Dirichlet allocation (LDA) model takes a ``Bayesian step up'' from latent
-variable modeling. Its main idea is that it defines a distribution over mixture vectors, \[
-    \vec{v} \in \Delta^{k-1},
+variable modeling. Its main idea is that it models a distribution over priors, which are modeled by
+mixture vectors, \[
+    \vec{v} \in \Delta^{k-1}.
 \]
-as a prior over topics. This parameter is distributed according to a Dirichlet distribution, and
-has hyperparameter $\vec{\alpha}$, \[
+This parameter is distributed according to a Dirichlet distribution, and has hyperparameter
+$\vec{\alpha}$, \[
     p(\vec{v}; \vec{\alpha}) \propto \prod_{z=1}^{k} v_z^{\alpha_z - 1}, \quad \alpha_z > 0, \forall z \in [k].
 \]
 The Dirichlet distribution is chosen as the prior because it is a conjugate prior of the
@@ -281,7 +282,7 @@ converged, we do not care about performing the task well, but rather the paramet
 the model that lead to the task being performed well.
 
 This task has the following likelihood function that we wish to maximize, \[
-    \ell(\vec{\theta}; \vec{x}) = \sum_{t=1}^{T} \sum_{\delta \in \mathcal{I}} \log p(x_{t+\delta} \mid x_t; \vec{\theta}),
+    \ell(\vec{\theta}) = \log \prod_{t=1}^{T} \prod_{\delta \in \mathcal{I}} p(x_{t+\delta} \mid x_t; \vec{\theta}) = \sum_{t=1}^{T} \sum_{\delta \in \mathcal{I}} \log p(x_{t+\delta} \mid x_t; \vec{\theta}),
 \]
 where $\vec{\theta}$ contains the embeddings as parameters of this model and $\mathcal{I}$ is a set
 of displacements, \eg, $\mathcal{I} = \{ -R, \ldots, -1, 1, \ldots, R \}$. The probabilities are
@@ -301,7 +302,7 @@ Sufficient statistics for this model is a co-occurrence matrix, where \[
     N_{vw} = | \{ t \mid x_t = w, x_{t+\delta}=v, \delta \in \mathcal{I} \} |.
 \]
 The log-likelihood can then be computed by \[
-    \ell(\vec{\theta}; \vec{x}) = \sum_{v \in \Sigma} \sum_{w \in \Sigma} N_{vw} \lft( \langle \vec{\zeta}_w, \vec{z}_v \rangle + b_v - \log \sum_{u \in \Sigma} \exp (\langle \vec{\zeta}_w, \vec{z}_u \rangle + b_u) \rgt).
+    \ell(\vec{\theta}) = \sum_{v \in \Sigma} \sum_{w \in \Sigma} N_{vw} \lft( \langle \vec{\zeta}_w, \vec{z}_v \rangle + b_v - \log \sum_{u \in \Sigma} \exp (\langle \vec{\zeta}_w, \vec{z}_u \rangle + b_u) \rgt).
 \]
 
 The problem with this approach is that computing the normalization constant is expensive. We can
@@ -341,7 +342,7 @@ likely to be sampled, as shown in \Cref{fig:alpha}.
 \end{marginfigure}
 
 We can then define a logistic log-likelihood function that we wish to minimize, \[
-    \ell(\vec{\theta}, \vec{x}) = \sum_{(w,v) \in \mathcal{S}^+} \log \sigma(v, w; \vec{\theta}) + \sum_{(w,u) \in \mathcal{S}^-} \log (1 - \sigma(u, w; \vec{\theta})).
+    \ell(\vec{\theta}) = \sum_{(w,v) \in \mathcal{S}^+} \log \sigma(\ang{\vec{\zeta}_w, \vec{z}_v} + b_v) + \sum_{(w,u) \in \mathcal{S}^-} \log (1 - \sigma(\ang{\vec{\zeta}_w, \vec{z}_u} + b_u)).
 \]
 This does not require computing a normalization constant.
 

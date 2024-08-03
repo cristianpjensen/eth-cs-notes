@@ -5,11 +5,11 @@ the dataset. Considering that collecting data is often expensive, we wish to par
 generative model $p(\vec{x}; \vec{\theta})$ that is indistinguishable from $p(\vec{x})$.
 
 We want the models to not generate unnatural patterns, so we do not want the following, \[
-    p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \approx 0.
+    p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \approx 0, \quad \exists \vec{x}.
 \]
 Furthermore, we want the full domain of the distribution to be covered by our generative model.
 Thus, we also do not want the following to happen, \[
-    p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \approx 0,
+    p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \approx 0, \quad \exists \vec{x}.
 \]
 
 Moreover, we want to train generative models such that they give high probabilistic mass to samples
@@ -18,7 +18,7 @@ from the dataset. Thus, a good objective function is to maximize the log-likelih
     \ell(\vec{\theta}) = \E_{\vec{x} \sim p(\vec{x})}[\log p(\vec{x}; \vec{\theta})].
 \]
 However, we will see that some models cannot tractably compute the likelihood and must thus resort
-to approximations. We will also see that the likelihood might not be the best measure of success,
+to lower bounds. We will also see that the likelihood might not be the best measure of success,
 which will lead to alternative loss functions.
 
 \subsection{Autoregressive models}

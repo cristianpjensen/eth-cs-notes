@@ -469,7 +469,7 @@ Using the shrink operator, we can define a new update rule, starting from $\mat{
     \mat{Y}^{(t+1)} & = \mat{Y}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{X}^{(t+1)} \rgt).
 \end{align*}
 With a suitable schedule $\eta_t > 0$, the sequence $\{ \mat{X}^{(t)} \}$ will converge to the solution of the following optimization problem, \[
-    \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2} \| \mat{B} \|_F^2, \quad \Pi_{\mat{\Omega}}(\tilde{\mat{A}}) = \Pi_{\mat{\Omega}}(\mat{B}).
+    \lim_{t\to \infty} \mat{X}^{(t)} \in \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2} \| \mat{B} \|_F^2, \quad \Pi_{\mat{\Omega}}(\tilde{\mat{A}}) = \Pi_{\mat{\Omega}}(\mat{B}).
 \]
 Hence, the result of this algorithm will be exactly reproducing the observed entries, which the
 non-relaxed problem cannot guarantee, as there may be no rank-$k$ algorithm with a projected
@@ -531,7 +531,7 @@ high probability, under the assumption that the entries have been uniformly samp
     for which $S$ samples have been observed at random. Then, there is a universal constant $C$ such
     that if $S \geq C \mu^2 nk (\log n)^6$, then with probability at least $1 - n^{-3}$, $\mat{A}$
     fulfills \[
-        \mat{A} = \argmin_{\mat{B}} \| \mat{B} \|_*, \quad \mathrm{s.t.}\; \Pi_{\mat{\Omega}}(\mat{B}) = \Pi_{\mat{\Omega}}(\mat{A}).
+        \mat{A} = \argmin_{\mat{B}} \| \mat{B} \|_*, \quad \Pi_{\mat{\Omega}}(\mat{B}) = \Pi_{\mat{\Omega}}(\mat{A}).
     \]
 \end{theorem}
 
