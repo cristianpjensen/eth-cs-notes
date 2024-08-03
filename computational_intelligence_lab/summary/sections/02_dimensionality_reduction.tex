@@ -227,7 +227,7 @@ all of the above results are a priori by the structure of the model and choice o
 
 \paragraph{Finding the optimal subspace.}
 
-Now we need to find out which subspace of dimension $m$ or less is optimal to project onto. First,
+Now we need to find out which subspace of dimension $k$ or less is optimal to project onto. First,
 we need to rewrite the objective function to find a new interpretation,
 \begin{align*}
     \mathcal{R}(\mat{P}) & = \frac{1}{2} \E \| \vec{x}-\mat{P}\vec{x} \|^2                                                                                                                                       \\
@@ -282,7 +282,7 @@ with the $k$ largest eigenvalues.
     Any symmetric and positive semidefinite matrix $\mat{\Sigma}$ can be non-negatively diagonalized with an orthogonal matrix, \[
         \mat{\Sigma} = \mat{Q} \mat{\Lambda} \transpose{\mat{Q}}, \quad \mat{\Lambda} = \diag{\lambda_1, \ldots, \lambda_d},
     \]
-    where $\lambda \geq \cdots \geq \lambda_d \geq 0$ and $\mat{Q} \in \R^d$ is orthogonal.
+    where $\lambda_1 \geq \cdots \geq \lambda_d \geq 0$ and $\mat{Q} \in \R^d$ is orthogonal.
 \end{theorem}
 
 The spectral theorem gives us the eigendecomposition of $\E[\vec{x}\transpose{\vec{x}}]$, because
@@ -351,7 +351,7 @@ this guess, \[
 The computational complexity of this algorithm is $\bigo{Td^2}$.
 
 \begin{lemma}
-    Let $\vec{u}_1$ be the unique principal eigenvector of a diagonalizable matrix $\mat{A}$ with eigenvalues $\lambda_1 > \lambda_2 \geq \cdots \geq \lambda_n \geq 0$. If $\ang{\vec{v}_0, \vec{u}_1} \neq 0$, then \[
+    Let $\vec{u}_1$ be the unique principal eigenvector of a diagonalizable matrix $\mat{A}$ with eigenvalues $\lambda_1 > \lambda_2 \geq \cdots \geq \lambda_n \geq 0$. If $\ang{\vec{v}^{(0)}, \vec{u}_1} \neq 0$, then \[
         \lim_{t\to\infty} \vec{v}^{(t)} = \vec{u}_1.
     \]
 \end{lemma}
@@ -362,7 +362,7 @@ The computational complexity of this algorithm is $\bigo{Td^2}$.
     \begin{align*}
         \vec{v}^{(k)} & \propto \mat{A}^k \vec{v}^{(0)}                                                                                                                                                      \\
                       & = \sum_{i=1}^{d} \alpha_i \lambda_i^k \vec{u}_i \margintag{$\mat{A}^k \vec{v}^{(0)} = \sum_{i=1}^{d} \alpha_i \mat{A}^k \vec{u}_i = \sum_{i=1}^{d} \alpha_i \lambda_i^k \vec{u}_i$.} \\
-                      & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{d} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^k \vec{u}_i. \margintag{Divide by $\lambda_1$.}
+                      & \propto \alpha_1 \vec{u}_1 + \sum_{i=2}^{d} \alpha_i \lft( \frac{\lambda_i}{\lambda_1} \rgt)^k \vec{u}_i. \margintag{Divide by $\lambda_1^k$.}
     \end{align*}
     $\nicefrac{\lambda_i}{\lambda_1} < 1$ for $i > 1$, thus the sum goes to 0 and $\vec{v}^{(k)} \to \vec{u}_1$.
 \end{proof}

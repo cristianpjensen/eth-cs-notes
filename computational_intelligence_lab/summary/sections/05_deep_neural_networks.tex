@@ -67,12 +67,12 @@ In order to tune this model, we need to be able to compute its gradients, which 
 locally optimize a loss function $\ell$. In this case, we choose a squared loss, $\ell(\hat{y}, y)
     = \frac{1}{2} (\hat{y} - y)^2$. The gradients are computed by
 \begin{align*}
-    \pdv*{\frac{1}{2} (\psi(\vec{x}) - y)^2}{\beta_j} & = (\psi(\vec{x}) - y) \pdv*{\psi(\vec{x})}{\beta_j}                                                                                                                                                                                                         \\
-                                                      & = \frac{\psi(\vec{x}) - y}{1 + \exp \lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}                                                                                                                                                                             \\
-    \pdv*{\frac{1}{2} (\psi(\vec{x}) - y)^2}{w_{ji}}  & = (\psi(\vec{x}) - y) \pdv*{\psi(\vec{x})}{w_{ji}}                                                                                                                                                                                                          \\
-                                                      & = (\psi(\vec{x}) - y) \beta_j \pdv*{\sigma\lft(\transpose{\vec{w}_j} \vec{x}\rgt)}{w_{ji}}                                                                                                                                                                  \\
-                                                      & = (\psi(\vec{x}) - y) \beta_j \sigma \lft( \transpose{\vec{w}_j} \vec{x} \rgt) \sigma \lft( - \transpose{\vec{w}_j} \vec{x} \rgt) \pdv*{\transpose{\vec{w}_j} \vec{x}}{w_{ji}} \margintag{$\sigma'(z) = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)$.} \\
-                                                      & = \frac{\psi(\vec{x}) - y}{1 + \exp \lft( - \transpose{\vec{w}_j} \vec{x} \rgt)} \frac{\beta_j x_i}{1 + \exp \lft( \transpose{\vec{w}_j} \vec{x} \rgt)}.
+    \pdv*{\frac{1}{2} (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y)^2}{\beta_j} & = (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y) \pdv*{\psi(\vec{x}; \vec{\beta}, \mat{W})}{\beta_j}                                                                                                                                                                                   \\
+                                                                            & = \frac{\psi(\vec{x}; \vec{\beta}, \mat{W}) - y}{1 + \exp \lft( -\transpose{\vec{w}_j} \vec{x} \rgt)}                                                                                                                                                                             \\
+    \pdv*{\frac{1}{2} (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y)^2}{w_{ji}}  & = (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y) \pdv*{\psi(\vec{x}; \vec{\beta}, \mat{W})}{w_{ji}}                                                                                                                                                                                    \\
+                                                                            & = (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y) \beta_j \pdv*{\sigma\lft(\transpose{\vec{w}_j} \vec{x}\rgt)}{w_{ji}}                                                                                                                                                                  \\
+                                                                            & = (\psi(\vec{x}; \vec{\beta}, \mat{W}) - y) \beta_j \sigma \lft( \transpose{\vec{w}_j} \vec{x} \rgt) \sigma \lft( - \transpose{\vec{w}_j} \vec{x} \rgt) \pdv*{\transpose{\vec{w}_j} \vec{x}}{w_{ji}} \margintag{$\sigma'(z) = \sigma(z) (1 - \sigma(z)) = \sigma(z) \sigma(-z)$.} \\
+                                                                            & = \frac{\psi(\vec{x}; \vec{\beta}, \mat{W}) - y}{1 + \exp \lft( - \transpose{\vec{w}_j} \vec{x} \rgt)} \frac{\beta_j x_i}{1 + \exp \lft( \transpose{\vec{w}_j} \vec{x} \rgt)}.
 \end{align*}
 Learning is typically carried out through stochastic gradient descent, which iteratively selects a random
 mini-batch $\mathcal{S}_t \subseteq \mathcal{S} = \{ (\vec{x}_i, y_i) \}_{i=1}^n$. The update rule is
@@ -94,20 +94,20 @@ Let $H_k: \R^n \to \R^m$ be an intermediate layer of a compositional model. It's
 defined as \[
     [\mat{J}_k]_{ij} \doteq \pdv{h_{ki}}{z_j}, \margintag{$h_{ki}$ is the $i$-th output of layer $k$ and $z_j$ is its $j$-th input.}
 \]
-which is an implicit function of the input $\vec{z} \in \R^n$ to $H_k$. Furthermore, define the
-error signal as \[
-    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]},
+which is an implicit function of the input $\vec{z} \in \R^n$ to $\vec{h}_k$. Furthermore, define
+the error signal as \[
+    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{\vec{h}_k} \rgt]},
 \]
 which quantifies how a change in loss is induced by a change in unit $k$'s activation. Using the
 chain rule, we can find a recurrence relation between error signals, \[
-    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{H_k} \rgt]} = \transpose{\lft[ \pdv{\ell}{H_{k+1}} \pdv{H_{k+1}}{H_k} \rgt]} \doteq \transpose{\mat{J}_{k+1}} \vec{\delta}_{k+1}.
+    \vec{\delta}_k \doteq \transpose{\lft[ \pdv{\ell}{\vec{h}_k} \rgt]} = \transpose{\lft[ \pdv{\ell}{\vec{h}_{k+1}} \pdv{\vec{h}_{k+1}}{\vec{h}_k} \rgt]} \doteq \transpose{\mat{J}_{k+1}} \vec{\delta}_{k+1}.
 \]
 Thus, we can use dynamic programming to compute all error signals efficiently. Lastly, in order to
 compute the gradient \wrt the parameters, we use the chain rule again,
 \begin{align*}
-    \pdv{\ell}{[\mat{W}_k]_{ij}} & = \pdv{\ell}{H_k} \pdv{H_k}{[\mat{W}_k]_{ij}}                                                                                                               \\
-                                 & = \pdv{\ell}{H_k} \lft[ \lft. \pdv{\phi(\vec{y})}{\vec{y}} \rgt|_{\vec{y} = \mat{W}_k \vec{z}_{k-1}} \rgt] \pdv*{\mat{W}_k \vec{z}_{k-1}}{[\mat{W}_k]_{ij}} \\
-                                 & = \transpose{\vec{\delta}_k} \mathrm{diag} \lft( \phi'(\mat{W}_k \vec{z}_{k-1}) \rgt) \mathrm{vec}_i([\vec{z}_{k-1}]_j)                                     \\
+    \pdv{\ell}{[\mat{W}_k]_{ij}} & = \pdv{\ell}{\vec{h}_k} \pdv{\vec{h}_k}{[\mat{W}_k]_{ij}}                                                                                                         \\
+                                 & = \pdv{\ell}{\vec{h}_k} \lft[ \lft. \pdv{\phi(\vec{y})}{\vec{y}} \rgt|_{\vec{y} = \mat{W}_k \vec{z}_{k-1}} \rgt] \pdv*{\mat{W}_k \vec{z}_{k-1}}{[\mat{W}_k]_{ij}} \\
+                                 & = \transpose{\vec{\delta}_k} \mathrm{diag} \lft( \phi'(\mat{W}_k \vec{z}_{k-1}) \rgt) \mathrm{vec}_i([\vec{z}_{k-1}]_j)                                           \\
                                  & = [\vec{\delta}_k]_i \cdot \phi'\lft(\transpose{[\mat{W}_k]_i} \vec{z}_{k-1}\rgt) \cdot [\vec{z}_{k-1}]_j.
 \end{align*}
 Intuitively, the local parameter gradient $\pdv{\ell}{\mat{W}_k}$ is the product of an upstream
@@ -181,7 +181,7 @@ ensure convergence to a global minimum.
 
 \begin{lemma}
     Let $\ell$ be differentiable, $L$-smooth, and $\mu$-PL. Then, gradient descent with stepsize $\eta = \nicefrac{1}{L}$ converges at a geometric rate, \[
-        \ell\lft( \vec{\theta}^{(k)} \rgt) - \ell^\star \leq \lft( 1 - \frac{\mu}{L} \rgt)^k \lft( \ell(\vec{\theta}_0) - \ell^\star \rgt).
+        \ell\lft( \vec{\theta}_k \rgt) - \ell^\star \leq \lft( 1 - \frac{\mu}{L} \rgt)^k \lft( \ell(\vec{\theta}_0) - \ell^\star \rgt).
     \]
 \end{lemma}
 
@@ -190,14 +190,6 @@ ensure convergence to a global minimum.
         \ell(\vec{\theta}') \geq \ell(\vec{\theta}) + \langle \grad{\ell(\vec{\theta})}{}, \vec{\theta}' - \vec{\theta} \rangle + \frac{\mu}{2} \| \vec{\theta}' - \vec{\theta} \|^2, \quad \forall \vec{\theta}, \vec{\theta}'.
     \]
 \end{definition}
-
-\begin{marginfigure}
-    \centering
-    \incfig{strong-convexity}
-    \caption{Graph of the gradient of a $\mu$-strongly convex 1-dimensional function. Due to strong convexity, the
-        gradient may only stay within the grey area for every point.}
-    \label{fig:strong-convexity}
-\end{marginfigure}
 
 Intuitively, strong convexity bounds the smallest eigenvalue of a locally quadratic approximation
 of $\ell$.
@@ -286,7 +278,7 @@ invariance, locality, and scale of the data. Furthermore, it increases the stati
 
 As MLPs, CNNs alternate between (linear) convolutional layers and non-linear element-wise functions
 to increase model capacity. Moreover, it employs max-pooling layers to decrease the dimensionality
-of the input. It does so by taking only the maximum in every $k \times k$ patch. This has the
+of the input. It does so by taking only the maximum of every $k \times k$ patch. This has the
 effect that the input is subsampled $k$ times. After many max-pooling layers, the data will no
 longer be location dependent, which allows us to throw away spatial information by flattening the
 data. From there, linear layers can be used to make the final prediction.

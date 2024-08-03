@@ -7,8 +7,8 @@ generative model $p(\vec{x}; \vec{\theta})$ that is indistinguishable from $p(\v
 We want the models to not generate unnatural patterns, so we do not want the following, \[
     p(\vec{x}; \vec{\theta}) \gg p(\vec{x}) \approx 0.
 \]
-Furthermore, we want the model to generate natural patterns with approximately correct
-probabilities, so we also do not want the following situation, \[
+Furthermore, we want the full domain of the distribution to be covered by our generative model.
+Thus, we also do not want the following to happen, \[
     p(\vec{x}) \gg p(\vec{x}; \vec{\theta}) \approx 0,
 \]
 
@@ -39,10 +39,10 @@ latent variable (embedding), \[
 \]
 which is used to predict the probability distribution over next observables $x_t$ by applying the
 softmax operator, \[
-    p(x \mid \vec{x}_{1:t-1}) = \frac{\exp \langle \vec{z}, \vec{w}_x \rangle}{\sum_{x' \in \mathcal{X}} \exp \langle \vec{z}, \vec{w}_{x'} \rangle}.
+    p(x \mid \vec{x}_{1:t-1}; \vec{\theta}) = \frac{\exp \langle \vec{z}, \vec{w}_x \rangle}{\sum_{x' \in \mathcal{X}} \exp \langle \vec{z}, \vec{w}_{x'} \rangle}.
 \]
-We sample from $p(\vec{x}; \vec{\theta})$ by iteratively sampling $p(x_t \mid \vec{x}_{1:t-1})$ and
-appending it to the history.
+We sample from $p(\vec{x}; \vec{\theta})$ by iteratively sampling $p(x_t \mid \vec{x}_{1:t-1};
+    \vec{\theta})$ and appending it to the history.
 
 \paragraph{Pixel CNN.}
 
@@ -148,18 +148,18 @@ distribution with the same probability. In the case of $q$ as a Gaussian, where 
 means $\vec{\mu}$ and variances $\vec{\sigma}$, we can obtain a sample from this distribution by
 only sampling from $\mathcal{N}(\vec{0}, \mat{I})$ as follows,
 \begin{align*}
-    \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, \mathrm{I})            \\
+    \vec{\epsilon} & \sim \mathcal{N}(\vec{0}, \mat{I})               \\
     \vec{z}        & = \vec{\mu} + \vec{\sigma} \odot \vec{\epsilon}.
 \end{align*}
 $\vec{z}$ is a sample from $\mathcal{N}(\vec{\mu}, \mathrm{diag}(\vec{\sigma}^2))$. The second term
-of the ELBO is analytically computable if we further assume define the prior to be Gaussian
+of the ELBO is analytically computable if we further define the prior to be Gaussian
 $\mathcal{N}(\vec{0}, \mat{I})$.
 
 \subsection{Generative adversarial networks}
 
 In practice, the log-likelihood may not be the best to optimize for. The next idea views generative
 models in terms of a classification problem, \[
-    p(\vec{x}, Y; \vec{\theta}) = \frac{Y}{2} p(\vec{x}) + \frac{1 - Y}{2} p(\vec{x}; \vec{\theta}), \quad Y \in \{ 0,1 \},
+    p(\vec{x}, Y; \vec{\theta}) = Y p(\vec{x}) + (1 - Y) p(\vec{x}; \vec{\theta}), \quad Y \in \{ 0,1 \},
 \]
 where $Y$ indicates from which distribution $\vec{x}$ is sampled.
 
@@ -175,20 +175,20 @@ We then have the following logistic loss,
 
 The Bayes-optimal classifier for this loss is
 \begin{align*}
-    \pi^\star(\vec{x}) & = \mathbb{P}(Y = 1 \mid \vec{x})                                                                                             \\
-                       & = \frac{p(\vec{x} \mid Y = 1) p(Y=1)}{p(\vec{x} \mid Y = 1) p(Y = 1) + p(\vec{x} \mid Y = 0) p(Y = 0)}                       \\
-                       & = \frac{p(\vec{x}) \cdot \nicefrac{1}{2}}{p(\vec{x}) \cdot \nicefrac{1}{2} + p(\vec{x}; \vec{\theta}) \cdot \nicefrac{1}{2}} \\
+    \pi^\star(\vec{x}) & = \mathbb{P}(Y = 1 \mid \vec{x})                                                                                                                                          \\
+                       & = \frac{p(\vec{x} \mid Y = 1) p(Y=1)}{p(\vec{x} \mid Y = 1) p(Y = 1) + p(\vec{x} \mid Y = 0) p(Y = 0)} \margintag{Bayes' rule.}                                           \\
+                       & = \frac{p(\vec{x}) \cdot \nicefrac{1}{2}}{p(\vec{x}) \cdot \nicefrac{1}{2} + p(\vec{x}; \vec{\theta}) \cdot \nicefrac{1}{2}} \margintag{Set equal priors for both cases.} \\
                        & = \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})}.
 \end{align*}
 Furthermore, by using the Bayes-optimal classifier, we can rewrite the logistic loss function as
 optimizing the Jensen-Shannon divergence between $p(\vec{x})$ and $p(\vec{x}; \vec{\theta})$,
 \begin{align*}
-    \ell(\vec{\theta}) & = \int p(\vec{x}) \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x} + \int p(\vec{x}; \vec{\theta}) \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x}                       \\
-                       & = \E_{p(\vec{x})} \lft[ \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt]                                   \\
-                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{2 \cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{2\cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] \\
-                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] - \log 4           \\
-                       & = D_{\mathrm{KL}}\lft(p(\vec{x}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) + D_{\mathrm{KL}} \lft( p(\vec{x}; \vec{\theta}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) - \log 4                            \\
-                       & = 2 D_{\mathrm{JS}}(p(\vec{x}) \| p(\vec{x}; \vec{\theta})) - \log 4.
+    \ell(\vec{\theta}) & = \int p(\vec{x}) \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x} + \int p(\vec{x}; \vec{\theta}) \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \mathrm{d}\vec{x} \margintag{Insert Bayes-optimal classifier.}                                                         \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] \margintag{Rewrite as expectations.}                                                                             \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{2 \cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{2\cdot (p(\vec{x}) + p(\vec{x}; \vec{\theta}))} \rgt] \margintag{Multiply by $\nicefrac{2}{2}$ within the logarithms on both sides.} \\
+                       & = \E_{p(\vec{x})} \lft[ \log \frac{2 \cdot p(\vec{x})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] + \E_{p(\vec{x}; \vec{\theta})} \lft[ \log \frac{2\cdot p(\vec{x}; \vec{\theta})}{p(\vec{x}) + p(\vec{x}; \vec{\theta})} \rgt] - \log 4 \margintag{Take out the $-\log 2$ of both expectations.}                                 \\
+                       & = D_{\mathrm{KL}}\lft(p(\vec{x}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) + D_{\mathrm{KL}} \lft( p(\vec{x}; \vec{\theta}) \middle\| \frac{p(\vec{x}) + p(\vec{x}; \vec{\theta})}{2} \rgt) - \log 4 \margintag{$D_{\mathrm{KL}}(p \| q) = \E_p \lft[ \log \frac{p(\vec{x})}{q(\vec{x})} \rgt]$.}              \\
+                       & = 2 D_{\mathrm{JS}}(p(\vec{x}) \| p(\vec{x}; \vec{\theta})) - \log 4. \margintag{$D_{\mathrm{JS}}(p \| q) = \frac{1}{2} D_{\mathrm{KL}}(p \| \frac{p+q}{2}) + \frac{1}{2} D_{\mathrm{KL}}(q \| \frac{p+q}{2})$.}
 \end{align*}
 
 In practice, we do not have access to $p(\vec{x})$ and $p(\vec{x}; \vec{\theta})$ to compute the
@@ -250,8 +250,8 @@ typically modeled as a U-net.
         \State $\vec{x}_0 \sim q$
         \State $t \sim \mathrm{Unif}([T])$
         \State $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$
-        \State $\mathcal{L} = \lft\| \vec{\epsilon} - \vec{\epsilon}\lft( \bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}, t; \vec{\theta} \rgt) \rgt\|^2$
-        \State {perform a gradient descent step on $\mathcal{L}$}
+        \State $\ell(\vec{\theta}) = \frac{1}{2} \lft\| \vec{\epsilon} - \vec{\epsilon}\lft( \bar{\alpha}_t \vec{x}_0 + \bar{\beta}_t \vec{\epsilon}, t; \vec{\theta} \rgt) \rgt\|^2$
+        \State $\vec{\theta} \gets \vec{\theta} - \eta \grad{\ell(\vec{\theta})}{}$
         \EndWhile
     \end{algorithmic}
     \label{alg:dm-training}

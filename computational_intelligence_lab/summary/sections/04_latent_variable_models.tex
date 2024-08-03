@@ -21,13 +21,13 @@ Specifically, we have the following prior categorical distribution, \[
 \]
 where $\vec{\pi} \in \Delta^{k-1}$ is an unknown parameter.\sidenote{$\Delta^{k-1}$ is the
     $k$-dimensional probability simplex, which is the space of vectors where all elements are
-    non-negative and sum to 1.} To fully parametrize the latent variable model, we need a class
-conditional distribution for each class, $p(\vec{x} \mid z)$. By parametrizing the
+    non-negative and sum to 1.} To fully parametrize the latent variable model, we need a
+class-conditional distribution for each class, $p(\vec{x} \mid z)$. By parametrizing the
 class-conditional distribution of $z$ by $\vec{\theta}_z$, we have the following parametrized
 distribution over $\vec{X}$, \[
     p(\vec{x}; \vec{\theta}) = \sum_{z=1}^{k} p(z) p(\vec{x} \mid z) = \sum_{z=1}^{k} \pi_z p(\vec{x}; \vec{\theta}_z).
 \]
-We interpret this as a mixture distribution; convex combinations of class-specific distributions.
+We interpret this as a mixture distribution -- convex combinations of class-specific distributions.
 Moreover, this model is fully parametrized by the prior and class-conditional distribution
 parameters, \[
     \vec{\theta} = [\vec{\pi}, \vec{\theta}_1, \ldots, \vec{\theta}_k].
@@ -42,10 +42,10 @@ We can interpret these probabilities as observable-specific probabilistic cluste
 A common approach to learn the best parameters is to maximize the likelihood of the data, which is
 called maximum likelihood estimation (MLE). In other words, we choose the model parameters that
 maximize the probability of the observed data, \[
-    \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}) = \sum_{t=1}^{s} \log p(\vec{x}_t; \vec{\theta}) = \sum_{t=1}^{s} \log \sum_{z=1}^{k} \pi_z p(\vec{x}_t; \vec{\theta}_z). \margintag{We take the log-likelihood for improved numerical stability.}
+    \ell(\vec{\theta}) = \log \prod_{t=1}^s p(\vec{x}_t; \vec{\theta}) = \sum_{t=1}^{s} \log p(\vec{x}_t; \vec{\theta}) = \sum_{t=1}^{s} \log \sum_{z=1}^{k} \pi_z p(\vec{x}_t; \vec{\theta}_z).
 \]
 This gives us the following optimization problem, \[
-    \vec{\theta}^{\mathrm{MLE}} \in \argmax_{\vec{\theta}} \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}),
+    \vec{\theta}^\star \in \argmax_{\vec{\theta}} \ell(\vec{\theta}),
 \]
 which we optimize by the expectation-maximization (EM) algorithm. The EM algorithm is a general
 tool for learning in latent variable models, but we will introduce it in the context of mixture
@@ -54,10 +54,10 @@ models.
 Let $\vec{q}_t \in \Delta^{k-1}, \forall t \in [s]$ be the variational parameters. Using this we
 can derive the evidence lower bound (ELBO),
 \begin{align*}
-    \ell(\vec{\theta}; \{ \vec{x}_1, \ldots, \vec{x}_s \}) & = \sum_{t=1}^{s} \log \sum_{z=1}^{k} q_{tz} \frac{\pi_z}{q_{tz}} p(\vec{x}; \vec{\theta}_z)                                                 \\
-                                                           & \geq \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log \lft( \frac{\pi_z}{q_{tz}} p(\vec{x}; \vec{\theta}_z) \rgt) \margintag{Jensen's inequality.} \\
-                                                           & = \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - \sum_{z=1}^{k} q_{tz} \log \frac{q_{tz}}{\pi_z}                    \\
-                                                           & = \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - D_{\mathrm{KL}}(\vec{q}_t \| \vec{\pi}).
+    \ell(\vec{\theta}) & = \sum_{t=1}^{s} \log \sum_{z=1}^{k} q_{tz} \frac{\pi_z}{q_{tz}} p(\vec{x}_t; \vec{\theta}_z)                                                                    \\
+                       & \geq \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log \lft( \frac{\pi_z}{q_{tz}} p(\vec{x}_t; \vec{\theta}_z) \rgt) \margintag{Jensen's inequality, $\log$ is concave.} \\
+                       & = \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \lft( \log \pi_z + \log p(\vec{x}_t; \vec{\theta}_z) - \log q_{tz} \rgt)                                                  \\
+                       & \doteq \ell(\vec{\theta}; \{ \vec{q}_t \}_{t=1}^s).
 \end{align*}
 Since this lower bounds the MLE, we can use the ELBO as an objective to implicitly maximize the log-likelihood. Maximizing \wrt
 $\vec{q}$ increases the tightness of the bound of ELBO on the MLE,\sidenote{$\vec{q}$ does not affect
@@ -65,19 +65,20 @@ $\vec{q}$ increases the tightness of the bound of ELBO on the MLE,\sidenote{$\ve
 improves the model fit.
 
 Firstly, we will solve for the optimal choice of $\vec{q}_t$, \[
-    \sum_{t=1}^{s} \sum_{z=1}^{k} q_{tz} \log p(\vec{x}; \vec{\theta}_z) - D_{\mathrm{KL}}(\vec{q}_t \| \vec{\pi}), \quad \sum_{z=1}^{k} q_{tz} = 1, \forall t \in [s].
+    \ell(\vec{\theta}; \{ \vec{q}_t \}_{t=1}^s), \quad \vec{q}_t \in \Delta^{k-1}, \forall t \in [s].
 \]
 We can solve for every $\vec{q}_t$ independently, because the ELBO is separable \wrt $\vec{q}_t$.
-Furthermore, we enforce the normalization constraint on $\vec{q}$ by introducing a Lagrange
+Furthermore, we enforce the normalization constraint on $\vec{q}_t$ by introducing a Lagrange
 multiplier $\lambda$. This results in the following objective to maximize per $\vec{q}_t$, \[
-    \vec{q}_t^\star \in \argmax_{\vec{q}_t} \ell(\vec{q}_t) \doteq \sum_{z=1}^{k} q_{tz} \lft( \log p(\vec{x}_t; \vec{\theta}_z) - \log \frac{q_{tz}}{\pi_z} \rgt) - \lambda \lft( \sum_{z=1}^{k} q_{tz} - 1 \rgt).
+    \vec{q}_t^\star \in \argmax_{\vec{q}_t} \sum_{z=1}^{k} q_{tz} \lft( \log \pi_z + \log p(\vec{x}_t; \vec{\theta}_z) - \log q_{tz} \rgt) - \lambda \lft( \sum_{z=1}^{k} q_{tz} - 1 \rgt).
 \]
 The derivative \wrt $q_{tz}$ of this function is
 \begin{align*}
-    \pdv{\ell(\vec{q}_t)}{q_{tz}} & = \pdv*{\sum_{z'=1}^{k} q_{tz'} \lft( \log p(\vec{x}_t; \vec{\theta}_{z'}) + \log \pi_{z'} - \log q_{tz'} \rgt)}{q_{tz}} \\
-                                  & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \pdv*{q_{tz} \log q_{tz}}{q_{tz}} - \lambda                           \\
-                                  & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \log q_{tz} - \frac{q_{tz}}{q_{tz}} - \lambda                         \\
-                                  & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \log q_{tz} - \lambda - 1.
+    \pdv{\ell(\vec{\theta}; \vec{q}_t)}{q_{tz}} & = \pdv*{\sum_{z'=1}^{k} q_{tz'} \lft( \log p(\vec{x}_t; \vec{\theta}_{z'}) + \log \pi_{z'} - \log q_{tz'} \rgt)}{q_{tz}} \\
+                                                & \quad - \pdv*{\lambda \lft( \sum_{z'=1}^{k} q_{tz'} - 1 \rgt)}{q_{tz}}                                                   \\
+                                                & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \pdv*{q_{tz} \log q_{tz}}{q_{tz}} - \lambda                           \\
+                                                & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \log q_{tz} - \frac{q_{tz}}{q_{tz}} - \lambda                         \\
+                                                & = \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \log q_{tz} - \lambda - 1.
 \end{align*}
 Thus, we have the following first-order optimality condition, \[
     \log p(\vec{x}_t; \vec{\theta}_z) + \log \pi_z - \log q_{tz} \overset{!}{=} \lambda + 1.
@@ -94,8 +95,10 @@ the parameters $\vec{\theta}$. Hence, it is only a partial step, called the expe
 
 Now we also need a step to maximize the model parameters $\vec{\theta}$. We can easily solve for
 $\vec{\pi}$ by \[
-    \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(z \mid \vec{x}_t \mid z) p(z) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}. \margintag{This assumes that the data are distributed uniformly. It can also be derived by the first-order optimality condition.}
+    \pi^{\star}_z = p(z) = \sum_{t=1}^{s} p(\vec{x}_t, z) = \sum_{t=1}^{s} p(z \mid \vec{x}_t) p(\vec{x}_t) = \frac{1}{s} \sum_{t=1}^{s} q_{tz}. \margintag{This assumes that the data is distributed uniformly.}
 \]
+This solution can also be derived by the first-order optimality condition.
+
 Moreover, the solution for $\vec{\theta}_z$ depends on the choice of the model distribution, but we
 can generally get to separable problems, \[
     \vec{\theta}^{\star}_z \in \argmax_{\vec{\theta}_z} \sum_{t=1}^{s} q_{tz} \log p(\vec{x}_t; \vec{\theta}_z).
@@ -108,7 +111,7 @@ is often possible to do analytically. This partial step is called the maximizati
 
 We will consider a common special case of the above framework, where we specify the component
 models $p(\vec{X} \mid Z)$ by Gaussians with unit variance, \[
-    p(\vec{x}; \vec{\pi}, \{ \vec{\mu}_1, \ldots, \vec{\mu}_k \}) = \sum_{z=1}^{k} \pi_z \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}),
+    p(\vec{x}; \vec{\pi}, \{ \vec{\mu}_1, \ldots, \vec{\mu}_k \}) = \sum_{z=1}^{k} \pi_z \mathcal{N}(\vec{x}; \vec{\mu}_z, \mat{I}_d),
 \]
 where \[
     \mathcal{N}(\vec{x}; \vec{\mu}, \mat{\Sigma}) = (2\pi)^{-\nicefrac{d}{2}} \det{\mat{\Sigma}}^{-\nicefrac{1}{2}} \exp \lft( -\frac{1}{2} \transpose{(\vec{x} - \vec{\mu})} \mat{\Sigma}^{-1} (\vec{x} - \vec{\mu}) \rgt).

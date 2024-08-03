@@ -28,13 +28,13 @@ observed. The observed matrix will be denoted by $\tilde{\mat{A}}$ to differenti
 underlying matrix and its observations. The goal is to predict all values $a_{kl}$, where
 $\omega_{kl}=0$.
 
-A possible issue with the values is that some users might generally give higher ratings than
-others. Thus, we want to account for this by variance normalization. We can do this per row (user)
-or per column (item).\sidenote{While it makes more sense intuitively that we should normalize
-    ratings per user, it has been shown to be more effective to normalize over item ratings.}
-Normalization yields a vector with zero mean and unit variance, \[
-    Z = \frac{X - \mu}{\sigma}.
-\]
+\marginnote{A possible issue with the values is that some users might generally give higher ratings than
+    others. Thus, we want to account for this by variance normalization. We can do this per row (user)
+    or per column (item). (While it makes more sense intuitively that we should normalize
+    ratings per user, it has been shown to be more effective to normalize over item ratings.)
+    Normalization yields a vector with zero mean and unit variance, \[
+        Z = \frac{X - \mu}{\sigma}.
+    \]}
 
 To approximate the underlying matrix $\mat{A} \in \R^{n \times m}$, we will make the assumption
 that it is a rank-$k$ matrix. This is enforced by approximating $\mat{A}$ as the product of two
@@ -52,7 +52,7 @@ Frobenius norm. Rewriting as sums, we get the following loss function, \[
 \begin{important}
     We view $\vec{u}_i \in \R^k$ as representing each user and $\vec{v}_j \in \R^k$ as
     representing each item. We estimate $a_{ij}$ to be their inner product, \[
-        a_{ij} \approx \transpose{\vec{u}_i} \vec{v}_i.
+        a_{ij} \approx \transpose{\vec{u}_i} \vec{v}_j.
     \]
     Furthermore, we have that $\mat{U}$ and $\mat{V}$ are fully determined by the observed values
     $\tilde{\mat{A}}$, but can be used to extrapolate to a full matrix $\mat{A}$, achieving our
@@ -64,7 +64,7 @@ Frobenius norm. Rewriting as sums, we get the following loss function, \[
 
 In this section, we consider the fully observed case, where $\mat{\Omega} = \mat{1}_{n \times m}$.
 Thus, we optimize \wrt the following loss function, \[
-    \ell(\mat{U}, \mat{V}) = \frac{1}{2} \lft\| \mat{A} - \mat{U}\transpose{\mat{V}} \rgt\|_F^2,
+    \ell(\mat{U}, \mat{V}) = \frac{1}{2} \lft\| \mat{A} - \mat{U}\transpose{\mat{V}} \rgt\|_F^2.
 \]
 
 \begin{marginfigure}
@@ -166,12 +166,13 @@ Solving this ODE yields the following solution for $x(t)$, \[
 
 Now consider the fully observed rank-1 model,
 \begin{align*}
-    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \lft\| \mat{A} - \vec{u}\transpose{\vec{v}} \rgt\|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m                                                                                                                   \\
+    \ell(\vec{u}, \vec{v}) & = \frac{1}{2} \lft\| \mat{A} - \vec{u}\transpose{\vec{v}} \rgt\|_F^2, \quad \mat{A} \in \R^{n \times m}, \vec{u} \in \R^n, \vec{v} \in \R^m.                                                                                                                  \\
     \intertext{We can rewrite this to a more useful form,}
                            & = \frac{1}{2} \tr{\transpose{\lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \lft( \mat{A} - \vec{u}\transpose{\vec{v}} \rgt)} \margintag{$\| \mat{M} \|_F^2 = \tr{\transpose{\mat{M}}\mat{M}}$.}                                                           \\
-                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A} - \vec{v}\transpose{\vec{u}} \mat{A} - \transpose{\mat{A}}\vec{u}\vec{v} + \vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}}                                                                                 \\
-                           & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - \tr{\vec{v}\transpose{\vec{u}} \mat{A}} - \tr{\transpose{\mat{A}}\vec{u} \vec{v}} + \tr{\vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}} \rgt) \margintag{Linearity of trace.}                     \\
+                           & = \frac{1}{2} \tr{\transpose{\mat{A}}\mat{A} - \vec{v}\transpose{\vec{u}} \mat{A} - \transpose{\mat{A}}\vec{u}\transpose{\vec{v}} + \vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}}                                                                     \\
+                           & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - \tr{\vec{v}\transpose{\vec{u}} \mat{A}} - \tr{\transpose{\mat{A}}\vec{u} \transpose{\vec{v}}} + \tr{\vec{v}\transpose{\vec{u}}\vec{u}\transpose{\vec{v}}} \rgt) \margintag{Linearity of trace.}         \\
                            & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - \tr{\transpose{\vec{u}} \mat{A} \vec{v}} - \tr{\transpose{\vec{v}} \transpose{\mat{A}} \vec{u}} + \tr{\transpose{\vec{v}}\vec{v}\transpose{\vec{u}}\vec{u}} \rgt) \margintag{Cyclic property of trace.} \\
+                           & = \frac{1}{2} \lft( \tr{\transpose{\mat{A}}\mat{A}} - 2 \tr{\transpose{\vec{u}} \mat{A} \vec{v}} + \| \vec{u} \|^2 \| \vec{v} \|^2 \rgt) \margintag{$\tr{\mat{A}} = \tr{\transpose{\mat{A}}}$.}                                                               \\
                            & \propto \frac{1}{2} \| \vec{u} \|^2 \| \vec{v} \|^2 - \transpose{\vec{u}} \mat{A} \vec{v}.
 \end{align*}
 
@@ -329,7 +330,7 @@ other row of $\mat{U}$.\sidenote{The parameter dependencies form a bipartite gra
 function depending on a row $\vec{v}_j$, where we treat $\mat{U}$ as fixed,
 \begin{align*}
     \ell_{\mat{U}}(\vec{v}_j) & = \frac{1}{2} \lft\| \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{U} \transpose{\mat{V}} \rgt) \rgt\|_F^2 + \frac{\lambda}{2} \lft( \| \mat{U} \|_F^2 + \| \mat{V} \|_F^2 \rgt)                                                                                                                                     \\
-                              & \propto \frac{1}{2} \sum_{i=1}^{n} \sum_{j'=1}^{m} \omega_{ij'} \lft( a_{ij'} - \transpose{\vec{u}_i} \vec{v}_{j'} \rgt)^2 + \frac{\lambda}{2} \sum_{j'=1}^{m} \sum_{r=1}^{k} (v_{j'r})^2 \margintag{Expand norms and remove $\| \mat{U} \|_F^2$, because it does not depend on $\vec{v}_j$.}                         \\
+                              & \propto \frac{1}{2} \sum_{i=1}^{n} \sum_{j'=1}^{m} \omega_{ij'} \lft( a_{ij'} - \transpose{\vec{u}_i} \vec{v}_{j'} \rgt)^2 + \frac{\lambda}{2} \sum_{j'=1}^{m} \sum_{r=1}^{k} v_{j'r}^2 \margintag{Expand norms and remove $\| \mat{U} \|_F^2$, because it does not depend on $\vec{v}_j$.}                           \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \lft( a_{ij} - \transpose{\vec{u}_i}\vec{v}_j \rgt)^2 + \frac{\lambda}{2} \sum_{r=1}^{k} v_{jr}^2 \margintag{Remove all terms that do not contain entries of $\vec{v}_j$.}                                                                                             \\
                               & = \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} a_{ij}^2 + \omega_{ij} \transpose{\vec{u}_i} \vec{v}_j \transpose{\vec{u}_i} \vec{v}_j - 2 \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j                                                                              \\
                               & \propto \frac{1}{2} \sum_{i=1}^{n} \omega_{ij} \transpose{\vec{v}_j} \vec{u}_i \transpose{\vec{u}_i} \vec{v}_j + \frac{\lambda}{2} \transpose{\vec{v}_j}\vec{v}_j - \sum_{i=1}^{n} \omega_{ij} a_{ij} \transpose{\vec{u}_i}\vec{v}_j \margintag{$\transpose{\vec{u}_i} \vec{v}_j = \transpose{\vec{v}_j} \vec{u}_i$.} \\
@@ -407,6 +408,9 @@ where $\sigma_i$ is the $i$-th singular value of $\mat{M}$.
     \]
     Similarly, the nuclear norm can be computed by \[
         \| \mat{M} \|_* = \| \vec{\sigma}(\mat{M}) \|_1.
+    \]
+    Furthermore, the spectral norm can be computed by \[
+        \| \mat{M} \|_2 = \| \vec{\sigma}(\mat{M}) \|_\infty.
     \]}
 
 \begin{definition}[Convex envelope]
@@ -426,7 +430,8 @@ where $\sigma_i$ is the $i$-th singular value of $\mat{M}$.
     Let $\mat{M} \in \R^{n \times m}$ with $\| \mat{M} \|_2 \leq 1$. By \Cref{lem:svd-spectral}, we thus have $\sigma_1 \leq 1$. Thus, \[
         \| \mat{M} \|_* = \sum_{i=1}^{\mathrm{rank}(\mat{M})} \sigma_i \leq \sum_{i=1}^{\mathrm{rank}(\mat{M})} 1 = \mathrm{rank}(\mat{M}).
     \]
-    By \Cref{def:convex-env}, this concludes the proof.
+    Furthermore, any valid norm is a convex function. Hence, by \Cref{def:convex-env}, this concludes
+    the proof.
 \end{proof}
 
 We will use this to approximate the objective by a convex function. We have the following
@@ -441,30 +446,36 @@ This can be rewritten using Lagrange multipliers as a non-convex objective,
 This approximation of this objective is convex, so, using gradient descent and correct $\eta$, we can
 optimize it to a global optimum.
 
-\begin{theorem}
-    Let $\mat{C} \in \R^{n\times m}$ with SVD $\mat{C} = \mat{U} \mathrm{diag}(\vec{\sigma}) \transpose{\mat{V}}$ be given, then
-    \begin{align*}
-        \mathrm{shrink}_{\tau}(\mat{C}) & \doteq \argmin_{\mat{B}} \frac{1}{2} \| \mat{C} - \mat{B} \|_F^2 + \tau \| \mat{B} \|_* \\
-                                        & = \mat{U}\mathrm{diag}(\vec{\sigma} - \tau)_+ \transpose{\mat{V}},
-    \end{align*}
+\begin{definition}[Shrinkage operator]
+    Let $\mat{X} \in \R^{n\times m}$ with SVD $\mat{X} = \mat{U} \mathrm{diag}(\vec{\sigma})
+        \transpose{\mat{V}}$ be given, then \[
+        \mathrm{shrink}_{\tau}(\mat{X}) \doteq \mat{U}\mathrm{diag}(\vec{\sigma} - \tau)_+ \transpose{\mat{V}},
+    \]
     where $\mat{M}_+$ clips all entries of $\mat{M}$ at zero.
-\end{theorem}
+\end{definition}
 Note that the rank of $\mathrm{shrink}_{\tau}(\mat{C})$ decreases monotonically with $\tau$, because
 more singular values are zeroed out as $\tau$ increases.
 
-Using the shrink operator, we can define a new update rule, starting from $\mat{A}^{(0)} =
-    \mat{0}$, \[
-    \mat{A}^{(t+1)} = \mat{A}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \rgt).
-\]
-With a suitable schedule $\eta_t > 0$, this algorithm will converge to
+\begin{theorem}
+    The shrinkage operator minimizes the following optimization problem, \[
+        \mathrm{shrink}_{\tau}(\mat{X}) \in \argmin_{\mat{B}} \frac{1}{2} \| \mat{X} - \mat{B} \|_F^2 + \tau \| \mat{B} \|_*.
+    \]
+\end{theorem}
+
+Using the shrink operator, we can define a new update rule, starting from $\mat{Y}^{(0)} =
+    \mat{0}$,
 \begin{align*}
-    \mathrm{shrink}_{\tau}\lft( \mat{A}^{(t)} \rgt) \xrightarrow{t\to \infty} \mat{A}^\star = & \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2\tau} \| \mat{B} \|_F^2   \\
-                                                                                              & \mathrm{s.t.} \quad \Pi_{\mat{\Omega}}(\tilde{\mat{A}} - \mat{B}) = \mat{0}.
+    \mat{X}^{(t+1)} & = \mathrm{shrink}_{\tau}\lft( \mat{Y}^{(t)} \rgt)                                         \\
+    \mat{Y}^{(t+1)} & = \mat{Y}^{(t)} + \eta_t \Pi_{\mat{\Omega}}\lft( \tilde{\mat{A}} - \mat{X}^{(t+1)} \rgt).
 \end{align*}
-The result of this algorithm will be exactly reproducing the observed entries, which the non-relaxed
-problem cannot guarantee, as there may be no rank-$k$ algorithm with a projected residual that is
-zero. However, the convex relaxation approach does not define a low-rank sequence of matrices.
-Rather, the shrinkage operator is used to implicitly encourage low-rank approximations.
+With a suitable schedule $\eta_t > 0$, the sequence $\{ \mat{X}^{(t)} \}$ will converge to the solution of the following optimization problem, \[
+    \argmin_{\mat{B}} \tau \| \mat{B} \|_* + \frac{1}{2} \| \mat{B} \|_F^2, \quad \Pi_{\mat{\Omega}}(\tilde{\mat{A}}) = \Pi_{\mat{\Omega}}(\mat{B}).
+\]
+Hence, the result of this algorithm will be exactly reproducing the observed entries, which the
+non-relaxed problem cannot guarantee, as there may be no rank-$k$ algorithm with a projected
+residual that is zero. However, the convex relaxation approach does not define a low-rank sequence
+of matrices. Rather, the shrinkage operator is used to implicitly encourage low-rank
+approximations.
 
 \begin{important}
     The singular value projection approach maintains a rank-$k$ matrix, while the convex
@@ -494,8 +505,8 @@ need to have sampled $a_{ij}$.
 
 \begin{important}
     For exact recovery, it does not only matter how many entries we have sampled, but
-    also where we have sampled them. Intuitively, we need the information to be sufficiently
-    distributed.
+    also where we have sampled them. Intuitively, we need the information to be ``sufficiently
+    distributed''.
 \end{important}
 
 The following gives us conditions for which we can exactly reconstruct the underlying matrix with
@@ -529,4 +540,30 @@ nuclear norm minimization.
 
 \subsection{Randomized methods for SVD}
 
-TODO: Is this necessary?
+Considering that most algorithms introduced in this section make use of the singular value
+decomposition as a fundamental operator, we will now consider algorithms for computing it
+approximately in a low time complexity.
+
+Let $\mat{A} \in \R^{n \times m}$. The idea is to find an orthogonal matrix $\mat{Q} \in \R^{n
+        \times 2k}$ such that $\mat{A} \approx \mat{Q} \transpose{\mat{Q}} \mat{A}$. Then, we perform SVD
+of the smaller matrix $\mat{B} \doteq \transpose{\mat{Q}} \mat{A} = \tilde{\mat{U}}
+    \tilde{\mat{\Sigma}} \transpose{\tilde{\mat{V}}}$, where $\mat{B} \in \R^{2k\times m}$, and extend
+this SVD to $\mat{A}$, $\mat{A} \approx (\mat{Q} \tilde{\mat{U}}) \tilde{\mat{\Sigma}}
+    \transpose{\tilde{\mat{V}}}$. The same can be done for the columns of $\mat{B}$ to further reduce
+the time complexity.
+
+\begin{marginfigure}
+    \centering
+    \incfig{random-svd}
+    \caption{Schematic view of how to use random projections to compute the matrix decompositions more efficiently.}
+    \label{fig:random-svd}
+\end{marginfigure}
+
+However, the key question is how to choose $\mat{Q}$ appropriately. The following is a scheme for
+finding a suitable $\mat{Q}$,
+\begin{enumerate}
+    \item Generate a random matrix with i.i.d. Gaussian entries, $\mat{R} \in \R^{m \times 2k}$;
+    \item Compute $\mat{Y} = \lft( \mat{A}\transpose{\mat{A}} \rgt)^q \mat{A} \mat{R}$, where $\mat{Y} \in
+              \R^{n \times 2k}$, by repeated matrix multiplications;
+    \item Construct an orthonormal basis $\mat{Q}$ for the image of $\mat{Y}$ (\eg, via Gram-Schmidt).
+\end{enumerate}
