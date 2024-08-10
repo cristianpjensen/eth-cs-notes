@@ -13,7 +13,7 @@ the goal of gradient descent is, for $\epsilon > 0$, to find a $\vec{x}\in\R^d$ 
     f(\vec{x}) - f(\vec{x}^\star) \leq \epsilon.
 \]
 
-It works by first choosing a $\vec{x}_0 \in \R^d$ and then iteratively updating this value by \[
+It works by first choosing an $\vec{x}_0 \in \R^d$ and then iteratively updating this value by \[
     \vec{x}_{t+1} = \vec{x}_t - \gamma \grad{f(\vec{x}_t)}{}, \margintag{Take a small step into the direction of the negative gradient to move toward the minimum.}
 \]
 for timesteps $t = 0,1,\ldots$ and stepsize $\gamma > 0$.
@@ -23,7 +23,7 @@ for timesteps $t = 0,1,\ldots$ and stepsize $\gamma > 0$.
 We want to be able to bound $f(\vec{x}_t) - f(\vec{x}^\star)$, which tells us how far off we are
 from the minimum at timestep $t$. For this, we can use the first-order characterization of
 convexity, \[
-    f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t) \iff f(\vec{x}_t) - f(\vec{x}^\star) \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
+    f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t) \Leftrightarrow f(\vec{x}_t) - f(\vec{x}^\star) \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
 \]
 
 Using the gradient descent update rule, we get \[

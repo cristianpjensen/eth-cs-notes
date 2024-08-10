@@ -11,9 +11,15 @@
     \]
 \end{theorem}
 
+\begin{theorem}[Cosine theorem]
+    Let $\vec{u}, \vec{v} \in \R^d$, then \[
+        \| \vec{u} - \vec{v} \|^2 = \| \vec{u} \|^2 + \| \vec{v} \|^2 - 2 \transpose{\vec{u}}\vec{v}.
+    \]
+\end{theorem}
+
 \begin{definition}[Spectral norm]
-    Let $\mat{A}$ be an $m \times d$ matrix, then \[
-        \|\mat{A}\| \doteq \max_{\vec{v}\in \R^d, \vec{v}\neq \vec{0}} \frac{\|\mat{A}\vec{v}\|}{\|\vec{v}\|} = \max_{\|\vec{v}\| = 1} \|\mat{A}\vec{v}\|.
+    Let $\mat{A} \in \R^{m \times d}$ , then \[
+        \|\mat{A}\|_2 \doteq \max_{\vec{v}\in \R^d, \vec{v}\neq \vec{0}} \frac{\|\mat{A}\vec{v}\|}{\|\vec{v}\|} = \max_{\|\vec{v}\| = 1} \|\mat{A}\vec{v}\|.
     \]
 \end{definition}
 
@@ -67,12 +73,12 @@ the same slope; see \Cref{fig:mean-value-theorem}.
     \label{fig:non-convex-set-example}
 \end{marginfigure}
 
-\begin{observation}
+\begin{lemma}
     Let $\mathcal{C}_i, i\in I$ be convex sets, where $I$ is a (possibly infinite) index set. Then, \[
         \mathcal{C} = \bigcap_{i\in I} \mathcal{C}_i,
     \]
     is a convex set.
-\end{observation}
+\end{lemma}
 
 \subsection{Convex functions}
 
@@ -84,8 +90,8 @@ the same slope; see \Cref{fig:mean-value-theorem}.
 \end{marginfigure}
 
 \begin{definition}[Convexity]
-    A function $f: \dom{f} \to \R$ is convex if (i) $\dom{f}$ is convex and (ii) for all
-    $\vec{x},\vec{y}\in\dom{f}$ and all $\lambda\in[0,1]$, we have \[
+    A function $f: \dom{f} \to \R$ is convex if (i) $\dom{f}$ is convex and (ii)
+    $\forall \vec{x}, \vec{y}\in\dom{f}, \lambda\in[0,1]$, we have \[
         f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}).
     \]
 \end{definition}
@@ -107,9 +113,9 @@ $f$; see \Cref{fig:convexity}.
     \]
 \end{definition}
 
-\begin{observation}
+\begin{lemma}
     $f$ is a convex function if and only if $\mathrm{epi}(f)$ is a convex set.
-\end{observation}
+\end{lemma}
 
 \begin{lemma}[Jensen's inequality]
     Let $f$ be convex, $\vec{x}_1,\ldots,\vec{x}_m\in\dom{f}$, $\lambda_1,\ldots,\lambda_m\in \R_+$ such that $\sum_{i=1}^m \lambda_i = 1$, then \[
@@ -163,8 +169,9 @@ $f$; see \Cref{fig:convexity}.
     \]
     exists at every point $\vec{x}\in\dom{f}$.
 
-    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) \[
-        \forall \vec{x},\vec{y} \in \dom{f} : f(\vec{y}) \geq f(\vec{x}) + \grad{f(\vec{x})}{}^\top (\vec{y}-\vec{x}).
+    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) $\forall \vec{x}, \vec{y} \in
+        \dom{f}$, \[
+        f(\vec{y}) \geq f(\vec{x}) + \grad{f(\vec{x})}{}^\top (\vec{y}-\vec{x}).
     \]
 \end{lemma}
 
@@ -177,7 +184,7 @@ Geometrically, this means that the graph is above all tangent hyperplanes; see
     \begin{enumerate}
         \item[$\Rightarrow$:] Suppose $f$ is convex. Then, for all $t\in(0,1)$,
               \begin{align*}
-                       &  & f((1-t)\vec{x} + t \vec{y})     & \leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity}                                                                    \\
+                       &  & f((1-t)\vec{x} + t \vec{y})     & \leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity.}                                                                   \\
                   \iff &  & f(\vec{x} + t(\vec{y}-\vec{x})) & \leq f(\vec{x}) + t(f(\vec{y}) - f(\vec{x}))                                                                                                \\
                   \iff &  & f(\vec{y})                      & \geq f(\vec{x}) + \frac{f(\vec{x} + t(\vec{y}-\vec{x}))-f(\vec{x})}{t}                                                                      \\
                        &  &                                 & = f(\vec{x}) + \frac{\transpose{\grad{f(\vec{x})}{}} t(\vec{y} - \vec{x}) + r(t(\vec{y}-\vec{x}))}{t}                                       \\
@@ -186,10 +193,8 @@ Geometrically, this means that the graph is above all tangent hyperplanes; see
 
         \item[$\Leftarrow$:] Define $\vec{z} \doteq \lambda \vec{x} + (1-\lambda) \vec{y} \in \dom{f}$ for $\lambda \in[0,1]$ by convexity of $\dom{f}$. Then, we have the following inequalities,
               \begin{align*}
-                  f(\vec{x})             & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z})                          \\
-                  \lambda f(\vec{x})     & \geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt)      \\
-                  f(\vec{y})             & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z})                          \\
-                  (1-\lambda) f(\vec{y}) & \geq (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt).
+                  f(\vec{x}) & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \Rightarrow \lambda f(\vec{x})     \geq \lambda \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) \rgt)      \\
+                  f(\vec{y}) & \geq f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \Rightarrow (1-\lambda) f(\vec{y}) \geq (1-\lambda) \lft( f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z}) \rgt).
               \end{align*}
               This implies the following,
               \begin{align*}
@@ -197,7 +202,6 @@ Geometrically, this means that the graph is above all tangent hyperplanes; see
                                                               & = f(\vec{z}) + \lambda \transpose{\grad{f(\vec{z})}{}} (\vec{x}-\vec{z}) + (1-\lambda) \transpose{\grad{f(\vec{z})}{}} (\vec{y}-\vec{z})                                         \\
                                                               & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda (\vec{x}-\vec{z}) + (1-\lambda) (\vec{y}-\vec{z}) \rgt)                                                             \\
                                                               & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \lambda \vec{x} + (1-\lambda) \vec{y} - (\lambda \vec{z} + (1-\lambda) \vec{z}) \rgt)                                       \\
-                                                              & = f(\vec{z}) + \transpose{\grad{f(\vec{z})}{}} \lft( \vec{z} - \vec{z} \rgt)                                                                                                     \\
                                                               & = f(\lambda \vec{x} + (1-\lambda) \vec{y}).
               \end{align*}
     \end{enumerate}
@@ -218,7 +222,7 @@ Geometrically, this means that the gradient is monotonic.
     We will first prove that it holds from left to right, and then from right to left.
 
     \begin{enumerate}
-        \item[$\Rightarrow$:] If $f$ is convex, the first-order characterization of convexity (\Cref{lem:first-order-convexity}) yields the following,
+        \item[$\Rightarrow$:] If $f$ is convex, the first-order characterization of convexity (\Cref{lem:first-order-convexity}) yields the following $\forall \vec{x}, \vec{y} \in \dom{f}$,
               \begin{align*}
                   f(\vec{x}) & \geq f(\vec{y}) + \transpose{\grad{f(\vec{y})}{}} (\vec{x}-\vec{y})  \\
                   f(\vec{y}) & \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}),
@@ -268,7 +272,7 @@ Geometrically, this means that the gradient is monotonic.
     \]
     exists at every point $\vec{x}\in\dom{f}$ and is symmetric.
 
-    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) for all $\vec{x}\in\dom{f}$, we
+    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) $\forall \vec{x}\in\dom{f}$, we
     have \[
         \hess{f(\vec{x})}{} \succeq 0. \margintag{\Ie, $\hess{f(\vec{x})}{}$ is positive semidefinite ($\mat{M}$ is positive semidefinite if $\transpose{\vec{x}}\mat{M}\vec{x} \geq 0$ for all $\vec{x}$ and $\transpose{\vec{x}}\mat{M}\vec{x} > 0$ for all $\vec{x} \neq \vec{0}$).}
     \]
@@ -277,7 +281,7 @@ Geometrically, this means that the gradient is monotonic.
 Geometrically, this means that $f$ has non-negative curvature everywhere. \Ie, the growth rate
 should be growing.
 
-\begin{observation}[Operations that preserve convexity]
+\begin{corollary}[Operations that preserve convexity]
     Let $f_1,\ldots,f_m$ be convex functions, $\lambda_1,\ldots,\lambda_m\in \R_+$, then \[
         f \doteq \max_{i=1}^m f_i,
     \]
@@ -290,7 +294,7 @@ should be growing.
     \ie $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$ for some $\mat{A}\in \R^{d\times m},\vec{b}\in \R^d$.
     Then, the function $f \circ g$ is convex on $\dom{f \circ g} \doteq \{ \vec{x}\in R^m \mid
         g(\vec{x}) \in \dom{f} \}$.
-\end{observation}
+\end{corollary}
 
 \begin{marginfigure}
     \centering
@@ -337,6 +341,12 @@ should be growing.
     \]
     for all $\vec{y} \in \dom{f}$, so $\vec{x}$ is a global minimum.
 \end{proof}
+
+\begin{lemma}[Optimality condition]
+    Suppose that $f: \dom{f} \to \R$ is convex and differentiable over an open domain $\dom{f} \subseteq \R^d$ and let $\mathcal{X} \subseteq \dom{f}$ be a convex set. A point $\vec{x}^\star \in \mathcal{X}$ is a minimizer of $f$ over $\mathcal{X}$ if and only if \[
+        \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{x} - \vec{x}^\star) \geq 0, \forall \vec{x} \in \mathcal{X}.
+    \]
+\end{lemma}
 
 \begin{definition}[Strict convexity]
     A function $f: \dom{f}\to \R$ is strictly convex if (i) $\dom{f}$ is convex and (ii) for all $\vec{x} \neq \vec{y}\in \dom{f}$ and all $\lambda\in(0,1)$, we have \[
@@ -441,6 +451,12 @@ maximized. This can be phrased as another optimization problem, called the Lagra
     The Lagrange dual is a convex program, even if the primal is not.
 \end{observation}
 
+\begin{observation}
+    By weak duality, the supremum value of the Lagrange dual is a lower bound of the infimum value of the primal problem, \[
+        \sup g(\vec{\lambda}, \vec{\nu}) \leq \inf f_0(\vec{x}).
+    \]
+\end{observation}
+
 \begin{theorem}
     Suppose that a convex program has a feasible solution $\tilde{\vec{x}}$ that in addition satisfies
     $f_i(\tilde{\vec{x}}) < 0, i = 1,\ldots,m$ (Slater point). Then, the infimum value of the primal
@@ -467,10 +483,10 @@ conditions for this case to occur.
 
 The consequence of zero duality gap is the \textit{master equation},
 \begin{align*}
-    f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}})                                                                                                                                  \\
-                         & = \inf_{\vec{x}\in \mathcal{D}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt)                          \\
-                         & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \underbrace{\tilde{\lambda}_i f_i(\tilde{\vec{x}})}_{\leq 0} + \sum_{j=1}^{p} \underbrace{\tilde{\nu}_j h_j(\tilde{\vec{x}})}_{=0} \\
-                         & \leq f_0(\tilde{\vec{x}}),
+    f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}}) \margintag{Zero duality gap.}                                                                                                          \\
+                         & = \inf_{\vec{x}\in \mathcal{D}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \margintag{Definition of $g$.} \\
+                         & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\tilde{\vec{x}}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\tilde{\vec{x}}) \margintag{Infimum is a lower bound.}         \\
+                         & \leq f_0(\tilde{\vec{x}}), \margintag{All constraints are less than or equal to zero.}
 \end{align*}
 which means that all inequalities turn into equalities. Thus, \[
     \tilde{\lambda}_i f_i(\tilde{\vec{x}}) = 0, \quad i = 1,\ldots,m,
@@ -500,3 +516,7 @@ problem. However, we cannot always count on the KTT conditions to be solvable, b
 only guaranteed if there are primal and dual solutions of zero duality gap. But, if the primal has
 a Slater point\sidenote{A point $\tilde{\vec{x}}$ such that $f_i(\tilde{\vec{x}}) < 0$ for all
     $i=1,\ldots,m$.}, then the KTT conditions are equivalent to the existence of a primal minimizer.
+
+The interior-point method is a general algorithm for solving convex programs, which has a high
+iteration cost. Thus, during this course, we will consider simple algorithms with a low cost per
+iteration (but possibly a high number of iterations).
