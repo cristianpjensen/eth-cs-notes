@@ -342,7 +342,9 @@ should be growing.
     for all $\vec{y} \in \dom{f}$, so $\vec{x}$ is a global minimum.
 \end{proof}
 
-\begin{lemma}[Optimality condition]
+\begin{lemma}[Constrained first-order optimality condition]
+    \label{lem:optim}
+
     Suppose that $f: \dom{f} \to \R$ is convex and differentiable over an open domain $\dom{f} \subseteq \R^d$ and let $\mathcal{X} \subseteq \dom{f}$ be a convex set. A point $\vec{x}^\star \in \mathcal{X}$ is a minimizer of $f$ over $\mathcal{X}$ if and only if \[
         \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{x} - \vec{x}^\star) \geq 0, \forall \vec{x} \in \mathcal{X}.
     \]

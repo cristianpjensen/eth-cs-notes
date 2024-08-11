@@ -1,14 +1,14 @@
 \section{Projected gradient descent}
 
-In constrained optimization, we want to minimize $f(\vec{x})$, subject to $\vec{x}\in \mathcal{X}
-    \subseteq \R^d$. We will assume that $\mathcal{X} \subsetneq \mathbb{R}^d$ is a closed convex set.
-The idea of projected gradient descent is to project onto $\mathcal{X}$ after every step, \[
-    \Pi_{\mathcal{X}}(\vec{y}) \doteq \argmin_{\vec{x} \in \mathcal{X}} \| \vec{x}-\vec{y} \|^2.
+In constrained optimization, we want to solve the following optimization problem, \[
+    \argmin_{\vec{x} \in \mathcal{X}} f(\vec{x}).
 \]
-The algorithm thus alternates between the following two steps,
+In the previous section, we considered $\mathcal{X} = \R^d$. However, now we will assume that
+$\mathcal{X} \subset \mathbb{R}^d$ is a closed convex set. The idea of projected gradient descent
+is to project onto $\mathcal{X}$ after every step,
 \begin{align*}
-    \vec{y}_{t+1} & \doteq \vec{x}_t - \gamma \grad{f(\vec{x}_t)}{} \\
-    \vec{x}_{t+1} & \doteq \Pi_{\mathcal{X}}(\vec{y}_{t+1}).
+    \vec{y}_{t+1} & = \vec{x}_t - \gamma \grad{f(\vec{x}_t)}{}                                                                   \\
+    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{y}_{t+1}) \doteq \argmin_{\vec{x} \in \mathcal{X}} \| \vec{x} - \vec{y}_{t+1} \|^2.
 \end{align*}
 
 \begin{marginfigure}
@@ -18,73 +18,113 @@ The algorithm thus alternates between the following two steps,
     \label{fig:constrained-optimization}
 \end{marginfigure}
 
-\begin{observation}
-    Let $\mathcal{X} \subseteq \R^d$ be closed and convex, $\vec{x}\in \mathcal{X}, \vec{y}\in \R^d$, then
+\begin{lemma}
+    \label{lem:proj}
+
+    Let $\mathcal{X} \subset \R^d$ be closed and convex, $\vec{x}\in \mathcal{X}, \vec{y}\in \R^d$,
+    then
     \begin{enumerate}
         \item $\transpose{(\vec{x} - \Pi_{\mathcal{X}}(\vec{y}))} (\vec{y} - \Pi_{\mathcal{X}}(\vec{y})) \leq 0$;
         \item $\| \vec{x} - \Pi_{\mathcal{X}}(\vec{y}) \|^2 + \| \vec{y} - \Pi_{\mathcal{X}}(\vec{y}) \|^2 \leq \|\vec{x} - \vec{y}\|^2$.
     \end{enumerate}
-\end{observation}
+\end{lemma}
+
+\begin{proof}[Proof of 1]
+    Let $d_{\vec{y}}(\vec{x}) \doteq \| \vec{x} - \vec{y} \|^2$, which is a differentiable convex
+    function with gradient $\grad{d_{\vec{y}}(\vec{x})}{} = 2(\vec{x} - \vec{y})$. $\Pi_{\mathcal{X}}(\vec{y})$ is the minimizer of this function over $\mathcal{X}$.
+    Thus, by the first-order optimality condition (\Cref{lem:optim}), we have
+    \begin{align*}
+         &      & \transpose{\grad{d_{\vec{y}}(\Pi_{\mathcal{X}}(\vec{y}))}{}} (\vec{x} - \Pi_{\mathcal{X}}(\vec{y})) & \geq 0 \\
+         & \iff & 2\transpose{(\Pi_{\mathcal{X}}(\vec{y}) - \vec{y})}(\vec{x} - \Pi_{\mathcal{X}}(\vec{y}))           & \geq 0 \\
+         & \iff & \transpose{(\vec{x} - \Pi_{\mathcal{X}}(\vec{y}))}(\vec{y} - \Pi_{\mathcal{X}}(\vec{y})) \leq 0.
+    \end{align*}
+\end{proof}
+
+\begin{proof}[Proof of 2]
+    This can easily be shown using the cosine theorem and the previous result,
+    \begin{align*}
+         &      & 2 \transpose{(\vec{x} - \Pi_{\mathcal{X}}(\vec{y}))}(\vec{y} - \Pi_{\mathcal{X}}(\vec{y}))                                                                & \leq 0 \margintag{Multiply both sides of (1) by 2.} \\
+         & \iff & \| \vec{x} - \Pi_{\mathcal{X}}(\vec{y}) \|^2 + \| \vec{y} - \Pi_{\mathcal{X}}(\vec{y}) \| - \| \vec{x} - \vec{y} \|^2 \leq 0. \margintag{Cosine theorem.}
+    \end{align*}
+    The result follows by rearranging.
+\end{proof}
 
 The two properties equivalently say that the vectors $\vec{y} - \Pi_{\mathcal{X}}(\vec{y})$ and
 $\vec{y} - \Pi_{\mathcal{X}}(\vec{y})$ form an obtuse angle; see
 \Cref{fig:constrained-optimization}.
 
-\subsection{Lipschitz convex functions}
-
-Since we minimize $f$ over a closed and bounded convex set $\mathcal{X}$, we get the existence of a
-minimizer and bound $R$ for free. Furthermore, if we assume that $f$ is continuously
-differentiable, we also have a bound $B$ for the gradient norms over $\mathcal{X}$. This makes the
-following theorem a much more useful result than in the unconstrained case, since we need to make
-less assumptions about $f$.
-
-\begin{theorem}
-    Let $f: \dom{f} \to \R$ be convex and differentiable, $\mathcal{X} \subseteq \dom{f}$ closed and
-    convex, $\vec{x}^\star$ a minimizer of $f$ over $\mathcal{X}$. Furthermore, suppose that
-    $\|\vec{x}_0-\vec{x}^\star\| \leq R$ and $\|\grad{f(\vec{x})}{}\| \leq B$ for all
-    $\vec{x} \in \mathcal{X}$. Choosing the constant stepsize, \[
-        \gamma \doteq \frac{R}{B\sqrt{T}},
-    \]
-    with projected gradient descent yields the following bound, \[
-        \frac{1}{T} \sum_{t=0}^{T-1}  (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{RB}{\sqrt{T}}.
-    \]
-\end{theorem}
+\begin{corollary}
+    Let $f: \dom{f} \to \R$ be a differentiable convex function and $\mathcal{X} \subseteq \dom{f}$ a
+    closed convex set. Then, during projected gradient descent of $f$ over $\mathcal{X}$, if
+    $\vec{x}_{t+1} = \vec{x}_t$, we have an optimal solution.
+\end{corollary}
 
 \begin{proof}
-    We only need to show that the vanilla analysis still holds for the projected $\vec{x}_{t+1}$. We
-    know that for the non-projected iterate, we get the following equality from the vanilla analysis, \[
-        \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) = \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{y}_{t+1} - \vec{x}^\star \|^2 \rgt).
-    \]
-    By the second property of projected gradient descent, we know $\| \vec{x}_{t+1} - \vec{x}^\star
-        \|^2 \leq \| \vec{y}_{t+1} - \vec{x}^\star \|^2$, hence we get \[
-        \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \leq \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \rgt).
-    \]
-    Then, we can prove the rest of the vanilla analysis as for unbounded gradient descent.
+    We assume $\vec{x}_{t+1} = \vec{x}_t$. Let $\vec{x} \in \mathcal{X}$, then, by \Cref{lem:proj}
+    (1), we have
+    \begin{align*}
+         &      & \transpose{(\vec{x} - \vec{x}_t)}(\vec{y}_{t+1} - \vec{x}_t)     & \leq 0 \\
+         & \iff & \transpose{(\vec{x} - \vec{x}_t)}(-\gamma \grad{f(\vec{x}_t)}{}) & \leq 0 \\
+         & \iff & \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x} - \vec{x}_t) \geq 0,
+    \end{align*}
+    which satisfies the first-order optimality condition (\Cref{lem:optim}) at ($\vec{x}_t$).
 \end{proof}
 
-This is the same bound as in the unconstrained case, thus the number of necessary iteration is of
-the order $\bigo{\nicefrac{1}{\epsilon^2}}$.
+% \subsection{Lipschitz convex functions}
+%
+% Since we minimize $f$ over a closed and bounded convex set $\mathcal{X}$, we get the existence of a
+% minimizer and bound $R$ for free. Furthermore, if we assume that $f$ is continuously
+% differentiable, we also have a bound $B$ for the gradient norms over $\mathcal{X}$. This makes the
+% following theorem a much more useful result than in the unconstrained case, since we need to make
+% less assumptions about $f$.
+%
+% \begin{theorem}
+%     Let $f: \dom{f} \to \R$ be convex and differentiable, $\mathcal{X} \subseteq \dom{f}$ closed and
+%     convex, $\vec{x}^\star$ a minimizer of $f$ over $\mathcal{X}$. Furthermore, suppose that
+%     $\|\vec{x}_0-\vec{x}^\star\| \leq R$ and $\|\grad{f(\vec{x})}{}\| \leq B$ for all
+%     $\vec{x} \in \mathcal{X}$. Choosing the constant stepsize, \[
+%         \gamma \doteq \frac{R}{B\sqrt{T}},
+%     \]
+%     with projected gradient descent yields the following bound, \[
+%         \frac{1}{T} \sum_{t=0}^{T-1}  (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{RB}{\sqrt{T}}.
+%     \]
+% \end{theorem}
+%
+% \begin{proof}
+%     We only need to show that the vanilla analysis still holds for the projected $\vec{x}_{t+1}$. We
+%     know that for the non-projected iterate, we get the following equality from the vanilla analysis, \[
+%         \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) = \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{y}_{t+1} - \vec{x}^\star \|^2 \rgt).
+%     \]
+%     By the second property of projected gradient descent, we know $\| \vec{x}_{t+1} - \vec{x}^\star
+%         \|^2 \leq \| \vec{y}_{t+1} - \vec{x}^\star \|^2$, hence we get \[
+%         \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \leq \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \rgt).
+%     \]
+%     Then, we can prove the rest of the vanilla analysis as for unbounded gradient descent.
+% \end{proof}
+%
+% This is the same bound as in the unconstrained case, thus the number of necessary iteration is of
+% the order $\bigo{\nicefrac{1}{\epsilon^2}}$.
 
 \subsection{Smooth functions}
 
-\begin{lemma}[Sufficient decrease of projected gradient descent]
+\begin{lemma}[Projected sufficient decrease]
     Let $f: \dom{f} \to \R$ be differentiable and smooth with parameter $L$ over a closed and convex
     set $\mathcal{X} \subseteq \dom{f}$. Choosing stepsize \[
         \gamma \doteq \frac{1}{L},
     \]
     projected gradient descent satisfies \[
-        f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2 + \underbrace{\frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2}_{\text{additional term}}.
+        f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2.
     \]
 \end{lemma}
 
 \begin{proof}
     \begin{align*}
-        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \margintag{Smoothness.}                                                                                                                            \\
-                         & = f(\vec{x}_t) - L \transpose{(\vec{y}_{t+1} - \vec{x}_t)}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \margintag{$\vec{y}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{} \Rightarrow \grad{f(\vec{x}_t)}{} = -L(\vec{y}_{t+1} - \vec{x}_t)$.} \\
-                         & = f(\vec{x}_t) - \frac{L}{2} \lft( \| \vec{y}_{t+1} - \vec{x}_t \|^2 + \| \vec{x}_{t+1} - \vec{x}_t \|^2 - \| \vec{y}_{t+1} - \vec{x}_{t+1} \| \rgt) \margintag{$2 \transpose{\vec{v}}\vec{w} = \|\vec{v}\|^2 + \|\vec{w}\|^2 - \|\vec{v}-\vec{w}\|^2$.}                             \\
-                         & \qquad + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2                                                                                                                                                                                                                               \\
-                         & = f(\vec{x}_t) - \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_t \|^2 + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2                                                                                                                                                                   \\
-                         & = f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \|\vec{y}_{t+1} - \vec{x}_{t+1}\|^2. \margintag{$\vec{y}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{} \Rightarrow \vec{y}_{t+1} - \vec{x}_t = - \frac{1}{L} \grad{f(\vec{x}_t)}{}$.}
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \margintag{Smoothness.}                                                                       \\
+                         & = f(\vec{x}_t) - L \transpose{(\vec{y}_{t+1} - \vec{x}_t)}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \margintag{Update rule: $\vec{y}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{}$.} \\
+                         & = f(\vec{x}_t) - \frac{L}{2} \lft( \| \vec{y}_{t+1} - \vec{x}_t \|^2 + \| \vec{x}_{t+1} - \vec{x}_t \|^2 - \| \vec{y}_{t+1} - \vec{x}_{t+1} \| \rgt) \margintag{Cosine theorem.}                                                \\
+                         & \qquad + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2                                                                                                                                                                          \\
+                         & = f(\vec{x}_t) - \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_t \|^2 + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2                                                                                                              \\
+                         & = f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \|\vec{y}_{t+1} - \vec{x}_{t+1}\|^2. \margintag{$\vec{y}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{}$.}
     \end{align*}
 \end{proof}
 
@@ -102,19 +142,19 @@ compensate for it in the vanilla analysis.
 \end{theorem}
 
 \begin{proof}
-    From property 2 of gradient descent, we get the following inequality, \[
+    From \Cref{lem:proj} (2), we get the following inequality, \[
         \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2 \leq \| \vec{y}_{t+1} - \vec{x}^\star \|^2.
     \]
     Using this inequality, we get the following upper bound,
     \begin{align*}
-        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                                                     \\
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \margintag{Convexity.}                                                                                                                                                                                              \\
                                         & = \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{y}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{See vanilla analysis, where $\vec{x}_{t+1}$ is substituted by $\vec{y}_{t+1}$, since that is the next unconstrained iterate.} \\
                                         & \leq \frac{1}{2 \gamma} \Big( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1} - \vec{x}^\star\|^2                                                                                                                                           \\
                                         & \qquad - \|\vec{y}_{t+1}-\vec{x}_{t+1}\|^2 \Big).
     \end{align*}
-    We use sufficient decrease to bound the sum of gradients,
+    We use projected sufficient decrease to bound the sum of gradients,
     \begin{align*}
-        \frac{1}{2L} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 & \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2 \margintag{Sufficient decrease.} \\
+        \frac{1}{2L} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 & \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2 \margintag{Projected sufficient decrease.} \\
                                                                   & = f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \sum_{t=0}^{T-1} \|\vec{y}_{t+1} - \vec{x}_{t+1}\|^2. \margintag{Telescoping sum.}
     \end{align*}
     Now, we can bound the summed error and we will see that the additional terms cancel,
@@ -134,35 +174,37 @@ compensate for it in the vanilla analysis.
 \end{proof}
 
 This is the same bound as in the unconstrained case, thus the number of necessary iterations is of
-the order $\bigo{\nicefrac{1}{\epsilon}}$.
+the order $\bigo{\nicefrac{1}{\epsilon}}$. This does not take into account the time it takes to
+compute the projection onto $\mathcal{X}$. However, for many problems, this can be computed
+efficiently.
 
-\subsection{Smooth and strongly convex functions}
-
-\begin{theorem}
-    Let $f: \dom{f} \to \R$ be convex and differentiable. Let $\mathcal{X} \subseteq \dom{f}$ be a
-    nonempty closed and convex set and suppose that $f$ is smooth over $\mathcal{X}$ with parameter
-    $L$ and strongly convex over $\mathcal{X}$ with parameter $\mu > 0$. Choosing stepsize \[
-        \gamma \doteq \frac{1}{L},
-    \]
-    projected gradient descent satisfies the following two properties,
-    \begin{enumerate}
-        \item Squared distance to $\vec{x}^\star$ are geometrically decreasing, \[
-                  \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \lft( 1 - \frac{\mu}{L} \rgt) \|\vec{x}_t - \vec{x}^\star\|^2;
-              \]
-        \item The absolute error after $T$ iterations is exponentially small in $T$,
-              \begin{align*}
-                  f(\vec{x}_T) - f(\vec{x}^\star) & \leq \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2                                                                          \\
-                                                  & \qquad + \underbrace{\|\grad{f(\vec{x}^\star)}{}\| \lft( 1 - \frac{\mu}{L} \rgt)^{\nicefrac{T}{2}} \|\vec{x}_0 - \vec{x}^\star\|}_{\text{additional term}}.
-              \end{align*}
-    \end{enumerate}
-\end{theorem}
-
-\begin{proof}
-    These proofs are similar to the normal gradient descent case, starting from the constrained vanilla bound, \[
-        \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 - \|\vec{y}_{t+1}-\vec{x}_{t+1}\|^2 \rgt),
-    \]
-    which can be strengthened to \[
-        \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 - \|\vec{y}_{t+1}-\vec{x}_{t+1}\|^2 \rgt) - \frac{\mu}{2} \|\vec{x}_t - \vec{x}^\star\|^2,
-    \]
-    on $f(\vec{x}_t) - f(\vec{x}^\star)$.
-\end{proof}
+% \subsection{Smooth and strongly convex functions}
+%
+% \begin{theorem}
+%     Let $f: \dom{f} \to \R$ be convex and differentiable. Let $\mathcal{X} \subseteq \dom{f}$ be a
+%     nonempty closed and convex set and suppose that $f$ is smooth over $\mathcal{X}$ with parameter
+%     $L$ and strongly convex over $\mathcal{X}$ with parameter $\mu > 0$. Choosing stepsize \[
+%         \gamma \doteq \frac{1}{L},
+%     \]
+%     projected gradient descent satisfies the following two properties,
+%     \begin{enumerate}
+%         \item Squared distance to $\vec{x}^\star$ are geometrically decreasing, \[
+%                   \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \lft( 1 - \frac{\mu}{L} \rgt) \|\vec{x}_t - \vec{x}^\star\|^2;
+%               \]
+%         \item The absolute error after $T$ iterations is exponentially small in $T$,
+%               \begin{align*}
+%                   f(\vec{x}_T) - f(\vec{x}^\star) & \leq \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2                                                                          \\
+%                                                   & \qquad + \underbrace{\|\grad{f(\vec{x}^\star)}{}\| \lft( 1 - \frac{\mu}{L} \rgt)^{\nicefrac{T}{2}} \|\vec{x}_0 - \vec{x}^\star\|}_{\text{additional term}}.
+%               \end{align*}
+%     \end{enumerate}
+% \end{theorem}
+%
+% \begin{proof}
+%     These proofs are similar to the normal gradient descent case, starting from the constrained vanilla bound, \[
+%         \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 - \|\vec{y}_{t+1}-\vec{x}_{t+1}\|^2 \rgt),
+%     \]
+%     which can be strengthened to \[
+%         \frac{1}{2 \gamma} \lft( \gamma^2 \| \grad{f(\vec{x}_t)}{} \|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 - \|\vec{y}_{t+1}-\vec{x}_{t+1}\|^2 \rgt) - \frac{\mu}{2} \|\vec{x}_t - \vec{x}^\star\|^2,
+%     \]
+%     on $f(\vec{x}_t) - f(\vec{x}^\star)$.
+% \end{proof}

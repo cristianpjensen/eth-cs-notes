@@ -7,52 +7,59 @@
     \label{fig:gradient-descent}
 \end{marginfigure}
 
-Gradient descent is an optimization algorithm that aims to find the global minimizer. We assume
+\textit{Gradient descent} is an optimization algorithm that aims to find a global minimizer. We assume
 that $f: \R^d \to \R$ is convex, differentiable, and has a global minimizer $\vec{x}^\star$. Then,
 the goal of gradient descent is, for $\epsilon > 0$, to find a $\vec{x}\in\R^d$ such that \[
     f(\vec{x}) - f(\vec{x}^\star) \leq \epsilon.
 \]
-
-It works by first choosing an $\vec{x}_0 \in \R^d$ and then iteratively updating this value by \[
+It works by first choosing an $\vec{x}_0 \in \R^d$ and then iteratively updating by \[
     \vec{x}_{t+1} = \vec{x}_t - \gamma \grad{f(\vec{x}_t)}{}, \margintag{Take a small step into the direction of the negative gradient to move toward the minimum.}
 \]
 for timesteps $t = 0,1,\ldots$ and stepsize $\gamma > 0$.
 
+For special cases, we are then interested in whether it converges and the rate of convergence of
+this algorithm. \Ie, does and how quickly does the sequence $(f(\vec{x}_t) - f(\vec{x}^\star))_{t
+            \in \N}$ converge to $0$.
+
 \subsection{Vanilla analysis}
 
-We want to be able to bound $f(\vec{x}_t) - f(\vec{x}^\star)$, which tells us how far off we are
-from the minimum at timestep $t$. For this, we can use the first-order characterization of
-convexity, \[
-    f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t) \Leftrightarrow f(\vec{x}_t) - f(\vec{x}^\star) \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
-\]
-
-Using the gradient descent update rule, we get \[
+In order to see how far we can get with only convexity, we will not make any additional assumptions
+for now. We want to be able to bound $f(\vec{x}_t) - f(\vec{x}^\star)$. For this, we can use the
+first-order characterization of convexity,
+\begin{align*}
+         & f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t)  \\
+    \iff & f(\vec{x}_t) - f(\vec{x}^\star) \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
+\end{align*}
+Rearranging the gradient descent update rule, we get \[
     \grad{f(\vec{x}_t)}{} = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma},
 \]
 which gives the following bound
 \begin{align*}
-    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                          \\
-                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                      \\
-                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{$2\transpose{\vec{v}} \vec{w} = \|\vec{v}\|^2 + \|\vec{w}\|^2 - \|\vec{v}-\vec{w}\|^2$ (cosine theorem).} \\
-                                    & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt). \margintag{$\vec{x}_t - \vec{x}_{t+1} = \gamma \grad{f(\vec{x}_t)}{}$.}
+    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                                \\
+                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                            \\
+                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{Cosine theorem: $2\transpose{\vec{v}}\vec{w} = \| \vec{v} \|^2 + \| \vec{w} \|^2 - \| \vec{v} - \vec{w} \|^2$.} \\
+                                    & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt). \margintag{Update rule: $\vec{x}_t - \vec{x}_{t+1} = \gamma \grad{f(\vec{x}_t)}{}$.}
 \end{align*}
 Summing this up over the first $T$ iterations, we get an upper bound on the summed error,
 \begin{align*}
-    \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \sum_{t=0}^{T-1} \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x}_t - \vec{x}^\star)                                                                                                         \\
+    \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \sum_{t=0}^{T-1} \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt)                        \\
                                                        & = \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \lft( \|\vec{x}_0-\vec{x}^\star\|^2 - \|\vec{x}_T-\vec{x}^\star\|^2 \rgt) \margintag{Telescoping sum.} \\
                                                        & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2. \margintag{$\|\vec{x}_T - \vec{x}^\star\|^2 \geq 0$.}
 \end{align*}
 We can also use this to get a bound on the average error, \[
     \frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{1}{T} \lft( \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \rgt).
 \]
+The questions that arise are how to control $\| \grad{f(\vec{x}_t)}{} \|^2$ and choose $\gamma$ to
+make this bound useful.
 
 \subsection{Lipschitz convex functions}
 
-\marginnote{A function $f: \R^m \to \R^n$ is Lipschitz continuous if there exists an $M$, such that
-    $\forall \vec{x},\vec{y}\in\R:$ \[
-        \|f(\vec{x})-f(\vec{y})\| \leq M \|\vec{x} - \vec{y}\|.
+\marginnote{A function $f: \dom{f} \to \R$ is $B$-Lipschitz continuous if there exists a $B > 0$, such that \[
+        |f(\vec{x})-f(\vec{y})| \leq B \|\vec{x} - \vec{y}\|, \quad \forall \vec{x}, \vec{y} \in \dom{f}.
     \]
-    This holds if and only if the gradient is bounded.}
+    This holds if and only if the gradient is bounded, \[
+        \|\grad{f(\vec{x})}{}\| \leq B, \quad \forall \vec{x} \in \dom{f}.
+    \]}
 
 \begin{theorem} \label{thm:lipschitz}
     Let $f: \R^d \to \R$ be convex and differentiable with a global minimum $\vec{x}^\star$.
@@ -66,10 +73,11 @@ We can also use this to get a bound on the average error, \[
 \end{theorem}
 
 \begin{proof}
-    We can plug our bounds into the vanilla analysis,
+    We will derive the optimal stepsize $\gamma$. First, we plug our bounds into the vanilla analysis
+    to obtain a function only dependent on $\gamma$,
     \begin{align*}
         \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma} \|\vec{x}_0-\vec{x}^\star\|^2 \\
-                                                           & \leq \frac{\gamma}{2} B^2 T + \frac{1}{2\gamma} R^2                                                                  \\
+                                                           & \leq \frac{\gamma}{2} B^2 T + \frac{R^2}{2\gamma}                                                                    \\
                                                            & \doteq q(\gamma).
     \end{align*}
     Now, we want to choose $\gamma$ such that the bound $q(\gamma)$ is minimized. We can compute the
@@ -95,7 +103,7 @@ This means that we need at most $10000 \cdot R^2 B^2$ iterations to achieve an e
 
 \subsection{Smooth functions}
 
-\marginnote{``Not too curved.``}
+\marginnote{``Not too curved.''}
 
 \begin{marginfigure}
     \begin{tikzpicture}
@@ -150,39 +158,43 @@ This means that we need at most $10000 \cdot R^2 B^2$ iterations to achieve an e
 \end{marginfigure}
 
 \begin{definition}[Smoothness] \label{def:smoothness}
-    Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, $L\in \R_+$.
-    $f$ is smooth (with parameter $L$) over $\mathcal{X}$ if
-    $\forall \vec{x},\vec{y}\in \mathcal{X}:$ \[
-        \underbrace{f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x})}_{\text{first-order convexity}} + \frac{L}{2} \|\vec{x}-\vec{y}\|^2.
+    Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, and $L > 0$.
+    Then, $f$ is smooth with parameter $L$ over $\mathcal{X}$ if \[
+        f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y}-\vec{x}) + \frac{L}{2} \|\vec{x}-\vec{y}\|^2, \quad \forall \vec{x}, \vec{y} \in \mathcal{X}.
     \]
 \end{definition}
 
-\begin{remark}
-    This definition does not require convexity.
-\end{remark}
-
 Geometrically, this definition of smoothness means that the graph $f$ is below a not too steep
-tangent paraboloid at $(\vec{x},f(\vec{x}))$; see \Cref{fig:smooth}. Furthermore, we can easily
-check if $f$ is smooth with parameter $L$ if the following function is convex, \[
-    g(\vec{x}) \doteq \frac{L}{2} \transpose{\vec{x}}\vec{x} - f(\vec{x}),
-\]
-over $\dom{g} \doteq \dom{f}$.
-
-\begin{observation}[Operations that preserve smoothness]
-    Let $f_1,\ldots,f_m$ be smooth with parameters $L_1,\ldots,L_m$ and let
-    $\lambda_1,\ldots,\lambda_m\in \R_+$. Then, the function $f \doteq \sum_{i=1}^{m} \lambda_i f_i$
-    is smooth with parameter $\sum_{i=1}^{m} \lambda_i L_i$.
-
-    Let $f$ be smooth with parameter $L$ and let $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$. Then, the
-    function $f\circ g$ is smooth with parameter $L\|\mat{A}\|^2$, where $\|\mat{A}\|$ is the spectral
-    norm of $\mat{A}$.
-\end{observation}
+tangent paraboloid at $(\vec{x},f(\vec{x}))$; see \Cref{fig:smooth}.
 
 \begin{lemma}
-    Let $f: \R^d \to \R$ be convex and differentiable, then $f$ is smooth with parameter $L$ if and only if $\forall \vec{x},\vec{y}\in \R^d:$ \[
-        \|\grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}\| \leq L\|\vec{x}-\vec{y}\|.
-    \]
-    \Ie, $\grad{f}{}$ is Lipschitz continuous.
+    Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, and $L > 0$.
+    Then, the following are equivalent definitions of smoothness of $f$ with parameter $L$ over $\mathcal{X}$,
+    \begin{enumerate}
+        \item If $f$ is convex, $\| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq L \| \vec{x} - \vec{y} \|,
+                  \forall \vec{x}, \vec{y} \in \mathcal{X}$;
+        \item If $f$ is twice differentiable, $\| \hess{f(\vec{x})}{} \|_2 \leq L, \forall \vec{x} \in
+                  \mathcal{X}$;
+        \item $g(\vec{x}) = \frac{L}{2} \transpose{\vec{x}} \vec{x} - f(\vec{x})$ is convex over $\mathcal{X}$.
+    \end{enumerate}
+\end{lemma}
+
+The first definition ensures that the gradient is Lipschitz continuous, which gives us a bound on
+how much the gradient changes within an area of any point. Hence, if $L$ is smaller, the gradient
+remains more informative and we can use a bigger stepsize. The second definition tells us that the
+eigenvalues of the Hessian are upper bounded by $L$.
+
+\begin{lemma}[Operations that preserve smoothness]
+    Smoothness is preserved under sum, positive scaling, and affine transformations.
+
+    \begin{enumerate}
+        \item Let $f_1,\ldots,f_m$ be smooth with $L_1,\ldots,L_m$ and $\lambda_1,\ldots,\lambda_m > 0$. Then,
+              the function $f \doteq \sum_{i=1}^{m} \lambda_i f_i$ is smooth with parameter $\sum_{i=1}^{m}
+                  \lambda_i L_i$;
+        \item Let $f$ be smooth with parameter $L$ and let $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$. Then, the
+              function $f\circ g$ is smooth with parameter $L\|\mat{A}\|_2^2$.
+    \end{enumerate}
+
 \end{lemma}
 
 \begin{lemma}[Sufficient decrease]
@@ -194,13 +206,11 @@ over $\dom{g} \doteq \dom{f}$.
     \]
 \end{lemma}
 
-Sufficient decrease implies that, every step, we get closer to the minimum.
-
 \begin{proof}
     \begin{align*}
-        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \|\vec{x}_t-\vec{x}_{t+1}\|^2 \margintag{Smoothness.}                                                                                           \\
-                         & = f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \lft( - \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt) + \frac{L}{2} \lft\| \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt\|^2 \margintag{GD: $\vec{x}_{t+1} = \vec{x}_t - \frac{1}{L} \grad{f(\vec{x}_t)}{}$.} \\
-                         & = f(\vec{x}_t) - \frac{1}{L} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2                                                                                                                                           \\
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \|\vec{x}_t-\vec{x}_{t+1}\|^2 \margintag{Smoothness.}                                                                                                     \\
+                         & = f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \lft( - \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt) + \frac{L}{2} \lft\| \frac{\grad{f(\vec{x}_t)}{}}{L} \rgt\|^2 \margintag{Update rule: $\vec{x}_{t+1} - \vec{x}_t = -\frac{1}{L} \grad{f(\vec{x}_t)}{}$.} \\
+                         & = f(\vec{x}_t) - \frac{1}{L} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2                                                                                                                                                     \\
                          & = f(\vec{x}_t) - \frac{1}{2L} \| \grad{f(\vec{x}_t)}{} \|^2.
     \end{align*}
 \end{proof}
@@ -219,18 +229,18 @@ Sufficient decrease implies that, every step, we get closer to the minimum.
     Due to sufficient decrease, we can bound the sum of squared gradients (which will be useful when bounding
     the vanilla analysis),
     \begin{align*}
-        \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 & \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) \margintag{SD: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \|\grad{f(\vec{x}_t)}{}\|^2$.} \\
+        \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 & \leq \sum_{t=0}^{T-1} f(\vec{x}_t) - f(\vec{x}_{t+1}) \margintag{Sufficient decrease.} \\
                                                                     & = f(\vec{x}_0) - f(\vec{x}_T). \margintag{Telescoping sum.}
     \end{align*}
     Using the vanilla analysis, we can derive a bound on the average error,
     \begin{align*}
-        \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star))           & \leq \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \|\vec{x}_0-\vec{x}^\star\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.} \\
-                                                                     & \leq f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star \|^2                                                                       \\
-        \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star))             & \leq \frac{L}{2} \| \vec{x}_0 - \vec{x}^\star \|^2                                                                                                    \\
-        \frac{1}{T} \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2.
+         &      & \sum_{t=0}^{T-1} (f(\vec{x}_t) - f(\vec{x}^\star))           & \leq \frac{1}{2L} \sum_{t=0}^{T-1} \| \grad{f(\vec{x}_t)}{} \|^2 + \frac{L}{2} \|\vec{x}_0-\vec{x}^\star\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.} \\
+         &      &                                                              & \leq f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star \|^2                                                                       \\
+         & \iff & \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star))             & \leq \frac{L}{2} \| \vec{x}_0 - \vec{x}^\star \|^2                                                                                                    \\
+         & \iff & \frac{1}{T} \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2.
     \end{align*}
-    From sufficient decrease, we know that the last iterate must be the best, thus \[
-        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{1}{T} \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2.
+    From sufficient decrease, we know that the last iterate must be the best. Hence, \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star \|^2.
     \]
 \end{proof}
 
@@ -246,7 +256,7 @@ case).
 
 \subsection{Smooth and strongly convex functions}
 
-\marginnote{``Not too flat.``}
+\marginnote{``Not too flat.''}
 
 \begin{marginfigure}
     \begin{tikzpicture}
@@ -301,18 +311,25 @@ case).
 \end{marginfigure}
 
 \begin{definition}[Strong convexity]
-    Let $f: \dom{f} \to \R$ be a convex and differentiable function, $\mathcal{X}\in\dom{f}$ convex
-    and $\mu \in \R_+, \mu > 0$. $f$ is called \textit{strongly convex} with parameter $\mu$ over
-    $\mathcal{X}$ if $\forall \vec{x},\vec{y}\in \mathcal{X}:$ \[
-        f(\vec{y}) \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) + \frac{\mu}{2} \|\vec{x}-\vec{y}\|^2.
+    Let $f: \dom{f} \to \R$ be a convex and differentiable function, $\mathcal{X}\subseteq\dom{f}$ convex
+    and $\mu > 0$. $f$ is called \textit{strongly convex} with parameter $\mu$ over
+    $\mathcal{X}$ if \[
+        f(\vec{y}) \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) + \frac{\mu}{2} \|\vec{x}-\vec{y}\|^2, \quad \forall \vec{x}, \vec{y} \in \mathcal{X}.
     \]
 \end{definition}
 
 Geometrically, this means that, for any $\vec{x}$, the graph of $f$ is above a not too flat tangent
-paraboloid at $(\vec{x},f(\vec{x}))$; see \Cref{fig:strong-convexity}. Furthermore, we can easily
-check if $f$ is strongly convex if and only if the following function is convex, \[
-    g(\vec{x}) \doteq f(\vec{x}) - \frac{\mu}{2}\transpose{\vec{x}}\vec{x}.
-\]
+paraboloid at $(\vec{x},f(\vec{x}))$; see \Cref{fig:strong-convexity}.
+
+\begin{lemma}
+    Let $f: \dom{f} \to \R$ be differentiable, $\dom{f}$ an open convex set, and $\mu > 0$. Then, $f$
+    is strongly convex with $\mu > 0$ if and only if $g(\vec{x}) = f(\vec{x}) - \frac{\mu}{2}
+        \transpose{\vec{x}} \vec{x}$ is convex.
+\end{lemma}
+
+\begin{lemma}
+    If $f$ is strongly convex, then $f$ is strictly convex and has a unique global minimum.
+\end{lemma}
 
 By assuming that a function $f$ is smooth and strongly convex, we can use a stronger lower bound to
 derive a bound on the error from the vanilla analysis.
@@ -333,25 +350,20 @@ derive a bound on the error from the vanilla analysis.
 \end{theorem}
 
 \begin{proof}[Proof of 1]
-    Using the vanilla analysis, we know the following,
-    \begin{align*}
-        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                       \\
-                                        & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt).
-    \end{align*}
-    But, using strong convexity, we have a stronger lower bound on the left hand side,
+    Using strong convexity, we have a stronger lower bound in the vanilla analysis,
     \begin{align*}
         f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2 \margintag{Strong convexity.}          \\
                                         & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2 \gamma} \lft( \| \vec{x}_t - \vec{x}^\star \|^2 - \| \vec{x}_{t+1}-\vec{x}^\star \|^2 \rgt) \\
                                         & \quad - \frac{\mu}{2} \|\vec{x}_t-\vec{x}^\star\|^2.
     \end{align*}
     This can be rewritten to the following bound, \[
-        \|\vec{x}_{t+1} - \vec{x}^\star\|^2 \leq \underbrace{2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2}_{\text{``noise``}} + (1-\mu \gamma) \|\vec{x}_t - \vec{x}^\star\|^2.
+        \|\vec{x}_{t+1} - \vec{x}^\star\|^2 \leq \underbrace{2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2}_{\text{``noise''}} + (1-\mu \gamma) \|\vec{x}_t - \vec{x}^\star\|^2.
     \]
     Now we need to show that the noise is non-positive,
     \begin{align*}
-        2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2 & = \frac{2}{L} (f(\vec{x}^\star) - f(\vec{x}_t)) + \frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.}                                                         \\
-                                                                                       & \leq \frac{2}{L} (f(\vec{x}_{t+1}) - f(\vec{x}_t)) + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{Sufficient decrease.}                                                             \\
-                                                                                       & \leq -\frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{SD: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \|\grad{f(\vec{x}_t)}{}\|^2$.} \\
+        2\gamma(f(\vec{x}^\star) - f(\vec{x}_t)) + \gamma^2\|\grad{f(\vec{x}_t)}{}\|^2 & = \frac{2}{L} (f(\vec{x}^\star) - f(\vec{x}_t)) + \frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 \margintag{$\gamma \doteq \frac{1}{L}$.}                                             \\
+                                                                                       & \leq \frac{2}{L} (f(\vec{x}_{t+1}) - f(\vec{x}_t)) + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{$f(\vec{x}^\star) \leq f(\vec{x}), \forall \vec{x} \in \mathcal{X}$.} \\
+                                                                                       & \leq -\frac{1}{L^2}\|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{L^2} \|\grad{f(\vec{x}_t)}{}\|^2 \margintag{Sufficient decrease.}                                                     \\
                                                                                        & = 0.
     \end{align*}
     Hence, the noise is non-positive, and we get the following, \[
@@ -365,16 +377,16 @@ derive a bound on the error from the vanilla analysis.
     \]
     Using smoothness, we can derive a bound on the final iterate error,
     \begin{align*}
-        f(\vec{x}_T) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{x}_T - \vec{x}^\star) + \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2          \\
-                                        & = \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2 \margintag{$\grad{f(\vec{x}^\star)}{} = 0$, because it is a stationary point.} \\
+        f(\vec{x}_T) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{x}_T - \vec{x}^\star) + \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2                \\
+                                        & = \frac{L}{2} \|\vec{x}_T - \vec{x}^\star\|^2 \margintag{$\grad{f(\vec{x}^\star)}{} = \vec{0}$, because it is a stationary point.} \\
                                         & \leq \frac{L}{2} \lft( 1-\frac{\mu}{L} \rgt)^T \|\vec{x}_0-\vec{x}^\star\|^2. \margintag{Using (1).}
     \end{align*}
 \end{proof}
 
-From there, we can derive a lower bound on the number of iterations $T$ to get an error of at most
-$\epsilon$, \[
+From this result, we can derive a lower bound on the number of iterations $T$ to get an error of at
+most $\epsilon$, \[
     T \geq \frac{L}{\mu} \log \lft( \frac{R^2L}{2 \epsilon} \rgt),
 \]
 This means that we need $\frac{L}{\mu} \log (50 \cdot R^2 L)$ iterations for an error of at most
 $0.01$, as opposed to $50\cdot R^2 L$ in the smooth case. This bound only depends linearly on
-$\frac{\mu}{L}$, which might be very high.
+$\nicefrac{L}{\mu}$, which might be very high.
