@@ -39,8 +39,8 @@ We can easily make an analysis of gradient descent on smooth functions. A useful
 will use is that functions with bounded Hessians are smooth, as shown in the following lemma.
 
 \begin{lemma}
-    Let $f: \dom{f} \to \R$ be twice differentiable with $\mathcal{X} \in \dom{f}$ a convex set and
-    $\| \hess{f(\vec{x})}{} \| \leq L$ for all $\vec{x} \in \mathcal{X}$. Then $f$ is smooth with
+    Let $f: \dom{f} \to \R$ be twice differentiable with $\mathcal{X} \subseteq \dom{f}$ a convex set and
+    $\| \hess{f(\vec{x})}{} \|_2 \leq L$ for all $\vec{x} \in \mathcal{X}$. Then $f$ is smooth with
     parameter $L$ over $\mathcal{X}$.
 \end{lemma}
 
@@ -56,15 +56,14 @@ will use is that functions with bounded Hessians are smooth, as shown in the fol
     \]
     Now, we can show smoothness,
     \begin{align*}
-         & f(\vec{y}) - f(\vec{x}) - \transpose{\grad{f(\vec{x})}{}}(\vec{y}-\vec{x})                                                                                                                    \\ & = h(1) - h(0) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Definition of $h$.}                                                                                            \\
-         & = \int_0^1 h'(t) \mathrm{d}t - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Fundamental theorem of calculus.}                                                               \\
-         & = \int_0^1 \transpose{\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{}} (\vec{y} - \vec{x}) \mathrm{d}t - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Fill in $h'(t)$.}          \\
-         & = \int_0^1 \transpose{\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{}} (\vec{y} - \vec{x}) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \mathrm{d}t \margintag{Integral from $0$ to $1$.} \\
-         & = \int_0^1 \transpose{(\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}) \mathrm{d}t                                                                     \\
-         & \leq \int_0^1 \lft| \transpose{(\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}) \rgt| \mathrm{d}t                                                      \\
-         & \leq \int_0^1 \| \grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{} - \grad{f(\vec{x})}{} \| \| \vec{y} - \vec{x} \| \mathrm{d}t \margintag{Cauchy-Schwarz inequality.}                               \\
-         & \leq \int_0^1 L \| t(\vec{y} - \vec{x}) \| \| \vec{y} - \vec{x} \| \mathrm{d}t \margintag{Lipschitz continuous gradient.}                                                                     \\
-         & = \int_0^1 Lt \| \vec{x} - \vec{y} \|^2 \mathrm{d}t                                                                                                                                           \\
+         & f(\vec{y}) - f(\vec{x}) - \transpose{\grad{f(\vec{x})}{}}(\vec{y}-\vec{x})                                                                                                                       \\ & = h(1) - h(0) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Definition of $h$.}                                                                                            \\
+         & = \int_0^1 h'(t) \mathrm{d}t - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Fundamental theorem of calculus.}                                                                  \\
+         & = \int_0^1 \transpose{\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{}} (\vec{y} - \vec{x}) \mathrm{d}t - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \margintag{Fill in $h'(t)$.}             \\
+         & = \int_0^1 \transpose{\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{}} (\vec{y} - \vec{x}) - \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}) \mathrm{d}t \margintag{$\int_0^1 c\mathrm{d}t = c$.} \\
+         & = \int_0^1 \transpose{(\grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{} - \grad{f(\vec{x})}{})} (\vec{y} - \vec{x}) \mathrm{d}t                                                                        \\
+         & \leq \int_0^1 \| \grad{f(\vec{x} + t(\vec{y} - \vec{x}))}{} - \grad{f(\vec{x})}{} \| \| \vec{y} - \vec{x} \| \mathrm{d}t \margintag{Cauchy-Schwarz inequality.}                                  \\
+         & \leq \int_0^1 L \| t(\vec{y} - \vec{x}) \| \| \vec{y} - \vec{x} \| \mathrm{d}t \margintag{Lipschitz continuous gradient.}                                                                        \\
+         & = \int_0^1 Lt \| \vec{x} - \vec{y} \|^2 \mathrm{d}t                                                                                                                                              \\
          & = \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
     \end{align*}
     Thus, we have smoothness, \[
@@ -72,9 +71,9 @@ will use is that functions with bounded Hessians are smooth, as shown in the fol
     \]
 \end{proof}
 
-Now, we can use this fact and sufficient decrease\sidenote{Recall that sufficient decrease did not
-    require convexity.} to prove that the gradients of smooth functions are bounded and approach 0, as
-we increase the number of iterations.
+Now, we can use this fact and sufficient decrease -- which did not require convexity -- to prove
+that the gradients of smooth functions are bounded and approach 0, as we increase the number of
+iterations.
 
 \begin{theorem}
     Let $f: \R^d \to \R$ be differentiable with a global minimum $\vec{x}^\star$. Furthermore, suppose that $f$ is smooth with parameter $L$. Choosing stepsize \[
@@ -235,12 +234,12 @@ this to compute a bound on the Hessian by bounding the products.
 
 \begin{lemma}
     Let $\vec{x} > \vec{0}$ be $c$-balanced with $\prod_k x_k \leq 1$, then \[
-        \lft\| \hess{f(\vec{x})}{} \rgt\| \leq \lft\| \hess{f(\vec{x})}{} \rgt\|_F \leq 3 d c^2.
+        \lft\| \hess{f(\vec{x})}{} \rgt\|_2 \leq \lft\| \hess{f(\vec{x})}{} \rgt\|_F \leq 3 d c^2.
     \]
 \end{lemma}
 
 \begin{proof}
-    The fact that $\| \mat{A} \| \leq \| \mat{A} \|_F$ is well known. To bound the Frobenius norm, we
+    The fact that $\| \mat{A} \|_2 \leq \| \mat{A} \|_F$ is well known. To bound the Frobenius norm, we
     use the previous lemma to compute \[
         \lft|\hess{f(\vec{x})}{ii}\rgt| = \lft| \lft( \prod_{k \neq i} x_i \rgt)^2 \rgt| \leq c^2,
     \]
