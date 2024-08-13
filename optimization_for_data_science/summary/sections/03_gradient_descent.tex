@@ -1,6 +1,6 @@
 \section{Gradient descent}
 
-\begin{marginfigure}
+\begin{marginfigure}[-0.5cm]
     \centering
     \incfig{gradient-descent}
     \caption{Gradient descent updates.}
@@ -9,7 +9,7 @@
 
 \textit{Gradient descent} is an optimization algorithm that aims to find a global minimizer. We assume
 that $f: \R^d \to \R$ is convex, differentiable, and has a global minimizer $\vec{x}^\star$. Then,
-the goal of gradient descent is, for $\epsilon > 0$, to find a $\vec{x}\in\R^d$ such that \[
+the goal of gradient descent is, for $\epsilon > 0$, to find an $\vec{x}\in\R^d$ such that \[
     f(\vec{x}) - f(\vec{x}^\star) \leq \epsilon.
 \]
 It works by first choosing an $\vec{x}_0 \in \R^d$ and then iteratively updating by \[
@@ -24,20 +24,20 @@ this algorithm. \Ie, does and how quickly does the sequence $(f(\vec{x}_t) - f(\
 \subsection{Vanilla analysis}
 
 In order to see how far we can get with only convexity, we will not make any additional assumptions
-for now. We want to be able to bound $f(\vec{x}_t) - f(\vec{x}^\star)$. For this, we can use the
-first-order characterization of convexity,
+in this section. We want to be able to bound $f(\vec{x}_t) - f(\vec{x}^\star)$. For this, we can
+use the first-order characterization of convexity,
 \begin{align*}
-         & f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t)  \\
-    \iff & f(\vec{x}_t) - f(\vec{x}^\star) \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
+     &      & f(\vec{x}^\star)                & \geq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}^\star - \vec{x}_t) \\
+     & \iff & f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star).
 \end{align*}
 Rearranging the gradient descent update rule, we get \[
     \grad{f(\vec{x}_t)}{} = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma},
 \]
 which gives the following bound
 \begin{align*}
-    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                                                \\
-                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                            \\
-                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{Cosine theorem: $2\transpose{\vec{v}}\vec{w} = \| \vec{v} \|^2 + \| \vec{w} \|^2 - \| \vec{v} - \vec{w} \|^2$.} \\
+    f(\vec{x}_t) - f(\vec{x}^\star) & \leq \transpose{\grad{f(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                                    \\
+                                    & = \frac{1}{\gamma} \transpose{(\vec{x}_t - \vec{x}_{t+1})} (\vec{x}_t - \vec{x}^\star)                                                                                                                                                \\
+                                    & = \frac{1}{2 \gamma} \lft( \|\vec{x}_t - \vec{x}_{t+1}\|^2 + \|\vec{x}_t - \vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt) \margintag{Cosine theorem.}                                                                    \\
                                     & = \frac{\gamma}{2} \|\grad{f(\vec{x}_t)}{}\|^2 + \frac{1}{2\gamma}\lft( \|\vec{x}_t-\vec{x}^\star\|^2 - \|\vec{x}_{t+1}-\vec{x}^\star\|^2 \rgt). \margintag{Update rule: $\vec{x}_t - \vec{x}_{t+1} = \gamma \grad{f(\vec{x}_t)}{}$.}
 \end{align*}
 Summing this up over the first $T$ iterations, we get an upper bound on the summed error,
@@ -171,17 +171,23 @@ tangent paraboloid at $(\vec{x},f(\vec{x}))$; see \Cref{fig:smooth}.
     Let $f: \dom{f} \to \R$ be differentiable, $\mathcal{X} \subseteq \dom{f}$ convex, and $L > 0$.
     Then, the following are equivalent definitions of smoothness of $f$ with parameter $L$ over $\mathcal{X}$,
     \begin{enumerate}
+        \item $g(\vec{x}) = \frac{L}{2} \transpose{\vec{x}} \vec{x} - f(\vec{x})$ is convex over $\mathcal{X}$;
         \item If $f$ is convex, $\| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq L \| \vec{x} - \vec{y} \|,
                   \forall \vec{x}, \vec{y} \in \mathcal{X}$;
         \item If $f$ is twice differentiable, $\| \hess{f(\vec{x})}{} \|_2 \leq L, \forall \vec{x} \in
-                  \mathcal{X}$;
-        \item $g(\vec{x}) = \frac{L}{2} \transpose{\vec{x}} \vec{x} - f(\vec{x})$ is convex over $\mathcal{X}$.
+                  \mathcal{X}$.
     \end{enumerate}
 \end{lemma}
 
-The first definition ensures that the gradient is Lipschitz continuous, which gives us a bound on
+\begin{proof}
+    These can all easily be proven by first proving that the definition of smoothness is equivalent
+    to (1) and then proving that the rest are equivalent to (1) by using the various equivalent
+    definitions of convexity.
+\end{proof}
+
+The second definition ensures that the gradient is Lipschitz continuous, which gives us a bound on
 how much the gradient changes within an area of any point. Hence, if $L$ is smaller, the gradient
-remains more informative and we can use a bigger stepsize. The second definition tells us that the
+remains more informative and we can use a bigger stepsize. The third definition tells us that the
 eigenvalues of the Hessian are upper bounded by $L$.
 
 \begin{lemma}[Operations that preserve smoothness]

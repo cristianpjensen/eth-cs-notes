@@ -10,11 +10,12 @@ The \textit{Newton-Raphson method} is an iterative method for finding a zero of 
 univariate function $f: \R \to \R$. Starting from some $x_0$, it iteratively computes \[
     x_{t+1} \doteq x_t - \frac{f(x_t)}{f'(x_t)}.
 \]
-In formulas, $x_{t+1}$ is the solution to the linear equation \[
+In formulas, $x_{t+1}$ is the solution to the following linear equation, \[
     f(x_t) + f'(x_t) (x - x_t) = 0,
 \]
-yielding the above update formula. The Newton step fails if $f'(x_t) = 0$ or gets out of control if
-$|f'(x_t)|$ is very small. Thus, we need to keep this in mind when making a theoretical analysis.
+which yields the above update formula. The Newton step fails if $f'(x_t) = 0$ or gets out of
+control if $|f'(x_t)|$ is very small. Thus, we need to keep this in mind when making a theoretical
+analysis.
 
 \begin{marginfigure}
     \centering
@@ -27,23 +28,35 @@ We can use this method for optimization as well, called \textit{Newton's method}
 critical points $f'(x) = 0$ by applying the method to the derivative of $f$, \[
     x_{t+1} \doteq x_t - \frac{f'(x_t)}{f''(x_t)}.
 \]
-We can further generalize this to any dimensionality, \[
+We can further generalize this update step to finding critical points $\grad{f(\vec{x})}{} =
+    \vec{0}$ in any dimensionality, \[
     \vec{x}_{t+1} \doteq \vec{x}_t - \inv{\hess{f(\vec{x}_t)}{}} \grad{f(\vec{x}_t)}{}.
 \]
 As before, we need to keep in mind that the Hessian must be invertible and may get out of control
-if the Hessian has small norm.
+if the Hessian has a small Spectral norm.
 
 A second interpretation of Newton's method is that it is a special case of the general update
 scheme, \[
     \vec{x}_{t+1} \doteq \vec{x}_t - H(\vec{x}_t) \grad{f(\vec{x}_t)}{},
 \]
-where $H(\vec{x}_t) \in \R^{d \times d}$ is some matrix, like gradient descent with $H(\vec{x}_t) =
-    \gamma_t \mat{I}$. Hence, we can think of Newton's method of an ``adaptive gradient descent'' that
+where $H(\vec{x}_t) \in \R^{d \times d}$ is some matrix -- like gradient descent with $H(\vec{x}_t)
+    = \gamma_t \mat{I}$. Hence, we can think of Newton's method as ``adaptive'' gradient descent that
 adapts to the local curvature of the function at $\vec{x}_t$.\sidenote{This is very apparent in the
     case of optimizing a quadratic function of the form $f(\vec{x}) = \frac{1}{2} \transpose{\vec{x}}
         \mat{M} \vec{x} - \transpose{\vec{q}} \vec{x} + c$, which has the same curvature
     $\hess{f(\vec{x})}{} = \mat{M}$ everywhere. In this case, Newton's method yields the optimum in a
-    single step, $\vec{x}_1 = \vec{x}^\star$.}
+    single step, $\vec{x}_1 = \vec{x}^\star$. \textit{Proof}:
+    \begin{align*}
+        \vec{x}_1 & = \vec{x}_0 - \hess{f(\vec{x}_0)}{}^{-1} \grad{f(\vec{x}_0)}{} \\
+                  & = \vec{x}_0 - \mat{M}^{-1} (\mat{M} \vec{x}_0 - \vec{q})       \\
+                  & = \mat{M}^{-1} \vec{q}                                         \\
+                  & = \vec{x}^\star.
+    \end{align*}}
+
+Furthermore, we can interpret Newton's method as minimizing the local second-order Taylor
+approximation around $\vec{x}_t$, \[
+    \vec{x}_{t+1} \in \argmin_{\vec{x} \in \R^d} f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x} - \vec{x}_t) + \frac{1}{2} \transpose{(\vec{x} - \vec{x}_t)} \hess{f(\vec{x}_t)}{}(\vec{x} - \vec{x}_t).
+\]
 
 We will not prove any general convergence guarantees for Newton's method. We will prove that, under
 suitable conditions, and starting close to a critical point, we will reach distance at most
@@ -53,11 +66,13 @@ close to the critical point. The proof will rely on the assumption that the loca
 small space around the critical point is near constant.
 
 \begin{theorem} \label{thm:newton}
-    Let $f: \dom{f} \to \R$ be twice differentiable with a critical point $\vec{x}^\star$. Suppose there is a ball $\mathcal{X} \subseteq \dom{f}$ with center $\vec{x}^\star$ such that the inverse Hessians are bounded, \[
-        \exists \mu > 0, \quad \lft\| \inv{\hess{f(\vec{x})}{}} \rgt\| \leq \frac{1}{\mu}, \quad \forall \vec{x} \in \mathcal{X},
+    Let $f: \dom{f} \to \R$ be twice differentiable with a critical point $\vec{x}^\star$. Suppose
+    there is a ball $\mathcal{X} \subseteq \dom{f}$ with center $\vec{x}^\star$ such that the inverse
+    Hessians are bounded. \Ie, for some $\mu > 0$, we have \[
+        \lft\| \inv{\hess{f(\vec{x})}{}} \rgt\|_2 \leq \frac{1}{\mu}, \quad \forall \vec{x} \in \mathcal{X}.
     \]
-    and the Hessian is Lipschitz continuous, \[
-        \exists B \geq 0, \quad \lft\| \hess{f(\vec{x})}{} - \hess{f(\vec{y})}{} \rgt\| \leq B \| \vec{x} - \vec{y} \|, \quad \forall \vec{x},\vec{y}\in \mathcal{X}.
+    Moreover, assume that the Hessian is Lipschitz continuous. \Ie, there exists $B > 0$, such that \[
+        \lft\| \hess{f(\vec{x})}{} - \hess{f(\vec{y})}{} \rgt\|_2 \leq B \| \vec{x} - \vec{y} \|, \quad \forall \vec{x},\vec{y}\in \mathcal{X}.
     \]
     Then, for $\vec{x}_t \in \mathcal{X}$ and $\vec{x}_{t+1}$, resulting from the Newton step, we have \[
         \| \vec{x}_{t+1} - \vec{x}^\star \| \leq \frac{B}{2 \mu} \| \vec{x}_t - \vec{x}^\star \|^2.
@@ -68,24 +83,33 @@ small space around the critical point is near constant.
     Let $H(\vec{x}) = \hess{f(\vec{x})}{}$, $\vec{x} = \vec{x}_t$, $\vec{x}' = \vec{x}_{t+1}$. Then,
     subtracting $\vec{x}^\star$ from both sides of the Newton step yields
     \begin{align*}
-        \vec{x}' - \vec{x}^\star & = \vec{x} - \vec{x}^\star - \inv{H(\vec{x})} \grad{f(\vec{x})}{}                                                                                                                                                                                     \\
-                                 & = \vec{x} - \vec{x}^\star + \inv{H(\vec{x})} (\grad{f(\vec{x}^\star)}{} - \grad{f(\vec{x})}{}). \margintag{$\grad{f(\vec{x}^\star)}{} = \vec{0}$.}                                                                                                   \\
+        \vec{x}' - \vec{x}^\star & = \vec{x} - \vec{x}^\star - \inv{H(\vec{x})} \grad{f(\vec{x})}{}                                                                                                                                                             \\
+                                 & = \vec{x} - \vec{x}^\star + \inv{H(\vec{x})} (\grad{f(\vec{x}^\star)}{} - \grad{f(\vec{x})}{}). \margintag{$\grad{f(\vec{x}^\star)}{} = \vec{0}$.}                                                                           \\
         \intertext{Let $h(t) \doteq \grad{f(\vec{x} + t(\vec{x}^\star - \vec{x}))}{}$. Then, using the fundamental theorem of calculus, we get}
-                                 & = \vec{x} - \vec{x}^\star + \inv{H(\vec{x})} \int_0^1 H(\vec{x} + t(\vec{x}^\star - \vec{x})) (\vec{x}^\star - \vec{x}) \mathrm{d}t \margintag{$h'(t) = H(\vec{x} + t(\vec{x}^\star - \vec{x})) (\vec{x}^\star - \vec{x})$.}                         \\
-        \intertext{Using $\vec{x} - \vec{x}^\star = \inv{H(\vec{x})} H(\vec{x}) (\vec{x} - \vec{x}^\star) = \inv{H(\vec{x})} \int_0^1 - H(\vec{x}) (\vec{x}^\star - \vec{x}) \mathrm{d}t$, we get}
-                                 & = \inv{H(\vec{x})} \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t                                                                                                                   \\
+                                 & = \vec{x} - \vec{x}^\star + \inv{H(\vec{x})} \int_0^1 H(\vec{x} + t(\vec{x}^\star - \vec{x})) (\vec{x}^\star - \vec{x}) \mathrm{d}t \margintag{$h'(t) = H(\vec{x} + t(\vec{x}^\star - \vec{x})) (\vec{x}^\star - \vec{x})$.} \\
+                                 & = H(\vec{x})^{-1}H(\vec{x})(\vec{x} - \vec{x}^\star) + \inv{H(\vec{x})} \int_0^1 H(\vec{x} + t(\vec{x}^\star - \vec{x})) (\vec{x}^\star - \vec{x}) \mathrm{d}t                                                               \\
+                                 & = \inv{H(\vec{x})} \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t                                                                                           \\
         \intertext{Taking norm of both sides yields}
-        \| \vec{x}' - \vec{x} \| & = \lft\| \inv{H(\vec{x})} \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t \rgt\|                                                                                                     \\
-                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\| \cdot \lft\|  \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t \rgt\| \margintag{$\| \mat{A} \vec{x} \| \leq \| \mat{A} \| \cdot \| \vec{x} \|$.} \\
-                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\| \cdot \int_0^1 \lft\| \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \rgt\| \mathrm{d}t                                                                              \\
-                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\| \cdot \int_0^1 \lft\|  H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt\| \cdot \| \vec{x}^\star - \vec{x} \| \mathrm{d}t \margintag{$\| \mat{A} \vec{x} \| \leq \| \mat{A} \| \cdot \| \vec{x} \|$.}   \\
-                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\| \cdot \| \vec{x}^\star - \vec{x} \| \int_0^1 \lft\|  H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt\| \mathrm{d}t                                                                                     \\
-                                 & \leq \frac{1}{\mu} \| \vec{x}^\star - \vec{x} \| \int_0^1 B \| t(\vec{x}^\star - \vec{x}) \| \mathrm{d}t \margintag{Assumptions of theorem.}                                                                                                         \\
-                                 & \leq \frac{B}{\mu} \| \vec{x}^\star - \vec{x} \|^2 \int_0^1 t \mathrm{d}t                                                                                                                                                                            \\
+        \| \vec{x}' - \vec{x} \| & = \lft\| \inv{H(\vec{x})} \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t \rgt\|                                                                             \\
+                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\|_2 \cdot \lft\|  \int_0^1 \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \mathrm{d}t \rgt\|                                                   \\
+                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\|_2 \cdot \int_0^1 \lft\| \lft( H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt) (\vec{x}^\star - \vec{x}) \rgt\| \mathrm{d}t                                                    \\
+                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\|_2 \cdot \int_0^1 \lft\|  H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt\|_2 \cdot \| \vec{x}^\star - \vec{x} \| \mathrm{d}t                                                   \\
+                                 & \leq \lft\| \inv{H(\vec{x})} \rgt\|_2 \cdot \| \vec{x}^\star - \vec{x} \| \int_0^1 \lft\|  H(\vec{x} + t(\vec{x}^\star - \vec{x})) - H(\vec{x}) \rgt\|_2 \mathrm{d}t                                                         \\
+                                 & \leq \frac{1}{\mu} \| \vec{x}^\star - \vec{x} \| \int_0^1 B \| t(\vec{x}^\star - \vec{x}) \| \mathrm{d}t \margintag{Assumptions of theorem.}                                                                                 \\
+                                 & \leq \frac{B}{\mu} \| \vec{x}^\star - \vec{x} \|^2 \int_0^1 t \mathrm{d}t                                                                                                                                                    \\
                                  & \leq \frac{B}{2 \mu} \| \vec{x}^\star - \vec{x} \|^2.
     \end{align*}
-
+    This concludes the proof.
 \end{proof}
+
+An easy way to ensure bounded inverse Hessians is by requiring strong convexity over $\mathcal{X}$.
+
+\begin{lemma}
+    Let $f: \dom{f} \to \R$ be twice differentiable and strongly convex with $\mu$ over an open
+    convex subset $\mathcal{X} \subseteq \dom{f}$. Then, $\hess{f(\vec{x})}{}$ is invertible and \[
+        \| \hess{f(\vec{x})}{}^{-1} \|_2 \leq \frac{1}{\mu}, \quad \forall \vec{x} \in \mathcal{X}.
+    \]
+\end{lemma}
 
 \begin{corollary}
     With the assumptions of \Cref{thm:newton}, if $\vec{x}_0 \in \mathcal{X}$ satisfies \[

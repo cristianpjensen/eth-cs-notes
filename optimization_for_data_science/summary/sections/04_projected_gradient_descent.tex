@@ -163,10 +163,11 @@ compensate for it in the vanilla analysis.
                                                            & \qquad - \frac{L}{2} \sum_{t=0}^{T-1} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2                                             \\
                                                            & \leq f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \sum_{t=0}^{T-1} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2                   \\
                                                            & \qquad + \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star\|^2 - \frac{L}{2} \sum_{t=0}^{T-1} \|\vec{y}_{t+1} - \vec{x}_{t+1}\|^2 \\
-                                                           & = f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star\|^2,                                            \\
-        \intertext{which results in}
-        \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star))   & \leq \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star\|^2.
+                                                           & = f(\vec{x}_0) - f(\vec{x}_T) + \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star\|^2,
     \end{align*}
+    which results in \[
+        \sum_{t=1}^{T} (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{L}{2} \|\vec{x}_0 - \vec{x}^\star\|^2.
+    \]
     Due to sufficient decrease, we get
     \begin{align*}
         f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{L}{2T} \|\vec{x}_0 - \vec{x}^\star\|^2.

@@ -13,9 +13,9 @@ algorithm itself.
 
 Typically, we have a data source $\mathcal{X}$, equipped with an unknown probability distribution.
 However, we do have access to independent samples $X_1,\ldots,X_n \sim \mathcal{X}$, which we call
-the dataset. The goal is to ``explain`` $\mathcal{X}$ through these samples. More specifically, we
+the dataset. The goal is to ``explain'' $\mathcal{X}$ through these samples. More specifically, we
 have a class of hypotheses $\mathcal{H}$, which are possible explanations of $\mathcal{X}$. The
-goal is then to select the hypothesis $H\in \mathcal{H}$ that best ''explains`` $\mathcal{X}$,
+goal is then to select the hypothesis $H\in \mathcal{H}$ that best ``explains'' $\mathcal{X}$,
 which we measure by a \textit{risk} (or loss) function $\ell: \mathcal{H}\times \mathcal{X}\to \R$.
 
 The expected risk can be computed by \[
@@ -105,7 +105,7 @@ The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empi
 ($\ell_n(H_n)$, training data) against the expected risk ($\ell(H_n)$, estimated by a validation
 set). $H_n$ is found by mapping the training data to the hypothesis, which is done by an
 optimization algorithm. With high probability, we are in the area denoted by ``empirical risk
-minimization``, because
+minimization'', because
 \begin{align*}
     \ell_n(\tilde{H}_n) & \leq \inf_{H\in \mathcal{H}} \ell_n(H) + \epsilon                                 \\
                         & \leq \ell_n(\tilde{H}) + \epsilon \margintag{This holds for any $\tilde{H}$.}     \\
@@ -124,7 +124,7 @@ theory is too simple to capture the nature of the data.
 
 The model is learning when we have low empirical risk and low expected risk. This means that the
 training was successful. Generalization occurs when the expected risk is close to the empirical
-risk. Note that this does not mean that the explanation is good, since any ``blind explanation``
+risk. Note that this does not mean that the explanation is good, since any ``blind explanation''
 will generalize well due to the weak law of large numbers. Generalization means that the empirical
 performance is similar the expected performance. Ideally, we want generalization and learning.
 

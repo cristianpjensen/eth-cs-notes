@@ -16,14 +16,15 @@ $\inv{\mat{H}}_t$.\sidenote{We directly work with $\inv{\mat{H}}_t$, instead of 
     computing the inverse would again result in a $\bigo{d^3}$ runtime complexity.}
 
 Recall from Newton's method that we wanted $\hess{f(\vec{x}_t)}{}$ to fluctuate very little in
-regions of fast convergence. Hence, in Quasi-Newton methods, it makes sense if $\inv{\mat{H}}_{t-1}
-    \approx \inv{\mat{H}}_t$. This intuition yields the approach by \cite{greenstadt1970variations},
-where we update $\inv{\mat{H}}_{t-1}$ by an error matrix $\mat{E}_t$, \[
+regions of fast convergence. Hence, in Quasi-Newton methods, it makes sense to ensure
+$\inv{\mat{H}}_{t-1} \approx \inv{\mat{H}}_t$. This intuition yields the approach by
+\cite{greenstadt1970variations}, where we update $\inv{\mat{H}}_{t-1}$ by an error matrix
+$\mat{E}_t$, \[
     \inv{\mat{H}}_t = \inv{\mat{H}}_{t-1} + \mat{E}_t,
 \]
-and we want this error to be as small as possible, \ie minimize $\| \mat{E} \|_F^2$, subject to its
-constraints. \cite{greenstadt1970variations} found this method ``too specialized'', which lead him
-to minimize the following error term instead, \[
+and we want this error to be as small as possible, \ie, minimize $\| \mat{E} \|_F^2$, subject to
+its constraints. \cite{greenstadt1970variations} found this method ``too specialized'', which lead
+him to minimize the following error term instead, \[
     \| \mat{A} \mat{E} \transpose{\mat{A}} \|_F^2,
 \]
 where $\mat{A} \in \R^{d\times d}$ is a fixed invertible transformation matrix.

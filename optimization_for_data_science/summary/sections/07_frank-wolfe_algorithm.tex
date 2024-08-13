@@ -11,9 +11,9 @@ Projected gradient descent is the only algorithm we have seen that dealt with co
 optimization problems. However, that algorithm came with the clear disadvantage that projections
 can be very expensive, even when $\mathcal{X}$ is convex. The Frank-Wolfe algorithm solves
 constrained optimization problems without projection steps. Instead, it makes use of a
-\textit{linear minimization oracle} (LMO). For the feasible region $\mathcal{X} \subseteq
-    \mathcal{R}^d$ and an arbitrary vector $\vec{g} \in R^d$,\sidenote{$\vec{g}$ can be thought of as
-    an ``optimization direction''.} \[
+\textit{linear minimization oracle} (LMO). For the feasible region $\mathcal{X} \subseteq \R^d$ and
+an arbitrary vector $\vec{g} \in \R^d$,\sidenote{$\vec{g}$ can be thought of as an ``optimization
+    direction''.} \[
     \mathrm{LMO}_{\mathcal{X}}(\vec{g}) \doteq \argmin_{\vec{z} \in \mathcal{X}} \transpose{\vec{g}} \vec{z}.
 \]
 Notice that this is the minimization of a linear function.
@@ -29,12 +29,12 @@ The algorithm reduces non-linear constrained optimization to linear optimization
 $\mathcal{X}$; it is able to solve general non-linear constrained optimization problems by only
 solving a simpler linear constrained optimization over the same set $\mathcal{X}$ in each
 iteration, by calling the oracle. We solve this linear optimization problem in the direction of the
-gradient, since that is the best linear approximation of $f$ at $\vec{x}_t$.
+gradient -- the best linear approximation of $f$ at $\vec{x}_t$.
 
 A nice property of the oracle is that if $\mathcal{X} = \mathrm{conv}(\mathcal{A})$, then
 $\mathrm{LMO}_{\mathcal{X}}(\vec{x}) \in \mathcal{A}$. So, if we have a set $\mathcal{X}$ that is
-the convex hull of a small number of points, such as the $\ell_1$-ball, we have an easy
-optimization problem with runtime $\bigo{|\mathcal{A}|}.$
+the convex hull of a small number of points -- such as the $\ell_1$-ball, which has $2d$ vertices
+-- we have an easy optimization problem with runtime $\bigo{|\mathcal{A}|}.$
 
 The advantages of this method are
 \begin{itemize}
@@ -60,10 +60,10 @@ $\ell_1$-ball. This is the convex hull of the unit basis vectors; $\mathcal{X} =
 \begin{align*}
     \mathrm{LMO}_{\mathcal{X}}(\vec{g}) & = \argmin_{\vec{z}\in \mathcal{X}} \transpose{\vec{z}} \vec{g}                                 \\
                                         & = \argmin_{\vec{z} \in \{ \pm \vec{e}_1, \ldots, \pm \vec{e}_d \}} \transpose{\vec{z}} \vec{g} \\
-                                        & = -\mathrm{sign}(g_i) \vec{e}_i, \quad i \doteq \argmax_{i \in [d]} |g_i|.
+                                        & = -\mathrm{sign}(g_i) \vec{e}_i, \quad i \in \argmax_{i \in [d]} |g_i|.
 \end{align*}
 So, we only have to identify $\vec{g}$'s largest coordinate, which is much more efficient than
-projection onto an $\ell_1$-ball.
+projection onto the $\ell_1$-ball.
 
 \subsection{Duality gap}
 
@@ -82,18 +82,18 @@ This can be interpreted as the optimality gap $\transpose{\grad{f(\vec{x})}{}} \
 
 \begin{proof}
     \begin{align*}
-        g(\vec{x}) & = \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})                                                                                                                                                    \\
-                   & \geq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \margintag{$\vec{s}$ is the minimizer of $f(\vec{z}) \doteq \transpose{\grad{f(\vec{x})}{}} \vec{z}$.}                                    \\
-                   & \geq f(\vec{x}) - f(\vec{x}^\star). \margintag{First-order characterization of convexity: $f(\vec{y}) \geq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x}), \forall \vec{x}, \vec{y}$.}
+        g(\vec{x}) & = \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})                                                                                                                                             \\
+                   & \geq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \margintag{$\vec{s}$ minimizes LMO: $\transpose{\grad{f(\vec{x})}{}} \vec{z} \leq \transpose{\grad{f(\vec{x})}{}} \vec{x}^\star$.} \\
+                   & \geq f(\vec{x}) - f(\vec{x}^\star). \margintag{First-order characterization of convexity.}
     \end{align*}
 \end{proof}
 
 Thus, we always have a computable upper bound $g(\vec{x}_t)$ on the unknown error $f(\vec{x}_t) -
     f(\vec{x}^\star)$, which is not the case in general for \textit{unconstrained} optimization.
 Furthermore, at an optimal point $\vec{x}^\star$, $g(\vec{x}^\star) = 0$, which follows from the
-optimality conditions for constrained convex
-optimization.\sidenote{$\transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \geq 0, \forall
-        \vec{x} \in \mathcal{X}$.}
+constrained optimality condition (\Cref{lem:optim}), $-g(\vec{x}^\star) =
+    \transpose{\grad{f(\vec{x}^\star)}{}}(\vec{s} - \vec{x}^\star) \geq 0$, and $g(\vec{x}^\star) \geq
+    f(\vec{x}^\star) - f(\vec{x}^\star) = 0$.
 
 \subsection{Convergence analysis}
 
@@ -102,8 +102,9 @@ To prove convergence, we need the following descent lemma,
 \begin{lemma}
     \label{lem:fw-descent}
 
-    For a step $\vec{x}_{t+1} \doteq \vec{x}_t + \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize
-    $\gamma_t \in [0,1]$, it holds that \[
+    Let $f: \R^d \to \R$ be differentiable and smooth with parameter $L > 0$. For a step $\vec{x}_{t+1}
+        \doteq \vec{x}_t + \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize $\gamma_t \in [0,1]$, it holds
+    that \[
         f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
     \]
     where $\vec{s} = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})$.
@@ -111,9 +112,9 @@ To prove convergence, we need the following descent lemma,
 
 \begin{proof}
     \begin{align*}
-        f(\vec{x}_{t+1}) & = f(\vec{x}_t + \gamma_t(\vec{s} - \vec{x}_t))                                                                                                                                                                                                                                               \\
-                         & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}} \gamma_t (\vec{s} - \vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2 \margintag{Smoothness: $f(\vec{y}) \leq f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}}(\vec{y} - \vec{x}) + \frac{L}{2} \| \vec{x} - \vec{y} \|^2$.} \\
-                         & = f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2. \margintag{Duality gap: $g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})$.}
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \margintag{Smoothness.}                   \\
+                         & = f(\vec{x}_t) + \gamma_t \transpose{\grad{f(\vec{x}_t)}{}}(\vec{s}-\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2 \margintag{Definition of duality gap.} \\
+                         & = f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2.
     \end{align*}
 \end{proof}
 
@@ -129,8 +130,8 @@ Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
     the Frank-Wolfe algorithm yields \[
         f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{2L}{T+1} \mathrm{diam}(\mathcal{X})^2,
     \]
-    where $\mathrm{diam}(\vec{x}) \doteq \max_{\vec{x},\vec{y}\in \mathcal{X}} \| \vec{x} - \vec{y} \|$
-    is the diameter of $\mathcal{X}$.
+    where $\mathrm{diam}(\mathcal{X}) \doteq \max_{\vec{x},\vec{y}\in \mathcal{X}} \| \vec{x} - \vec{y}
+        \|$ is the diameter of $\mathcal{X}$.
 \end{theorem}
 
 \begin{proof}
@@ -152,13 +153,13 @@ Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
                      & \leq 2C.
     \end{align*}
     Suppose it holds for $T = k$, \[
-        h(\vec{x}_k) \leq \frac{4C}{k+1}.
+        h(\vec{x}_k) \leq \frac{4C}{k+1},
     \]
     then we need to show that it also holds for $T = k+1$,
     \begin{align*}
         h(\vec{x}_{k+1}) & \leq (1-\gamma_k) h(\vec{x}_k) + \gamma_k^2 C                                                                                                    \\
                          & \leq \lft( 1 - \frac{2}{k+2} \rgt) \frac{4C}{k+1} + \lft( \frac{2}{k+2} \rgt)^2 C \margintag{Induction step and $\gamma_k = \nicefrac{2}{k+2}$.} \\
-                         & = \frac{k}{k+2} \frac{4C}{k+1} + \frac{4}{(k+2)^2} C                                                                                             \\
+                         & = \frac{k}{k+2} \frac{4C}{k+1} + \frac{4C}{(k+2)^2}                                                                                              \\
                          & = \frac{4C}{k+2} \lft( \frac{k}{k+1} + \frac{1}{k+2} \rgt)                                                                                       \\
                          & \leq \frac{4C}{k+2}.
     \end{align*}
@@ -172,7 +173,7 @@ $\mathcal{X} = \{ [x_1,x_2] \mid 0 \leq x_1 \leq 1, 0 \leq x2 \leq 1 \}$. This f
 with $L=2$ and $\mathrm{diam}(\mathcal{X})^2 = 2$. This has the following error bound, \[
     f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{8}{T+1}.
 \]
-Next consider $f'(x_1, x_2) \doteq x_1^2 + (10x_2)^2$ over the rectangle $\mathcal{X}'' = \{ [x_1,
+Next consider $f'(x_1, x_2) \doteq x_1^2 + (10x_2)^2$ over the rectangle $\mathcal{X}' = \{ [x_1,
             x_2] \mid 0 \leq x_1 \leq 1, 0\leq x_2 \leq \nicefrac{1}{10} \}$. This function is smooth with $L'
     = 200$ and $\mathrm{diam}(\mathcal{X}')^2 = 1 + \nicefrac{1}{100}$. Thus, $f'$ has the error bound \[
     f'(\vec{x}_T) - f'(\vec{x}^\star) \leq \frac{404}{T+1}.
