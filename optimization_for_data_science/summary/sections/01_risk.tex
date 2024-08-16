@@ -11,12 +11,13 @@ algorithm itself.
 
 \subsection{Empirical and expected risk}
 
-Typically, we have a data source $\mathcal{X}$, equipped with an unknown probability distribution.
-However, we do have access to independent samples $X_1,\ldots,X_n \sim \mathcal{X}$, which we call
-the dataset. The goal is to ``explain'' $\mathcal{X}$ through these samples. More specifically, we
-have a class of hypotheses $\mathcal{H}$, which are possible explanations of $\mathcal{X}$. The
-goal is then to select the hypothesis $H\in \mathcal{H}$ that best ``explains'' $\mathcal{X}$,
-which we measure by a \textit{risk} (or loss) function $\ell: \mathcal{H}\times \mathcal{X}\to \R$.
+Typically, we have a data source $\mathcal{X}$, equipped with an unknown probability distribution
+$P$. However, we do have access to independent samples $X_1,\ldots,X_n \sampleiid \mathcal{P}$,
+which we call the dataset. The goal is to ``explain'' $\mathcal{X}$ through these samples. More
+specifically, we have a class of hypotheses $\mathcal{H}$, which are possible explanations of
+$\mathcal{X}$. The goal is then to select the hypothesis $H\in \mathcal{H}$ that best ``explains''
+$\mathcal{X}$, which we measure by a \textit{loss function} $\ell: \mathcal{H}\times \mathcal{X}\to
+    \R$.
 
 The expected risk can be computed by \[
     \ell(H) \doteq \E_{\mathcal{X}}[\ell(H, X)].
@@ -67,7 +68,7 @@ holds for all hypotheses with high probability. This leads us to the following t
 \begin{theorem} \label{thm:weaker-llm}
     Assume that for any $\delta,\epsilon > 0$, there exists $n_0 \in \mathbb{N}$ such that for $n \geq
         n_0$, \[
-        \sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon, \margintag{The worst hypothesis has a smaller error than $\epsilon$.}
+        \sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon,
     \]
     with probability at least $1-\delta$. Then, for $n \geq n_0$, an approximate empirical risk
     minimizer $\tilde{H}_n$ is PAC for expected risk minimization, meaning that it satisfies \[
@@ -77,9 +78,11 @@ holds for all hypotheses with high probability. This leads us to the following t
 \end{theorem}
 
 \begin{proof}
+    Let $\tilde{H}_n$ be the minimizer of $\ell_n$. This is a random variable, but the weak law of
+    large numbers holds for all $H \in \mathcal{H}$. Thus,
     \begin{align*}
-        \ell(\tilde{H}_n) & \leq \ell_n(\tilde{H}_n) + \epsilon \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}                 \\
-                          & \leq \inf_{H \in \mathcal{H}} \ell_n(H) + 2 \epsilon \margintag{$\tilde{H}_n$ is an almost best explanation of the training data.}          \\
+        \ell(\tilde{H}_n) & \leq \ell_n(\tilde{H}_n) + \epsilon \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}                                                                                  \\
+                          & \leq \inf_{H \in \mathcal{H}} \ell_n(H) + 2 \epsilon \margintag{$\tilde{H}_n$ is an almost best explanation of the training data: $\ell_n(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}} \ell_n(H) + \epsilon$.} \\
                           & \leq \inf_{H \in \mathcal{H}} \ell(H) + 3 \epsilon, \margintag{Follows from $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$.}
     \end{align*}
     with probability at least $1-\delta$.
@@ -88,24 +91,24 @@ holds for all hypotheses with high probability. This leads us to the following t
 It turns out that the assumption made by \Cref{thm:weaker-llm} holds in many relevant cases, but it
 is not always true.
 
-In this course, we will not learn how to pick the theory ($\mathcal{H}$ and $\ell$), but rather how
-to solve the optimization problems that arise in empirical risk minimization after the theory has
-been chosen.
+In this course, we will not learn how to pick the theory --- $\mathcal{H}$ and $\ell$ --- but
+rather how to solve the optimization problems that arise in empirical risk minimization after the
+theory has been chosen.
 
 \subsection{The map of learning}
 
-\begin{marginfigure}[7cm]
+\begin{marginfigure}[9cm]
     \centering
     \incfig{map-of-learning}
     \caption{The map of learning. $H_n$ depends on the training data and is generally found by an optimization algorithm. The training data is used to find and compute the empirical risk $\ell_n(H_n)$. We estimate the expected risk $\ell(H_n)$ by held-out validation data.}
     \label{fig:map-of-learning}
 \end{marginfigure}
 
-The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empirical risk
-($\ell_n(H_n)$, training data) against the expected risk ($\ell(H_n)$, estimated by a validation
-set). $H_n$ is found by mapping the training data to the hypothesis, which is done by an
-optimization algorithm. With high probability, we are in the area denoted by ``empirical risk
-minimization'', because
+The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empirical risk ---
+$\ell_n(H_n)$ --- against the expected risk --- $\ell(H_n)$, estimated by a validation set. $H_n$
+is found by mapping the training data to the hypothesis, which is done by an optimization
+algorithm. With high probability, we are in the area denoted by ``empirical risk minimization'',
+because
 \begin{align*}
     \ell_n(\tilde{H}_n) & \leq \inf_{H\in \mathcal{H}} \ell_n(H) + \epsilon                                 \\
                         & \leq \ell_n(\tilde{H}) + \epsilon \margintag{This holds for any $\tilde{H}$.}     \\
@@ -115,8 +118,7 @@ minimization'', because
 
 A model is overfit when we have low empirical risk, while having high expected risk. This means
 that the explanation quality on the data source is much worse than on the training data. The main
-reason for this is that the theory ($\mathcal{H}$ and $\ell$) is so complex that it can explain
-almost anything.
+reason for this is that the theory is so complex that it can explain almost anything.
 
 A model is underfit when we have high empirical risk, while having high expected risk. This means
 that we neither explain the training data nor the data source. The main reason for this is that the

@@ -48,15 +48,12 @@ defined for any norm.
     \]
 \end{definition}
 
-Note that the Bregman divergence $V_{\omega}$ is thus the first-order Taylor approximation of
-$\omega$, evaluated at $\vec{x}$.
-
 \begin{example}
     \label{ex:bregman}
     We have the following examples of Bregman divergences,
     \begin{enumerate}
         \item \label{item:euc} (Euclidean distance) $\Omega = \R^d$, $\omega(\vec{x}) = \frac{1}{2} \| \vec{x} \|_2^2$, and $\|
-                  \cdot \| = \| \cdot \|_2$. Then \[
+                  \cdot \| = \| \cdot \|_2$. Then, \[
                   V_{\omega}(\vec{x}, \vec{y}) = \frac{1}{2} \| \vec{x} - \vec{y} \|_2^2.
               \]
         \item (Mahalanobis distance) $\Omega = \R^d$, $\omega(\vec{x}) = \frac{1}{2} \transpose{\vec{x}} \mat{Q}
@@ -80,6 +77,13 @@ $\omega$, evaluated at $\vec{x}$.
     \end{enumerate}
 \end{lemma}
 
+\begin{marginfigure}
+    \centering
+    \incfig{three-point-identity}
+    \caption{Illustration of the three-point identity of a non-Euclidean Bregman divergence.}
+    \label{fig:three-point-identity}
+\end{marginfigure}
+
 The following Lemma is a key property of the Bregman divergence and is used extensively in this
 course.
 
@@ -89,26 +93,28 @@ course.
     \]
 \end{lemma}
 
-\begin{marginfigure}
-    \centering
-    \incfig{three-point-identity}
-    \caption{Illustration of the three-point identity of a non-Euclidean Bregman divergence.}
-    \label{fig:three-point-identity}
-\end{marginfigure}
+In the case of $\omega(\vec{x}) \doteq \frac{1}{2} \| \vec{x} \|_2^2$, this is the cosine theorem, \[
+    \| \vec{x} - \vec{z} \|^2 = \| \vec{x} - \vec{y} \|^2 + \| \vec{y} - \vec{z} \|^2 - 2 \langle \vec{z} - \vec{y}, \vec{x} - \vec{y} \rangle.
+\]
 
 \subsection{Mirror descent algorithm}
 
-The mirror descent algorithm is a generalization of the subgradient method, where the norm is
-replaced by a Bregman divergence,\sidenote{Using \Cref{item:euc} of \Cref{ex:bregman} recovers the
-    subgradient method, and \Cref{item:kl} recovers Entropic descent, \[
-        \vec{x}_{t+1} \propto \vec{x}_t \odot \exp(-\gamma_t \vec{g}_t).
-    \]} \[
-    \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}, \quad \vec{g}_t \in \partial f(\vec{x}_t).
+The mirror descent algorithm is a generalization of the subgradient method. We can rewrite the
+subgradient update rule in the following way,
+\begin{align*}
+    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t)                                                                                                                                                          \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - (\vec{x}_t - \gamma_t \vec{g}_t) \|^2                                                                                                           \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - \vec{x}_t - (-\gamma_t \vec{g}_t) \|^2                                                                                                          \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \lft( \| \vec{x} - \vec{x}_t \|^2 + \| \gamma_t \vec{g}_t \|^2 + 2 \langle \gamma_t \vec{g}_t, \vec{x} - \vec{x}_t \rangle \rgt) \margintag{Cosine theorem.} \\
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ \frac{1}{2} \| \vec{x} - \vec{x}_t \|^2 + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}. \margintag{Remove terms that do not depend on $\vec{x}$.}
+\end{align*}
+We then replace the norm by the Bregman divergence to obtain the mirror descent update rule, \[
+    \vec{x}_{t+1} \in \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}, \quad \vec{g}_t \in \partial f(\vec{x}_t).
 \]
 
 \begin{lemma}
     Let $f$ be convex and $\omega$ be $1$-strongly convex on $\mathcal{X}$ \wrt norm $\| \cdot \|$.
-    Then, the following inequality holds, \[
+    Running mirror descent, the following inequality holds, \[
         \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
     \]
 \end{lemma}
@@ -117,7 +123,7 @@ replaced by a Bregman divergence,\sidenote{Using \Cref{item:euc} of \Cref{ex:bre
     We have the following update rule, \[
         \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}.
     \]
-    Thus, by the optimality condition, we have \[
+    Thus, by the optimality condition for constrained optimization, we have \[
         \langle \grad{\omega(\vec{x}_{t+1})}{} + \gamma_t \vec{g}_t - \grad{\omega(\vec{x}_t)}{}, \vec{x} - \vec{x}_{t+1} \rangle \geq 0, \quad \forall \vec{x} \in \mathcal{X},
     \]
     which can be equivalently written as $\forall \vec{x} \in \mathcal{X}:$
@@ -159,10 +165,12 @@ Then, we have the following convergence rate, \[
 This is equivalent to the convergence rate of the subgradient method, but then for a more general
 notions of norm.
 
-In practice, if we optimize over the simplex $\Delta^{d-1}$ with $\| \vec{g} \|_\infty \leq 1,
-    \forall \vec{g} \in \partial f(\vec{x})$ and $\vec{x}_0 = [\nicefrac{1}{d}, \ldots,
-    \nicefrac{1}{d}]$. Then, we have the following convergence rate for the subgradient method,
-$\bigo{\frac{\sqrt{d}}{\sqrt{T}}}$, because $B \in \bigo{\sqrt{d}}$ and $R \in \bigo{1}$. On the
-other hand, we have the following convergence rate for mirror descent, $\bigo{\frac{\sqrt{\log
-                d}}{\sqrt{T}}}$, since $B \in \bigo{1}$ and $R \in \bigo{\sqrt{\log d}}$. This is a considerable
-speedup.
+\begin{example}
+    In practice, if we optimize over the simplex $\Delta^{d-1}$ with $\| \vec{g} \|_\infty \leq 1,
+        \forall \vec{g} \in \partial f(\vec{x})$ and $\vec{x}_0 = [\nicefrac{1}{d}, \ldots,
+        \nicefrac{1}{d}]$. Then, we have the following convergence rate for the subgradient method,
+    $\bigo{\frac{\sqrt{d}}{\sqrt{T}}}$, because $B \in \bigo{\sqrt{d}}$ and $R \in \bigo{1}$. On the
+    other hand, we have the following convergence rate for mirror descent \wrt the $\ell$-1 norm,
+    $\bigo{\frac{\sqrt{\log d}}{\sqrt{T}}}$, since $B \in \bigo{1}$ and $R \in \bigo{\sqrt{\log d}}$.
+    This is a considerable speedup.
+\end{example}

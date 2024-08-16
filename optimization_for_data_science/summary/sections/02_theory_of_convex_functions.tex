@@ -26,8 +26,15 @@
     \]
 \end{definition}
 
+\begin{definition}[Positive semi-definiteness]
+    A matrix $\mat{A} \in \R^{m \times d}$ is positive semi-definite over $\mathcal{X}$ if \[
+        \transpose{\vec{x}} \mat{A} \vec{x} \geq 0, \quad \forall \vec{x} \in \mathcal{X}.
+    \]
+\end{definition}
+
 Intuitively, this means that $\|\mat{A}\|_2$ is the largest factor by which a vector can be
-stretched in length under the mapping $\vec{v}\mapsto\mat{A}\vec{v}$.
+stretched in length under the mapping $\vec{v}\mapsto\mat{A}\vec{v}$. It is equal to the principal
+eigenvalue.
 
 \begin{theorem}[Mean value theorem]
     Let $a<b$ be real numbers, and let $h: [a,b]\to \R$ be a continuous function that is differentiable
@@ -187,10 +194,10 @@ Geometrically, this means that the graph is above all tangent hyperplanes; see
     \begin{enumerate}
         \item[$\Rightarrow$:] Suppose $f$ is convex. Then, for all $t\in(0,1)$,
               \begin{align*}
-                       &  & f((1-t)\vec{x} + t \vec{y})     & \leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity.}                                                                   \\
-                  \iff &  & f(\vec{x} + t(\vec{y}-\vec{x})) & \leq f(\vec{x}) + t(f(\vec{y}) - f(\vec{x}))                                                                                                \\
-                  \iff &  & f(\vec{y})                      & \geq f(\vec{x}) + \frac{f(\vec{x} + t(\vec{y}-\vec{x}))-f(\vec{x})}{t}                                                                      \\
-                       &  &                                 & = f(\vec{x}) + \frac{\transpose{\grad{f(\vec{x})}{}} t(\vec{y} - \vec{x}) + r(t(\vec{y}-\vec{x}))}{t}                                       \\
+                       &  & f((1-t)\vec{x} + t \vec{y})     & \leq (1-t) f(\vec{x}) + t f(\vec{y}) \margintag{Definition of convexity.}                                                                                                                                                            \\
+                  \iff &  & f(\vec{x} + t(\vec{y}-\vec{x})) & \leq f(\vec{x}) + t(f(\vec{y}) - f(\vec{x}))                                                                                                                                                                                         \\
+                  \iff &  & f(\vec{y})                      & \geq f(\vec{x}) + \frac{f(\vec{x} + t(\vec{y}-\vec{x}))-f(\vec{x})}{t}                                                                                                                                                               \\
+                       &  &                                 & = f(\vec{x}) + \frac{\transpose{\grad{f(\vec{x})}{}} t(\vec{y} - \vec{x}) + r(t(\vec{y}-\vec{x}))}{t} \margintag{$r(\cdot)$ is an error function such that $\lim_{\vec{v} \to \vec{0}} \frac{\| r(\vec{v}) \|}{\| \vec{v} \|} = 0$.} \\
                        &  &                                 & = f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}}(\vec{y}-\vec{x}) + \underbrace{\frac{r(t(\vec{y}-\vec{x}))}{t}}_{\to 0 \text{ for } t\to 0}.
               \end{align*}
 
@@ -275,9 +282,8 @@ Geometrically, this means that the gradient is monotonic.
     \]
     exists at every point $\vec{x}\in\dom{f}$ and is symmetric.
 
-    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) we have \[
-        \hess{f(\vec{x})}{} \succeq \mat{0}, \quad \forall \vec{x} \in \dom{f}. \margintag{\Ie, $\hess{f(\vec{x})}{}$ is positive semidefinite ($\mat{M}$ is positive semidefinite if $\transpose{\vec{x}}\mat{M}\vec{x} \geq 0$ for all $\vec{x}$ and $\transpose{\vec{x}}\mat{M}\vec{x} > 0$ for all $\vec{x} \neq \vec{0}$).}
-    \]
+    Then, $f$ is convex if and only if (i) $\dom{f}$ is convex and (ii) the Hessian
+    $\hess{f(\vec{x})}{}$ is positive semi-definite for all $\vec{x} \in \dom{f}$.
 \end{lemma}
 
 Geometrically, this means that $f$ has non-negative curvature everywhere. \Ie, the growth rate
@@ -312,10 +318,6 @@ should be growing.
         f(\vec{x}) \leq f(\vec{y}), \quad \forall \vec{y} \in \dom{f} \text{ s.t. } \| \vec{y}-\vec{x} \| < \epsilon.
     \]
 \end{definition}
-
-\begin{remark}
-    This definition of local minima means that in some small neighborhood around $\vec{x}$, $\vec{x}$ is the smallest point.
-\end{remark}
 
 \begin{lemma}
     Let $\vec{x}^\star$ be a local minimum of a convex function $f: \dom{f} \to \R$. Then,
@@ -366,12 +368,12 @@ a function that is not strictly convex can be found in \Cref{fig:non-strict-conv
 \begin{marginfigure}
     \centering
     \incfig{non-strict-convexity}
-    \caption{A non-strictly convex function.}
+    \caption{A non-strictly convex function with one global minimum.}
     \label{fig:non-strict-convexity}
 \end{marginfigure}
 
 \begin{lemma}
-    Let $f: \dom{f} \to \R$ be strictly convex. Then, $f$ has -- at most -- one global minimum.
+    Let $f: \dom{f} \to \R$ be strictly convex. Then, $f$ has --- at most --- one global minimum.
 \end{lemma}
 
 % But, how do we know a minimizer exists? To be able to find this out, we must use the Weierstrass
@@ -413,19 +415,19 @@ In standard form, optimization problems look like the following, \[
          &                   &  & h_j(\vec{x}) = 0,    \quad j = 1, \ldots, p.
     \end{aligned}
 \]
-The problem domain is then $\mathcal{D} = \bigcap_{i=0}^m \dom{f_i} \cap \bigcap_{j=1}^p
-    \dom{h_j}$.
-
+The problem domain is then \[
+    \mathcal{X} = \lft( \bigcap_{i=0}^m \dom{f_i} \rgt) \cap \lft( \bigcap_{j=1}^p \dom{h_j} \rgt).
+\]
 In a convex program, all $f_i$ are convex functions, and all $h_j$ are affine functions with domain
 $\R^d$.
 
 \begin{definition}[Lagrange dual function]
-    Given an optimization problem in standard form, its Lagrangian is the function $L: \mathcal{D} \times \R^m \times \R^p \to \R$ given by \[
+    Given an optimization problem in standard form, its Lagrangian is the function $L: \mathcal{X} \times \R^m \times \R^p \to \R$ given by \[
         L(\vec{x},\vec{\lambda},\vec{\nu}) = f_0(\vec{x}) + \sum_{i=1}^{m} \lambda_i f_i(\vec{x}) + \sum_{j=1}^{p} \nu_j h_j(\vec{x}).
     \]
     The $\lambda_i,\nu_j$ are called Lagrange multipliers. The Lagrange dual function is the function
     $g: \R^m \times \R^p \to \R \cup \{ -\infty \}$ defined by \[
-        g(\vec{\lambda},\vec{\nu}) = \inf_{\vec{x}\in \mathcal{D}} L(\vec{x},\vec{\lambda},\vec{\nu}).
+        g(\vec{\lambda},\vec{\nu}) = \inf_{\vec{x}\in \mathcal{X}} L(\vec{x},\vec{\lambda},\vec{\nu}).
     \]
 \end{definition}
 
@@ -433,10 +435,10 @@ Only the $(\vec{\lambda},\vec{\nu})$ pairs with $g(\vec{\lambda},\vec{\nu}) > -\
 interesting.
 
 \begin{lemma}[Weak Lagrange duality]
-    Let $\vec{x}$ be a feasible solution -- $f_i(\vec{x}) \leq 0, \forall i \in [m]$ and $h_j(\vec{x})
+    Let $\vec{x}$ be a feasible solution --- $f_i(\vec{x}) \leq 0, \forall i \in [m]$ and $h_j(\vec{x})
         = 0, \forall j \in [p]$. Let $g$ be the Lagrange dual function and $\vec{\lambda}\in \R^m,
         \vec{\nu}\in \R^p$ such that $\vec{\lambda} \geq \vec{0}$. Then, \[
-            g(\vec{\lambda},\vec{\nu}) \leq f_0(\vec{x}).
+        g(\vec{\lambda},\vec{\nu}) \leq f_0(\vec{x}).
     \]
 \end{lemma}
 
@@ -492,7 +494,7 @@ conditions for this case to occur.
 The consequence of zero duality gap is the \textit{master equation},
 \begin{align*}
     f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}}) \margintag{Zero duality gap.}                                                                                                          \\
-                         & = \inf_{\vec{x}\in \mathcal{D}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \margintag{Definition of $g$.} \\
+                         & = \inf_{\vec{x}\in \mathcal{X}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \margintag{Definition of $g$.} \\
                          & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\tilde{\vec{x}}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\tilde{\vec{x}}) \margintag{Infimum is a lower bound.}         \\
                          & \leq f_0(\tilde{\vec{x}}), \margintag{All constraints are less than or equal to zero.}
 \end{align*}
@@ -526,5 +528,5 @@ a Slater point\sidenote{A point $\tilde{\vec{x}}$ such that $f_i(\tilde{\vec{x}}
     $i=1,\ldots,m$.}, then the KTT conditions are equivalent to the existence of a primal minimizer.
 
 The interior-point method is a general algorithm for solving convex programs, which has a high
-iteration cost. Thus, during this course, we will consider simple algorithms with a low cost per
+iteration cost. During this course, we will consider simple algorithms with a low cost per
 iteration (but possibly a high number of iterations).

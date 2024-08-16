@@ -5,11 +5,11 @@ be smooth. The question is thus whether we can exploit additional structure of n
 functions, instead of treating them as black boxes. The idea behind smoothing is to optimize a
 smooth approximation $f_{\mu}$ of the non-smooth function $f$.
 
-\subsection{Nesterov smoothing}
+\subsection{Convex conjugate theory}
 
 \begin{definition}[Conjugate function]
     The conjugate function of $f$ is \[
-        f^*(\vec{y}) = \sup_{\vec{x} \in \dom{f}} \lft\{ \transpose{\vec{x}} \vec{y} - f(\vec{x}) \rgt\}.
+        f^*(\vec{y}) \doteq \sup_{\vec{x} \in \dom{f}} \lft\{ \transpose{\vec{x}} \vec{y} - f(\vec{x}) \rgt\}.
     \]
     It is also called the Legendre-Fenchel transformation.
 \end{definition}
@@ -17,23 +17,25 @@ smooth approximation $f_{\mu}$ of the non-smooth function $f$.
 \begin{lemma}[Convex conjugate properties]
     The following holds for conjugate functions,
     \begin{enumerate}
-        \item (Duality) If $f$ is continuous and convex, then $f^{**} = f$;
+        \item (Duality) If $f$ convex, then $f^{**} = f$;
         \item (Fenchel's inequality) \[
-                  f(\vec{x}) + f^*(\vec{y}) \geq \transpose{\vec{x}} \vec{y}, \quad \forall \vec{x}, \vec{y};
+                  f(\vec{x}) + f^*(\vec{y}) \geq \transpose{\vec{x}} \vec{y} \iff \vec{y} \in \partial f(\vec{x}) \iff \vec{x} \in \partial f^*(\vec{y}), \quad \forall \vec{x}, \vec{y};
               \]
-        \item If $f$ and $g$ are continuous and convex, then \[
+        \item If $f$ and $g$ are convex, then \[
                   (f+g)^*(\vec{x}) = \inf_{\vec{y}} \lft\{ f^*(\vec{y}) + g^*(\vec{x} - \vec{y}) \rgt\};
               \]
         \item If $f$ is $\mu$-strongly convex, then $f^*$ is differentiable and $\nicefrac{1}{\mu}$-smooth.
     \end{enumerate}
 \end{lemma}
 
+\subsection{Nesterov smoothing}
+
 Nesterov smoothing approximates a non-smooth function $f$ by \[
     f_{\mu}(\vec{x}) = \max_{\vec{y} \in \dom{f^*}} \lft\{ \transpose{\vec{x}}\vec{y} - f^*(\vec{y}) - \mu \cdot d(\vec{y}) \rgt\},
 \]
 where $d(\vec{y})$ is a proximity function. A proximity function is 1-strongly convex and
 non-negative. The function $f_{\mu}$ is $\nicefrac{1}{\mu}$-smooth and approximates a convex $f$ by \[
-    f(\vec{x}) - \mu D^2 \leq f_{\mu}(\vec{x}) \leq f(\vec{x}), \quad D^2 \doteq \max{\vec{y} \in \dom{f^*}} d(\vec{y}). \margintag{High $\mu$ results in a bad approximation.}
+    f(\vec{x}) - \mu D^2 \leq f_{\mu}(\vec{x}) \leq f(\vec{x}), \quad D^2 \doteq \max_{\vec{y} \in \dom{f^*}} d(\vec{y}). \margintag{High $\mu$ results in a bad approximation.}
 \]
 Thus, we have a trade-off between approximation error and optimization efficiency. Specifically, \[
     f(\vec{x}) - f(\vec{x}^\star) \leq \underbrace{f(\vec{x}) - f_{\mu}(\vec{x})}_{\textit{approximation error}} + \underbrace{f_{\mu}(\vec{x}) - \min_{\vec{x}} f_{\mu}(\vec{x})}_{\textit{optimization error}}.
@@ -66,7 +68,7 @@ it minimizes exactly, \ie, $\min_{\vec{x}} f(\vec{x}) = \min_{\vec{x}} f_{\mu}(\
 
 \begin{definition}[Proximal operator]
     The proximal operator of a convex function $f$ at $\vec{x}$ is defined as \[
-        \mathrm{prox}_f(\vec{x}) \doteq \argmin_{\vec{y} \in \dom{f}} \lft\{ f(\vec{y}) + \frac{1}{2} \| \vec{x} - \vec{y} \|_2^2 \rgt\}.
+        \mathrm{prox}_{\mu,f}(\vec{x}) \doteq \argmin_{\vec{y} \in \dom{f}} \lft\{ f(\vec{y}) + \frac{1}{2 \mu} \| \vec{x} - \vec{y} \|_2^2 \rgt\}.
     \]
 \end{definition}
 Note that this is a special case of Moreau-Yosida regularization with $\mu = 1$. Furthermore, for
@@ -74,21 +76,31 @@ many non-smooth functions, their proximal operator can be computed efficiently i
 
 \subsection{Proximal point algorithm}
 
-The proximal point algorithm (PPA) repeatedly applies the proximal operator, \[
-    \vec{x}_{t+1} = \mathrm{prox}_{\lambda_t f}(\vec{x}_t).
+The gradient of $f_{\mu}$ is \[
+    \grad{f_{\mu}(\vec{x})}{} = \frac{1}{\mu} (\vec{x} - \mathrm{prox}_{\mu, f}(\vec{x})).
 \]
+Thus, applying gradient descent to smooth $f_{\mu}$ --- which is $\nicefrac{1}{\mu}$-smooth ---
+reduces to \[
+    \vec{x}_{t+1} = \vec{x}_t - \mu \grad{f_{\mu}(\vec{x}_t)}{} = \mathrm{prox}_{\mu, f}(\vec{x}_t),
+\]
+which is the proximal point algorithm (PPA). In general, we define a timestep-dependent stepsize
+$\lambda_t$, \[
+    \vec{x}_{t+1} = \mathrm{prox}_{\lambda_t, f}(\vec{x}_t).
+\]
+For many functions $f$, the proximal operator can be computed analytically.
 
 \begin{theorem}[Convergence of PPA]
-    If $f$ is convex, then for any $T \geq 1$, we have \[
-        f(\vec{x}_{T+1}) - f(\vec{x}^\star) \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|_2^2}{2 \sum_{t=1}^{T} \lambda_t}.
+    If $f$ is convex, then for any $T \geq 0$, we have \[
+        f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|_2^2}{2 \sum_{t=0}^{T-1} \lambda_t}.
     \]
 \end{theorem}
+
 If we set $\lambda_t = \lambda$ to be constant, we get a $\bigo{\nicefrac{1}{t}}$ convergence rate.
 
 \subsection{Proximal gradient method}
 
-Assume the following convex composite optimization problem, \[
-    \min_{\vec{x} \in \R^d} f(\vec{x}) + g(\vec{x}),
+Consider the following convex composite optimization problem, \[
+    \min_{\vec{x} \in \R^d} F(\vec{x}) \doteq f(\vec{x}) + g(\vec{x}),
 \]
 where $f$ and $g$ are convex.\sidenote{Most supervised learning problems can be cast into this
     form, \[
@@ -102,9 +114,9 @@ Note that it alternates between a gradient update on $f$ and a proximal operator
 
 \begin{theorem}[Convergence of PGM]
     Let $F(\vec{x}) = f(\vec{x}) + g(\vec{x})$. Assume $f$ is convex and $L$-smooth, $g$ is convex
-    and possibly non-smooth. Proximal gradient method with fixed stepsize $\gamma_t = \nicefrac{1}{L}$
+    and possibly non-smooth. Proximal gradient method with fixed stepsize $\gamma_t \doteq \nicefrac{1}{L}$
     satisfies \[
-        F(\vec{x}_t) - F(\vec{x}^\star) \leq \frac{L \| \vec{x}_0 - \vec{x}^\star \|_2^2}{2t}.
+        F(\vec{x}_T) - F(\vec{x}^\star) \leq \frac{L \| \vec{x}_0 - \vec{x}^\star \|_2^2}{2T}.
     \]
 \end{theorem}
 This is nearly the same convergence rate as gradient descent, despite $F$ being possibly non-smooth.

@@ -1,7 +1,7 @@
 \section{Subgradient methods}
 
-Until now, we have mostly assumed all functions to be smooth and hence differentiable. However, in
-general this is not the case. In machine learning, non-smoothness arises everywhere:
+Until now, we have mostly assumed all functions to be differentiable and smooth. However, in
+general this is not the case. In machine learning, non-differentiable functions arise everywhere:
 \begin{itemize}
     \item Loss functions, such as the Hinge loss, $\max\{ 0, 1-x \}$ (SVM);
     \item Regularization, such as the $\ell_1$-norm (LASSO);
@@ -42,11 +42,11 @@ only subgradient or there is no subgradient at all. There might not be any subgr
 case because it might be that the hyperplane is not below the entire function if the function is
 non-convex.
 
-\begin{lemma}
-    The following characterizes convexity with the subgradient:
+\begin{lemma}[Convexity and subgradient]
+    Let $f: \dom{f} \to \R$, then
     \begin{itemize}
         \item If $f$ is convex, then $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x}$ in the relative
-              interior of $\dom{f}$;
+              interior of $\dom{f}$ (so not necessarily on the edges);
         \item If $\dom{f}$ is convex and $\partial f(\vec{x}) \neq \emptyset$ for all $\vec{x} \in \dom{f}$, then
               $f$ is convex.
     \end{itemize}
@@ -66,14 +66,14 @@ non-convex.
 \begin{lemma}[Subgradient calculus]
     We can use the following operations to work with subgradients:
     \begin{itemize}
-        \item Conic combination: Let $h(\vec{x}) = \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha,\beta \geq
+        \item \textit{Conic combination}: Let $h(\vec{x}) \doteq \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha,\beta \geq
                   0$, then \[
-                  \partial h(\vec{x}) = \alpha \partial f(\vec{x}) + \beta \partial g(\vec{x});
+                  \partial h(\vec{x}) = \alpha \cdot \partial f(\vec{x}) + \beta \cdot \partial g(\vec{x});
               \]
-        \item Affine transformation: Let $h(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$, then \[
+        \item \textit{Affine transformation}: Let $h(\vec{x}) \doteq f(\mat{A} \vec{x} + \vec{b})$, then \[
                   \partial h(\vec{x}) = \transpose{\mat{A}} \partial f(\mat{A} \vec{x} + \vec{b});
               \]
-        \item Pointwise maximum: Let $h(\vec{x}) = \max_{i\in [m]} f_i(\vec{x})$, then \[
+        \item \textit{Pointwise maximum}: Let $h(\vec{x}) \doteq \max_{i\in [m]} f_i(\vec{x})$, then \[
                   \partial h(\vec{x}) = \mathrm{conv}(\{ \partial f_i(\vec{x}) \mid f_i(\vec{x}) = h(\vec{x}) \}).
               \]
               Thus, at each point where we transition from one function to another, we get the convex hull of
@@ -84,16 +84,9 @@ non-convex.
 
 \subsection{Subgradient method}
 
-In the subgradient method, the general update rule becomes
-\begin{align*}
-    \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t),                                                                                                              \\
-    \intertext{which can be rewritten as an optimization problem,}
-                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - (\vec{x}_t - \gamma_t \vec{g}_t) \|^2                                                                                                           \\
-                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - \vec{x}_t - (-\gamma_t \vec{g}_t) \|^2                                                                                                          \\
-                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \lft( \| \vec{x} - \vec{x}_t \|^2 + \| \gamma_t \vec{g}_t \|^2 + 2 \langle \gamma_t \vec{g}_t, \vec{x} - \vec{x}_t \rangle \rgt) \margintag{Cosine theorem.} \\
-                  & = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ \frac{1}{2} \| \vec{x} - \vec{x}_t \|^2 + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}. \margintag{Remove terms that do not depend on $\vec{x}$.}
-\end{align*}
-
+In the subgradient method, the general update rule becomes \[
+    \vec{x}_{t+1} = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t).
+\]
 If $f$ is differentiable, gradient descent and projected gradient descent are special cases of this
 update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively. However, if
 $f$ is non-differentiable, we will see that this is technically not a descent method, because the
@@ -109,10 +102,10 @@ subgradient is not a descent direction in general.
 
 \begin{proof}
     \begin{align*}
-        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 & = \| \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t) - \vec{x}^\star \|^2 \margintag{Subgradient descent update rule.}                                                                                                                                       \\
-                                              & = \| \vec{x}_t - \gamma_t \vec{g}_t - \vec{x}^\star \|^2 \margintag{$\mathcal{X}$ is convex, so we get closer to $\vec{x}^\star$ after projection.}                                                                                                            \\
-                                              & = \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star) + \gamma_t^2 \| \vec{g}_t \|^2 \margintag{Cosine theorem: $\| \vec{x} - \vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2 \transpose{\vec{x}} \vec{y}$.} \\
-                                              & \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2. \margintag{Convexity: $f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star)$.}
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 & = \| \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t) - \vec{x}^\star \|^2 \margintag{Subgradient descent update rule.}                                                                                                                 \\
+                                              & = \| \vec{x}_t - \gamma_t \vec{g}_t - \vec{x}^\star \|^2 \margintag{$\mathcal{X}$ is convex, so we get closer to $\vec{x}^\star$ after projection.}                                                                                      \\
+                                              & = \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star) + \gamma_t^2 \| \vec{g}_t \|^2 \margintag{Cosine theorem.}                                                                            \\
+                                              & \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2. \margintag{Subgradient: $f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\vec{g}_t} (\vec{x}^\star - \vec{x}_t)$.}
     \end{align*}
 \end{proof}
 
@@ -167,9 +160,6 @@ $\bigo{\frac{B^2R^2}{\epsilon^2}}$ iterations.
     \]
 \end{theorem}
 
-In the case of strong convexity, to achieve $\epsilon$-optimality, the subgradient method requires
-$\bigo{\frac{B^2}{\mu \epsilon}}$ iterations.
-
 \begin{proof}
     Adapting the proof of \Cref{lem:subgrad-descent} to use strong convexity in its last step, we
     get \[
@@ -177,8 +167,12 @@ $\bigo{\frac{B^2}{\mu \epsilon}}$ iterations.
     \]
     Using this, we get the following,
     \begin{align*}
-        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \frac{1 - \mu \gamma_t}{2 \gamma_t} \|\vec{x}_t - \vec{x}^\star\|^2 - \frac{1}{2 \gamma_t} \|\vec{x}_{t+1} - \vec{x}^\star \|^2 + \frac{\gamma_t}{2} \|\vec{g}_t\|^2                                    \\
-                                        & = \frac{\mu(t-1)}{4} \| \vec{x}_t - \vec{x}^\star \|^2 - \frac{\mu(t+1)}{4} \|\vec{x}_{t+1} - \vec{x}^\star\|^2 + \frac{1}{\mu(t+1)} \| \vec{g}_t \|^2 \margintag{$\gamma_t \doteq \nicefrac{2}{\mu(t+1)}$}.
+        f(\vec{x}_t) - f(\vec{x}^\star) & \leq \frac{1 - \mu \gamma_t}{2 \gamma_t} \|\vec{x}_t - \vec{x}^\star\|^2 - \frac{1}{2 \gamma_t} \|\vec{x}_{t+1} - \vec{x}^\star \|^2 + \frac{\gamma_t}{2} \|\vec{g}_t\|^2 \\
+                                        & = \frac{\mu(t-1)}{4} \| \vec{x}_t - \vec{x}^\star \|^2 - \frac{\mu(t+1)}{4} \|\vec{x}_{t+1} - \vec{x}^\star\|^2                                                           \\
+                                        & \qquad + \frac{1}{\mu(t+1)} \| \vec{g}_t \|^2 \margintag{$\gamma_t \doteq \nicefrac{2}{\mu(t+1)}$}.
     \end{align*}
     Now, it is easy to show the result by a telescoping sum.
 \end{proof}
+
+Hence, in the case of strong convexity, in order to achieve $\epsilon$-optimality, the subgradient
+method requires $\bigo{\frac{B^2}{\mu \epsilon}}$ iterations.
