@@ -39,13 +39,13 @@ A second interpretation of Newton's method is that it is a special case of the g
 scheme, \[
     \vec{x}_{t+1} \doteq \vec{x}_t - H(\vec{x}_t) \grad{f(\vec{x}_t)}{},
 \]
-where $H(\vec{x}_t) \in \R^{d \times d}$ is some matrix -- like gradient descent with $H(\vec{x}_t)
-    = \gamma_t \mat{I}$. Hence, we can think of Newton's method as ``adaptive'' gradient descent that
-adapts to the local curvature of the function at $\vec{x}_t$.\sidenote{This is very apparent in the
-    case of optimizing a quadratic function of the form $f(\vec{x}) = \frac{1}{2} \transpose{\vec{x}}
-        \mat{M} \vec{x} - \transpose{\vec{q}} \vec{x} + c$, which has the same curvature
-    $\hess{f(\vec{x})}{} = \mat{M}$ everywhere. In this case, Newton's method yields the optimum in a
-    single step, $\vec{x}_1 = \vec{x}^\star$. \textit{Proof}:
+where $H(\vec{x}_t) \in \R^{d \times d}$ is some matrix --- like gradient descent with
+$H(\vec{x}_t) = \gamma_t \mat{I}$. Hence, we can think of Newton's method as ``adaptive'' gradient
+descent that adapts to the local curvature of the function at $\vec{x}_t$.\sidenote{This is very
+    apparent in the case of optimizing a quadratic function of the form $f(\vec{x}) = \frac{1}{2}
+        \transpose{\vec{x}} \mat{M} \vec{x} - \transpose{\vec{q}} \vec{x} + c$, which has the same
+    curvature $\hess{f(\vec{x})}{} = \mat{M}$ everywhere. In this case, Newton's method yields the
+    optimum in a single step, $\vec{x}_1 = \vec{x}^\star$. \textit{Proof}:
     \begin{align*}
         \vec{x}_1 & = \vec{x}_0 - \hess{f(\vec{x}_0)}{}^{-1} \grad{f(\vec{x}_0)}{} \\
                   & = \vec{x}_0 - \mat{M}^{-1} (\mat{M} \vec{x}_0 - \vec{q})       \\

@@ -29,11 +29,11 @@ The algorithm reduces non-linear constrained optimization to linear optimization
 $\mathcal{X}$; it is able to solve general non-linear constrained optimization problems by only
 solving a simpler linear constrained optimization over the same set $\mathcal{X}$ in each
 iteration, by calling the oracle. We solve this linear optimization problem in the direction of the
-gradient -- the best linear approximation of $f$ at $\vec{x}_t$.
+gradient --- the best linear approximation of $f$ at $\vec{x}_t$.
 
 A nice property of the oracle is that if $\mathcal{X} = \mathrm{conv}(\mathcal{A})$, then
 $\mathrm{LMO}_{\mathcal{X}}(\vec{x}) \in \mathcal{A}$. So, if we have a set $\mathcal{X}$ that is
-the convex hull of a small number of points -- such as the $\ell_1$-ball, which has $2d$ vertices
+the convex hull of a small number of points --- such as the $\ell_1$-ball, which has $2d$ vertices
 -- we have an easy optimization problem with runtime $\bigo{|\mathcal{A}|}.$
 
 The advantages of this method are
