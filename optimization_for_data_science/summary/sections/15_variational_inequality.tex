@@ -19,19 +19,19 @@ such that $\langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0$ for
 
 \begin{definition}[VI strong solution]
     A solution $\vec{z}^\star \in \mathcal{Z}$ is a strong solution if it satisfies \[
-        \langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}.
+        \langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0, \quad \forall \vec{z} \in \mathcal{Z}.
     \]
 \end{definition}
 
 \begin{definition}[VI weak solution]
     A solution $\vec{z}^\star \in \mathcal{Z}$ is a weak solution if it satisfies \[
-        \langle F(\vec{z}), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}.
+        \langle F(\vec{z}), \vec{z} - \vec{z}^\star \rangle \geq 0, \quad \forall \vec{z} \in \mathcal{Z}.
     \]
 \end{definition}
 
 If $F$ is monotone, then a strong solution is also a weak solution. If $F$ is continuous, then a
 weak solution is also a strong solution. Furthermore, we use \[
-    \epsilon_{\mathrm{VI}}(\hat{\vec{z}}) \doteq \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \hat{\vec{z}}, \vec{z} \rangle
+    g(\hat{\vec{z}}) \doteq \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \hat{\vec{z}} - \vec{z} \rangle
 \]
 to measure the inaccuracy of a solution $\hat{\vec{z}}$.
 
@@ -44,21 +44,64 @@ saddle points of $\phi$.
 Like in min-max optimization, we can define a more general extragradient algorithm for VIs, where
 the update rule is
 \begin{align*}
-    \tilde{\vec{z}}_t & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_t))          \\
-    \vec{z}_{t+1}     & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\tilde{\vec{z}}_t)).
+    \vec{z}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_t))                    \\
+    \vec{z}_{t+1}               & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_{t+\nicefrac{1}{2}})).
 \end{align*}
 
 \begin{theorem}
-    Let $F$ be monotone and $L$-smooth. Set $\gamma_t = \nicefrac{1}{\sqrt{2L}}$, then EG satisfies \[
-        \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \hat{\vec{z}} - \vec{z} \rangle \leq \frac{\sqrt{2} L D_{\mathcal{Z}}^2}{T},
+    Let $F$ be monotone and $L$-smooth. Set $\gamma \doteq \nicefrac{1}{\sqrt{2L}}$, then EG satisfies \[
+        \max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \bar{\vec{z}} - \vec{z} \rangle \leq \frac{\sqrt{2} L D_{\mathcal{Z}}^2}{T},
     \]
     where \[
-        \hat{\vec{z}} = \frac{1}{T} \sum_{t=1}^{T} \tilde{\vec{z}}_t.
+        \bar{\vec{z}} = \frac{1}{T} \sum_{t=1}^{T} \vec{z}_{t+\nicefrac{1}{2}}
+    \]
+    and \[
+        D_{\mathcal{Z}} = \max_{\vec{z}, \vec{z}' \in \mathcal{Z}} \| \vec{z} - \vec{z}' \|_2.
     \]
 \end{theorem}
 
 \begin{proof}
-    TODO
+    We have the following update,
+    \begin{align*}
+        \vec{z}_{t+\nicefrac{1}{2}} & \in \argmin_{\vec{z} \in \mathcal{Z}} \| \vec{z}_t - \gamma F(\vec{z}_t) - \vec{z} \|^2                    \\
+        \vec{z}_{t+1}               & \in \argmin_{\vec{z} \in \mathcal{Z}} \| \vec{z}_t - \gamma F(\vec{z}_{t+\nicefrac{1}{2}}) - \vec{z} \|^2.
+    \end{align*}
+    By the optimality condition of $\vec{z}_{t+\nicefrac{1}{2}}$, we have \[
+        2 \langle \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_t + \gamma F(\vec{z}_t), \vec{z} - \vec{z}_{t+\nicefrac{1}{2}} \rangle \geq 0, \quad \forall \vec{z} \in \mathcal{Z}.
+    \]
+    This is equivalent to
+    \begin{align*}
+        2 \gamma \langle F(\vec{z}_t), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle & \leq \langle \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_t, \vec{z} - \vec{z}_{t+\nicefrac{1}{2}} \rangle                                                          \\
+                                                                                     & = \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_t - \vec{z}_{t+\nicefrac{1}{2}} \|^2 - \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \|^2. \margintag{Cosine theorem.}
+    \end{align*}
+    Using the optimality condition with the update for $\vec{z}_{t+1}$, we get the following in the same way, \[
+        2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+1} - \vec{z} \rangle \leq \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_t - \vec{z}_{t+1} \|^2 - \| \vec{z}_{t+1} - \vec{z} \|^2, \quad \forall \vec{z} \in \mathcal{Z}.
+    \]
+    Applying $\vec{z} = \vec{z}_{t+1}$ to the first optimality condition, we get \[
+        2 \gamma \langle F(\vec{z}_{t}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \rangle \leq \| \vec{z}_t - \vec{z}_{t+1} \|^2 - \| \vec{z}_t - \vec{z}_{t+\nicefrac{1}{2}} \|^2 - \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \|^2.
+    \]
+    Combining the two above inequalities, we get
+    \begin{align*}
+         & 2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle                                                                                          \\
+         & = 2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \rangle + \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+1} - \vec{z} \rangle \\
+         & = 2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}) - F(\vec{z}_t), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \rangle                                                                   \\
+         & \qquad + \gamma \langle F(\vec{z}_t), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \rangle + \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+1} - \vec{z} \rangle              \\
+         & \leq 2 \gamma \| F(\vec{z}_{t+\nicefrac{1}{2}}) - F(\vec{z}_t) \| \cdot \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \| \margintag{Cauchy-Schwarz and the above inequalities.}        \\
+         & \qquad + \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_{t+1} - \vec{z} \|^2 - \| \vec{z}_t - \vec{z}_{t+\nicefrac{1}{2}} \|^2 - \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \|^2          \\
+         & \leq 2 \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_t \| \cdot \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \| \margintag{Smoothness and $\gamma = \nicefrac{1}{L}$.}                     \\
+         & \qquad + \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_{t+1} - \vec{z} \|^2 - \| \vec{z}_t - \vec{z}_{t+\nicefrac{1}{2}} \|^2 - \| \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \|^2          \\
+         & \leq  \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_{t+1} - \vec{z} \|^2 \margintag{$\| \vec{x} \| \cdot \| \vec{y} \| \leq \frac{1}{2} \| \vec{x} \|^2 + \frac{1}{2} \| \vec{y} \|^2$.}     \\
+    \end{align*}
+    By monotonicity of $F$, we have \[
+        \gamma \langle F(\vec{z}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle \leq \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle.
+    \]
+    Hence, \[
+        \gamma \langle F(\vec{z}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle \leq \frac{1}{2} \lft( \| \vec{z}_t - \vec{z} \|^2 - \| \vec{z}_{t+1} - \vec{z} \|^2 \rgt), \quad \forall \vec{z} \in \mathcal{Z}.
+    \]
+    Summing over all timesteps and using $\gamma = \nicefrac{1}{L}$, \[
+        \lft\langle F(\vec{z}), \frac{1}{T} \lft( \sum_{t=1}^{T} \vec{z}_{t+\nicefrac{1}{2}} \rgt) - \vec{z} \rgt\rangle \leq \frac{L \| \vec{z}_1 - \vec{z} \|^2}{2 T}.
+    \]
+    Taking the maximum \wrt $\vec{z}$ on both sides yields the result.
 \end{proof}
 
 We can do the same for other algorithms, such as GDA, PPA, and OGDA.

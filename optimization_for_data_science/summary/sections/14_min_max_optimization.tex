@@ -9,7 +9,7 @@ This general problem has many applications, such as solving zero-sum matrix game
 \]
 This problem is convex-concave. Furthermore, generative adversarial networks are also a special
 case of this scheme, \[
-    \min_{G} \max_{D} \E_{\vec{\xi} \in p_{\mathrm{data}}} [D(\vec{\xi})] - \E_{\vec{\zeta} \in p_{\vec{\zeta}}} [D(G(\vec{\zeta}))].
+    \min_{G} \max_{D} \E_{\vec{\xi} \sim p_{\mathrm{data}}} [D(\vec{\xi})] - \E_{\vec{\zeta} \sim p_{\vec{\zeta}}} [D(G(\vec{\zeta}))].
 \]
 This problem is nonconvex-nonconcave.
 
@@ -37,24 +37,25 @@ response. In game theory, this is called the Stackelberg equilibrium, which is a
 equilibrium in a game where one player is the leader and another is the follower. The response of
 $\vec{x}$ must be the best response to the best response $\vec{y}$ could ever make.
 
-The min-max optimization problem induces a primal problem, \[
-    \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}) \doteq \min_{\vec{x} \in \mathcal{X}} \bar{\phi}(\vec{x}),
-\]
-and a dual problem, \[
-    \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) \doteq \max_{\vec{y} \in \mathcal{Y}} \underline{\phi}(\vec{y}).
-\]
+The min-max optimization problem induces a primal and a dual problem,
+\begin{align*}
+    \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} & \phi(\vec{x}, \vec{y}), \margintag{Primal problem.} \\
+    \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} & \phi(\vec{x}, \vec{y}). \margintag{Dual problem.}
+\end{align*}
 Note that we have the following relationship between the two, \[
     \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) \leq \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}).
 \]
 
-\begin{lemma}[Characterization of saddle point]
+\begin{lemma}
     $(\vec{x}^\star, \vec{y}^\star)$ is a saddle point if and only if \[
         \max_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}) = \min_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}),
     \]
     and \[
-        \vec{x}^\star \in \argmin_{\vec{x} \in \mathcal{X}} \bar{\phi}(\vec{x}), \quad \vec{y}^\star \in \argmax_{\vec{y} \in \mathcal{Y}} \underline{\phi}(\vec{y}).
+        \vec{x}^\star \in \argmin_{\vec{x} \in \mathcal{X}} \max_{\vec{y} \in \mathcal{Y}} \phi(\vec{x}, \vec{y}), \quad \vec{y}^\star \in \argmax_{\vec{y} \in \mathcal{Y}} \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \vec{y}).
     \]
 \end{lemma}
+
+It is possible that a saddle point does not exist for a problem.
 
 \subsection{Convex-concave min-max optimization}
 
@@ -84,11 +85,10 @@ Note that we have the following relationship between the two, \[
 Thus, for convex-concave minimax optimization problems, a saddle point always exists.
 
 We measure optimality via the duality gap, \[
-    \epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \doteq \max_{\vec{y} \in \mathcal{Y}} \phi(\hat{\vec{x}}, \vec{y}) - \min_{\vec{x} \in \mathcal{X}} \phi(\vec{x}, \hat{\vec{y}}) \geq 0.
+    g(\vec{x}, \vec{y}) \doteq \max_{\vec{y}' \in \mathcal{Y}} \phi(\vec{x}, \vec{y}') - \min_{\vec{x}' \in \mathcal{X}} \phi(\vec{x}', \vec{y}) \geq 0.
 \]
-If $\epsilon(\hat{\vec{x}}, \hat{\vec{y}}) = 0$, then $(\hat{\vec{x}}, \hat{\vec{y}})$ is a saddle
-point, and if $\epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \leq \epsilon$, then $(\hat{\vec{x}},
-    \hat{\vec{y}})$ is an $\epsilon$-saddle point.
+If $g(\vec{x}, \vec{y}) = 0$, then $(\vec{x}, \vec{y})$ is a saddle point, and if $g(\vec{x},
+    \vec{y}) \leq \epsilon$, then $(\vec{x}, \vec{y})$ is an $\epsilon$-saddle point.
 
 \subsection{Algorithms}
 
@@ -113,7 +113,7 @@ optimization problems. It simply does a single gradient step in both gradient di
 $\vec{x}$ and $\vec{y}$,
 \begin{align*}
     \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}})  \\
-    \vec{t}_{t+1} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}).
+    \vec{y}_{t+1} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}).
 \end{align*}
 
 However, this is not guaranteed to converge in the C-C setting. Intuitively, this is because the
@@ -121,18 +121,48 @@ two updates can ``pull'' in opposite directions, resulting in no update. To guar
 we need the stronger SC-SC assumption.
 
 \begin{theorem}[Convergence of GDA, SC-SC]
-    In the SC-SC setting, GDA with stepsize $\gamma < \frac{\mu}{2L^2}$ converges linearly,
+    In the SC-SC setting, GDA with stepsize $\gamma < \nicefrac{\mu}{2L^2}$ converges linearly,
     \begin{align*}
-        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2 & \leq \lft( 1 + 4 \gamma^2 L^2 - 2 \gamma \mu \rgt)                                              \\
-                                                                                      & \qquad \cdot \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt).
+        d_{t+1} \leq \lft( 1 + 4 \gamma^2 L^2 - 2 \gamma \mu \rgt) d_t,
     \end{align*}
-    When $\gamma = \nicefrac{\mu}{4 L^2}$, GDA satisfies \[
-        \| \vec{x}_T - \vec{x}^\star \|^2 + \| \vec{y}_T - \vec{y}^\star \|^2 \leq \lft( 1 - \nicefrac{\mu^2}{4L^2} \rgt)^T \lft( \| \vec{x}_0 - \vec{x}^\star \|^2 + \| \vec{y}_0 - \vec{y}^\star \|^2 \rgt).
+    where \[
+        d_t = \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2.
+    \]
+    When $\gamma \doteq \nicefrac{\mu}{4 L^2}$, GDA satisfies \[
+        d_T \leq \lft( 1 - \frac{\mu^2}{4L^2} \rgt)^T d_0.
     \]
 \end{theorem}
 
 \begin{proof}
-    TODO
+    By SC-SC, we have
+    \begin{align*}
+         & \langle \grad{\phi(\vec{x}, \vec{y})}{\vec{x}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}}, \vec{x} - \vec{x}^\star \rangle + \langle \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} - \grad{\phi(\vec{x}, \vec{y})}{\vec{y}}, \vec{y} - \vec{y}^\star \rangle \\
+         & \geq \mu \| \vec{x} - \vec{x}^\star \|^2 + \mu \| \vec{y} - \vec{y}^\star \|^2.
+    \end{align*}
+    By $L$-smoothness, we have
+    \begin{align*}
+        \| \grad{\phi(\vec{x}, \vec{y})}{\vec{x}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}} \|^2 & \leq 2L^2 \| \vec{x} - \vec{x}^\star \| + 2L^2 \| \vec{y} - \vec{y}^\star \|^2 \\
+        \| \grad{\phi(\vec{x}, \vec{y})}{\vec{y}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} \|^2 & \leq 2L^2 \| \vec{x} - \vec{x}^\star \| + 2L^2 \| \vec{y} - \vec{y}^\star \|^2.
+    \end{align*}
+    Using these facts, we can prove the theorem,
+    \begin{align*}
+        & \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2                                                                                                                                                                                                            \\
+        & = \| \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}}) - \Pi_{\mathcal{X}}(\vec{x}^\star - \gamma \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}}) \|^2 \margintag{$\vec{x}^\star$ remains the same after update.}                                                                                                      \\
+        & \qquad + \| \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}) + \Pi_{\mathcal{Y}}(\vec{y}^\star - \gamma \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}}) \|^2                                                                                             \\
+        & \leq \| \vec{x}_t - \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}} - \vec{x}^\star + \gamma \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}} \|^2 \margintag{Non-expansiveness of projection: $\| \Pi_{\mathcal{X}}(\vec{x}) - \Pi_{\mathcal{X}}(\vec{y}) \| \leq \| \vec{x} - \vec{y} \|$.} \\
+        & \qquad + \| \vec{y}_t + \gamma \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}} - \vec{y}^\star - \gamma \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} \|^2                                                                                                                                   \\
+        & = \| (\vec{x}_t - \vec{x}^\star) - \gamma (\grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}}) \|^2                                                                                                                                               \\
+        & \qquad \| (\vec{y}_t - \vec{y}^\star) - \gamma (\grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} - \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}) \|^2                                                                                                                                               \\
+        & = \| \vec{x}_t - \vec{x}^\star \|^2 + \gamma^2 \| \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}} \|^2 \margintag{Cosine theorem.}                                                                                                                                         \\
+        & \qquad - 2 \gamma \langle \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{x}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{x}}, \vec{x}_t - \vec{x}^\star \rangle                                                                                                                                        \\
+        & \qquad + \| \vec{y}_t - \vec{y}^\star \|^2 + \gamma^2 \| \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}} - \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} \|^2 \\
+        & \qquad - 2 \gamma \langle \grad{\phi(\vec{x}^\star, \vec{y}^\star)}{\vec{y}} - \grad{\phi(\vec{x}_t, \vec{y}_t)}{\vec{y}}, \vec{y}_t - \vec{y}^\star \rangle \\
+        & \leq \lft( 1 + 4L^2 \gamma^2 - 2 \mu \gamma \rgt) \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt). \margintag{SC-SC and smoothness.}
+    \end{align*}
+    Setting $\gamma \doteq \nicefrac{\mu}{4 L^2}$, \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2 \leq \lft( 1 - \frac{\mu^2}{4 L^2} \rgt) \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt).
+    \]
+    The result follows.
 \end{proof}
 
 This implies a convergence complexity of $\bigo{\kappa^2 \log \nicefrac{1}{\epsilon}}$, where
@@ -158,10 +188,10 @@ gradients do not ``pull'' in opposite directions,
 
 \begin{theorem}[Convergence of EG, C-C]
     Let $\phi$ be convex-concave, $L$-smooth. Furthermore, $\mathcal{X}$ has diameter $D_{\mathcal{X}}$ and $\mathcal{Y}$ has diameter $D_{\mathcal{Y}}$. Then, EG with stepsize $\gamma \leq \nicefrac{1}{2L}$ satisfies \[
-        \epsilon(\hat{\vec{x}}, \hat{\vec{y}}) \leq \frac{D_{\mathcal{X}}^2 + D_{\mathcal{Y}}^2}{2 \gamma T},
+        g(\bar{\vec{x}}, \bar{\vec{y}}) \leq \frac{D_{\mathcal{X}}^2 + D_{\mathcal{Y}}^2}{2 \gamma T},
     \]
     where \[
-        \hat{\vec{x}} = \frac{1}{T} \sum_{t=1}^{T} \vec{x}_{t+\nicefrac{1}{2}}, \quad \hat{\vec{y}} = \frac{1}{T} \sum_{t=1}^{T} \vec{y}_{t+\nicefrac{1}{2}}.
+        \bar{\vec{x}} = \frac{1}{T} \sum_{t=1}^{T} \vec{x}_{t+\nicefrac{1}{2}}, \quad \bar{\vec{y}} = \frac{1}{T} \sum_{t=1}^{T} \vec{y}_{t+\nicefrac{1}{2}}.
     \]
 \end{theorem}
 
@@ -197,11 +227,11 @@ This can be seen as negative momentum.
 
 Like in normal optimization, we can also define the proximal point algorithm (PPA) for min-max
 optimization, \[
-    (\vec{x}_{t+1}, \vec{y}_{t+1}) = \argmax_{\vec{x} \in \mathcal{X}} \argmin_{\vec{y} \in \mathcal{Y}} \lft\{ \phi(\vec{x}, \vec{y}) + \frac{1}{2 \gamma} \| \vec{x} - \vec{x}_t \|^2 - \frac{1}{2 \gamma} \| \vec{y} - \vec{y}_t \|^2 \rgt\}.
+    (\vec{x}_{t+1}, \vec{y}_{t+1}) \in \argmax_{\vec{x} \in \mathcal{X}} \argmin_{\vec{y} \in \mathcal{Y}} \lft\{ \phi(\vec{x}, \vec{y}) + \frac{1}{2 \gamma} \| \vec{x} - \vec{x}_t \|^2 - \frac{1}{2 \gamma} \| \vec{y} - \vec{y}_t \|^2 \rgt\}.
 \]
-Solving the above optimization problem results in the following implicit update,
+Solving the above optimization problem results in the following update,
 \begin{align*}
     \vec{x}_{t+1} & = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma \grad{\phi(\vec{x}_{t+1}, \vec{y}_{t+1})}{\vec{x}})  \\
     \vec{y}_{t+1} & = \Pi_{\mathcal{Y}}(\vec{y}_t + \gamma \grad{\phi(\vec{x}_{t+1}, \vec{y}_{t+1})}{\vec{y}}).
 \end{align*}
-This algorithm has similar guarantees to the extragradient method and OGDA.
+This algorithm has similar guarantees to the EG and OGDA.
