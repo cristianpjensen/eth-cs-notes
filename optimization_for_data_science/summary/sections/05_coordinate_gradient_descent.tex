@@ -179,14 +179,14 @@ coordinate according to the coordinate with the largest gradient (\textit{Gauss-
 The main difference from the previous algorithms is that this algorithm is deterministic, thus we do
 not need to take the expectation.
 
-\begin{corollary}
+\begin{theorem}
     Let $f: \R^d \to \R$ be differentiable with a global minimum $\vec{x}^\star$. Suppose that $f$ is coordinate-wise smooth with parameter $L$ and satisfies the PL inequality with parameter $\mu > 0$. Choosing stepsize \[
         \gamma_i \doteq \frac{1}{L},
     \]
     steepest coordinate descent with arbitrary $\vec{x}_0$ yields \[
         f(\vec{x}_T) - f(\vec{x}^\star) \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f(\vec{x}^\star)).
     \]
-\end{corollary}
+\end{theorem}
 
 This is not good. It needs the same amount of iterations as randomized coordinate descent, but each
 iteration takes as long as in gradient descent.\sidenote{Note that a function may be

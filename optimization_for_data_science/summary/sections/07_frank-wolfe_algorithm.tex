@@ -21,8 +21,8 @@ Notice that this is the minimization of a linear function.
 The Frank-Wolfe algorithm iteratively updates by calling the oracle in the direction of the
 gradient,
 \begin{align*}
-    \vec{s}       & \doteq \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})                              \\
-    \vec{x}_{t+1} & \doteq (1- \gamma_t) \vec{x}_t + \gamma_t \vec{s}. \margintag{Move toward minimizer.}
+    \vec{s}       & = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})                              \\
+    \vec{x}_{t+1} & = (1- \gamma_t) \vec{x}_t + \gamma_t \vec{s}. \margintag{Move toward minimizer.}
 \end{align*}
 
 The algorithm reduces non-linear constrained optimization to linear optimization over the same set
@@ -68,7 +68,7 @@ projection onto the $\ell_1$-ball.
 \subsection{Duality gap}
 
 We define the duality gap of $\vec{x} \in \mathcal{X}$ as \[
-    g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s}), \quad \vec{s} \doteq \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x})}{}).
+    g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s}), \quad \vec{s} = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x})}{}).
 \]
 This can be interpreted as the optimality gap $\transpose{\grad{f(\vec{x})}{}} \vec{x} -
     \transpose{\grad{f(\vec{x})}{}} \vec{s}$ of the linear subproblem.
@@ -112,9 +112,9 @@ To prove convergence, we need the following descent lemma,
 
 \begin{proof}
     \begin{align*}
-        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \margintag{Smoothness.}                   \\
-                         & = f(\vec{x}_t) + \gamma_t \transpose{\grad{f(\vec{x}_t)}{}}(\vec{s}-\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2 \margintag{Definition of duality gap.} \\
-                         & = f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2.
+        f(\vec{x}_{t+1}) & \leq f(\vec{x}_t) + \transpose{\grad{f(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \margintag{Smoothness.}                                                     \\
+                         & = f(\vec{x}_t) + \gamma_t \transpose{\grad{f(\vec{x}_t)}{}}(\vec{s}-\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2 \margintag{$\vec{x}_{t+1} = \gamma_t \vec{s} + (1-\gamma_t) \vec{x}_t$.} \\
+                         & = f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2. \margintag{Definition of duality gap.}
     \end{align*}
 \end{proof}
 
@@ -195,7 +195,7 @@ $\vec{b}$. The consequence is that $f(\vec{x}) = f'(\vec{x}')$ if $\vec{x}' = \i
     \]}
 
 By the chain rule, we get \[
-    \grad{f(\vec{x}')}{} = \transpose{\mat{A}} \grad{f(\mat{A} \vec{x}' + \vec{b})}{} = \transpose{\mat{A}} f(\vec{x}).
+    \grad{f'(\vec{x}')}{} = \transpose{\mat{A}} \grad{f(\mat{A} \vec{x}' + \vec{b})}{} = \transpose{\mat{A}} f(\vec{x}).
 \]
 
 Consider the iterate $\vec{x}_k$ and its corresponding iterate $\vec{x}'_k = \inv{\mat{A}}

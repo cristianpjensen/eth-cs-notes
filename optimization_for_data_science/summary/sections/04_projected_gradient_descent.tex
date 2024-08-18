@@ -53,11 +53,11 @@ The two properties equivalently say that the vectors $\vec{y} - \Pi_{\mathcal{X}
 $\vec{y} - \Pi_{\mathcal{X}}(\vec{y})$ form an obtuse angle; see
 \Cref{fig:constrained-optimization}.
 
-\begin{corollary}
+\begin{lemma}
     Let $f: \dom{f} \to \R$ be a differentiable convex function and $\mathcal{X} \subseteq \dom{f}$ a
     closed convex set. Then, during projected gradient descent of $f$ over $\mathcal{X}$, if
     $\vec{x}_{t+1} = \vec{x}_t$, we have an optimal solution.
-\end{corollary}
+\end{lemma}
 
 \begin{proof}
     We assume $\vec{x}_{t+1} = \vec{x}_t$. Let $\vec{x} \in \mathcal{X}$, then, by \Cref{lem:proj}
