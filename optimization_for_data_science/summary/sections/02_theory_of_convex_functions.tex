@@ -26,15 +26,15 @@
     \]
 \end{definition}
 
+Intuitively, this means that $\|\mat{A}\|_2$ is the largest factor by which a vector can be
+stretched in length under the mapping $\vec{v}\mapsto\mat{A}\vec{v}$. It is equal to the principal
+eigenvalue.
+
 \begin{definition}[Positive semi-definiteness]
     A matrix $\mat{A} \in \R^{m \times d}$ is positive semi-definite over $\mathcal{X}$ if \[
         \transpose{\vec{x}} \mat{A} \vec{x} \geq 0, \quad \forall \vec{x} \in \mathcal{X}.
     \]
 \end{definition}
-
-Intuitively, this means that $\|\mat{A}\|_2$ is the largest factor by which a vector can be
-stretched in length under the mapping $\vec{v}\mapsto\mat{A}\vec{v}$. It is equal to the principal
-eigenvalue.
 
 \begin{theorem}[Mean value theorem]
     Let $a<b$ be real numbers, and let $h: [a,b]\to \R$ be a continuous function that is differentiable

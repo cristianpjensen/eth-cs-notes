@@ -84,7 +84,7 @@ defined for any norm.
     \label{fig:three-point-identity}
 \end{marginfigure}
 
-The following Lemma is a key property of the Bregman divergence and is used extensively in this
+The following lemma is a key property of the Bregman divergence and is used extensively in this
 course.
 
 \begin{lemma}[Three-point identity]
@@ -113,6 +113,8 @@ We then replace the norm by the Bregman divergence to obtain the mirror descent 
 \]
 
 \begin{lemma}
+    \label{lem:mirror-descent}
+
     Let $f$ be convex and $\omega$ be $1$-strongly convex on $\mathcal{X}$ \wrt norm $\| \cdot \|$.
     Running mirror descent, the following inequality holds, \[
         \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
@@ -139,7 +141,7 @@ We then replace the norm by the Bregman divergence to obtain the mirror descent 
                                                    & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) - \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \\
                                                    & \qquad + \langle \gamma_t \vec{g}_t, \vec{x}_t - \vec{x}_{t+1} \rangle                                                               \\
                                                    & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) - \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 \\
-                                                   & \qquad + \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 + \frac{1}{2} \| \gamma_t \vec{g}_t \|_*^2 \margintag{Young's inequality.}    \\
+                                                   & \qquad + \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 + \frac{1}{2} \| \gamma_t \vec{g}_t \|_*^2 \margintag{Young's inequality: $\langle \vec{x}, \vec{y} \rangle \leq \frac{1}{2} \lft( \| \vec{x} \|^2 + \| \vec{y} \|_*^2 \rgt)$.}    \\
                                                    & \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
     \end{align*}
 \end{proof}
@@ -150,6 +152,24 @@ We then replace the norm by the Bregman divergence to obtain the mirror descent 
         \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \frac{V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2}{\sum_{t=0}^{T-1} \gamma_t}.
     \]
 \end{theorem}
+
+\begin{proof}
+    By \Cref{lem:mirror-descent}, we have \[
+        \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \vec{g}_t \|_*^2.
+    \]
+    Summing over all timesteps yields
+    \begin{align*}
+        \sum_{t=0}^{T-1} \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) & \leq \sum_{t=0}^{T-1} V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2 \\
+                                                                    & \leq V_{\omega}(\vec{x}^\star, \vec{x}_0) - V_{\omega}(\vec{x}^\star, \vec{x}_T) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2 \\
+                                                                    & \leq V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2.
+    \end{align*}
+    Dividing both sides by $\sum_{t=0}^{T-1} \gamma_t$ yields
+    \begin{align*}
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) & \leq \frac{\sum_{t=0}^{T-1} \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star))}{\sum_{t=0}^{T-1} \gamma_t} \\
+                                                         & \leq \frac{V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|_*^2}{\sum_{t=0}^{T-1} \gamma_t}.
+    \end{align*}
+    This concludes the proof.
+\end{proof}
 
 Note that this generalizes the convergence result of the subgradient method.
 
@@ -163,14 +183,12 @@ Then, we have the following convergence rate, \[
     \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) \leq \bigo{\frac{BR}{\sqrt{T}}}.
 \]
 This is equivalent to the convergence rate of the subgradient method, but then for a more general
-notions of norm.
+notion of norm.
 
-\begin{example}
-    In practice, if we optimize over the simplex $\Delta^{d-1}$ with $\| \vec{g} \|_\infty \leq 1,
-        \forall \vec{g} \in \partial f(\vec{x})$ and $\vec{x}_0 = [\nicefrac{1}{d}, \ldots,
-        \nicefrac{1}{d}]$. Then, we have the following convergence rate for the subgradient method,
-    $\bigo{\frac{\sqrt{d}}{\sqrt{T}}}$, because $B \in \bigo{\sqrt{d}}$ and $R \in \bigo{1}$. On the
-    other hand, we have the following convergence rate for mirror descent \wrt the $\ell$-1 norm,
-    $\bigo{\frac{\sqrt{\log d}}{\sqrt{T}}}$, since $B \in \bigo{1}$ and $R \in \bigo{\sqrt{\log d}}$.
-    This is a considerable speedup.
-\end{example}
+In practice, if we optimize over the simplex $\Delta^{d-1}$ with $\| \vec{g} \|_\infty \leq 1,
+    \forall \vec{g} \in \partial f(\vec{x})$ and $\vec{x}_0 = [\nicefrac{1}{d}, \ldots,
+    \nicefrac{1}{d}]$. Then, we have the following convergence rate for the subgradient method,
+$\bigo{\frac{\sqrt{d}}{\sqrt{T}}}$, because $B \in \bigo{\sqrt{d}}$ and $R \in \bigo{1}$. On the
+other hand, we have the following convergence rate for mirror descent \wrt the $\ell$-1 norm,
+$\bigo{\frac{\sqrt{\log d}}{\sqrt{T}}}$, since $B \in \bigo{1}$ and $R \in \bigo{\sqrt{\log d}}$.
+This is a considerable speedup.

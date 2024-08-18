@@ -116,7 +116,18 @@ subgradient is not a descent direction in general.
 \end{theorem}
 
 \begin{proof}
-    This can easily be shown by telescoping sum of \Cref{lem:subgrad-descent} and invoking convexity.
+    By \Cref{lem:subgrad-descent}, we have \[
+        \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2.
+    \]
+    Rearranging yields \[
+        \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) \leq \frac{1}{2} \lft( \| \vec{x}_t - \vec{x}^\star \| - \| \vec{x}_{t+1} - \vec{x}^\star \| + \gamma_t^2 \| \vec{g}_t \|^2 \rgt).
+    \]
+    Summing over all timesteps and dividing by $\sum_{t=0}^{T-1} \gamma_t$ yields
+    \begin{align*}
+        \min_{t \in [T]} f(\vec{x}_t) - f(\vec{x}^\star) & \leq \frac{\sum_{t=0}^{T-1} \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star))}{\sum_{t=0}^{T-1} \gamma_t}                                                             \\
+                                                         & \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|^2 - \| \vec{x}_T - \vec{x}^\star \|^2 + \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|^2}{2 \sum_{t=0}^{T-1} \gamma_t} \\
+                                                         & \leq \frac{\| \vec{x}_0 - \vec{x}^\star \|^2 + \sum_{t=0}^{T-1} \gamma_t^2 \| \vec{g}_t \|^2}{2 \sum_{t=0}^{T-1} \gamma_t}.
+    \end{align*}
 \end{proof}
 
 Assuming bounded subgradient $\| \vec{g}_t \| \leq B$ for all steps $t$, we get the following

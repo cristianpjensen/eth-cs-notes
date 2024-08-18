@@ -102,15 +102,6 @@ small space around the critical point is near constant.
     This concludes the proof.
 \end{proof}
 
-An easy way to ensure bounded inverse Hessians is by requiring strong convexity over $\mathcal{X}$.
-
-\begin{lemma}
-    Let $f: \dom{f} \to \R$ be twice differentiable and strongly convex with $\mu$ over an open
-    convex subset $\mathcal{X} \subseteq \dom{f}$. Then, $\hess{f(\vec{x})}{}$ is invertible and \[
-        \| \hess{f(\vec{x})}{}^{-1} \|_2 \leq \frac{1}{\mu}, \quad \forall \vec{x} \in \mathcal{X}.
-    \]
-\end{lemma}
-
 \begin{corollary}
     With the assumptions of \Cref{thm:newton}, if $\vec{x}_0 \in \mathcal{X}$ satisfies \[
         \| \vec{x}_0 - \vec{x}^\star \| \leq \frac{\mu}{B},
@@ -119,6 +110,15 @@ An easy way to ensure bounded inverse Hessians is by requiring strong convexity 
         \| \vec{x}_T - \vec{x}^\star \| \leq \frac{\mu}{B} \lft( \frac{1}{2} \rgt)^{2^T - 1}.
     \]
 \end{corollary}
+
+An easy way to ensure bounded inverse Hessians is by requiring strong convexity over $\mathcal{X}$.
+
+\begin{lemma}
+    Let $f: \dom{f} \to \R$ be twice differentiable and strongly convex with $\mu$ over an open
+    convex subset $\mathcal{X} \subseteq \dom{f}$. Then, $\hess{f(\vec{x})}{}$ is invertible and \[
+        \| \hess{f(\vec{x})}{}^{-1} \|_2 \leq \frac{1}{\mu}, \quad \forall \vec{x} \in \mathcal{X}.
+    \]
+\end{lemma}
 
 Hence, we get the $\bigo{\log \log(\nicefrac{1}{\epsilon})}$ bound, but only if we are
 $\nicefrac{\mu}{B}$-close to $\vec{x}^\star$. Thus, we only converge fast to $\vec{x}^\star$ if we

@@ -64,30 +64,33 @@ function is the Moreau envelope of $f(x) = |x|$, \[
 As in Nesterov smoothing, $f_{\mu}$ is $\nicefrac{1}{\mu}$-smooth. However, the advantage is that
 it minimizes exactly, \ie, $\min_{\vec{x}} f(\vec{x}) = \min_{\vec{x}} f_{\mu}(\vec{x})$.
 
-\subsection{Proximal operators}
+\subsection{Proximal point algorithm}
 
 \begin{definition}[Proximal operator]
     The proximal operator of a convex function $f$ at $\vec{x}$ is defined as \[
         \mathrm{prox}_{\mu,f}(\vec{x}) \doteq \argmin_{\vec{y} \in \dom{f}} \lft\{ f(\vec{y}) + \frac{1}{2 \mu} \| \vec{x} - \vec{y} \|_2^2 \rgt\}.
     \]
 \end{definition}
-Note that this is a special case of Moreau-Yosida regularization with $\mu = 1$. Furthermore, for
-many non-smooth functions, their proximal operator can be computed efficiently in a closed form.
-
-\subsection{Proximal point algorithm}
+For many non-smooth functions, their proximal operator can be computed efficiently in a closed form.
 
 The gradient of $f_{\mu}$ is \[
     \grad{f_{\mu}(\vec{x})}{} = \frac{1}{\mu} (\vec{x} - \mathrm{prox}_{\mu, f}(\vec{x})).
 \]
-Thus, applying gradient descent to smooth $f_{\mu}$ --- which is $\nicefrac{1}{\mu}$-smooth ---
-reduces to \[
+Thus, applying gradient descent to $f_{\mu}$ --- which is $\nicefrac{1}{\mu}$-smooth --- reduces to \[
     \vec{x}_{t+1} = \vec{x}_t - \mu \grad{f_{\mu}(\vec{x}_t)}{} = \mathrm{prox}_{\mu, f}(\vec{x}_t),
 \]
 which is the proximal point algorithm (PPA). In general, we define a timestep-dependent stepsize
 $\lambda_t$, \[
     \vec{x}_{t+1} = \mathrm{prox}_{\lambda_t, f}(\vec{x}_t).
 \]
-For many functions $f$, the proximal operator can be computed analytically.
+
+\begin{corollary}[PPA descent]
+    \label{cor:ppa-descent}
+
+    When applying PPA, we have \[
+        f(\vec{x}_{t+1}) \leq f(\vec{x}_t).
+    \]
+\end{corollary}
 
 \begin{theorem}[Convergence of PPA]
     If $f$ is convex, then for any $T \geq 0$, we have \[
@@ -95,7 +98,39 @@ For many functions $f$, the proximal operator can be computed analytically.
     \]
 \end{theorem}
 
-If we set $\lambda_t = \lambda$ to be constant, we get a $\bigo{\nicefrac{1}{t}}$ convergence rate.
+\begin{proof}
+    Let $g_t(\vec{y}) \doteq f(\vec{y}) + \frac{1}{2 \lambda_t} \| \vec{x}_t - \vec{y} \|^2$, which is
+    minimized by $\vec{x}_{t+1}$. This function has the following subdifferential, \[
+        \partial g_t(\vec{y}) = \partial f(\vec{y}) + \frac{\vec{y} - \vec{x}_t}{\lambda_t}.
+    \]
+    By subgradient optimality, we have \[
+        \vec{0} \in \partial g_t(\vec{x}_{t+1}) \iff - \frac{\vec{x}_{t+1} - \vec{x}_t}{\lambda_t} \in \partial f(\vec{x}_{t+1}).
+    \]
+    $f$ is convex, so the subgradient exists everywhere in its domain's interior. Hence, \[
+        f(\vec{x}) \geq f(\vec{x}_{t+1}) - \frac{1}{\lambda_t} \langle \vec{x}_{t+1} - \vec{x}_t, \vec{x} - \vec{x}_{t+1} \rangle, \quad \forall \vec{x} \in \dom{f}.
+    \]
+    Rearranging yields
+    \begin{align*}
+        \lambda_t (f(\vec{x}_{t+1}) - f(\vec{x})) & \leq \langle \vec{x}_{t+1} - \vec{x}_t, \vec{x} - \vec{x}_{t+1} \rangle                                                                                 \\
+                                                  & = \frac{1}{2} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x}_t \|^2 \rgt) \margintag{Cosine theorem.} \\
+                                                  & \leq \frac{1}{2} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 \rgt).
+    \end{align*}
+    Summing over all timesteps,
+    \begin{align*}
+        \sum_{t=0}^{T-1} \lambda_t (f(\vec{x}_{t+1}) - f(\vec{x})) & \leq \frac{1}{2} \sum_{t=0}^{T-1} \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 \\
+                                                                   & = \frac{1}{2} \lft( \| \vec{x}_0 - \vec{x} \|^2 - \| \vec{x}_T - \vec{x} \|^2 \rgt)             \\
+                                                                   & \leq \frac{\| \vec{x}_0 - \vec{x} \|^2}{2}.
+    \end{align*}
+    Dividing both sides by $\sum_{t=0}^{T-1} \lambda_t$ and using \Cref{cor:ppa-descent}, we get
+    \begin{align*}
+        f(\vec{x}_T) - f(\vec{x}) & \leq \frac{\sum_{t=0}^{T-1} \lambda_t (f(\vec{x}_{t+1}) - f(\vec{x}))}{\sum_{t=0}^{T-1} \lambda_t} \\
+                                  & \leq \frac{\| \vec{x}_0 - \vec{x} \|^2}{2 \sum_{t=0}^{T-1} \lambda_t}.
+    \end{align*}
+    We apply this to $\vec{x} = \vec{x}^\star$ to obtain the result.
+\end{proof}
+
+If we set $\lambda_t = \lambda$ to be constant, we get an $\bigo{\nicefrac{1}{t}}$ convergence
+rate.
 
 \subsection{Proximal gradient method}
 
@@ -119,4 +154,39 @@ Note that it alternates between a gradient update on $f$ and a proximal operator
         F(\vec{x}_T) - F(\vec{x}^\star) \leq \frac{L \| \vec{x}_0 - \vec{x}^\star \|_2^2}{2T}.
     \]
 \end{theorem}
-This is nearly the same convergence rate as gradient descent, despite $F$ being possibly non-smooth.
+
+\begin{proof}
+    Let $h_t(\vec{y}) \doteq g(\vec{y}) + \frac{1}{2 \gamma_t} \| \vec{y} - (\vec{x}_t - \gamma_t
+        \grad{f(\vec{x}_t)}{}) \|^2$, which is minimized by $\vec{x}_{t+1}$. This function has the
+    following subdifferential, \[
+        \partial h_t(\vec{y}) = \partial g(\vec{y}) + \frac{1}{\gamma_t} (\vec{y} - \vec{x}_t + \gamma_t \grad{f(\vec{x}_t)}{}).
+    \]
+    By subgradient optimality, we have \[
+        \vec{0} \in \partial h_t(\vec{x}_{t+1}) \iff \frac{1}{\gamma_t} (\vec{x}_t - \vec{x}_{t+1} - \gamma_t \grad{f(\vec{x}_t)}{}) \in \partial g(\vec{x}_{t+1}).
+    \]
+    $g$ is convex, so the subgradient exists everywhere in its domain's interior. Hence, \[
+        g(\vec{x}) \geq g(\vec{x}_{t+1}) + \lft\langle \frac{1}{\gamma_t} (\vec{x}_t - \vec{x}_{t+1}) - \grad{f(\vec{x}_t)}{}, \vec{x} - \vec{x}_{t+1} \rgt\rangle, \quad \forall \vec{x} \in \dom{g}.
+    \]
+    Rearranging yields
+    \begin{align*}
+        g(\vec{x}_{t+1}) - g(\vec{x}) & \leq \frac{1}{\gamma_t} \langle \vec{x}_t - \vec{x}_{t+1}, \vec{x}_{t+1} - \vec{x} \rangle - \langle \grad{f(\vec{x}_t)}{}, \vec{x}_{t+1} - \vec{x} \rangle                                     \\
+                                      & = \frac{1}{2\gamma_t} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 - \| \vec{x}_t - \vec{x}_{t+1} \|^2 \rgt) \margintag{Cosine theorem.}                                 \\
+                                      & \qquad - \langle \grad{f(\vec{x}_t)}{}, \vec{x}_{t+1} - \vec{x} \rangle                                                                                                                         \\
+                                      & = \frac{1}{2\gamma_t} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 - \| \vec{x}_t - \vec{x}_{t+1} \|^2 \rgt)                                                             \\
+                                      & \qquad - \langle \grad{f(\vec{x}_t)}{}, \vec{x}_{t+1} - \vec{x}_t \rangle - \langle \grad{f(\vec{x}_t)}{}, \vec{x}_t - \vec{x} \rangle                                                          \\
+                                      & \leq \frac{L}{2} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 - \| \vec{x}_t - \vec{x}_{t+1} \|^2 \rgt) \margintag{Smoothness, convexity, and definition of $\gamma_t$.} \\
+                                      & \qquad + f(\vec{x}_t) - f(\vec{x}_{t+1}) + \frac{L}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2                                                                                                        \\
+                                      & \qquad + f(\vec{x}) - f(\vec{x}_t)                                                                                                                                                              \\
+                                      & = \frac{L}{2} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 \rgt) + f(\vec{x}) - f(\vec{x}_{t+1}).
+    \end{align*}
+    Moving the calls to $f$ to the left side gives \[
+        F(\vec{x}_{t+1}) - F(\vec{x}) \leq \frac{L}{2} \lft( \| \vec{x}_t - \vec{x} \|^2 - \| \vec{x}_{t+1} - \vec{x} \|^2 \rgt).
+    \]
+    Summing over all timesteps and using $F(\vec{x}_{t+1}) \leq F(\vec{x}_t)$, \[
+        F(\vec{x}_T) - F(\vec{x}) \leq \frac{L \| \vec{x}_0 - \vec{x} \|^2}{2 T}.
+    \]
+    This concludes the proof.
+\end{proof}
+
+This is nearly the same convergence rate as gradient descent, despite $F$ being possibly
+non-smooth.

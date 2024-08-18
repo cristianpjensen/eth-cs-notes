@@ -3,7 +3,7 @@
 \begin{marginfigure}
     \centering
     \incfig{frank-wolfe}
-    \caption{Illustration of a Frank-Wolfe step.}
+    \caption{Illustration of a Frank-Wolfe step. As can be seen, $\vec{s}_t$ is the minimizer of $\transpose{\grad{f(\vec{x}_t)}{}}\vec{z}$ and is on the edge of $\mathcal{X}$. Furthermore, it shows the duality gap $g(\vec{x}_t)$.}
     \label{fig:frank-wolfe}
 \end{marginfigure}
 
@@ -195,7 +195,7 @@ $\vec{b}$. The consequence is that $f(\vec{x}) = f'(\vec{x}')$ if $\vec{x}' = \i
     \]}
 
 By the chain rule, we get \[
-    \grad{f'(\vec{x}')}{} = \transpose{\mat{A}} \grad{f(\mat{A} \vec{x}' + \vec{b})}{} = \transpose{\mat{A}} f(\vec{x}).
+    \grad{f(\vec{x}')}{} = \transpose{\mat{A}} \grad{f(\mat{A} \vec{x}' + \vec{b})}{} = \transpose{\mat{A}} f(\vec{x}).
 \]
 
 Consider the iterate $\vec{x}_k$ and its corresponding iterate $\vec{x}'_k = \inv{\mat{A}}
