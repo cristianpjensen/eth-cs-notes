@@ -84,13 +84,13 @@ $\lambda_t$, \[
     \vec{x}_{t+1} = \mathrm{prox}_{\lambda_t, f}(\vec{x}_t).
 \]
 
-\begin{corollary}[PPA descent]
-    \label{cor:ppa-descent}
+\begin{lemma}[PPA descent]
+    \label{lem:ppa-descent}
 
     When applying PPA, we have \[
         f(\vec{x}_{t+1}) \leq f(\vec{x}_t).
     \]
-\end{corollary}
+\end{lemma}
 
 \begin{theorem}[Convergence of PPA]
     If $f$ is convex, then for any $T \geq 0$, we have \[
@@ -121,7 +121,7 @@ $\lambda_t$, \[
                                                                    & = \frac{1}{2} \lft( \| \vec{x}_0 - \vec{x} \|^2 - \| \vec{x}_T - \vec{x} \|^2 \rgt)             \\
                                                                    & \leq \frac{\| \vec{x}_0 - \vec{x} \|^2}{2}.
     \end{align*}
-    Dividing both sides by $\sum_{t=0}^{T-1} \lambda_t$ and using \Cref{cor:ppa-descent}, we get
+    Dividing both sides by $\sum_{t=0}^{T-1} \lambda_t$ and using \Cref{lem:ppa-descent}, we get
     \begin{align*}
         f(\vec{x}_T) - f(\vec{x}) & \leq \frac{\sum_{t=0}^{T-1} \lambda_t (f(\vec{x}_{t+1}) - f(\vec{x}))}{\sum_{t=0}^{T-1} \lambda_t} \\
                                   & \leq \frac{\| \vec{x}_0 - \vec{x} \|^2}{2 \sum_{t=0}^{T-1} \lambda_t}.
