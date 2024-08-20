@@ -67,8 +67,8 @@ can be computed by \[
     \grad{f(\mat{E})}{} = \transpose{\mat{A}} \mat{A} \mat{E} \transpose{\mat{A}} \mat{A} = \mat{W} \mat{E} \mat{W} = \inv{\mat{M}} \mat{E} \inv{\mat{M}}.
 \]
 
-Now, since the objective is quadratic, we can obtain the minimizer $\vec{x}^\star$ and the Lagrange
-multipliers $\vec{\lambda}$ by solving the following system of linear equations,
+Now, since the objective is quadratic, we can obtain the minimizer $\mat{E}^\star$ by solving the
+following system of linear equations,
 \begin{align*}
     \mat{C} \mat{E} & = \mat{B}                                                                    \\
     \mat{E}         & = \transpose{\mat{M}} \transpose{\vec{\lambda}} \mat{C} \transpose{\mat{M}}.
@@ -100,11 +100,11 @@ which will yield the \textit{L-BFGS} algorithm.
 Recall the Quasi-Newton update step, \[
     \vec{x}_{t+1} \doteq \vec{x}_t - \inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}.
 \]
-Observe that we do not necessarily need the $d \times d$ matrix $\inv{\mat{H}}_t$; we only need the
-$d$-dimensional vector $\inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}$. Let $\vec{g}' \in \R^d$. Suppose
-that we have an oracle to compute $\vec{s} = \mat{H} \vec{g}$ for any vector $\vec{g}$, then we can
-compute $\vec{s}' = \mat{H}' \vec{g}'$ with one oracle call and $\bigo{d}$ additional operations,
-assuming that $\vec{y}$ and $\vec{\sigma}$ are known.
+Observe that we do not necessarily need the $d \times d$ matrix $\inv{\mat{H}}_t$---we only need
+the $d$-dimensional vector $\inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}$. Let $\vec{g}' \in \R^d$.
+Suppose that we have an oracle to compute $\vec{s} = \mat{H} \vec{g}$ for any vector $\vec{g}$,
+then we can compute $\vec{s}' = \mat{H}' \vec{g}'$ with one oracle call and $\bigo{d}$ additional
+operations, assuming that $\vec{y}$ and $\vec{\sigma}$ are known.
 
 We can implement the oracle recursively,
 \begin{align*}
@@ -115,7 +115,7 @@ This allows us to compute the BFGS-step $\inv{\mat{H}}_t \grad{f(\vec{x}_t)}{}$ 
 this would result in $\bigo{td}$ runtime complexity per step, since we would have to go down all
 steps, and generally $t > d$. Thus, we have a worse algorithm if we want to compute the next vector
 exactly. But, if we only go down $m$ steps of recursion for some small $m$, we get $\bigo{md}$
-complexity, which is linear if $m$ is constant; see \Cref{alg:l-bfgs}. Intuitively, this should give
+complexity, which is linear if $m$ is constant---see \Cref{alg:l-bfgs}. Intuitively, this should give
 a good approximation, since the earlier steps should not be so relevant anymore, since we are likely
 in a different landscape at the current timestep.
 

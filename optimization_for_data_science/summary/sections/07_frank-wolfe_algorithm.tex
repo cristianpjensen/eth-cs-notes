@@ -11,9 +11,8 @@ Projected gradient descent is the only algorithm we have seen that dealt with co
 optimization problems. However, that algorithm came with the clear disadvantage that projections
 can be very expensive, even when $\mathcal{X}$ is convex. The Frank-Wolfe algorithm solves
 constrained optimization problems without projection steps. Instead, it makes use of a
-\textit{linear minimization oracle} (LMO). For the feasible region $\mathcal{X} \subseteq \R^d$ and
-an arbitrary vector $\vec{g} \in \R^d$,\sidenote{$\vec{g}$ can be thought of as an ``optimization
-    direction''.} \[
+\textit{linear minimization oracle} (LMO). For the feasible region $\mathcal{X} \subset \R^d$ and
+an arbitrary vector $\vec{g} \in \R^d$, \[
     \mathrm{LMO}_{\mathcal{X}}(\vec{g}) \doteq \argmin_{\vec{z} \in \mathcal{X}} \transpose{\vec{g}} \vec{z}.
 \]
 Notice that this is the minimization of a linear function.
@@ -21,27 +20,27 @@ Notice that this is the minimization of a linear function.
 The Frank-Wolfe algorithm iteratively updates by calling the oracle in the direction of the
 gradient,
 \begin{align*}
-    \vec{s}       & = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})                              \\
-    \vec{x}_{t+1} & = (1- \gamma_t) \vec{x}_t + \gamma_t \vec{s}. \margintag{Move toward minimizer.}
+    \vec{s}_t     & = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{}) \\
+    \vec{x}_{t+1} & = (1- \gamma_t) \vec{x}_t + \gamma_t \vec{s}_t.
 \end{align*}
 
 The algorithm reduces non-linear constrained optimization to linear optimization over the same set
-$\mathcal{X}$; it is able to solve general non-linear constrained optimization problems by only
+$\mathcal{X}$. It is able to solve general non-linear constrained optimization problems by only
 solving a simpler linear constrained optimization over the same set $\mathcal{X}$ in each
 iteration, by calling the oracle. We solve this linear optimization problem in the direction of the
-gradient --- the best linear approximation of $f$ at $\vec{x}_t$.
+gradient---the best linear approximation of $f$ at $\vec{x}_t$.
 
 A nice property of the oracle is that if $\mathcal{X} = \mathrm{conv}(\mathcal{A})$, then
 $\mathrm{LMO}_{\mathcal{X}}(\vec{x}) \in \mathcal{A}$. So, if we have a set $\mathcal{X}$ that is
-the convex hull of a small number of points --- such as the $\ell_1$-ball, which has $2d$ vertices
--- we have an easy optimization problem with runtime $\bigo{|\mathcal{A}|}.$
+the convex hull of a small number of points---such as the $\ell_1$-ball, which has $2d$
+vertices---we have an easy optimization problem with runtime $\bigo{|\mathcal{A}|}.$
 
 The advantages of this method are
 \begin{itemize}
     \item Iterates are always feasible if $\mathcal{X}$ is convex;
     \item No projections, which are often harder to compute than linear optimization problems;
-    \item Iterates always have a simple sparse representations: $\vec{x}_t$ is a convex combination of
-          $\vec{x}_0$ and all $\vec{s}$ used so far.
+    \item Iterates always have a simple sparse representations: $\vec{x}_T$ is a convex combination of $\{
+              \vec{x}_0, \vec{s}_0, \ldots, \vec{s}_{T-1} \}$
 \end{itemize}
 
 \subsection{Linear minimization oracles}
@@ -55,7 +54,7 @@ The LASSO problem in its standard form is given by \[
     \end{aligned}
 \]
 The constraint set $\mathcal{X} = \{ \vec{x} \in \R^d \mid \| \vec{x} \|_1 \leq 1 \}$ is the unit
-$\ell_1$-ball. This is the convex hull of the unit basis vectors; $\mathcal{X} = \mathrm{conv}(\{
+$\ell_1$-ball. This is the convex hull of the unit basis vectors---$\mathcal{X} = \mathrm{conv}(\{
     \pm \vec{e}_1, \ldots, \pm \vec{e}_d \})$. The LMO for this set is easy to compute,
 \begin{align*}
     \mathrm{LMO}_{\mathcal{X}}(\vec{g}) & = \argmin_{\vec{z}\in \mathcal{X}} \transpose{\vec{z}} \vec{g}                                 \\
@@ -63,7 +62,7 @@ $\ell_1$-ball. This is the convex hull of the unit basis vectors; $\mathcal{X} =
                                         & = -\mathrm{sign}(g_i) \vec{e}_i, \quad i \in \argmax_{i \in [d]} |g_i|.
 \end{align*}
 So, we only have to identify $\vec{g}$'s largest coordinate, which is much more efficient than
-projection onto the $\ell_1$-ball.
+projection onto the $\ell_1$-ball---and this has $\bigo{d \log d}$ runtime.
 
 \subsection{Duality gap}
 
@@ -71,10 +70,11 @@ We define the duality gap of $\vec{x} \in \mathcal{X}$ as \[
     g(\vec{x}) \doteq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s}), \quad \vec{s} = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x})}{}).
 \]
 This can be interpreted as the optimality gap $\transpose{\grad{f(\vec{x})}{}} \vec{x} -
-    \transpose{\grad{f(\vec{x})}{}} \vec{s}$ of the linear subproblem.
+    \transpose{\grad{f(\vec{x})}{}} \vec{s}$ of the linear subproblem---see \Cref{fig:frank-wolfe}.
 
 \begin{lemma}
-    Suppose that the constrained minimization problem has a minimizer $\vec{x}^\star$. Let $\vec{x} \in \mathcal{X}$, then \[
+    Let $f: \dom{f} \to \R$ be convex, differentiable, and have minimizer $\vec{x}^\star$.
+    Let $\vec{x} \in \dom{f}$, then \[
         g(\vec{x}) \geq f(\vec{x}) - f(\vec{x}^\star),
     \]
     meaning that the duality gap is an upper bound for the optimality gap.
@@ -83,7 +83,7 @@ This can be interpreted as the optimality gap $\transpose{\grad{f(\vec{x})}{}} \
 \begin{proof}
     \begin{align*}
         g(\vec{x}) & = \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{s})                                                                                                                                             \\
-                   & \geq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \margintag{$\vec{s}$ minimizes LMO: $\transpose{\grad{f(\vec{x})}{}} \vec{z} \leq \transpose{\grad{f(\vec{x})}{}} \vec{x}^\star$.} \\
+                   & \geq \transpose{\grad{f(\vec{x})}{}} (\vec{x} - \vec{x}^\star) \margintag{$\vec{s}$ minimizes LMO: $\transpose{\grad{f(\vec{x})}{}} \vec{s} \leq \transpose{\grad{f(\vec{x})}{}} \vec{x}^\star$.} \\
                    & \geq f(\vec{x}) - f(\vec{x}^\star). \margintag{First-order characterization of convexity.}
     \end{align*}
 \end{proof}
@@ -97,14 +97,12 @@ constrained optimality condition (\Cref{lem:optim}), $-g(\vec{x}^\star) =
 
 \subsection{Convergence analysis}
 
-To prove convergence, we need the following descent lemma,
-
-\begin{lemma}
+\begin{lemma}[Frank-Wolfe descent lemma]
     \label{lem:fw-descent}
 
-    Let $f: \R^d \to \R$ be differentiable and smooth with parameter $L > 0$. For a step $\vec{x}_{t+1}
-        \doteq \vec{x}_t + \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize $\gamma_t \in [0,1]$, it holds
-    that \[
+    Let $f: \dom{f} \to \R$ be differentiable and $L$-smooth. For a step $\vec{x}_{t+1} = (1-\gamma_t)
+        \vec{x}_t - \gamma_t \vec{s}_t = \vec{x}_t + \gamma_t (\vec{s} - \vec{x}_t)$ with stepsize
+    $\gamma_t \in [0,1]$, it holds that \[
         f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s} - \vec{x}_t \|^2,
     \]
     where $\vec{s} = \mathrm{LMO}_{\mathcal{X}}(\grad{f(\vec{x}_t)}{})$.
@@ -120,9 +118,8 @@ To prove convergence, we need the following descent lemma,
 
 Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
 
-\begin{theorem}
-    Consider the constrained minimization problem where $f: \R^d \to \R$ is convex and smooth with
-    parameter $L$, and $\mathcal{X}$ is convex, closed and bounded. (This means that the minimizer
+\begin{theorem}[Frank-Wolfe convergence]
+    Consider the constrained minimization problem where $f: \dom{f} \to \R$ is convex and $L$-smooth, and $\mathcal{X} \subseteq \dom{f}$ is convex, closed and bounded. (This means that the minimizer
     $\vec{x}^\star$ of $f$ over $\mathcal{X}$ exists and that all minimization oracles have
     minimizers.) With any $\vec{x}_0 \in \mathcal{X}$ and stepsizes \[
         \gamma_t \doteq \frac{2}{t+2},
@@ -138,7 +135,7 @@ Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
     Let $h(\vec{x}) \doteq f(\vec{x}) - f(\vec{x}^\star)$ and $C \doteq \frac{L}{2} \mathrm{diam}(\mathcal{X})^2$.
     \begin{align*}
         f(\vec{x}_{t+1}) - f(\vec{x}^\star) & \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2 - f(\vec{x}^\star) \margintag{\Cref{lem:fw-descent} and subtract $f(\vec{x}^\star)$ from both sides.} \\
-        h(\vec{x}_{t+1})                    & \leq h(\vec{x}_t) - \gamma_t h(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2 \margintag{Duality gap, $g(\vec{x}) \geq h(\vec{x})$.}                                                \\
+        h(\vec{x}_{t+1})                    & \leq h(\vec{x}_t) - \gamma_t h(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2 \margintag{Duality gap: $g(\vec{x}) \geq h(\vec{x})$.}                                                \\
                                             & = (1- \gamma_t) h(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \|\vec{s} - \vec{x}_t\|^2                                                                                                                    \\
                                             & \leq (1- \gamma_t) h(\vec{x}_t) + \gamma_t^2 C.
     \end{align*}
@@ -169,22 +166,19 @@ Now, we can prove the main convergence theorem of the Frank-Wolfe algorithm.
 \paragraph{Affine invariance.}
 
 Consider the problem of minimizing $f(x_1, x_2) \doteq x_1^2 + x_2^2$ over the unit square
-$\mathcal{X} = \{ [x_1,x_2] \mid 0 \leq x_1 \leq 1, 0 \leq x2 \leq 1 \}$. This function is smooth
-with $L=2$ and $\mathrm{diam}(\mathcal{X})^2 = 2$. This has the following error bound, \[
+$\mathcal{X} = \{ [x_1,x_2] \mid x_1, x_2 \in [0,1] \}$. This function is smooth with $L=2$ and
+$\mathrm{diam}(\mathcal{X})^2 = 2$. This has the following error bound, \[
     f(\vec{x}_T) - f(\vec{x}^\star) \leq \frac{8}{T+1}.
 \]
 Next consider $f'(x_1, x_2) \doteq x_1^2 + (10x_2)^2$ over the rectangle $\mathcal{X}' = \{ [x_1,
-            x_2] \mid 0 \leq x_1 \leq 1, 0\leq x_2 \leq \nicefrac{1}{10} \}$. This function is smooth with $L'
-    = 200$ and $\mathrm{diam}(\mathcal{X}')^2 = 1 + \nicefrac{1}{100}$. Thus, $f'$ has the error bound \[
+            x_2] \mid x_1 \in [0,1], x_2 \in [0, \nicefrac{1}{2}] \}$. This function is smooth with $L' = 200$
+and $\mathrm{diam}(\mathcal{X}')^2 = 1 + \nicefrac{1}{100}$. Thus, $f'$ has the error bound \[
     f'(\vec{x}_T) - f'(\vec{x}^\star) \leq \frac{404}{T+1}.
 \]
 Hence, according to our analysis, it seems that the error of the Frank-Wolfe algorithm on $f'$ over
-$\mathcal{X}'$ is roughly 50 times larger than on $f$ over $\mathcal{X}$.
-
-However, when we look more closely at the function, the two problems $(f,\mathcal{X})$ and
-$(f',\mathcal{X}')$ are equivalent under a rescaling of $x_2$. The Frank-Wolfe algorithm is
-invariant under affine transformations, thus there should be no difference in the analysis of the
-two considered problems.
+$\mathcal{X}'$ is roughly 50 times larger than on $f$ over $\mathcal{X}$. However, when we look
+more closely at the function, the two problems $(f,\mathcal{X})$ and $(f',\mathcal{X}')$ are
+equivalent under a rescaling of $x_2$.
 
 Formally, two problems $(f, \mathcal{X})$ and $(f', \mathcal{X}')$ are \textit{affinely equivalent}
 if $f'(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$ and $\mathcal{X}' = \{ \inv{\mat{A}}(\vec{x} -
@@ -218,6 +212,9 @@ transformation. As a consequence, the next iterates will also correspond to each
                    & = \inv{\mat{A}} ((1-\gamma)\vec{x}_k + \gamma \vec{s}) - \vec{b}                             \\
                    & = \inv{\mat{A}} \vec{x}_{k+1} - \vec{b}.
 \end{align*}
+Thus, the Frank-Wolfe algorithm is invariant to affine transformations. But, in our example, we saw a
+clear difference in convergence rate between problems that were affinely equivalent. Hence, we need a
+better convergence result that reflects this fact.
 
 In particular, after any number of steps, both problems will incur the same optimization error.
 Thus, we need a better analysis that provides a bound that is invariant under affine
@@ -230,7 +227,7 @@ distance between the graph of $f$, $f(\vec{y})$ and its linear approximation at 
 $f(\vec{x}) + \transpose{\grad{f(\vec{x})}{}} (\vec{y} - \vec{x})$.
 
 \begin{theorem}
-    Consider the constrained minimization problem, where $f: \R^d \to \R$ is convex, and $\mathcal{X}$ is convex, closed and bounded. Let $C_{(f, \mathcal{X})}$ be the curvature constant of $f$ over $\mathcal{X}$. With any $\vec{x}_0 \in \mathcal{X}$ and with stepsizes \[
+    Consider the constrained minimization problem, where $f: \dom{f} \to \R$ is convex, and $\mathcal{X} \subseteq \dom{f}$ is convex, closed and bounded. Let $C_{(f, \mathcal{X})}$ be the curvature constant of $f$ over $\mathcal{X}$. With any $\vec{x}_0 \in \mathcal{X}$ and with stepsizes \[
         \gamma_t = \frac{2}{t+2},
     \]
     the Frank-Wolfe algorithm yields \[

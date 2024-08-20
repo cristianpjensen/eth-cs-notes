@@ -51,7 +51,7 @@ eigenvalue.
 \end{marginfigure}
 
 Geometrically, this means that between $a$ and $b$, there is a tangent to the graph of $h$ that has
-the same slope; see \Cref{fig:mean-value-theorem}.
+the same slope---see \Cref{fig:mean-value-theorem}.
 
 \begin{theorem}[Fundamental theorem of calculus]
     Let $a<b$ be real numbers, and let $h: \dom{h} \to \R$ be a differentiable function on an open domain $\dom{h} \supset [a,b]$, and such that $h'$ is continuous on $[a,b]$. Then, \[
@@ -106,7 +106,7 @@ the same slope; see \Cref{fig:mean-value-theorem}.
 
 Geometrically, this condition means that the line segment connecting the two points
 $(\vec{x},f(\vec{x}))$ and $(\vec{y},f(\vec{y})) \in \R^{d+1}$ lies pointwise above the graph of
-$f$; see \Cref{fig:convexity}.
+$f$---see \Cref{fig:convexity}.
 
 % \begin{marginfigure}
 %     \centering
@@ -185,7 +185,7 @@ $f$; see \Cref{fig:convexity}.
     \]
 \end{lemma}
 
-Geometrically, this means that the graph is above all tangent hyperplanes; see
+Geometrically, this means that the graph is above all tangent hyperplanes---see
 \Cref{fig:first-order-convexity}.
 
 \begin{proof}
@@ -289,7 +289,9 @@ Geometrically, this means that the gradient is monotonic.
 Geometrically, this means that $f$ has non-negative curvature everywhere. \Ie, the growth rate
 should be growing.
 
-\begin{corollary}[Operations that preserve convexity]
+\begin{lemma}[Operations that preserve convexity]
+    \label{lem:conv-pres}
+
     Let $f_1,\ldots,f_m$ be convex functions, $\lambda_1,\ldots,\lambda_m \geq 0$, then \[
         f \doteq \max_{i=1}^m f_i,
     \]
@@ -302,7 +304,7 @@ should be growing.
     \ie $g(\vec{x}) = \mat{A}\vec{x} + \vec{b}$ for some $\mat{A}\in \R^{d\times m},\vec{b}\in \R^d$.
     Then, the function $f \circ g$ is convex on $\dom{f \circ g} \doteq \{ \vec{x}\in R^m \mid
         g(\vec{x}) \in \dom{f} \}$.
-\end{corollary}
+\end{lemma}
 
 \begin{marginfigure}
     \centering
@@ -322,7 +324,7 @@ should be growing.
 \begin{lemma}
     Let $\vec{x}^\star$ be a local minimum of a convex function $f: \dom{f} \to \R$. Then,
     $\vec{x}^\star$ is a global minimum, meaning that
-    $f(\vec{x}^\star) \leq f(\vec{y}) \;\; \forall \vec{y} \in \dom{f}$.
+    $f(\vec{x}^\star) \leq f(\vec{y}), \forall \vec{y} \in \dom{f}$.
 \end{lemma}
 
 \begin{proof}
@@ -336,6 +338,8 @@ should be growing.
 \end{proof}
 
 \begin{lemma}
+    \label{lem:conv-global-min}
+
     Suppose that $f$ is convex and differentiable over an open domain $\dom{f}$. Let $\vec{x}\in\dom{f}$. If $\grad{f(\vec{x})}{} = \vec{0}$ (critical point), then $\vec{x}$ is a global minimum.
 \end{lemma}
 
@@ -373,7 +377,7 @@ a function that is not strictly convex can be found in \Cref{fig:non-strict-conv
 \end{marginfigure}
 
 \begin{lemma}
-    Let $f: \dom{f} \to \R$ be strictly convex. Then, $f$ has --- at most --- one global minimum.
+    Let $f: \dom{f} \to \R$ be strictly convex. Then, $f$ has---at most---one global minimum.
 \end{lemma}
 
 % But, how do we know a minimizer exists? To be able to find this out, we must use the Weierstrass
@@ -435,7 +439,7 @@ Only the $(\vec{\lambda},\vec{\nu})$ pairs with $g(\vec{\lambda},\vec{\nu}) > -\
 interesting.
 
 \begin{lemma}[Weak Lagrange duality]
-    Let $\vec{x}$ be a feasible solution --- $f_i(\vec{x}) \leq 0, \forall i \in [m]$ and $h_j(\vec{x})
+    Let $\vec{x}$ be a feasible solution---$f_i(\vec{x}) \leq 0, \forall i \in [m]$ and $h_j(\vec{x})
         = 0, \forall j \in [p]$. Let $g$ be the Lagrange dual function and $\vec{\lambda}\in \R^m,
         \vec{\nu}\in \R^p$ such that $\vec{\lambda} \geq \vec{0}$. Then, \[
         g(\vec{\lambda},\vec{\nu}) \leq f_0(\vec{x}).
@@ -468,11 +472,11 @@ maximized. This can be phrased as another optimization problem, called the Lagra
 \end{corollary}
 
 \begin{theorem}
-    Suppose that a convex program has a feasible solution $\tilde{\vec{x}}$ that in addition satisfies
-    $f_i(\tilde{\vec{x}}) < 0, \forall i \in [m]$ (Slater point). Then, the infimum value of the primal
+    Suppose that a convex program has a feasible solution $\bar{\vec{x}}$ that in addition satisfies
+    $f_i(\bar{\vec{x}}) < 0, \forall i \in [m]$ (Slater point). Then, the infimum value of the primal
     equals the supremum value of its Lagrange dual. Moreover, if the value is finite, it is attained
     by a feasible solution of the dual, \[
-        \inf f_0(\vec{x}) = \max g(\vec{\lambda},\vec{\nu}).
+        \max g(\vec{\lambda},\vec{\nu}) = \inf f_0(\vec{x}).
     \]
 \end{theorem}
 
@@ -491,28 +495,8 @@ conditions for this case to occur.
     $f_0(\tilde{\vec{x}}) = g(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$.
 \end{definition}
 
-The consequence of zero duality gap is the \textit{master equation},
-\begin{align*}
-    f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}}) \margintag{Zero duality gap.}                                                                                                          \\
-                         & = \inf_{\vec{x}\in \mathcal{X}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \margintag{Definition of $g$.} \\
-                         & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\tilde{\vec{x}}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\tilde{\vec{x}}) \margintag{Infimum is a lower bound.}         \\
-                         & \leq f_0(\tilde{\vec{x}}), \margintag{All constraints are less than or equal to zero.}
-\end{align*}
-which means that all inequalities turn into equalities. Thus, \[
-    \tilde{\lambda}_i f_i(\tilde{\vec{x}}) = 0, \quad i = 1,\ldots,m,
-\]
-which is called complementary slackness, because if $\tilde{\lambda}_i \neq 0$, then
-$f_i(\tilde{\vec{x}}) = 0$, and vice versa. Furthermore, if all $f_i$ and $h_j$ are differentiable,
-then \[
-    \grad{f_0(\tilde{\vec{x}})}{} + \sum_{i=1}^{m} \tilde{\lambda}_i \grad{f_i(\tilde{\vec{x}})}{} + \sum_{j=1}^{p} \tilde{\nu}_j \grad{h_j(\tilde{\vec{x}})}{} = \vec{0},
-\]
-which is called the vanishing Lagrangian gradient condition.
-
-In summary, we get the following result.
-
-\begin{theorem}[Karush-Kuhn-Tucker necessary conditions]
-    Let $\tilde{\vec{x}}$ and $(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ be feasible solutions of
-    the primal optimization problem and its Lagrange dual, respectively, with zero duality gap. If
+\begin{theorem}[KKT necessary conditions]
+    Let $\tilde{\vec{x}}$ and $(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ be feasible solutions with zero duality gap. If
     all $f_i$ and $h_j$ are differentiable, then
     \begin{align*}
         \tilde{\lambda}_i f_i(\tilde{\vec{x}}) = 0, \quad i = 1,\ldots,m \margintag{Complementary slackness} \\
@@ -520,13 +504,55 @@ In summary, we get the following result.
     \end{align*}
 \end{theorem}
 
-If we have a convex program, then the KKT conditions are sufficient for zero duality gap. The
-motivation behind this is that they may be easier to solve for than solving the primal optimization
-problem. However, we cannot always count on the KTT conditions to be solvable, because they are
-only guaranteed if there are primal and dual solutions of zero duality gap. But, if the primal has
-a Slater point\sidenote{A point $\tilde{\vec{x}}$ such that $f_i(\tilde{\vec{x}}) < 0$ for all
-    $i=1,\ldots,m$.}, then the KTT conditions are equivalent to the existence of a primal minimizer.
+\begin{proof}
+    The consequence of zero duality gap is the \textit{master equation},
+    \begin{align*}
+        f_0(\tilde{\vec{x}}) & = g(\tilde{\vec{\lambda}},\tilde{\vec{\nu}}) \margintag{Zero duality gap.}                                                                                                          \\
+                            & = \inf_{\vec{x}\in \mathcal{X}} \lft( f_0(\vec{x}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\vec{x}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\vec{x}) \rgt) \margintag{Definition of $g$.} \\
+                            & \leq f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\tilde{\vec{x}}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\tilde{\vec{x}}) \margintag{Infimum is a lower bound.}         \\
+                            & \leq f_0(\tilde{\vec{x}}), \margintag{All constraints are less than or equal to zero, because $\tilde{\vec{x}}$ is feasible.}
+    \end{align*}
+    which means that all inequalities turn into equalities. Thus, \[
+        \tilde{\lambda}_i f_i(\tilde{\vec{x}}) = 0, \quad i = 1,\ldots,m,
+    \]
+    which is called complementary slackness, because if $\tilde{\lambda}_i \neq 0$, then
+    $f_i(\tilde{\vec{x}}) = 0$, and vice versa. Furthermore, if all $f_i$ and $h_j$ are differentiable,
+    then \[
+        \grad{f_0(\tilde{\vec{x}})}{} + \sum_{i=1}^{m} \tilde{\lambda}_i \grad{f_i(\tilde{\vec{x}})}{} + \sum_{j=1}^{p} \tilde{\nu}_j \grad{h_j(\tilde{\vec{x}})}{} = \vec{0},
+    \]
+    which is called the vanishing Lagrangian gradient condition. This holds due to $\tilde{\vec{x}}$
+    being the minimizer of $L(\vec{x}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$.
+\end{proof}
+
+\begin{theorem}[KKT sufficient conditions]
+    Let $\tilde{\vec{x}}$ and $(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ be feasible solutions.
+    Further, suppose all $f_i, h_j$ are differentiable, all $f_i$ are convex, and all $h_j$ are
+    affine. Moreover, let complementary slackness and vanishing Lagrangian gradient hold,
+    \begin{align*}
+        \tilde{\lambda}_i f_i(\tilde{\vec{x}}) & = 0, \quad \forall i \in [m] \\
+        \grad{L(\tilde{\vec{x}}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}})}{\vec{x}}.
+    \end{align*}
+    Then, $\tilde{\vec{x}}$ and $(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ have zero duality gap.
+\end{theorem}
+
+\begin{proof}
+    This can easily be proven by lemmas that have already been introduced,
+    \begin{align*}
+        f_0(\tilde{\vec{x}}) & = f_0(\tilde{\vec{x}}) + \sum_{i=1}^{m} \tilde{\lambda}_i f_i(\tilde{\vec{x}}) + \sum_{j=1}^{p} \tilde{\nu}_j h_j(\tilde{\vec{x}}) \margintag{$\tilde{\vec{x}}$ is feasible, so $h_j(\tilde{\vec{x}}) = 0, \forall j \in [p]$ and we have complementary slackness.} \\
+                             & = L(\tilde{\vec{x}}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}})                                                                     \\
+                             & = \inf_{\vec{x} \in \mathcal{X}} L(\vec{x}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}}) \margintag{$L$ is convex in $\vec{x}$, because convexity is preserved under summation and scaling (\Cref{lem:conv-pres}). Furthermore, $\grad{L(\tilde{\vec{x}}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}})}{\vec{x}} = \vec{0}$, so $\tilde{\vec{x}}$ is a global minimizer (\Cref{lem:conv-global-min}).}                                             \\
+                             & = g(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}}).
+    \end{align*}
+    Hence, zero duality gap holds.
+\end{proof}
+
+The KKT conditions are very useful for solving convex programs. If we can find $\tilde{\vec{x}},
+(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ that satisfies the conditions, we know that
+$\tilde{\vec{x}}$ is a minimizer of the optimization problem. This may be easier than solving the
+problem itself. However, these conditions are not always solvable. If the primal has a
+Slater point---a feasible solution $\bar{\vec{x}}$ such that $f_i(\bar{\vec{x}}) < 0, \forall i \in [m]$---then
+there exists a minimizer.
 
 The interior-point method is a general algorithm for solving convex programs, which has a high
 iteration cost. During this course, we will consider simple algorithms with a low cost per
-iteration (but possibly a high number of iterations).
+iteration---but possibly a high number of iterations.

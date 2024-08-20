@@ -76,7 +76,7 @@ For many non-smooth functions, their proximal operator can be computed efficient
 The gradient of $f_{\mu}$ is \[
     \grad{f_{\mu}(\vec{x})}{} = \frac{1}{\mu} (\vec{x} - \mathrm{prox}_{\mu, f}(\vec{x})).
 \]
-Thus, applying gradient descent to $f_{\mu}$ --- which is $\nicefrac{1}{\mu}$-smooth --- reduces to \[
+Thus, applying gradient descent to $f_{\mu}$---which is $\nicefrac{1}{\mu}$-smooth---reduces to \[
     \vec{x}_{t+1} = \vec{x}_t - \mu \grad{f_{\mu}(\vec{x}_t)}{} = \mathrm{prox}_{\mu, f}(\vec{x}_t),
 \]
 which is the proximal point algorithm (PPA). In general, we define a timestep-dependent stepsize

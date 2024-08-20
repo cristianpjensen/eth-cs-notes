@@ -12,32 +12,29 @@ algorithm itself.
 \subsection{Empirical and expected risk}
 
 Typically, we have a data source $\mathcal{X}$, equipped with an unknown probability distribution
-$P$. However, we do have access to independent samples $X_1,\ldots,X_n \sampleiid \mathcal{P}$,
-which we call the dataset. The goal is to ``explain'' $\mathcal{X}$ through these samples. More
-specifically, we have a class of hypotheses $\mathcal{H}$, which are possible explanations of
-$\mathcal{X}$. The goal is then to select the hypothesis $H\in \mathcal{H}$ that best ``explains''
-$\mathcal{X}$, which we measure by a \textit{loss function} $\ell: \mathcal{H}\times \mathcal{X}\to
-    \R$.
+$P$. However, we do have access to independent samples $X_1,\ldots,X_n \sampleiid P$, which we call
+the dataset. The goal is to ``explain'' $\mathcal{X}$ through these samples. More specifically, we
+have a class of hypotheses $\mathcal{H}$, which are possible explanations of $\mathcal{X}$. The
+goal is then to select the hypothesis $H\in \mathcal{H}$ that best ``explains'' $\mathcal{X}$,
+which we measure by a \textit{loss function} $\ell: \mathcal{H}\times \mathcal{X}\to \R$.
 
-The expected risk can be computed by \[
-    \ell(H) \doteq \E_{\mathcal{X}}[\ell(H, X)].
-\]
 The hypothesis that explains best is the \textit{expected risk minimizer}, \[
-    H^\star \in \argmin_{H\in \mathcal{H}} \ell(H).
+    H^\star \in \argmin_{H\in \mathcal{H}} \ell(H) \doteq \E_{\mathcal{X}}[\ell(H, X)].
 \]
 
 However, since we do not have access to the distribution over $\mathcal{X}$, we cannot compute
 $\ell(H)$ or $H^\star$.\sidenote{In some cases, we might be able to argue mathematically about
-    expected risk.} Thus, we need to compute the \textit{probably approximately correct} (PAC)
-hypothesis. This means that given $\delta,\epsilon > 0$, we want to produce, with probability at
-least $1-\delta$, a hypothesis $\tilde{H}\in \mathcal{H}$ such that \[
-    \ell(\tilde{H}) \leq \inf_{H\in \mathcal{H}} \ell(H) + \epsilon,
-\]
-meaning that with high probability, we approximately solve the expected risk minimization problem.
+    expected risk.} Hence, we need to compromise.
+
+\begin{definition}[Probably approximately correct (PAC) hypothesis]
+    Let $\epsilon, \delta > 0$ A hypothesis $\tilde{H} \in \mathcal{H}$ is PAC if, with probability at least $1-\delta$, \[
+        \ell(\tilde{H}) \leq \inf_{H \in \mathcal{H}} \ell(H) + \epsilon.
+    \]
+\end{definition}
 
 However, we can still not compute this, thus we must use our training data to compute the
 \textit{empirical risk}, \[
-    \ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H,X_i). \margintag{This is a random variable, because it depends on the training data, which are all random variables, distributed according to the probability distribution of $\mathcal{X}$.}
+    \ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H,X_i). \margintag{This is a random variable, because it depends on the training data, which are all random variables, distributed according an unknown $P$.}
 \]
 
 \begin{lemma}[Weak law of large numbers]
@@ -48,7 +45,11 @@ However, we can still not compute this, thus we must use our training data to co
     with probability at least $1-\delta$.
 \end{lemma}
 
-Given $n\in \mathbb{N}$ and training data $X_1,\ldots,X_n$ from $\mathcal{X}$, we want to produce a
+In words, this states that for any probability $1-\delta$ and approximation error $\epsilon$, there
+is a threshold $n_0$ such that the empirical risk approximates the expected risk by that
+approximation error with that probability. Furthermore, it only holds for a fixed hypothesis.
+
+Given $n\in \mathbb{N}$ and training data $X_1,\ldots,X_n \in \mathcal{X}$, we want to produce a
 data-dependent hypothesis $\tilde{H}_n$ that is optimal for the data-dependent risk, \[
     \ell_n(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}} \ell_n(H) + \epsilon. \margintag{$\tilde{H}_n$ is a random variable that depends on the training data.}
 \]
@@ -70,8 +71,9 @@ holds for all hypotheses with high probability. This leads us to the following t
         n_0$, \[
         \sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon,
     \]
-    with probability at least $1-\delta$. Then, for $n \geq n_0$, an approximate empirical risk
-    minimizer $\tilde{H}_n$ is PAC for expected risk minimization, meaning that it satisfies \[
+    with probability at least $1-\delta$. (This means that the weak law of large numbers holds
+    uniformly for all hypotheses $H \in \mathcal{H}$.) Then, for $n \geq n_0$, an approximate empirical
+    risk minimizer $\tilde{H}_n$ is PAC for expected risk minimization, meaning that it satisfies \[
         \ell(\tilde{H}_n) \leq \inf_{H\in \mathcal{H}} \ell(H) + 3\epsilon,
     \]
     with probability at least $1-\delta$.
@@ -91,9 +93,9 @@ holds for all hypotheses with high probability. This leads us to the following t
 It turns out that the assumption made by \Cref{thm:weaker-llm} holds in many relevant cases, but it
 is not always true.
 
-In this course, we will not learn how to pick the theory --- $\mathcal{H}$ and $\ell$ --- but
-rather how to solve the optimization problems that arise in empirical risk minimization after the
-theory has been chosen.
+In this course, we will not learn how to pick the theory---$\mathcal{H}$ and $\ell$---but rather
+how to solve the optimization problems that arise in empirical risk minimization after the theory
+has been chosen.
 
 \subsection{The map of learning}
 
@@ -104,15 +106,15 @@ theory has been chosen.
     \label{fig:map-of-learning}
 \end{marginfigure}
 
-The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empirical risk ---
-$\ell_n(H_n)$ --- against the expected risk --- $\ell(H_n)$, estimated by a validation set. $H_n$
+The map of learning can be seen in \Cref{fig:map-of-learning}. It plots the empirical risk
+$\ell_n(H_n)$ against the expected risk $\ell(H_n)$, which is estimated by a validation set. $H_n$
 is found by mapping the training data to the hypothesis, which is done by an optimization
 algorithm. With high probability, we are in the area denoted by ``empirical risk minimization'',
 because
 \begin{align*}
-    \ell_n(\tilde{H}_n) & \leq \inf_{H\in \mathcal{H}} \ell_n(H) + \epsilon                                 \\
-                        & \leq \ell_n(\tilde{H}) + \epsilon \margintag{This holds for any $\tilde{H}$.}     \\
-                        & \leq \ell(\tilde{H}) + 2 \epsilon \margintag{Weak law of large numbers (w.h.p.).} \\
+    \ell_n(\tilde{H}_n) & \leq \inf_{H\in \mathcal{H}} \ell_n(H) + \epsilon                                             \\
+                        & \leq \ell_n(\tilde{H}) + \epsilon \margintag{This holds for any $\tilde{H} \in \mathcal{H}$.} \\
+                        & \leq \ell(\tilde{H}) + 2 \epsilon \margintag{Weak law of large numbers (w.h.p.).}             \\
                         & \leq \ell(\tilde{H}_n) + 3 \epsilon.
 \end{align*}
 
@@ -132,7 +134,7 @@ performance is similar the expected performance. Ideally, we want generalization
 
 Regularization can improve performance by introducing a function $r$ that punishes complex
 hypotheses, \[
-    \ell' = \ell + \lambda r.
+    \ell'(H, X) = \ell(H, X) + \lambda \cdot r(H).
 \]
 As $\lambda$ grows, more bias is introduced and the empirical risk increases. At the same time, the
 sensitivity to the training data decreases, which may lead to a decreased expected risk.

@@ -13,7 +13,7 @@ $\mathcal{X}$.\sidenote{Until this point, we have only made use of Euclidean geo
     \begin{enumerate}
         \item (Positive definiteness) $\| \vec{x} \| = 0$ if and only if $\vec{x} = \vec{0}$;
         \item (Positive homogeneity) $\| \alpha \vec{x} \| = |\alpha| \| \vec{x} \|$;
-        \item (Subadditivity): $\| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|$.
+        \item (Subadditivity) $\| \vec{x} + \vec{y} \| \leq \| \vec{x} \| + \| \vec{y} \|$.
     \end{enumerate}
 \end{definition}
 
@@ -23,11 +23,11 @@ $\mathcal{X}$.\sidenote{Until this point, we have only made use of Euclidean geo
     \]
 \end{definition}
 
-\begin{example}
+\begin{lemma}
     For $p \geq 1$ and $\nicefrac{1}{p} + \nicefrac{1}{q} = 1$, we have the following norms with their dual norms, \[
         \| \vec{x} \|_p \doteq \lft( \sum_{i=1}^{d} |x_i|^p \rgt)^{\nicefrac{1}{p}}, \quad \| \cdot \|_{p,*} = \| \cdot \|_q.
     \]
-\end{example}
+\end{lemma}
 
 \begin{lemma}
     \[
@@ -106,10 +106,10 @@ subgradient update rule in the following way,
                   & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - (\vec{x}_t - \gamma_t \vec{g}_t) \|^2                                                                                                           \\
                   & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - \vec{x}_t - (-\gamma_t \vec{g}_t) \|^2                                                                                                          \\
                   & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \lft( \| \vec{x} - \vec{x}_t \|^2 + \| \gamma_t \vec{g}_t \|^2 + 2 \langle \gamma_t \vec{g}_t, \vec{x} - \vec{x}_t \rangle \rgt) \margintag{Cosine theorem.} \\
-                  & = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ \frac{1}{2} \| \vec{x} - \vec{x}_t \|^2 + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}. \margintag{Remove terms that do not depend on $\vec{x}$.}
+                  & = \argmin_{\vec{x} \in \mathcal{X}} \frac{1}{2} \| \vec{x} - \vec{x}_t \|^2 + \langle \gamma_t \vec{g}_t, \vec{x} \rangle. \margintag{Remove terms that do not depend on $\vec{x}$.}
 \end{align*}
 We then replace the norm by the Bregman divergence to obtain the mirror descent update rule, \[
-    \vec{x}_{t+1} \in \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}, \quad \vec{g}_t \in \partial f(\vec{x}_t).
+    \vec{x}_{t+1} \in \argmin_{\vec{x} \in \mathcal{X}} V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle, \quad \vec{g}_t \in \partial f(\vec{x}_t).
 \]
 
 \begin{lemma}
@@ -123,7 +123,7 @@ We then replace the norm by the Bregman divergence to obtain the mirror descent 
 
 \begin{proof}
     We have the following update rule, \[
-        \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} \lft\{ V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle \rgt\}.
+        \vec{x}_{t+1} = \argmin_{\vec{x} \in \mathcal{X}} V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle.
     \]
     Thus, by the optimality condition for constrained optimization, we have \[
         \langle \grad{\omega(\vec{x}_{t+1})}{} + \gamma_t \vec{g}_t - \grad{\omega(\vec{x}_t)}{}, \vec{x} - \vec{x}_{t+1} \rangle \geq 0, \quad \forall \vec{x} \in \mathcal{X},

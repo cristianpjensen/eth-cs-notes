@@ -1,6 +1,6 @@
 \section{Stochastic optimization}
 
-\marginnote{In the context of machine learning, do finite-sum optimization, which is a special case of stochastic optimization, \[
+\marginnote{In the context of machine learning, we perform finite-sum optimization, which is a special case of stochastic optimization, \[
         \min_{\vec{x} \in \R^d} F(\vec{x}) \doteq \frac{1}{n} \sum_{i=1}^{n} f_i(\vec{x}),
     \]
     where each data point defines its own function and $\xi$ is uniformly distributed over $\{ 1,
@@ -48,9 +48,9 @@ evaluations.
 
 \begin{proof}
     \begin{align*}
-        \E[F(\vec{x}_{t+1}) - F(\vec{x}_t)] & \leq \E \lft[ \transpose{\grad{F(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \rgt] \margintag{Smoothness of $F$.}                                  \\
-                                            & = \E \lft[ -\gamma_t \transpose{\grad{F(\vec{x}_t)}{}} \grad{f(\vec{x}_t, \vec{\xi}_t)}{} + \frac{L \gamma_t^2}{2} \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 \rgt] \margintag{SGD update rule.} \\
-                                            & = -\lft(\gamma_t - \frac{L \gamma_t^2}{2}\rgt) \E \| \grad{F(\vec{x}_t)}{} \|^2 + \frac{L \sigma^2 \gamma_t^2}{2} \margintag{$\E[X^2] = \E[X]^2 + \Var[X]$.}                                     \\
+        \E[F(\vec{x}_{t+1}) - F(\vec{x}_t)] & \leq \E \lft[ \transpose{\grad{F(\vec{x}_t)}{}}(\vec{x}_{t+1} - \vec{x}_t) + \frac{L}{2} \| \vec{x}_{t+1} - \vec{x}_t \|^2 \rgt] \margintag{Smoothness of $F$.}                                                                                                                                                                  \\
+                                            & = \E \lft[ -\gamma_t \transpose{\grad{F(\vec{x}_t)}{}} \grad{f(\vec{x}_t, \vec{\xi}_t)}{} + \frac{L \gamma_t^2}{2} \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 \rgt] \margintag{SGD update rule.}                                                                                                                                 \\
+                                            & = -\lft(\gamma_t - \frac{L \gamma_t^2}{2}\rgt) \E \| \grad{F(\vec{x}_t)}{} \|^2 + \frac{L \sigma^2 \gamma_t^2}{2} \margintag{$\E[X^2] = \E[X]^2 + \Var[X]$ $\Rightarrow \E \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \|^2 = \| \grad{F(\vec{x}_t)}{} \|^2 + \E \| \grad{f(\vec{x}_t, \vec{\xi}_t)}{} - \grad{F(\vec{x}_t)}{} \|^2$.} \\
                                             & \leq -\frac{\gamma_t}{2} \E \| \grad{F(\vec{x}_t)}{} \|^2 + \frac{L \sigma^2 \gamma_t^2}{2}. \margintag{$\gamma_t \leq \nicefrac{1}{L}$.}
     \end{align*}
     We can rewrite this as \[
@@ -91,9 +91,9 @@ $\bigo{\nicefrac{1}{\epsilon^2}}$ sample complexity.
     \end{align*}
     Furthermore, by the law of total expectation ($\E[X] = \E_Y[\E_X[X\mid Y]]$),
     \begin{align*}
-        \E_{\vec{\xi}_{1:t}} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt] & = \E_{\vec{\xi}_{1:t-1}} \lft[ \E_{\vec{\xi}_t} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \;\middle|\; \vec{x}_t \rgt] \rgt]                                                                   \\
-                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\E_{\vec{\xi}_t} \lft[ \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \;\middle|\; \vec{x}_t \rgt]} (\vec{x}_t - \vec{x}^\star) \rgt] \margintag{$\vec{x}_t$ can be computed from $\vec{\xi}_{1:t-1}$.} \\
-                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\grad{F(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt]                                                                                                                                    \\
+        \E_{\vec{\xi}_{1:t}} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt] & = \E_{\vec{x}_t} \lft[ \E_{\vec{\xi}_{1:t}} \lft[ \transpose{\grad{f(\vec{x}_t, \vec{\xi}_t)}{}} (\vec{x}_t - \vec{x}^\star) \;\middle|\; \vec{x}_t \rgt] \rgt]                                                                                                                                 \\
+                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\E_{\vec{\xi}_t} \lft[ \grad{f(\vec{x}_t, \vec{\xi}_t)}{} \;\middle|\; \vec{x}_t \rgt]} (\vec{x}_t - \vec{x}^\star) \rgt] \margintag{$\vec{x}_t$ can be computed from $\vec{\xi}_{1:t-1}$, and we only need $\vec{\xi}_t$ for the inner expectation.} \\
+                                                                                                                    & = \E_{\vec{\xi}_{1:t-1}} \lft[ \transpose{\grad{F(\vec{x}_t)}{}} (\vec{x}_t - \vec{x}^\star) \rgt]                                                                                                                                                                                              \\
                                                                                                                     & \geq \E[F(\vec{x}_t) - F(\vec{x}^\star)]. \margintag{Convexity of $F$.}
     \end{align*}
     This gives us the following recursion, \[
@@ -245,23 +245,23 @@ Thus, we update the past gradients as \[
         \vec{v}_i^{t-1}             & i \neq i_t.
     \end{cases}
 \]
-Equivalently, we thus have the following update rule,
+Equivalently, we have the following update rule for the gradient estimate,
 \begin{align*}
     \vec{g}_t & = \vec{g}_{t-1} - \frac{1}{n} \vec{v}_{i_t}^{t-1} + \frac{1}{n} \grad{f_{i_t}(\vec{x}_t)}{}  \\
               & = \frac{1}{n} \lft( \grad{f_{i_t}(\vec{x}_t)}{} - \vec{v}_{i_t}^{t-1} \rgt) + \vec{g}_{t-1}.
 \end{align*}
-Thus, we have $\alpha = \nicefrac{1}{n}$ and $Y = \vec{v}_{i_t}^{t-1}$ with $\E[Y] = \vec{g}_{t-1}$.
+Specifically, we have $\alpha = \nicefrac{1}{n}$ and $Y = \vec{v}_{i_t}^{t-1}$ with $\E[Y] = \vec{g}_{t-1}$.
 
-The downside of this approach is that it has a biased gradient, a large $\bigo{nd}$ memory cost,
-and it is hard to analyze. But, we gain a total complexity of $\bigo{(n + \kappa_{\max}) \log
-        \nicefrac{1}{\epsilon}}$, where $\kappa_{\max} = \min_{i \in [n]} \nicefrac{L_i}{\mu}$, where $L_i$
-is the smoothness parameter of $f_i$.
+The downside of this approach is that it has a biased gradient ($\alpha \neq 1$), a large
+$\bigo{nd}$ memory cost, and it is hard to analyze. But, we gain a total complexity of $\bigo{(n +
+        \kappa_{\max}) \log \nicefrac{1}{\epsilon}}$, where $\kappa_{\max} = \min_{i \in [n]}
+    \nicefrac{L_i}{\mu}$, where $L_i$ is the smoothness parameter of $f_i$.
 
 SAGA is an unbiased version of SAG, because it sets $\alpha=1$, \[
     \vec{g}_t = \grad{f_{i_t}(\vec{x}_t)}{} - \vec{v}_{i_t}^{t-1} + \vec{g}_{t-1}.
 \]
 But, it still enjoys the same benefits as SAG with a much simpler proof. However, we still have a
-higher memory cost --- $\bigo{nd}$ --- than SGD, which we would like to get rid of.
+higher memory cost---$\bigo{nd}$---than SGD, which we would like to get rid of.
 
 \paragraph{Stochastic variance reduced gradient.}
 
@@ -289,10 +289,10 @@ The algorithm works by updating $\tilde{\vec{x}}$ every $m$-th iteration to be t
 last $m$ iterations. It estimates the gradient by \[
     \grad{f_{i_t}(\vec{x}_t)}{} - \grad{f_{i_t}(\tilde{\vec{x}})}{} + \grad{F(\tilde{\vec{x}})}{}.
 \]
-Thus, we have $\alpha=1$ and $Y=\grad{f_{i_t}(\tilde{\vec{x}})}{}$ with $\E[Y] =
+Specifically, we have $\alpha=1$ and $Y=\grad{f_{i_t}(\tilde{\vec{x}})}{}$ with $\E[Y] =
     \grad{F(\tilde{\vec{x}})}{}$.
 
 While we gain the low memory cost of $\bigo{d}$, we now need to do $\bigo{n+2m}$ gradient
 evaluations per epoch, where the $n$ comes from computing $\E[Y]$ and $2m$ comes from computing
 $\grad{f_{i_t}(\vec{x}_t)}{}$ and $\grad{f_{i_t}(\tilde{\vec{x}})}{}$. This method has the same
-iteration complexity as SAG and SAGA --- $\bigo{(n + \kappa_{\max})\log \nicefrac{1}{\epsilon}}$.
+iteration complexity as SAG and SAGA---$\bigo{(n + \kappa_{\max})\log \nicefrac{1}{\epsilon}}$.

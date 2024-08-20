@@ -66,14 +66,14 @@ non-convex.
 \begin{lemma}[Subgradient calculus]
     We can use the following operations to work with subgradients:
     \begin{itemize}
-        \item \textit{Conic combination}: Let $h(\vec{x}) \doteq \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha,\beta \geq
+        \item (Conic combination) Let $h(\vec{x}) \doteq \alpha f(\vec{x}) + \beta g(\vec{x})$ with $\alpha,\beta \geq
                   0$, then \[
                   \partial h(\vec{x}) = \alpha \cdot \partial f(\vec{x}) + \beta \cdot \partial g(\vec{x});
               \]
-        \item \textit{Affine transformation}: Let $h(\vec{x}) \doteq f(\mat{A} \vec{x} + \vec{b})$, then \[
+        \item (Affine transformation) Let $h(\vec{x}) \doteq f(\mat{A} \vec{x} + \vec{b})$, then \[
                   \partial h(\vec{x}) = \transpose{\mat{A}} \partial f(\mat{A} \vec{x} + \vec{b});
               \]
-        \item \textit{Pointwise maximum}: Let $h(\vec{x}) \doteq \max_{i\in [m]} f_i(\vec{x})$, then \[
+        \item (Pointwise maximum) Let $h(\vec{x}) \doteq \max_{i\in [m]} f_i(\vec{x})$, then \[
                   \partial h(\vec{x}) = \mathrm{conv}(\{ \partial f_i(\vec{x}) \mid f_i(\vec{x}) = h(\vec{x}) \}).
               \]
               Thus, at each point where we transition from one function to another, we get the convex hull of
@@ -87,10 +87,10 @@ non-convex.
 In the subgradient method, the general update rule becomes \[
     \vec{x}_{t+1} = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t).
 \]
-If $f$ is differentiable, gradient descent and projected gradient descent are special cases of this
-update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively. However, if
-$f$ is non-differentiable, we will see that this is technically not a descent method, because the
-subgradient is not a descent direction in general.
+If $f$ is convex and differentiable, gradient descent and projected gradient descent are special
+cases of this update rule, where $\mathcal{X} = \R^d$ and $\mathcal{X} \subset \R^d$, respectively.
+However, if $f$ is non-differentiable, we will see that this is technically not a descent method,
+because the subgradient is not a descent direction in general.
 
 \begin{lemma}[Subgradient method ``descent'' lemma]
     \label{lem:subgrad-descent}
@@ -103,7 +103,7 @@ subgradient is not a descent direction in general.
 \begin{proof}
     \begin{align*}
         \| \vec{x}_{t+1} - \vec{x}^\star \|^2 & = \| \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \vec{g}_t) - \vec{x}^\star \|^2 \margintag{Subgradient descent update rule.}                                                                                                                 \\
-                                              & = \| \vec{x}_t - \gamma_t \vec{g}_t - \vec{x}^\star \|^2 \margintag{$\mathcal{X}$ is convex, so we get closer to $\vec{x}^\star$ after projection.}                                                                                      \\
+                                              & \leq \| \vec{x}_t - \gamma_t \vec{g}_t - \vec{x}^\star \|^2 \margintag{Projection is non-expansive.}                                                                                                                                     \\
                                               & = \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t \transpose{\vec{g}_t} (\vec{x}_t - \vec{x}^\star) + \gamma_t^2 \| \vec{g}_t \|^2 \margintag{Cosine theorem.}                                                                            \\
                                               & \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f(\vec{x}^\star)) + \gamma_t^2 \| \vec{g}_t \|^2. \margintag{Subgradient: $f(\vec{x}^\star) \geq f(\vec{x}_t) + \transpose{\vec{g}_t} (\vec{x}^\star - \vec{x}_t)$.}
     \end{align*}
