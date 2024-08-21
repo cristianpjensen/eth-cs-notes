@@ -1,7 +1,7 @@
-\documentclass[a4paper]{article}
-% \documentclass[8pt,a4paper]{extarticle}
+% \documentclass[a4paper]{article}
+\documentclass[8pt,a4paper]{extarticle}
 
-\usepackage[margin=0.25cm, showframe=true]{geometry}
+\usepackage[margin=0.25cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{multicol}
@@ -19,6 +19,18 @@
 \usepackage{color,soul}
 \usepackage{xcolor}
 
+\usepackage[most]{tcolorbox}
+
+\tcbset{
+    colback=blue!3!white,
+    colframe=blue!40!white,
+    arc=0mm, 
+    left=0mm, right=0mm, top=0mm, bottom= 0mm,
+    boxrule=0.1mm
+}
+
+\renewcommand{\proof}[1]{\begin{tcolorbox}#1 \hfill $\square$\end{tcolorbox}}
+
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 
@@ -29,16 +41,14 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Var}{\mathrm{Var}}
 
-\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\bm{#1}}
 \newcommand{\mat}[1]{#1}
 \newcommand{\transpose}[1]{#1^\top}
 \newcommand{\dom}[1]{\mathrm{dom}(#1)}
 
-\newcommand{\proofsquare}{$\blacksquare$}
-
 \renewcommand{\familydefault}{\sfdefault}
 
-\setlength{\columnseprule}{0.4pt}
+\setlength{\columnseprule}{0.1cm}
 
 \title{Optimization for Data Science Cheatsheet}
 
@@ -72,7 +82,7 @@
             \item \textbf{$L$-smoothness}: $\forall \vec{x}, \vec{y} \in \dom{f}$,
                   \begin{enumerate}
                       \item $\| \nabla f(\vec{x}) - \nabla f(\vec{y}) \| \leq L \| \vec{x} - \vec{y} \|$.
-                      \item $g(\vec{x}) := \frac{L}{2} \| \vec{x} \|^2 - f(\vec{x})$ is convex.
+                      \item $g(\vec{x}) \colonequals \frac{L}{2} \| \vec{x} \|^2 - f(\vec{x})$ is convex.
                       \item $f(\vec{y}) \leq f(\vec{x}) + \langle \nabla f(\vec{x}), \vec{y} - \vec{x} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2$ (canonical).
                       \item $\langle \nabla f(\vec{x}) - \nabla f(\vec{y}), \vec{x} - \vec{y} \rangle \leq L \| \vec{x} - \vec{y} \|^2$.
                       \item $\| \nabla^2 f(\vec{x}) \|_2 \leq L$.
@@ -82,13 +92,14 @@
                   Relations: $[5] \Leftrightarrow [1] \Rightarrow [2] \Leftrightarrow [3] \Leftrightarrow [4]$ (If convex, all $\Leftrightarrow$).
             \item \textbf{$\mu$-strong convexity}: $\forall \vec{x}, \vec{y} \in \dom{f}$,
                   \begin{enumerate}
-                      \item $f(\vec{y}) \geq f(\vec{x}) + \langle \nabla f(\vec{x}), \vec{y} - \vec{x} \rangle + \frac{\mu}{2} \| \vec{x} - \vec{y} \|^2$.
-                      \item $g(\vec{x}) := f(\vec{x}) - \frac{\mu}{2} \| \vec{x} \|^2$ is convex.
+                      \item $f(\vec{y}) \geq f(\vec{x}) + \langle \nabla f(\vec{x}), \vec{y} - \vec{x} \rangle + \frac{\mu}{2} \| \vec{x} - \vec{y} \|^2$ (canonical).
+                      \item $g(\vec{x}) \colonequals f(\vec{x}) - \frac{\mu}{2} \| \vec{x} \|^2$ is convex.
                       \item $\langle \nabla f(\vec{x}) - \nabla f(\vec{y}), \vec{x} - \vec{y} \rangle \geq \mu \| \vec{x} - \vec{y} \|^2$ (needs proof).
                       \item $\mu$-SC $\Rightarrow$ PL inequality: $\frac{1}{2} \| \nabla f(\vec{x}) \|^2 \geq \mu (f(\vec{x}) - f^\star)$.
                   \end{enumerate}
             \item \textbf{Subgradient}: $\vec{g} \in \partial f(\vec{x}) \Leftrightarrow f(\vec{y}) \geq f(\vec{x}) + \langle \vec{g}, \vec{y} - \vec{x} \rangle, \forall \vec{y} \in \dom{f}$.
-            \item \textbf{Conjugate function}: $f^\star(\vec{y}) := \sup_{\vec{x} \in \dom{f}} \langle \vec{x}, \vec{y} \rangle - f(\vec{x})$.
+            \item \textbf{Conjugate function}: $f^\star(\vec{y}) \colonequals \sup_{\vec{x} \in \dom{f}} \langle \vec{x}, \vec{y} \rangle - f(\vec{x})$.
+            \item \textbf{Dual norm}: $\| \vec{y} \|_\star \colonequals \max_{\| \vec{x} \| \leq 1} \langle \vec{x}, \vec{y} \rangle$.
         \end{itemize}
     \end{topic}
 
@@ -122,6 +133,14 @@
                       \item $h(\vec{x}) = f(\mat{A} \vec{x} + \vec{b}) \Rightarrow \partial h(\vec{x}) = \transpose{\mat{A}} \partial f(\mat{A} \vec{x} + \vec{b})$.
                       \item $h(\vec{x}) = \max f_i(\vec{x}) \Rightarrow \partial h(\vec{x}) = \mathrm{conv}(\{ \partial f_i(\vec{x}) \mid f_i(\vec{x}) = h(\vec{x}) \})$.
                   \end{enumerate}
+            \item If $f$ is differentiable at $\vec{x}$, then $\partial f(\vec{x}) \subseteq \{ \nabla f(\vec{x}_t)
+                      \}$.
+            \item If $f$ is convex, then $\partial f(\vec{x}) \neq \emptyset$ for all in $\vec{x}$ in the relative
+                  interior.
+            \item If $\dom{f}$ convex and $\partial f(\vec{x}) \neq \emptyset,\forall \vec{x} \in \dom{f}$, then $f$
+                  is convex.
+            \item For $p \geq 1$, $\frac{1}{p} + \frac{1}{q} = 1$, we have dual norms, $\| \cdot \|_{p,\star} = \|
+                      \cdot \|_q$.
         \end{itemize}
     \end{topic}
 
@@ -140,8 +159,8 @@
         \begin{itemize}
             \item \textbf{Rearrange the update rule} for an equality---e.g., $\nabla f(\vec{x}_t) = \frac{\vec{x}_t -
                           \vec{x}_{t+1}}{\gamma_t}$.
-            \item Define $h(t) := f(\vec{x} + t(\vec{y} - \vec{x}))$, where $h'(t) = \nabla f(\vec{x} + t(\vec{y} -
-                      \vec{x}))^\top (\vec{y} - \vec{x})$ and use with fundamental theorem of calculus, \[
+            \item Define $h(t) \colonequals f(\vec{x} + t(\vec{y} - \vec{x}))$, where $h'(t) = \nabla f(\vec{x} +
+                      t(\vec{y} - \vec{x}))^\top (\vec{y} - \vec{x})$ and use with fundamental theorem of calculus, \[
                       f(\vec{y}) - f(\vec{x}) = \int_0^1 \nabla f(\vec{x} + t(\vec{y} - \vec{x}))^\top (\vec{y} - \vec{x}) \mathrm{d}t.
                   \]
                   Or, mean-value theorem, \[
@@ -159,7 +178,7 @@
 
     \begin{topic}{Expectation and variance for SGD}
         \begin{itemize}
-            \item $\Var[X] := \E\lft[ (X - \E[X])^2 \rgt]$
+            \item $\Var[X] \colonequals \E\lft[ (X - \E[X])^2 \rgt]$
             \item $\Var[X] = \E[X^2] - \E[X]^2$ \\ $\Rightarrow \E \| \nabla f(\vec{x}_t, \vec{\xi}_t) \|^2 = \| \nabla F(\vec{x}_t) \|^2 + \E \| \nabla f(\vec{x}_t, \vec{\xi}_t) - \nabla F(\vec{x}_t) \|^2 \leq \| \nabla F(\vec{x}_t) \|^2 + \sigma^2$.
             \item \textbf{Law of total expectation}: $\E[X] = \E_Y[\E_X[X \mid Y]]$.
             \item \textbf{Law of total var.}: $\Var[Y] = \E_X[\Var_Y[Y \mid X]] + \Var_Y[\E_X[Y \mid X]]$.
@@ -168,29 +187,92 @@
         \end{itemize}
     \end{topic}
 
-    \begin{topic}{Risk minimization}
+    \vspace{0.2cm}
+    \hrule
 
+    \begin{topic}{Risk minimization}
+        \begin{itemize}
+            \item Unknown distribution $P$. We only have access to samples $X_1, \ldots, X_n \sim P$. We want to
+                  explain data source $X$ through these samples by minimizing risk.
+            \item \textbf{Expected risk}: $\ell(H) = \E_X[\ell(H, X)]$.
+            \item \textbf{Empirical risk}: $\ell_n(H) = \frac{1}{n} \sum_{i=1}^{n} \ell(H, X_i)$.
+            \item \textbf{Probably approximately correct (PAC)}: Let $\epsilon, \delta > 0$,
+                  $\tilde{H} \in \mathcal{H}$ is PAC if, with probability at least $1-\delta$,
+                  $\ell(\tilde{H}) \leq \inf_{H \in \mathcal{H}} \ell(H) + \epsilon$.
+            \item \textbf{Weak law of large numbers (WLLM)}: Let $H \in \mathcal{H}$ be
+                  \underline{fixed}. For any $\delta,\epsilon > 0$, there exists $n_0 \in \mathbb{N}$
+                  such that for $n \geq n_0$, $|\ell_n(H) - \ell(H)| \leq \epsilon$ with probability
+                  at least $1-\delta$.
+            \item Assume that for any $\delta, \epsilon > 0$, there exists $n_0 \in \mathbb{N}$ such that for $n \geq
+                      n_0$, $\sup_{H\in \mathcal{H}} |\ell_n(H) - \ell(H)| \leq \epsilon$ with probability at least
+                  $1-\delta$. (WLMM holds uniformly for all hypotheses.) Then, an approximate empirical risk
+                  minimizer $\tilde{H}_n$ ($\ell_n(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}} \ell_n(H) + \epsilon$)
+                  is PAC for expected risk minimization, meaning $\ell(\tilde{H}_n) \leq \inf_{H \in \mathcal{H}}
+                      \ell(H) + 3 \epsilon$ with probability at least $1-\delta$. \proof{$\ell(\tilde{H}_n)
+                          \overset{\text{uniform WLMM}}{\leq} \ell_n(\tilde{H}_n) + \epsilon \overset{\text{emp. risk
+                                  min.}}{\leq} \inf_{H \in \mathcal{H}} \ell_n(H) + 2 \epsilon \overset{\text{uniform WLMM}}{\leq}
+                          \inf_{H \in \mathcal{H}} \ell(H) + 3 \epsilon$.}
+            \item \textbf{Empirical risk minimization} ($\ell_n(H_n)$: empirical, training; $\ell(H_n)$: expected, validation): We want generalization and learning,
+                  \begin{itemize}
+                      \item (Low $\ell_n(H_n)$, High $\ell(H_n)$): Overfitting.
+                      \item (High $\ell_n(H_n)$, High $\ell(H_n)$): Underfitting.
+                      \item (Low $\ell_n(H_n)$, Low $\ell(H_n)$): Learning.
+                      \item ($\ell_n(H_n) \approx \ell(H_n)$): Generalization.
+                      \item Regularization: Punish complex hypotheses.
+                      \item W.h.p. we do not have high $\ell_n(H_n)$, low $\ell(H_n)$, because $\ell_n(H_n) \leq \inf_{H \in
+                                    \mathcal{H}} \ell_n(H) + \epsilon \leq \ell_n(\tilde{H}) + \epsilon \leq \ell(\tilde{H}) + 2
+                                \epsilon \leq \ell(\tilde{H}_n) + 3 \epsilon$.
+                  \end{itemize}
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Non-linear programming}
-
+        \begin{itemize}
+            \item \textbf{Optimization problem}:
+                  \begin{align*}
+                       & \text{minimize}   &  & f_0(\vec{x})                         \\
+                       & \text{subject to} &  & f_i(\vec{x}) \leq 0, \quad i \in [m] \\
+                       &                   &  & h_j(\vec{x}) = 0, \quad j \in [p].
+                  \end{align*}
+            \item \textbf{Problem domain}: $X = \lft( \bigcap_{i=0}^m \dom{f_i} \rgt) \cap \lft( \bigcap_{j=1}^p \dom{h_j} \rgt)$.
+            \item \textbf{Convex program}: All $f_i$ are convex and all $h_j$ are affine.
+            \item \textbf{Lagrangian}: $L(\vec{x}, \vec{\lambda}, \vec{\nu}) \colonequals f_0(\vec{x}) + \sum_{i=1}^{m} \lambda f_i(\vec{x}) + \sum_{j=1}^{p} \nu_j h_j(\vec{x})$.
+            \item \textbf{Lagrange dual function}: $g(\vec{\lambda}, \vec{\nu}) \colonequals \inf_{\vec{x} \in X} L(\vec{x}, \vec{\lambda}, \vec{\nu})$.
+            \item \textbf{Weak Lagrange duality} ($\vec{\lambda} \geq 0$, $\vec{x}$ is feasible): $g(\vec{\lambda}, \vec{\nu}) \leq f_0(\vec{x})$.
+            \item \textbf{Lagrange dual problem} (convex):
+                  \begin{align*}
+                       & \text{maximize}   &  & g(\vec{\lambda}, \vec{\nu}) \\
+                       & \text{subject to} &  & \vec{\lambda} \geq \vec{0}.
+                  \end{align*}
+            \item If a convex program has a feasible solution $\bar{\vec{x}}$ that is a Slater point
+                  ($f_i(\bar{\vec{x}}) < 0, \forall i \in[m]$), then $\max_{\vec{\lambda} \geq 0, \vec{\nu}}
+                      g(\vec{\lambda}, \vec{\nu}) = \inf_{\vec{x} \in X} f_0(\vec{x})$.
+            \item \textbf{Zero duality gap}: Feasible solutions $\tilde{\vec{x}}$ and $(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ have zero duality gap if $f_0(\tilde{\vec{x}}) = g(\tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$ ($\Rightarrow$ $\tilde{\vec{x}}$ is a minimizer of primal).
+            \item \textbf{KKT necessary}: Zero duality gap $\Rightarrow$ $\tilde{\lambda} f_i(\tilde{\vec{x}}) = 0, \forall i \in [m]$ (complementary slackness) and $\nabla_{\vec{x}} L(\tilde{\vec{x}}, \tilde{\vec{\lambda}}, \tilde{\vec{\nu}}) = \vec{0}$ (vanishing Lag. gradient).
+            \item \textbf{KKT sufficient}: Convex program, complementary slackness, and vanishing Lagrangian gradient $\Rightarrow$ Zero duality gap.
+                  \proof{Complementary slackness ($f_0(\tilde{\vec{x}}) = L(\tilde{\vec{x}},
+                          \tilde{\vec{\lambda}}, \tilde{\vec{\nu}})$) $\Rightarrow$ $L$ is convex in $\vec{x}$
+                      and gradient is zero, so $\tilde{\vec{x}}$ is a global minimizer.}
+            \item Program maybe not solvable, but if Slater point, then a solution exists. $\Rightarrow$ Only need to
+                  show that the KKT conditions are satisfied.
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Gradient descent}
         \begin{itemize}
             \item \textbf{Update rule}: $\vec{x}_{t+1} = \vec{x}_t - \gamma \nabla f(\vec{x})$.
             \item \textbf{VA}: $\sum_{t=0}^{T-1} (f(\vec{x}_t) - f^\star) \leq \frac{\gamma}{2} \sum_{t=0}^{T-1} \| \nabla f(\vec{x}_t) \|^2 + \frac{1}{2 \gamma} \| \vec{x}_0 - \vec{x}^\star \|^2$.
-            \item[\proofsquare] 1st-order convexity on $(\vec{x}^\star, \vec{x}_t)$ $\Rightarrow$ $\nabla f(\vec{x}_t) = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma}$ $\Rightarrow$ Cosine theorem $\Rightarrow$ $\vec{x}_t - \vec{x}_{t+1} = \gamma \nabla f(\vec{x}_t)$ $\Rightarrow$ Telescoping sum.
+                  \proof{1st-order convexity on $(\vec{x}^\star, \vec{x}_t)$ $\Rightarrow$ $\nabla f(\vec{x}_t) = \frac{\vec{x}_t - \vec{x}_{t+1}}{\gamma}$ $\Rightarrow$ Cosine theorem $\Rightarrow$ $\vec{x}_t - \vec{x}_{t+1} = \gamma \nabla f(\vec{x}_t)$ $\Rightarrow$ Telescoping sum.}
             \item \textbf{Sufficient decrease}: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \nabla f(\vec{x}_t) \|^2$.
-            \item[\proofsquare] Smoothness on ($\vec{x}_{t+1}, \vec{x}_t$) $\Rightarrow$ $\vec{x}_{t+1} - \vec{x}_t = -\frac{1}{L} \nabla f(\vec{x}_t)$.
+                  \proof{Smoothness on ($\vec{x}_{t+1}, \vec{x}_t$) $\Rightarrow$ $\vec{x}_{t+1} - \vec{x}_t = -\frac{1}{L} \nabla f(\vec{x}_t)$.}
             \item \textbf{Convergence results}: ($\| \vec{x}_0 - \vec{x}^\star \| \leq R$)
                   \begin{itemize}
-                      \item ($B$-Lipschitz, convex, $\gamma := \frac{R}{B \sqrt{T}}$) $\frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f^\star) \leq \frac{RB}{\sqrt{T}}$.
-                      \item[\proofsquare] Apply bounds to VA and find $\gamma$ by 1st-order optimality.
-                      \item ($L$-smooth, convex, $\gamma := \frac{1}{L}$) $f(\vec{x}_T) - f^\star \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2$
-                      \item[\proofsquare] Sufficient decrease to bound gradients of VA with telescoping sum.
-                      \item ($L$-smooth, $\mu$-SC, $\gamma := \frac{1}{L}$) $f(\vec{x}_T) - f^\star \leq \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2$
-                      \item[\proofsquare] Use $\mu$-SC to strengthen VA bound for squared norm $\Rightarrow$ Upper bound ``noise'' with $f^\star \leq f(\vec{x}_{t+1})$ and SD $\Rightarrow$ Smoothness on $(\vec{x}^\star, \vec{x}_T)$.
+                      \item ($B$-Lipschitz, convex, $\gamma \colonequals \frac{R}{B \sqrt{T}}$) $\frac{1}{T} \sum_{t=0}^{T-1} (f(\vec{x}_t) - f^\star) \leq \frac{RB}{\sqrt{T}}$.
+                            \proof{Apply bounds to VA and find $\gamma$ by 1st-order optimality.}
+                      \item ($L$-smooth, convex, $\gamma \colonequals \frac{1}{L}$) $f(\vec{x}_T) - f^\star \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2$
+                            \proof{Sufficient decrease to bound gradients of VA with telescoping sum.}
+                      \item ($L$-smooth, $\mu$-SC, $\gamma \colonequals \frac{1}{L}$) $f(\vec{x}_T) - f^\star \leq \frac{L}{2} \lft( 1 - \frac{\mu}{L} \rgt)^T \| \vec{x}_0 - \vec{x}^\star \|^2$
+                            \proof{Use $\mu$-SC to strengthen VA bound for squared norm $\Rightarrow$ Upper bound ``noise'' with $f^\star \leq f(\vec{x}_{t+1})$ and SD $\Rightarrow$ Smoothness on $(\vec{x}^\star, \vec{x}_T)$.}
                   \end{itemize}
         \end{itemize}
     \end{topic}
@@ -200,66 +282,68 @@
             \item \textbf{Update rule} ($X \subset \R^d$ is closed and convex):
                   \begin{align*}
                       \vec{y}_{t+1} & = \vec{x}_t - \gamma_t \nabla f(\vec{x}_t)                                                   \\
-                      \vec{x}_{t+1} & = \Pi_X(\vec{y}_{t+1}) := \argmin_{\vec{x} \in \mathcal{X}} \| \vec{x} - \vec{y}_{t+1} \|^2.
+                      \vec{x}_{t+1} & = \Pi_X(\vec{y}_{t+1}) \colonequals \argmin_{\vec{x} \in X} \| \vec{x} - \vec{y}_{t+1} \|^2.
                   \end{align*}
-            \item ($\vec{x} \in X, \vec{y} \in \R^d$): $(\vec{x} - \Pi_X(\vec{y}))^\top (\vec{y} - \Pi_X(\vec{y})) \leq 0$.
-            \item[\proofsquare] Constrained 1st-order optimality $\Rightarrow$ Rearrange.
-            \item ($\vec{x} \in X, \vec{y} \in \R^d$): $\| \vec{x} - \Pi_X(\vec{y}) \|^2 + \| \vec{y} - \Pi_X(\vec{y}) \|^2 \leq \| \vec{x} - \vec{y} \|^2$.
-            \item[\proofsquare] Cosine theorem on previous.
-            \item If $\vec{x}_{t+1} = \vec{x}_t$, then $\vec{x}_t = \vec{x}^\star$.
-            \item[\proofsquare] $(\vec{x} - \vec{x}_t)^\top (\vec{y}_{t+1} - \vec{x}_t) = (\vec{x} - \vec{x}_{t+1})^\top (\vec{y}_{t+1} - \vec{x}_{t+1}) \leq 0, \forall \vec{x} \in X$ to show that constrained 1st-order optimality holds.
-            \item \textbf{Projected SD}:
-            \item[\proofsquare]
-            \item ($L$-smooth, convex, $\gamma := \frac{1}{L}$):
-            \item[\proofsquare]
+            \item[1.] ($\vec{x} \in X, \vec{y} \in \R^d$): $(\vec{x} - \Pi_X(\vec{y}))^\top (\vec{y} - \Pi_X(\vec{y})) \leq 0$.
+                  \proof{Constrained 1st-order optimality $\Rightarrow$ Rearrange.}
+            \item[2.] ($\vec{x} \in X, \vec{y} \in \R^d$): $\| \vec{x} - \Pi_X(\vec{y}) \|^2 + \| \vec{y} - \Pi_X(\vec{y}) \|^2 \leq \| \vec{x} - \vec{y} \|^2$.
+                  \proof{Cosine theorem on (1).}
+            \item If $\vec{x}_{t+1} = \vec{x}_t$, then $\vec{x}_t = \vec{x}^\star$. \proof{Use (1) and $\vec{x}_{t+1}
+                          = \vec{x}_t$ to show that 1st-order optimality holds.}
+            \item \textbf{Projected SD}: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L} \| \nabla f(\vec{x}_t) \|^2 + \frac{L}{2} \| \vec{y}_{t+1} - \vec{x}_{t+1} \|^2$.
+                  \proof{Smoothness on $(\vec{x}_{t+1}, \vec{x}_t)$ $\Rightarrow$ $\nabla f(\vec{x}_t) = L(\vec{y}_{t+1} - \vec{x}_t)$ $\Rightarrow$ Cosine theorem $\Rightarrow$ $\vec{y}_{t+1} - \vec{x}_t = -\frac{1}{L} \nabla f(\vec{x}_t)$.}
+            \item ($L$-smooth, convex, $\gamma \colonequals \frac{1}{L}$): $f(\vec{x}_T) - f^\star \leq \frac{L}{2T} \| \vec{x}_0 - \vec{x}^\star \|^2$.
+                  \proof{VA with additional term ($\vec{y}_{t+1}$ instead of $\vec{x}_{t+1}$ and use (2)) and bound gradients with projected SD. Additional terms cancel.}
         \end{itemize}
     \end{topic}
 
     \begin{topic}{Coordinate descent}
         \begin{itemize}
-            \item \textbf{Coordinate-wise SD}:
-            \item[\proofsquare]
+            \item \textbf{Coordinate-wise SD}: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \frac{1}{2L_i} |\nabla_i f(\vec{x}_t)|^2$.
+                  \proof{CW smoothness with $\lambda = \frac{-\nabla_i f(\vec{x}_t)}{L_i}$ such that $\vec{x}_{t+1} = \vec{x}_t + \lambda \vec{e}_i$.}
             \item \textbf{Convergence results} ($\mu$-PL, $\mathcal{L}$-CS, $\bar{L} = \frac{1}{d} \sum_{i=1}^{d} L_i$):
                   \begin{itemize}
-                      \item ($i \sim \mathrm{Unif}([d])$)
-                      \item[\proofsquare]
-                      \item ($i \sim \mathrm{Cat}(\nicefrac{L_1}{\sum_{j=1}^{d} L_j}, \ldots, \nicefrac{L_d}{\sum_{j=1}^{d} L_j})$)
-                      \item[\proofsquare]
-                      \item ($i \in \argmax_{j\in[d]} |\nabla_j f(\vec{x}_t)|$)
+                      \item ($L$-smooth, $\mu$-PL, $i \sim \mathrm{Unif}([d])$) \\
+                            $\E[f(\vec{x}_T) - f^\star] \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T(f(\vec{x}_0) - f^\star)$.
+                            \proof{CW SD $\Rightarrow$ $\E_i$ $\Rightarrow$ Use sample prob. $\Rightarrow$ PL $\Rightarrow$ $\E_{\vec{x}_t}$ (LoTE).}
+                      \item ($L$-smooth, $\mu$-PL, $i \sim \mathrm{Cat}(\nicefrac{L_1}{\sum_{j=1}^{d} L_j}, \ldots, \nicefrac{L_d}{\sum_{j=1}^{d} L_j})$) \\
+                            $\E[f(\vec{x}_T) - f^\star] \leq \lft( 1 - \frac{\mu}{d \bar{L}} \rgt)^T (f(\vec{x}_0 - f^\star))$.
+                            \proof{Same as above with different probabilities. $\bar{L} \colonequals \frac{1}{d} \sum_{i=1}^{d} L_i$.}
+                      \item ($L$-smooth, $\mu_1$-SC w.r.t. $\ell_1$ $\Rightarrow$ $\mu_1$-PL w.r.t. $\ell_{\infty}$, $i \in \argmax_{j\in[d]} |\nabla_j f(\vec{x}_t)|$) \\
+                            $f(\vec{x}_T) - f^\star \leq \lft( 1 - \frac{\mu}{dL} \rgt)^T (f(\vec{x}_0) - f^\star)$ \\
+                            $f(\vec{x}_T) - f^\star \leq \lft( 1 - \frac{\mu_1}{L} \rgt)^T (f(\vec{x}_0) - f^\star)$.
+                            \proof{CW SD $\Rightarrow$ $\ell_{\infty}$ because of update rule $\Rightarrow$ PL.}
+                            $\frac{1}{\sqrt{d}} \| \vec{x} - \vec{y} \|_2 \leq \| \vec{x} - \vec{y} \|_1 \leq \| \vec{x} - \vec{y} \|_2$ $\Rightarrow$ $\frac{\mu}{d} \leq \mu_1 \leq \mu$.
                   \end{itemize}
         \end{itemize}
     \end{topic}
 
     \begin{topic}{Nonconvex functions}
         \begin{itemize}
-            \item ($L$-smooth):
-            \item[\proofsquare]
-            \item \textbf{Trajectory analysis}: Optimize $f(\vec{x}) := \frac{1}{2} \lft( \prod_{k=1}^d x_k - 1 \rgt)^2$.
+            \item ($L$-smooth, $\gamma \colonequals \frac{1}{L}$, $\exists \vec{x}^\star$): $\frac{1}{T} \sum_{t=0}^{T-1} \| \nabla f(\vec{x}_t) \|^2 \leq \frac{2L}{T} (f(\vec{x}_0) - f^\star)$.
+                  \proof{SD does not require convexity. Rewrite with telescoping sum.}
+            \item \textbf{Trajectory analysis}: Optimize $f(\vec{x}) \colonequals \frac{1}{2} \lft( \prod_{k=1}^d x_k - 1 \rgt)^2$.
             \item $\pdv{f(\vec{x})}{x_i} = \lft( \prod_k x_k - 1 \rgt) \prod_{k\neq i} x_k$ ($\nabla f(\vec{x})=\vec{0}$ if 2 dims are $0$ or all $1$).
             \item $\pdv[order=2]{f(\vec{x})}{x_i} = \lft( \prod_{k\neq i} x_k \rgt)^2$.
             \item $\pdv{f(\vec{x})}{x_i,x_j} = 2 \prod_{k\neq i} x_k \prod_{k \neq j} x_k - \prod_{k\neq i,j} x_k$, if $i \neq j$.
             \item \textbf{$c$-balanced}: Let $\vec{x} > \vec{0}$, $c \geq 1$. $\vec{x}$ is $c$-balanced if $x_i \leq c \cdot x_j, \forall i, j \in [d]$.
             \item If $\vec{x}_t$ is $c$-balanced, $\gamma > 0$, then $\vec{x}_{t+1}$ is $c$-balanced and
                   $\vec{x}_{t+1} \geq \vec{x}_t$.
-            \item[\proofsquare]
             \item If $\vec{x}$ is $c$-balanced, then for any $I \subseteq [d]$, we have \[
                       \prod_{k \not\in I} x_k \leq c^{|I|} \lft( \prod_{k=1}^d x_k \rgt)^{1 - \nicefrac{|I|}{d}} \leq c^{|I|}.
                   \]
-            \item[\proofsquare]
             \item Let $\vec{x}$ be $c$-balanced and $\prod_k x_k \leq 1$, then \[
                       \| \nabla^2 f(\vec{x}) \|_2 \leq \| \nabla^2 f(\vec{x}) \|_F \leq 3dc^2.
                   \]
                   Thus, $f$ is smooth along the whole trajectory of GD.
-            \item[\proofsquare]
             \item \textbf{Convergence} ($\gamma = \frac{1}{3dc^2}$, $\vec{x}_0 > \vec{0}$ and $c$-balanced, $\delta \leq \prod_k x_{0,k} < 1$) \\ $f(\vec{x}_T) \leq \lft( 1 - \frac{\delta^2}{3c^4} \rgt)^T f(\vec{x}_0)$.
-            \item[\proofsquare]
             \item $\delta$ decays polynomially in $d$, so we must start $\mathcal{O}(\nicefrac{1}{\sqrt{d}})$ from $\vec{x}^\star = \vec{1}$.
         \end{itemize}
     \end{topic}
 
     \begin{topic}{Frank-Wolfe}
         \begin{itemize}
-            \item $\mathrm{LMO}_X(\vec{g}) := \argmin_{\vec{z} \in X} \vec{g}^\top \vec{z}$.
+            \item $\mathrm{LMO}_X(\vec{g}) \colonequals \argmin_{\vec{z} \in X} \vec{g}^\top \vec{z}$.
             \item \textbf{Update rule}:
                   \begin{align*}
                       \vec{s}_t     & = \mathrm{LMO}_X(\nabla f(\vec{x}_t))          \\
@@ -271,22 +355,22 @@
                       \vec{s}_t \}$.
             \item LMO of unit $\ell_1$-ball: $\mathrm{LMO}(\vec{g}) = -\mathrm{sgn}(g_i) \vec{e}_i, i \in \argmax_{j
                           \in [d]} |g_i|$.
-            \item \textbf{Optimality gap}: $g(\vec{x}) := \nabla f(\vec{x})^\top (\vec{x} - \vec{s}), \vec{s} = \mathrm{LMO}_X(\nabla f(\vec{x}))$.
-            \item $g(\vec{x}) \geq f(\vec{x}) - f^\star$.
-            \item[\proofsquare]
+            \item \textbf{Optimality gap}: $g(\vec{x}) \colonequals \nabla f(\vec{x})^\top (\vec{x} - \vec{s}), \vec{s} = \mathrm{LMO}_X(\nabla f(\vec{x}))$.
+            \item (Convex): $g(\vec{x}) \geq f(\vec{x}) - f^\star$.
+                  \proof{$g(\vec{x}) = \nabla f(\vec{x})^\top (\vec{x} - \vec{s}) \geq \nabla f(\vec{x})^\top(\vec{x} - \vec{x}^\star) \geq f(\vec{x}) - f^\star$.}
             \item \textbf{Descent lemma}: $f(\vec{x}_{t+1}) \leq f(\vec{x}_t) - \gamma_t g(\vec{x}_t) + \gamma_t^2 \frac{L}{2} \| \vec{s}_t - \vec{x}_t \|^2$.
             \item \textbf{Convergence} ($L$-smooth, convex, $X$ is compact, $\gamma_t = \frac{2}{t+2}$): \\ $f(\vec{x}_T) - f^\star \leq \frac{2L}{T+1} \mathrm{diam}(X)^2$.
-            \item[\proofsquare] Lemma$-f^\star$ $\Rightarrow$ Use $g(\vec{x}) \geq f(\vec{x}) - f^\star$ $\Rightarrow$ Rearrange and induction.
+                  \proof{Lemma$-f^\star$ $\Rightarrow$ Use $g(\vec{x}) \geq f(\vec{x}) - f^\star$ $\Rightarrow$ Rearrange and induction.}
             \item \textbf{Affine equivalence}: $(f, X)$ and $(f', X')$ are affinely equivalent if $f'(\vec{x}) = f(\mat{A} \vec{x} + \vec{b})$ and $X' = \{ \mat{A}^{-1}(\vec{x} - \vec{b}) \mid \vec{x} \in X \}$. Then,
                   \begin{align*}
                       \nabla f'(\vec{x}')                    & = \mat{A}^\top \nabla f(\vec{x}), \quad \vec{x} = \mat{A}^{-1} (\vec{x} - \vec{b})    \\
                       \mathrm{LMO}_{X'}(\nabla f'(\vec{x}')) & = \mat{A}^{-1}(\vec{s} - \vec{b}), \quad \vec{s} = \mathrm{LMO}_X(\nabla f(\vec{x})).
                   \end{align*}
             \item \textbf{Curvature constant}: \[
-                      C_{(f,X)} := \sup_{\substack{\vec{x}, \vec{s}\in X, \gamma \in (0,1] \\ \vec{y} = (1-\gamma)\vec{x} + \gamma \vec{s})}} \frac{1}{\gamma^2}\lft( f(\vec{y}) - f(\vec{x}) - \nabla f(\vec{x})^\top (\vec{y} - \vec{x}) \rgt).
+                      C_{(f,X)} \colonequals \sup_{\substack{\vec{x}, \vec{s}\in X, \gamma \in (0,1] \\ \vec{y} = (1-\gamma)\vec{x} + \gamma \vec{s}}} \frac{1}{\gamma^2}\lft( f(\vec{y}) - f(\vec{x}) - \nabla f(\vec{x})^\top (\vec{y} - \vec{x}) \rgt).
                   \]
             \item \textbf{Affine invariant convergence}: $f(\vec{x}_T) - f^\star \leq \frac{4 C_{(f,X)}}{T+1}$.
-            \item[\proofsquare] Descent lemma w.r.t. $C_{(f,X)}$ by setting $\vec{x} = \vec{x}_t, \vec{s} = \mathrm{LMO}_X(\nabla f(\vec{x}_t))$ in the supremum.
+                  \proof{Descent lemma w.r.t. $C_{(f,X)}$ by setting $\vec{x} = \vec{x}_t, \vec{s} = \mathrm{LMO}_X(\nabla f(\vec{x}_t))$ in the supremum.}
             \item \textbf{Convergence of $g(\vec{x}_t)$}: $\min_{1 \leq t \leq T} g(\vec{x}_t) \leq \frac{\nicefrac{27}{2} \cdot C_{(f, X)}}{T+1}$.
         \end{itemize}
     \end{topic}
@@ -300,11 +384,11 @@
                   \]
             \item \textbf{Convergence} ($\| \nabla^2 f(\vec{x})^{-1} \| \leq \frac{1}{\mu}$, $\| \nabla^2 f(\vec{x}) - \nabla^2 f(\vec{y}) \| \leq B \| \vec{x} - \vec{y} \|$): \\
                   $\| \vec{x}_{t+1} - \vec{x}^\star \| \leq \frac{B}{2 \mu} \| \vec{x}_t - \vec{x}^\star \|^2$.
-            \item[\proofsquare] $\vec{x}_{t+1} - \vec{x}^\star \leq \vec{x}_t - \vec{x}^\star +
-                      H(\vec{x}_t)^{-1} (\nabla f(\vec{x}^\star) - \nabla f(\vec{x}_t))$ $\Rightarrow$
-                  $h(t) := \nabla f(\vec{x} + t(\vec{x}^\star - \vec{x}))$ with fundamental theorem
-                  of calculus $\Rightarrow$ Take norm of both sides and simplify using $\| \mat{A}
-                      \vec{x} \| = \| \mat{A} \|_2 \| \vec{x} \|$ and assumptions.
+                  \proof{$\vec{x}_{t+1} - \vec{x}^\star \leq \vec{x}_t - \vec{x}^\star +
+                          H(\vec{x}_t)^{-1} (\nabla f(\vec{x}^\star) - \nabla f(\vec{x}_t))$ $\Rightarrow$
+                      $h(t) \colonequals \nabla f(\vec{x} + t(\vec{x}^\star - \vec{x}))$ with fundamental theorem
+                      of calculus $\Rightarrow$ Take norm of both sides and simplify using $\| \mat{A}
+                          \vec{x} \| = \| \mat{A} \|_2 \| \vec{x} \|$ and assumptions.}
             \item Ensure bounded inverse Hessians by requiring strong convexity over $X$.
             \item If $\| \vec{x}_0 - \vec{x}^\star \| \leq \frac{\mu}{B}$, then $\| \vec{x}_T - \vec{x}^\star \| \leq
                       \frac{\mu}{B} \lft( \frac{1}{2} \rgt)^{2^T - 1}$.
@@ -313,32 +397,241 @@
     \end{topic}
 
     \begin{topic}{Quasi-Newton methods}
-
+        \begin{itemize}
+            \item Time complexity of Hessian is $\mathcal{O}(d^3)$ $\Rightarrow$ Approximate by $\mat{H}_t$.
+            \item \textbf{Secant condition}: $\nabla f(\vec{x}_t) - \nabla f(\vec{x}_{t-1}) = H_t (\vec{x}_t - \vec{x}_{t-1})$.
+            \item \textbf{Idea}: We wanted Hessian to fluctuate little in regions of fast conv. $\Rightarrow$ Update $\mat{H}_t^{-1} = \mat{H}_{t-1}^{-1} + \mat{E}_t$ while minimizing $\| \mat{A} \mat{E} \mat{A}^\top \|_F^2$ for some $\mat{A}$.
+            \item $\mat{H} \colonequals \mat{H}_{t-1}^{-1}$, $\mat{H}' \colonequals \mat{H}_t^{-1}$, $\mat{E} \colonequals \mat{E}_t$, $\vec{\sigma} \colonequals \vec{x}_t - \vec{x}_{t-1}$, $\vec{y} \colonequals \nabla f(\vec{x}_t) - \nabla f(\vec{x}_{t-1})$, $\vec{r} \colonequals \vec{\sigma} - \mat{H} \vec{y}$. Convex program:
+                  \begin{align*}
+                       & \text{minimize}   &  & \frac{1}{2} \| \mat{A} \mat{E} \mat{A}^\top \|_F^2                             \\
+                       & \text{subject to} &  & \mat{E} \vec{y} = \vec{r}                          & \text{(secant condition)} \\
+                       &                   &  & \mat{E}^\top - \mat{E} = \mat{0}.                  & \text{(symmetry)}
+                  \end{align*}
+            \item \textbf{Greenstadt method} ($\mathcal{O}(d^2)$): Solving yields
+                  \begin{align*}
+                      \mat{E}^\star = \frac{1}{\vec{y}^\top \mat{M} \vec{y}} \Big( \vec{\sigma} \vec{y}^\top \mat{M} + \mat{M} \vec{y} \vec{\sigma}^\top - \mat{H} \vec{y} \vec{y}^\top \mat{M} - \mat{M} \vec{y} \vec{y}^\top \mat{H} & \\
+                      - \frac{1}{\vec{y}^\top \mat{M} \vec{y}} \lft( \vec{y}^\top \vec{\sigma} - \vec{y}^\top \mat{H} \vec{y} \rgt) \mat{M} \vec{y} \vec{y}^\top \mat{M} \Big)                                                         &
+                  \end{align*}
+                  for some matrix $\mat{M}$.
+            \item \textbf{BFGS}: Set $\mat{M} = \mat{H}'$, \[
+                      \mat{E}^\star = \frac{1}{\vec{y}^\top \vec{\sigma}} \lft( - \mat{H} \vec{y} \vec{\sigma}^\top - \vec{\sigma} \vec{y}^\top \mat{H} + \lft( 1 + \frac{\vec{y}^\top \mat{H} \vec{y}}{\vec{y}^\top \vec{\sigma}} \rgt) \vec{\sigma} \vec{\sigma}^\top \rgt).
+                  \]
+                  Equivalent update: \[
+                      \mat{H}' = \lft( \mat{I} - \frac{\vec{\sigma} \vec{y}^\top}{\vec{y}^\top \vec{\sigma}} \rgt) \mat{H} \lft( \mat{I} - \frac{\vec{y} \vec{\sigma}^\top}{\vec{y}^\top \vec{\sigma}} \rgt) + \frac{\vec{\sigma} \vec{\sigma}^\top}{\vec{y}^\top \vec{\sigma}}.
+                  \]
+            \item \textbf{L-BFGS} ($\mathcal{O}(md)$): Recursive BFGS and only go down $m$ steps.
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Subgradient method}
-
+        \begin{itemize}
+            \item Until now, we have only considered non-smooth (and hence differentiable) functions $\Rightarrow$
+                  Generalize notion of gradient.
+            \item \textbf{Update rule}: $\vec{x}_{t+1} = \Pi_X(\vec{x}_t - \gamma_t \vec{g}_t), \quad \vec{g}_t \in \partial f(\vec{x}_t)$.
+            \item \textbf{``Descent'' lemma} (Convex): $\| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f^\star) + \gamma_t^2 \| \vec{g}_t \|^2$.
+                  \proof{Norm of update rule$-\vec{x}^\star$ $\Rightarrow$ $\Pi_X$ is non-expansive $\Rightarrow$ Cosine theorem $\Rightarrow$ Subgradient definition (exists because of convexity).}
+            \item (Convex): $\min_{1 \leq t \leq T} f(\vec{x}_t) - f^\star \leq \frac{\| \vec{x}_1 - \vec{x}^\star \|^2 + \sum_{t=1}^{T} \gamma_t^2 \| \vec{g}_t \|^2}{2 \sum_{t=1}^{T} \gamma_t}$.
+                  \proof{Rearrange ``descent'' lemma $\Rightarrow$ Sum and divide by $\sum_{t=1}^T \gamma_t$.}
+            \item ($\mu$-SC, $B$-Lipschitz, $\gamma_t \colonequals \frac{2}{\mu(t+1)}$): $\min_{1 \leq t \leq T} f(\vec{x}_t) - f^\star \leq \frac{2B^2}{\mu(T+1)}$.
+                  \proof{Adapt ``descent'' lemma with $\mu$-SC $\Rightarrow$ Def. of $\gamma_t$ and $\| \vec{g}_t \| \leq B$.}
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Mirror descent}
+        \begin{itemize}
+            \item Exploit non-Euclidean geometry of convex set $X$.
+            \item \textbf{Bregman divergence}: Let $\omega: \Omega \to \R$ be continuously differentiable on $\Omega$ and $1$-SC w.r.t. some norm $\| \cdot \|$. Then, \[
+                      V_{\omega}(\vec{x}, \vec{y}) \colonequals \omega(\vec{x}) - \omega(\vec{y}) - \nabla \omega(\vec{y})^\top (\vec{x} - \vec{y}).
+                  \]
+            \item \textbf{Properties}: $V_{\omega}(\vec{x}, \vec{y}) \geq 0$; $V_{\omega}(\vec{x}, \vec{y})$ is convex in $\vec{x}$; $V_{\omega}(\vec{x}, \vec{y}) = 0$ iff $\vec{x} = \vec{y}$; and $V_{\omega}(\vec{x}, \vec{y}) \geq \frac{1}{2} \| \vec{x} - \vec{y} \|^2$.
+            \item \textbf{3-point id.}: $V_{\omega}(\vec{x}, \vec{z}) = V_{\omega}(\vec{x}, \vec{y}) + V_{\omega}(\vec{y}, \vec{z}) - \langle \nabla \omega(\vec{z}) - \nabla \omega(\vec{y}), \vec{x} - \vec{y} \rangle$.
+            \item \textbf{Update rule}: $\vec{x}_{t+1} \in \argmin_{\vec{x} \in X} V_{\omega}(\vec{x}, \vec{x}_t) + \langle \gamma_t \vec{g}_t, \vec{x} \rangle, \vec{g}_t \in \partial f(\vec{x}_t)$. This is a generalization of subgradient descent.
+            \item \textbf{Lemma}: $\gamma_t(f(\vec{x}_t) - f^\star) \leq V_{\omega}(\vec{x}^\star, \vec{x}_t) - V_{\omega}(\vec{x}^\star, \vec{x}_{t+1}) + \frac{\gamma_t^2}{2} \| \gamma_t \|_\star^2$.
+                  \proof{Rearrange update rule 1st-order optimality $\Rightarrow$ 3PI $\Rightarrow$ $-V_{\omega}(\vec{x}_{t+1}, \vec{x}_t) \leq -\frac{1}{2}\| \vec{x}_t - \vec{x}_{t+1} \|^2$ $\Rightarrow$ Subgradient definition and bound with prev. $\Rightarrow$ Young's inequality: $\langle \gamma_t \vec{g}_t, \vec{x}_t - \vec{x}_{t+1} \rangle \leq \frac{1}{2} \| \vec{x}_t - \vec{x}_{t+1} \|^2 + \frac{1}{2} \| \gamma_t \vec{g}_t \|^2_\star$.}
+            \item (Convex): $\min_{1\leq t\leq T} f(\vec{x}_t) - f^\star \leq \frac{V_{\omega}(\vec{x}^\star, \vec{x}_0) + \frac{1}{2} \sum_{t=1}^{T} \gamma_t^2 \| \vec{g}_t \|_\star^2}{\sum_{t=1}^{T} \gamma_t}$.
+                  \proof{Easily follows from above lemma by summing, dividing by summed $\gamma_t$, and telescoping sum.}
+        \end{itemize}
+    \end{topic}
 
+    \begin{topic}{Smoothing}
+        \begin{itemize}
+            \item \textbf{Nesterov smoothing}: $f_{\mu}(\vec{x}) \colonequals \max_{\vec{y} \in \dom{f^\star}} \langle \vec{x}, \vec{y} \rangle - f^\star(\vec{y}) - \mu \cdot d(\vec{y})$, where $d$ is $1$-SC and non-negative.
+            \item $f_{\mu}$ is $\nicefrac{1}{\mu}$-smooth and approximates $f$ by $f(\vec{x}) - \mu D^2 \leq f_{\mu}(\vec{x}) \leq f(\vec{x})$, $D^2 \colonequals \max_{\vec{y} \in \dom{f^\star}} d(\vec{y})$.
+            \item Applying GD to $f_{\mu}$ converges faster than subgradient descent.
+            \item \textbf{Moreau-Yosida smoothing}: $f_{\mu}(\vec{x}) \colonequals \min_{\vec{y} \in \dom{f^\star}} f(\vec{y}) - \frac{1}{2 \mu} \| \vec{x} - \vec{y} \|_2^2$.
+            \item $f_{\mu}$ is $\nicefrac{1}{\mu}$-smooth and minimizes exactly: $\min f(\vec{x}) = \min f_{\mu}(\vec{x})$.
+            \item $\nabla f_{\mu}(\vec{x}) = \frac{1}{\mu}(\vec{x} - \mathrm{prox}_{\mu f}(\vec{x}))$.
+        \end{itemize}
+    \end{topic}
+
+    \begin{topic}{Proximal algorithms}
+        \begin{itemize}
+            \item \textbf{Proximal point algorithm}: Apply gradient descent to Moreau-Yosida $f_{\mu}$: $\vec{x}_{t+1} = \mathrm{prox}_{\lambda_t f}(\vec{x}_t)$.
+            \item (Convex): $f(\vec{x}_{T+1}) - f^\star \leq \frac{\| \vec{x}_1 - \vec{x}^\star \|^2}{2 \sum_{t=1}^{T} \lambda_t}$
+                  \proof{Subgradient optimality: $-\frac{\vec{x}_{t+1} - \vec{x}_t}{\lambda_t} \in \partial f(\vec{x}_{t+1})$ $\Rightarrow$ Subgradient exists because of convexity $\Rightarrow$ Subgradient definition $\Rightarrow$ Cosine theorem $\Rightarrow$ Sum over timesteps and use that it is a descent method.}
+            \item \textbf{Proximal gradient method}: Consider $F(\vec{x}) \colonequals f(\vec{x}) + g(\vec{x})$ with differentiable $f$ (both are convex): $\vec{x}_{t+1} = \mathrm{prox}_{\gamma_t g}(\vec{x}_t - \gamma_t \nabla f(\vec{x}_t))$.
+            \item ($f$ is $L$-smooth, $\gamma_t \colonequals \frac{1}{L}$): $F(\vec{x}_{T+1}) - F^\star \leq \frac{L \| \vec{x}_1 - \vec{x}^\star \|^2}{2T}$.
+                  \proof{Subgradient optimality: $\frac{1}{\gamma_t} (\vec{x}_t - \vec{x}_{t+1} - \gamma_t \nabla f(\vec{x}_t)) \in \partial g(\vec{x}_{t+1})$ $\Rightarrow$ Subgradient exists because of convexity $\Rightarrow$ Subgradient definition $\Rightarrow$ Cosine theorem $\Rightarrow$ $- \langle \nabla f(\vec{x}_t), \vec{x}_{t+1} - \vec{x} \rangle = - \langle \nabla f(\vec{x}_t), \vec{x}_{t+1} - \vec{x}_t \rangle - \langle \nabla f(\vec{x}_{t+1}), \vec{x}_t - \vec{x} \rangle$ $\Rightarrow$ Smoothness, convexity, and definition of $\gamma_t$.}
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Stochastic optimization}
-
+        \begin{itemize}
+            \item \textbf{Optimization problem}: $\min_{\vec{x} \in \R^d} F(\vec{x}) \colonequals \E_{\vec{\xi}}[f(\vec{x},
+                          \vec{\xi})]$.
+            \item \textbf{Unbiased gradient}: $\E_{\vec{\xi}}[\nabla f(\vec{x}, \vec{\xi}) \mid \vec{x}] = \nabla F(\vec{x})$.
+            \item \textbf{Update rule}: $\vec{\xi}_t \sim P$, $\vec{x}_{t+1} = \vec{x}_t - \gamma_t \nabla f(\vec{x}_t, \vec{\xi}_t)$.
+            \item \textbf{Bounded variance}: $\E \| \nabla f(\vec{x}_t, \vec{\xi}_t) - \nabla F(\vec{x}) \|^2 \leq \sigma^2$.
+            \item ($L$-smooth, bounded variance, random output, $\gamma \colonequals \min \lft\{ \frac{1}{L}, \frac{\gamma_0}{\sigma \sqrt{T}} \rgt\}$): \\
+                  $\E \| \nabla F(\hat{\vec{x}}_T) \|^2 \leq \frac{\sigma}{\sqrt{T}} \lft( \frac{2(F(\vec{x}_1) - F^\star)}{\gamma_0} + L \gamma_0 \rgt) + \frac{2L(F(\vec{x}_1) - F^\star)}{T}$, where $\hat{\vec{x}}_T \sim \mathrm{Unif}(\{ \vec{x}_1, \ldots, \vec{x}_T \})$.
+                  \proof{Smoothness of $F$ on $(\vec{x}_{t+1}, \vec{x}_t)$ in $\E$ $\Rightarrow$ Update rule: $\vec{x}_{t+1} - \vec{x}_t = -\gamma_t \nabla f(\vec{x}_t, \vec{\xi}_t)$ $\Rightarrow$ $\E[X^2] + \E[X]^2 + \Var[X]$: $\E \| \nabla f(\vec{x}_t, \vec{\xi}_t) \|^2 = \| \nabla F(\vec{x}_t) \|^2 + \E \| \nabla f(\vec{x}_t, \vec{\xi}_t) - \nabla F(\vec{x}_t) \|^2 \leq \| \nabla F(\vec{x}_t) \|^2 + \sigma^2$ $\Rightarrow$ $\gamma_t \leq \frac{1}{L}$ $\Rightarrow$ Rearrange $\Rightarrow$ Use definition of $\hat{\vec{x}}_T$ $\Rightarrow$ Telescoping sum $\Rightarrow$ Definition of $\gamma_t$ $\Rightarrow$ $\max \{ a,b \} \leq a + b$ if $a,b \geq 0$.}
+            \item ($L$-smooth, $\E \| \nabla f(\vec{x}, \vec{\xi}) \|^2 \leq B^2$)
+                  $\E[F(\hat{\vec{x}}_T) - F^\star] \leq \frac{R^2 + B^2 \sum_{t=1}^{T} \gamma_t^2}{2 \sum_{t=1}^{T} \gamma_t}$, where $\hat{\vec{x}_t} \colonequals \frac{\sum_{t=1}^{T} \gamma_t \vec{x}_t}{\sum_{t=1}^{T} \gamma_t}$ and $\| \vec{x}_1 - \vec{x}^\star \| \leq R$.
+                  \proof{Squared norm of update rule$-\vec{x}^\star$ $\Rightarrow$ Cosine theorem $\Rightarrow$ Law of total expectation to bound inner product $\Rightarrow$ Convexity of $F$ $\Rightarrow$ Telescoping sum $\Rightarrow$ Jensen's inequality.}
+            \item ($\mu$-SC, $\E \| \nabla f(\vec{x}, \vec{\xi}) \|^2 \leq B^2$, $\gamma_t \colonequals \frac{\gamma}{t}$, $\gamma > \frac{1}{2 \mu}$)\\
+                  $\E \| \vec{x}_T - \vec{x}^\star \|^2 \leq \frac{\max \{ \frac{\gamma^2 B^2}{2 \mu \gamma - 1}, \| \vec{x}_1 - \vec{x}^\star \|^2 \}}{T}$.
+                  \proof{Squared norm of update rule$-\vec{x}^\star$ $\Rightarrow$ Cosine theorem $\Rightarrow$ $\mu$-SC to get $\E[\nabla f(\vec{x}_t, \vec{\xi}_t)^\top(\vec{x}_t - \vec{x}^\star)] \geq \mu \cdot \E \| \vec{x}_t - \vec{x}^\star \|^2$ $\Rightarrow$ Recursion.}
+            \item \textbf{Adaptive method}: $\vec{g}_t = \nabla f(\vec{x}_t, \vec{\xi}_t)$, $\vec{m}_t = \phi_t(\vec{g}_1, \ldots, \vec{g}_t)$, $\mat{V}_t = \psi_t(\vec{g}_1, \ldots, \vec{g}_t)$, $\hat{\vec{x}}_t = \vec{x}_t - \alpha_t \mat{V}_t^{-\nicefrac{1}{2}} \vec{m}_t$, $\vec{x}_{t+1} = \argmin_{\vec{x} \in X} \lft\{ (\vec{x} - \hat{\vec{x}}_t)^\top \mat{V}_t^{-\nicefrac{1}{2}}(\vec{x} - \hat{\vec{x}}_t) \rgt\}$.
+                  \begin{itemize}
+                      \item \textbf{SGD}: $\vec{m}_t = \vec{g}_t$, $\mat{V}_t = \mat{I}$.
+                      \item \textbf{AdaGrad}: $\vec{m}_t = \vec{g}_t$, $\mat{V}_t = \frac{\mathrm{diag}(\sum_{\tau=1}^{t} \vec{g}_{\tau}^2)}{t}$.
+                      \item \textbf{Adam}: $\vec{m}_t = (1-\alpha) \sum_{\tau}^{t} \alpha^{t-\tau} \vec{g}_{\tau}$, $\mat{V}_t = (1-\beta) \mathrm{diag} \lft( \sum_{\tau=1}^{t} \beta^{t-\tau} \vec{g}_{\tau}^2 \rgt)$.
+                            Recursively: $\vec{m}_t = \alpha \vec{m}_{t-1} + (1-\alpha) \vec{g}_t$, $\mat{V}_t = \beta \mat{V}_{t-1} + (1-\beta)\mathrm{diag}(\vec{g}_t^2)$.
+                  \end{itemize}
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Variance reduction}
-
+        \begin{itemize}
+            \item SGD requires more iterations due to high variance $\Rightarrow$ Reduce variance.
+            \item \textbf{Finite-sum optimization}: $\min_{\vec{x} \in \R^d} F(\vec{x}) \colonequals \frac{1}{n} \sum_{i=1}^{n} f_i(\vec{x})$.
+            \item If we want to estimate $\theta = \E[X]$, we can also estimate $\vec{\theta}$ as $\E[X-Y]$ if and
+                  only if $\E[Y] = 0$. Furthermore, $\Var[X-Y] \leq \Var[X]$ if $Y$ is highly positively correlated
+                  with $X$. Specifically, if $\mathrm{Cov}(X, Y) > \frac{1}{2} \Var[Y]$, the variance will be
+                  reduced.
+            \item Let $\alpha \in [0,1]$, we estimate $\theta$ by $\hat{\theta}_{\alpha} = \alpha(X-Y) + \E[Y]$. We
+                  then have
+                  \begin{align*}
+                      \E[\hat{\theta}_{\alpha}]   & = \alpha\E[X] + (1-\alpha)\E[Y]                             \\
+                      \Var[\hat{\theta}_{\alpha}] & = \alpha^2 (\Var[X] + \Var[Y] - 2 \cdot \mathrm{Cov}(X,Y)).
+                  \end{align*}
+                  Implication: Trade-off between bias and variance, where $\alpha=1$ makes the estimator unbiased, but the variance decreases when $\alpha$ decreases.
+            \item SGD estimates $\nabla F(\vec{x}_t)$ by $\nabla f_{i_t}(\vec{x}_t)$, but VR methods estimate the
+                  full gradient by \[
+                      \vec{g}_t \colonequals \alpha(\nabla f_{i_t}(\vec{x}_t) - Y) + \E[Y],
+                  \]
+                  such that $\vec{g}_t$ satisfies the \textbf{VR property}: $\lim_{t \to \infty} \E \| \vec{g}_t -
+                      \nabla F(\vec{x}_t) \|^2 = 0$.
+            \item \textbf{Key idea}: If $\vec{x}_t$ is not too far away from previous iterates
+                  $\vec{x}_{1:t-1}$, we can leverage previous gradient information to construct
+                  positively correlated control variates $Y$.
+                  \begin{itemize}
+                      \item \textbf{Stochastic Average Gradient (SAG)}: Keep track of the latest gradients $\vec{v}_i^t$ for all points $i \in [n]$: $\mathcal{O}(nd)$ storage requirement. Estimate full gradient by average of these: \[
+                                \vec{g}_t = \frac{1}{n} \sum_{i=1}^{n} \vec{v}_i^t.
+                            \]
+                            Each iteration we update $\vec{v}_i^t$ by \[
+                                \vec{v}_i^t =
+                                \begin{cases}
+                                    \nabla f_{i_t}(\vec{x}_t) & i = i_t     \\
+                                    \vec{v}_i^{t-1}           & i \neq i_t.
+                                \end{cases}
+                            \]
+                            Thus, we have $\alpha=\frac{1}{n}$, $Y = \vec{v}_{i_t}^{t-1}$, and $\E[Y] = \vec{g}_{t-1}$, \[
+                                \vec{g}_t = \frac{1}{n} \lft( \nabla f_{i_t}(\vec{x}_t) - \vec{v}_{i_t}^{t-1} \rgt) + \vec{g}_{t-1}.
+                            \]
+                            Problem: (1) $\mathcal{O}(nd)$ storage, (2) biased $\alpha \neq 1$. Advantage:
+                            $\mathcal{O}((n+\kappa_{\max} \log \frac{1}{\epsilon}))$ iteration complexity, where $\kappa_{\max}
+                                = \max_{i \in [n]} \frac{L_i}{\mu}$.
+                      \item \textbf{SAGA}: Unbiased version of SAG, because it sets $\alpha=1$: \[
+                                \vec{g}_t = \nabla f_{i_t}(\vec{x}_t) - \vec{v}_{i_t}^{t-1} + \vec{g}_{t-1}.
+                            \]
+                            But, it still enjoys the same benefits.
+                      \item \textbf{Stochastic variance reduced gradient (SVRG)}: Build covariates based on a fixed reference point $\tilde{\vec{x}}$ that is periodically updated every $m$-th iteration: \[
+                                \vec{g}_t = \nabla f_{i_t}(\vec{x}_t) - \nabla f_{i_t}(\tilde{\vec{x}}) + \nabla F(\tilde{\vec{x}}).
+                            \]
+                            Problem: (1) $\mathcal{O}(n+2m)$ gradient evaluations per epoch, (2) More hyperparameters.
+                            Advantages: (1) Unbiased, (2) $\mathcal{O}(d)$ memory cost, (3) Same iteration complexity as
+                            SAG(A).
+                  \end{itemize}
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Min-max optimization}
-
+        \begin{itemize}
+            \item \textbf{Optimization problem}: $\min_{\vec{x} \in X} \max_{\vec{y} \in Y} \phi(\vec{x}, \vec{y})$.
+            \item \textbf{Saddle point}: $(\vec{x}^\star, \vec{y}^\star)$ is a saddle point if \[
+                      \phi(\vec{x}^\star, \vec{y}) \leq \phi(\vec{x}^\star, \vec{y}^\star) \leq \phi(\vec{x}, \vec{y}^\star), \quad \forall \vec{x} \in X, \vec{y} \in Y.
+                  \]
+                  Interpretation: No player has the incentive to make a unilateral change, because it can only get
+                  worse. Game theory: Nash equilibrium.
+            \item \textbf{Global minimax point}: $(\vec{x}^\star, \vec{y}^\star)$ is a global minimax point if \[
+                      \phi(\vec{x}^\star, \vec{y}) \leq \phi(\vec{x}^\star, \vec{y}^\star) \leq \max_{\vec{y}' \in Y} \phi(\vec{x}, \vec{y}'), \quad \forall \vec{x} \in X, \vec{y} \in Y.
+                  \]
+                  Interpretation: $\vec{x}^\star$ is the best response to the best response. Game theory: Stackelberg
+                  equilibrium.
+            \item $\max_{\vec{y} \in Y} \min_{\vec{x} \in X} \phi(\vec{x}, \vec{y}) \leq \min_{\vec{x} \in X} \max_{\vec{y} \in Y} \phi(\vec{x}, \vec{y})$.
+            \item \textbf{Saddle point lemma}: $(\vec{x}^\star, \vec{y}^\star)$ is a saddle point if and only if $\max_{\vec{y} \in Y} \min_{\vec{x} \in X} \phi(\vec{x}, \vec{y}) = \min_{\vec{x} \in X} \max_{\vec{y} \in Y} \phi(\vec{x}, \vec{y})$.
+            \item \textbf{Minimax theorem}: If $X$ and $Y$ are closed convex sets, one of them is bounded, and $\phi$ is a continuous convex-concave function, then there exists a saddle point in $X \times Y$.
+            \item \textbf{Duality gap}: $\hat{\epsilon}(\vec{x}, \vec{y}) \colonequals \max_{\vec{y}' \in Y} \phi(\vec{x}, \vec{y}') - \min_{\vec{x}' \in X} \phi(\vec{x}', \vec{y}) \geq 0$.
+            \item If $\hat{\epsilon}(\vec{x}, \vec{y}) = 0$, then $(\vec{x}, \vec{y})$ is a saddle point and if
+                  $\hat{\epsilon}(\vec{x}, \vec{y}) \leq \epsilon$, then $(\vec{x}, \vec{y})$ is an $\epsilon$-saddle
+                  point.
+            \item \textbf{Gradient descent ascent (GDA)}: $\vec{x}_{t+1} = \Pi_X(\vec{x}_t - \gamma \nabla_{\vec{x}} \phi(\vec{x}_t, \vec{y}_t))$, $\vec{y}_{t+1} = \Pi_Y(\vec{y}_t + \gamma \nabla_{\vec{y}} \phi(\vec{x}_t, \vec{y}_t))$. \\
+                  Does not guarantee convergence in C-C setting.
+            \item ($L$-smooth, $\mu$-SC-SC, $\gamma \colonequals \frac{\mu}{4L^2}$): $\| \vec{x}_T - \vec{x}^\star \|^2 + \| \vec{y}_T - \vec{y}^\star \|^2 \leq \lft( 1 - \frac{\mu^2}{4L^2} \rgt)^T (\| \vec{x}_1 - \vec{x}^\star \|^2 + \| \vec{y}_1 - \vec{y}^\star \|^2)$.
+                  \proof{Add $\mu$-SC-SC definitions together $\Rightarrow$ Use $L$-smoothness for a bound $\Rightarrow$ Use update rule in $\| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2$ $\Rightarrow$ Non-expansiveness of projection $\Rightarrow$ Rearrange $\Rightarrow$ Cosine theorem $\Rightarrow$ Bound inner products using SC-SC and smoothness.}
+            \item \textbf{Extragradient method (EG)}:
+                  \begin{align*}
+                      \vec{x}_{t+\nicefrac{1}{2}} & = \Pi_X(\vec{x}_t - \gamma \nabla_{\vec{x}} \phi(\vec{x}_t, \vec{y}_t))                                      \\
+                      \vec{y}_{t+\nicefrac{1}{2}} & = \Pi_Y(\vec{y}_t + \gamma \nabla_{\vec{y}} \phi(\vec{x}_t, \vec{y}_t))                                      \\
+                      \vec{x}_{t+1}               & = \Pi_X(\vec{x}_t - \gamma \nabla_{\vec{x}} \phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}}))  \\
+                      \vec{y}_{t+1}               & = \Pi_Y(\vec{y}_t + \gamma \nabla_{\vec{y}} \phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})).
+                  \end{align*}
+            \item ($L$-smooth, C-C, $\gamma \leq \frac{1}{2L}$): $\hat{\epsilon}(\bar{\vec{x}}, \bar{\vec{y}}) \leq \frac{D_X^2 + D_Y^2}{2 \gamma T}$, where $\bar{\vec{x}} = \frac{1}{T} \sum_{t=1}^{T} \vec{x}_{t+\nicefrac{1}{2}}$ and $\bar{\vec{y}} = \frac{1}{T} \sum_{t=1}^{T} \vec{y}_{t+\nicefrac{1}{2}}$.
+            \item ($L$-smooth, $\mu$-SC-SC, $\gamma \colonequals \frac{1}{8L}$): $\| \vec{x}_{t+1} - \vec{x}^\star \|^2 + \| \vec{y}_{t+1} - \vec{y}^\star \|^2 \leq \lft( 1 - \frac{\mu}{4L} \rgt) \lft( \| \vec{x}_t - \vec{x}^\star \|^2 + \| \vec{y}_t - \vec{y}^\star \|^2 \rgt)$.
+            \item \textbf{Optimistic gradient descent ascent (OGDA)}:
+                  \begin{align*}
+                      \vec{x}_{t+\nicefrac{1}{2}} & = \Pi_X(\vec{x}_t - \gamma \nabla_{\vec{x}} \phi(\vec{x}_{t-\nicefrac{1}{2}}, \vec{y}_{t-\nicefrac{1}{2}}))  \\
+                      \vec{y}_{t+\nicefrac{1}{2}} & = \Pi_Y(\vec{y}_t + \gamma \nabla_{\vec{y}} \phi(\vec{x}_{t-\nicefrac{1}{2}}, \vec{y}_{t-\nicefrac{1}{2}}))  \\
+                      \vec{x}_{t+1}               & = \Pi_X(\vec{x}_t - \gamma \nabla_{\vec{x}} \phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}}))  \\
+                      \vec{y}_{t+1}               & = \Pi_Y(\vec{y}_t + \gamma \nabla_{\vec{y}} \phi(\vec{x}_{t+\nicefrac{1}{2}}, \vec{y}_{t+\nicefrac{1}{2}})).
+                  \end{align*}
+            \item In the case $X = Y = \R^d$, this can be seen as negative momentum:
+                  \begin{align*}
+                      \vec{x}_{t+1} & = \vec{x}_t - 2 \gamma \nabla_{\vec{x}} \phi(\vec{x}_t, \vec{y}_t) + \gamma \nabla_{\vec{x}} \phi(\vec{x}_{t-1}, \vec{y}_{t-1})  \\
+                      \vec{y}_{t+1} & = \vec{y}_t + 2 \gamma \nabla_{\vec{y}} \phi(\vec{x}_t, \vec{y}_t) - \gamma \nabla_{\vec{y}} \phi(\vec{x}_{t-1}, \vec{y}_{t-1}).
+                  \end{align*}
+            \item \textbf{Proximal point algorithm}: \[
+                      (\vec{x}_{t+1}, \vec{y}_{t+1}) \in \argmin_{\vec{x} \in X} \argmax_{\vec{y} \in Y} \phi(\vec{x}, \vec{y}) + \frac{1}{2 \gamma} \| \vec{x} - \vec{x}_t \|^2 - \frac{1}{2 \gamma} \| \vec{y} - \vec{y}_t \|^2.
+                  \]
+        \end{itemize}
     \end{topic}
 
     \begin{topic}{Variational inequalities}
-
+        \begin{itemize}
+            \item Generalizes all of the above to mapping $F: \mathcal{Z} \to \R^d$. Goal: Find $\vec{z}^\star \in
+                      \mathcal{Z}$, such that $\langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall
+                      \vec{z} \in \mathcal{Z}$.
+            \item \textbf{Monotone operator}: $\langle F(\vec{x}) - F(\vec{y}), \vec{x} - \vec{y} \rangle \geq 0$.
+            \item \textbf{$\mu$-strongly monotone}: $\langle F(\vec{x}) - F(\vec{y}), \vec{x} - \vec{y} \rangle \geq \mu \| \vec{x} - \vec{y} \|^2$.
+            \item \textbf{VI strong solution (Stampacchia)}: $\langle F(\vec{z}^\star), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}$.
+            \item \textbf{VI weak solution (Minty)}: $\langle F(\vec{z}), \vec{z} - \vec{z}^\star \rangle \geq 0, \forall \vec{z} \in \mathcal{Z}$.
+            \item If $F$ is monotone, then strong $\Rightarrow$ weak. If $F$ is continuous, then weak $\Rightarrow$
+                  strong.
+            \item Convex minimization can be cast as VI problem by defining $F = \nabla f$ for a convex function.
+                  Min-max problems can be cast as VI problem by defining $F = [\nabla_{\vec{x}} \phi,
+                      -\nabla_{\vec{y}} \phi]$ for a convex-concave $\phi$.
+            \item \textbf{Extragradient method}:
+                  \begin{align*}
+                      \vec{z}_{t+\nicefrac{1}{2}} & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_t))                    \\
+                      \vec{z}_{t+1}               & = \Pi_{\mathcal{Z}}(\vec{z}_t - \gamma_t F(\vec{z}_{t+\nicefrac{1}{2}})).
+                  \end{align*}
+            \item ($L$-smooth, monotone, $\gamma \colonequals \frac{1}{\sqrt{2L}}$): $\max_{\vec{z} \in \mathcal{Z}} \langle F(\vec{z}), \bar{\vec{z}} - \vec{z} \rangle \leq \frac{\sqrt{2} LD_{\mathcal{Z}}^2}{T}$, where $\bar{\vec{z}} = \frac{1}{T} \sum_{t=1}^{T} \vec{z}_{t+\nicefrac{1}{2}}$.
+                  \proof{Optimality condition w.r.t. $\vec{z}_{t+\nicefrac{1}{2}}$ $\Rightarrow$ Rewrite using cosine theorem $\Rightarrow$ Optimality condition w.r.t. $\vec{z}_{t+1}$ (set $\vec{z} = \vec{z}_{t+1}$ in the other optimality condition) $\Rightarrow$ Use previous and Cauchy-Schwarz to bound $2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z} \rangle = 2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+\nicefrac{1}{2}} - \vec{z}_{t+1} \rangle + 2 \gamma \langle F(\vec{z}_{t+\nicefrac{1}{2}}), \vec{z}_{t+1} - \vec{z} \rangle$ $\Rightarrow$ Smoothness and $\gamma = \frac{1}{L}$ $\Rightarrow$ Young's inequality: $\| \vec{x} \| \cdot \| \vec{y} \| \leq \frac{1}{2} \| \vec{x} \|^2 + \frac{1}{2} \| \vec{y} \|^2$ $\Rightarrow$ Use monotonicity and sum over all timesteps.}
+        \end{itemize}
     \end{topic}
+
+    \textit{EXTRA ROOM FOR MORE INFORMATION IF NEEDED. MAYBE ADD THINGS THAT WERE USEFUL FOR THE GRADED ASSIGNMENTS. MAYBE ELABORATE ON SOME PROOFS.}
 \end{multicols*}
 
 \newpage
@@ -714,7 +1007,7 @@
 %                   \]
 %         \end{itemize}
 %
-%         \textbf{Subgradient method update rule}: $\vec{x}_{t+1} = \Pi_{\mathcal{X}}(\vec{x}_t - \gamma_t \gamma_t), \vec{g}_t \in \partial f(\vec{x}_t)$.
+%         \textbf{Subgradient method update rule}: $\vec{x}_{t+1} = \Pi_X(\vec{x}_t - \gamma_t \gamma_t), \vec{g}_t \in \partial f(\vec{x}_t)$.
 %
 %         \textbf{``Descent'' lemma}: If $f$ is convex, then for any optimal solution $\vec{x}^\star$, we have \[
 %             \| \vec{x}_{t+1} - \vec{x}^\star \|^2 \leq \| \vec{x}_t - \vec{x}^\star \|^2 - 2 \gamma_t (f(\vec{x}_t) - f^\star) + \gamma_t^2 \| \vec{g}_t \|^2.
