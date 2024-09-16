@@ -1,0 +1,545 @@
+\documentclass{article}
+
+\usepackage[landscape, a4paper, margin=0.2cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[osf,sc]{mathpazo}
+\usepackage[most]{tcolorbox}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac}
+\usepackage{blindtext}
+\usepackage{derivative}
+\usepackage{nicefrac}
+\usepackage{savetrees}
+\usepackage[document]{ragged2e}
+
+\usepackage{color,soul}
+\usepackage{xcolor}
+
+\DeclareRobustCommand{\hlal}[1]{{\textcolor{red}{#1}}}
+\DeclareRobustCommand{\hlep}[1]{{\textcolor{olive}{#1}}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\DeclareRobustCommand{\hleq}[1]{{\sethlcolor{pink} \hl{#1}}}
+
+\DeclareMathOperator*{\argmax}{amax}
+\DeclareMathOperator*{\argmin}{amin}
+
+\newcommand{\lft}{\mathopen{}\left}
+\newcommand{\rgt}{\aftergroup\mathclose\aftergroup{\aftergroup}\right}
+
+\newcommand{\E}{\mathbb{E}}
+
+\title{Probabilistic Artificial Intelligence cheatsheet}
+
+\newenvironment{topic}[1]
+{\textbf{\sffamily  \colorbox{black}{\textcolor{white}{#1}}}}
+{}
+
+\parindent0pt
+\parskip2pt
+
+\begin{document}
+
+\setlength{\columnsep}{0.2cm}
+
+\begin{multicols*}{3}
+
+  \begin{topic}{Probability review}
+
+    \textbf{Product rule}: \hleq{$P(X_{1:n}) = P(X_1) \prod_{i=2}^n P(X_i \mid
+    X_{1:i-1})$.}
+
+    \textbf{Sum rule}: \hleq{$P(X,Y) = \sum_{y} P(X, Y=y)$.}
+
+    \textbf{Bayes rule}: \hleq{$P(X\mid Y) = \nicefrac{P(Y\mid X) P(X)}{P(Y)}$.}
+
+    \textbf{Independence}: $P_{XY} = P_X P_Y$.
+
+    \textbf{Conditional independence}: $P_{XY\mid Z} = P_{X\mid Z} P_{Y\mid
+    Z}$.
+
+    \textbf{Linearity of expectation}: \hleq{$\E_{x,y}[aX + bY] = a\E_x[X] +
+    b\E_y[Y]$.}
+
+    \textbf{Expectation}: \hl{$\E_{p}[f(X)] = \sum_{i=0}^n p(x) f(x)$} (don't forget $p(x)$).
+
+    \textbf{Variance}: $\mathrm{Var}[X] = \E[(X - \E[X])^2] =
+    \E[X^2]-\E[X]^2$.
+
+    \textbf{Linearity of variance}:\\ \hleq{$\mathrm{Var}[aX + bY + c] =
+    a^2\mathrm{Var}[X] + b^2\mathrm{Var}[Y] + 2ab\mathrm{Cov}(X,Y)$.}
+
+    \textbf{Covariance}: $\mathrm{Cov}(X,Y) = \E[(X - \E[X])(Y
+    - \E[Y])]$.
+
+    \textbf{Cum. dist. function}: $\mathbb{P}(x \leq t) = F(t)$, where $F$ is CDF.
+
+    \textbf{Matrix inversion}: $\begin{bmatrix} a & b \\ c & d
+      \end{bmatrix}^{-1} = \frac{1}{ad-bc} \begin{bmatrix} d & -b \\ -c & a
+    \end{bmatrix}$.
+
+    \textbf{Multivariate Gaussian}: \[
+      \text{\hleq{$\mathcal{N}(\bm{x};\bm{\mu},\bm{\Sigma}) = \frac{1}{\sqrt{(2\pi)^d |\bm{\Sigma}|}} \exp \lft( -\frac{1}{2} (\bm{x}-\bm{\mu})^\top \bm{\Sigma}^{-1} (\bm{x} - \bm{\mu}) \rgt)$}}
+    .\]
+    A random vector is Gaussian if (1) the RVs are Gaussian, and (2) any linear
+    combination of the RVs is Gaussian.
+
+    \textbf{Properties}: \begin{align*}
+      \bm{X}_A &\sim \mathcal{N}(\bm{\mu}_A, \bm{\Sigma}_{AA}) \\
+      \bm{X}_A \mid \bm{X}_B &\sim \mathcal{N}(\bm{\mu}_{A\mid B}, \bm{\Sigma}_{A\mid B}) \\
+      \bm{\mu}_{A\mid B} &= \bm{\mu}_A + \bm{\Sigma}_{AB} \bm{\Sigma}_{BB}^{-1} (\bm{x}_B - \bm{\mu}_B) \\
+      \bm{\Sigma}_{A\mid B} &= \bm{\Sigma}_{AA} - \bm{\Sigma}_{AB} \bm{\Sigma}_{BB}^{-1} \bm{\Sigma}_{BA} \\
+      \bm{M}\bm{X} &\sim \text{\hleq{$\mathcal{N} \lft( \bm{M}\bm{\mu}, \bm{M}\bm{\Sigma}\bm{M}^\top \rgt)$}} \\
+      \bm{X} + \bm{X}' &\sim \text{\hleq{$\mathcal{N}(\bm{\mu} + \bm{\mu}', \bm{\Sigma} + \bm{\Sigma}')$}}
+    \end{align*}
+
+    \hl{If asked about \textbf{conditional distribution of linear functions of
+    Gaussians}, notice that the functions can be jointly computed by a matrix
+    operation, which results in a Gaussian, or use LoV.}
+
+    \textbf{Kalman filters}: Motion model updates the state $\mathrm{X}_{t+1} =
+    \bm{F}\mathrm{X}_t + \bm{\epsilon}_t$. Sensor model computes observation
+    $\mathrm{Y}_t = \bm{H} \mathrm{X}_t + \bm{\eta}_t$. $\bm{\epsilon}_t \sim
+    \mathcal{N}(\bm{0},\bm{\Sigma}_x)$, $\bm{\eta}_t \sim
+    \mathcal{N}(\bm{0},\bm{\Sigma}_y)$. $\bm{\epsilon}_t \uparrow \Rightarrow
+    \bm{K}_{t+1} \uparrow$, $\bm{\eta}_t \uparrow \Rightarrow \bm{K}_{t+1}
+    \downarrow$, $\bm{\Sigma}_t \uparrow \Rightarrow \bm{K}_{t+1} \uparrow$.
+    Update: \begin{align*}
+      \mathrm{X}_{t+1} \mid \bm{y}_{1:t+1} &\sim \mathcal{N}(\bm{\mu}_{t+1},\bm{\Sigma}_{t+1}) \\
+      \bm{\mu}_{t+1} &= \bm{F}\bm{\mu}_t + \bm{K}_{t+1} (\bm{y}_{t+1} - \bm{H}\bm{F}\bm{\mu}_t) \\
+      \bm{\Sigma}_{t+1} &= (\bm{I} - \bm{K}_{t+1} \bm{H}) (\bm{F}\bm{\Sigma}_t \bm{F}^\top + \bm{\Sigma}_x) \\
+      \bm{K}_{t+1} &= (\bm{F}\bm{\Sigma}_t \bm{F}^\top + \bm{\Sigma}_x) \bm{H}^\top (\bm{H}(\bm{F}\bm{\Sigma}_t\bm{F}^\top + \bm{\Sigma}_x) \bm{H}^\top + \bm{\Sigma}_y)^{-1}
+    \end{align*}
+
+    \textbf{Entropy}: \hleq{$H[p] = \E_p[-\log p(x)]$.}
+
+    \textbf{$d$-Gaussian}: $H[\mathcal{N}(\bm{\mu},\bm{\Sigma})] = \frac{d}{2} (1 + \log(2\pi)) + \frac{1}{2}\log |\bm{\Sigma}|$.
+    
+    \textbf{$1$-Gaussian}: $H[\mathcal{N}(\mu,\sigma^2)] = \frac{1}{2}\log(2\pi\sigma^2) + \frac{1}{2}$.
+
+    $H[p,q] = H[p] + H[q\mid p]$. $H[X\mid Y] = \E_p \lft[\log \frac{p(x,
+    y)}{p(x)} \rgt]$.
+
+    \textbf{KL-divergence}: \hleq{$KL(q \mathrel{\lVert} p) = \E_q \lft[ \log
+    \frac{q(x)}{p(x)} \rgt] = \E_q \lft[ -\log \frac{p(x)}{q(x)} \rgt]$.}
+    Non-negative ($0$ if $p=q$, $\infty$ if $p(x)=0$ for $x$ with $q(x)>0$).
+    Additional expected surprise when observing $q$ samples while assuming $p$.
+
+    \textbf{Mutual information}: $I(X;Y) = H[X] - H[X\mid Y]$. Symmetric:
+    $I(X;Y)=I(Y;X)$. Information never hurts: $I(X;Y) \geq 0$.
+
+    % $I(X;Y\mid Z) = H[X\mid Z] - H[X\mid Y,Z] = I(X;Y,Z) - I(X;Z)$.
+
+    \textbf{Jensen's inequality}: If $f$ convex: $f(\E[X]) \leq \E[f(X)]$.
+
+    \textbf{MLE}: \hleq{$\hat{\bm{\theta}} = \argmax_{\bm{\theta}} p(\bm{y}\mid\bm{X}, \bm{\theta}) = \argmax_{\bm{\theta}} \sum_{i=1}^n \log p(y_i\mid \bm{x}_i, \bm{\theta})$.}
+
+    \textbf{MAP}: \hleq{$\hat{\bm{\theta}} = \argmax_{\bm{\theta}} p(\bm{\theta} \mid \bm{X}, \bm{y}) = \argmax_{\bm{\theta}} \log p(\bm{\theta}) + \sum_{i=1}^n \log p(y_i\mid \bm{x}_i,\bm{\theta})$.}
+
+    \textbf{Bayesian learning}: Prior: $p(\bm{\theta})$. Likelihood:
+    $p(\bm{y}\mid \bm{X},\bm{\theta}) = \prod_{i=1}^n p(y_i \mid
+    \bm{x}_i,\bm{\theta})$. \textbf{Posterior}: $p(\bm{\theta} \mid
+    \bm{X},\bm{y}) = \frac{1}{Z} p(\bm{\theta}) \prod_{i=1}^n p(y_i \mid
+    \bm{x}_i,\bm{\theta})$. $Z = \int p(\bm{\theta}) \prod_{i=1}^n p(y_i \mid
+    \bm{x}_i,\bm{\theta}) d\bm{\theta}$. \textbf{Prediction}: $p(y^\star \mid
+    \bm{x}^\star,\bm{X},\bm{y}) = \int p(y^\star \mid \bm{x}^\star,\bm{\theta})
+    p(\bm{\theta} \mid \bm{X},\bm{y}) d\bm{\theta}$. \hl{In general,
+    intractable: GP, VI, and MCMC solve.}
+
+    \hlal{\textbf{Aleatoric uncertainty}: Uncertainty due to irreducible noise
+    in data.} \hlep{\textbf{Epistemic uncertainty}: Uncertainty due to lack of
+    data.}
+
+    \textbf{LoTV}: $\mathrm{Var}[y^\star \mid \bm{x}^\star] =
+    \text{\hlal{$\E_{\bm{\theta}}[\mathrm{Var}_{y^\star}[y^\star \mid \bm{x}^\star,
+    \bm{\theta}]]$}} + \text{\hlep{$\mathrm{Var}_{\bm{\theta}}[\E_{y^\star}[y^\star\mid
+    \bm{x}^\star, \bm{\theta}]]$}}$.
+  \end{topic}
+
+  \begin{topic}{Bayesian Linear Regression}
+    $f^\star = \bm{w}^\top \bm{x}^\star$, $y^\star = f^\star + \epsilon$,
+    \hlal{$\epsilon \sim \mathcal{N}(0, \sigma_n^2)$}. \textbf{Prior}: $\bm{w}
+    \sim \mathcal{N}(\bm{0}, \sigma_p^2\bm{I})$. \hl{\textbf{Posterior}:
+    $\bm{w}\mid \bm{X},\bm{y} \sim
+    \mathcal{N}(\bar{\bm{\mu}},\bar{\bm{\Sigma}})$, $\bar{\bm{\mu}} =
+    (\bm{X}^\top\bm{X} + \sigma_n^2 \sigma_p^{-2} \bm{I})^{-1} \bm{X}^\top
+    \bm{y} = \sigma_n^{-2} \bm{\Sigma}\bm{X}^\top\bm{y}$, $\bar{\bm{\Sigma}} =
+    (\sigma_n^{-2} \bm{X}^\top \bm{X} + \sigma_p^{-2}\bm{I})^{-1}$.}
+
+    \hl{\textbf{Inference}: $y^\star = \bm{x}^{\star\top}\bm{w} + \epsilon
+    \Rightarrow f^\star \mid \bm{x}^\star,\bm{X},\bm{y} \sim
+    \mathcal{N}(\bm{x}^{\star\top} \bar{\bm{\mu}}, \text{\hlep{$\bm{x}^{\star\top}
+    \bar{\bm{\Sigma}}\bm{x}^\star$}} + \text{\hlal{$\sigma_n^2$}})$.}
+
+    \textbf{Logistic regression}: Bernoulli likelihood ($\pi^y(1-\pi)^{1-y}$).
+
+    \textbf{Recursive update:} $p^{(t+1)}(\bm{\theta}) = p(\bm{\theta}\mid
+    y_{1:{t+1}}) = \frac{1}{Z} p^{(t)}(\bm{\theta}) p(y_{t+1}\mid
+    \bm{\theta})$.
+
+    \textbf{Online data recursion}: $\bm{X}^\top\bm{X} = \sum_{i=1}^n \bm{x}_i
+    \bm{x}_i^\top$, $\bm{X}^\top\bm{y} = \sum_{i=1}^n y_i\bm{x}_i$.
+  \end{topic}
+
+  \begin{topic}{Gaussian Processes}
+    \textbf{Problem}: BLR can only make linear predictions. \textbf{Solution}:
+    GP describes distributions over (non-linear) functions. In function space,
+    $\bm{f}=\bm{X}\bm{w}$, which can be sampled by $\bm{f} \sim
+    \mathcal{N}(\bm{0}, \bm{X}^\top\bm{X})$ $\Rightarrow$ data points enter as
+    inner products $\Rightarrow$ use kernel function $\bm{f} \sim
+    \mathcal{N}(\bm{0},k(\bm{X},\bm{X}))$. \hl{$\mathcal{GP}(\mu,k)$ is
+    formally defined as an infinite collection of RVs, of which any finite
+    number are jointly Gaussian.} \textbf{Kernel:} Formally, $k(\bm{x},\bm{x}')
+    = \bm{\phi}(\bm{x})^\top\bm{\phi}(\bm{x}')$ for some feature function
+    $\bm{\phi}$ $\Rightarrow$ kernel function is more efficient.
+    Intuitively, $k(\bm{x},\bm{x}')$ describes how $f(\bm{x})$ and
+    $f(\bm{x}')$ are related. $k(\bm{X},\bm{X})$ is symmetric and positive
+    semidefinite ($\bm{z}^\top \bm{M} \bm{z} \geq 0$ for all $\bm{z} \neq
+    \bm{0}$). Must satisfy $k(\bm{x},\bm{x}') \leq
+    \sqrt{k(\bm{x},\bm{x})k(\bm{x}',\bm{x}')}$. \textbf{Stationary}:
+    $k(\bm{x},\bm{x}')=k(\bm{x}-\bm{x}')$. \textbf{Isotropic}:
+    $k(\bm{x},\bm{x}')=k(\|\bm{x}-\bm{x}'\|_2)$ (same as stat. in 1D).
+    \textbf{Linear}: Line. \textbf{Gaussian (RBF)}: Smooth, larger $\ell$: smoother.
+    \textbf{Laplace (exponential)}: Non-smooth, larger $\ell$: smoother.
+    \textbf{Mat\`ern}: $\nu=\nicefrac{1}{2}$: Laplace, $\nu\to\infty$:
+    Gaussian. Addition, multiplication, scaling, polynomial function of kernel
+    functions are also kernel functions.
+
+    \textbf{Inference}: $y^\star \mid \bm{x}^\star,\bm{X},\bm{y} \sim
+    \mathcal{N}(\mu^\star,\text{\hlep{$k^\star$}} +
+    \text{\hlal{$\sigma_n^2$}})$ with data $\bm{X}_A$: \begin{align*}
+      \mu^\star &= \text{\hleq{$\mu(\bm{x}^\star) + \bm{k}_{\bm{x}^\star,A}^\top (\bm{K}_{AA} + \sigma_n^2 \bm{I})^{-1} (\bm{y} - \bm{\mu}_A)$}} \\
+      k^\star &= \text{\hleq{$k(\bm{x}^\star,\bm{x}^\star) - \bm{k}_{\bm{x}^\star,A}^\top (\bm{K}_{AA} + \sigma_n^2\bm{I})^{-1} \bm{k}_{\bm{x}^\star,A}$}}
+    .\end{align*}
+
+    \textbf{GP posterior}: $\mathcal{GP}(\mu',k')$ such that: \begin{align*}
+      \mu'(\bm{x}) &= \text{\hleq{$\mu(\bm{x}) + \bm{k}_{\bm{x},A}^\top (\bm{K}_{AA} + \sigma_n^2 \bm{I})^{-1} (\bm{y} - \bm{\mu}_A)$}} \\
+      k'(\bm{x},\bm{x}') &= \text{\hleq{$k(\bm{x},\bm{x}') - \bm{k}_{\bm{x},A}^\top (\bm{K}_{AA} + \sigma_n^2\bm{I})^{-1} \bm{k}_{\bm{x}',A}$}}
+    .\end{align*}
+
+    \textbf{Forward sampling}: Iter sample 1-d Gaussian with prod. rule
+    $p(f_1,\ldots,f_n)$. \textbf{Model selection}: Hyperparameters matter a lot
+    $\Rightarrow$ Can be learned by maximizing marginal likelihood, \[
+      \hat{\bm{\theta}} = \argmin_{\bm{\theta}} \;\;\; \bm{y}^\top
+      \bm{K}_{\bm{y},\bm{\theta}}^{-1} \bm{y} + \log
+      \mathrm{det}(\bm{K}_{\bm{y},\bm{\theta}}) ,\] which balances the goodness
+    of the fit (term 1) and model complexity (term 2).
+
+    \textbf{Problem}: To learn a GP, need to invert matrices, which take
+    $\mathcal{O}(n^3)$ (BLR: $\mathcal{O}(dn^2)$). \textbf{Local methods}:
+    Stationary kernels depend on distance, so only condition if
+    $|k(\bm{x},\bm{x}')| \geq \tau$. \textbf{Approximation}: Approximate
+    stationary kernel with Random Fourier Transform. \textbf{Inducing point
+    (FITC)}: Throw away data where there is a lot (cubic in inducing points,
+    linear in data points).
+  \end{topic}
+
+  \begin{topic}{Variational Inference}
+    In some cases, not realistic to assume Gaussian $\Rightarrow$
+    \hl{Approximate $p(\bm{\theta}\mid\bm{y}) =
+    \frac{1}{Z}p(\bm{\theta},\bm{y}) \approx q_{\lambda}(\bm{\theta})$}
+    $\Rightarrow$ Minimize $KL(q_{\lambda} \mathrel{\lVert} p)$ $\Rightarrow$
+    \hleq{$q^\star = \argmax_{\lambda} \E_{\bm{\theta} \sim q_{\lambda}} [\log
+    p(\bm{y}\mid \bm{\theta})] - KL(q_{\lambda} \mathrel{\lVert}
+    p_{\text{prior}})$}. I.e., minimizing $KL(q_\lambda \mathrel{\lVert} p)$
+    $\equiv$ maximizing expected likelihood, while remaining close to prior.
+    \textbf{ELBO}: Lower bounds $\log p(\bm{y})$, so it is a good method of
+    model selection.
+
+    \textbf{Forward KL} $KL(p \mathrel{\lVert} q_\lambda)$: covers full prob.
+    density, but intractable. \textbf{Backward KL} $KL(q_\lambda
+    \mathrel{\lVert} p)$: greedily covers mode.
+
+    \textbf{Laplace approximation}: $q_{\lambda}(\bm{\theta}) =
+    \mathcal{N}(\hat{\bm{\theta}}, \bm{\Lambda})$, where $\hat{\bm{\theta}} =
+    \argmax_{\bm{\theta}} p(\bm{\theta} \mid \bm{y})$ and
+    $\bm{\Lambda}=-\bm{H}_{\bm{\theta}} \log p(\bm{\theta}\mid\bm{y})$.
+    \hl{Matches shape of the true posterior around its mode $\Rightarrow$
+    Extremely overconfident predictions, because it is greedy.}
+
+    \textbf{Problem}: Want to compute gradient w.r.t. $\lambda$ of an
+    expectation w.r.t. $\lambda$. \hl{\textbf{Reparameterization trick}:
+    Suppose $\epsilon \sim \phi$, $\bm{\theta} = g(\epsilon,\lambda)$ (diff.
+    and inv.), then $\E_{\bm{\theta} \sim q_\lambda}[f(\bm{\theta})] =
+    \E_{\epsilon\sim\phi}[f(g(\epsilon,\lambda))]$.} (Can be used for MC obj,
+    unbiased.) \textbf{Gaussian}: $\bm{\theta} = g(\bm{\epsilon},\lambda) =
+    \bm{\Sigma}^{\nicefrac{1}{2}} \bm{\epsilon} + \bm{\mu} \sim
+    \mathcal{N}(\bm{\mu},\bm{\Sigma})$.
+
+    \textbf{Inference}: $p(y^\star\mid\bm{x}^\star,\bm{y}) \approx \int
+    p(y^\star\mid f^\star) q_{\lambda}(f^\star\mid\bm{x}^\star) df^\star$
+    (intractable, but single dimension).
+  \end{topic}
+
+  \begin{topic}{Markov Chain Monte Carlo}
+    \textbf{Markov chain}: Seq. of RVs s.t. $X_{t+1} \bot X_{1:t-1} \mid X_t$.
+    \textbf{Stationary dist.}: $\pi(x) = \sum_{x'}p(x\mid x')\pi(x')$.
+    \hl{(Solve by $\bm{\pi} = \bm{P}^\top\bm{\pi}$, $\bm{1}\cdot \bm{\pi}=1$.)}
+    \textbf{Ergodicity}: $\exists t [ \forall x,x' [ p^{(t)}(x'\mid x) > 0 ]]$,
+    where $p^{(t)}$ is prob. to reach $x'$ from $x$ in \hl{exactly} $t$ steps.
+    (Terminal states $\Rightarrow$ not ergodic.) (Ensure ergodicity by
+    self-loops.) \textbf{Fundamental theorem of ergodic MCs}: Ergodic MC always
+    converges to a unique pos. stat. dist. \textbf{Detailed balance equation}:
+    For an \hl{unnormalized} dist. $q$ an MC satisfies DBE iff
+    \hl{$q(x)p(x'\mid x) = q(x')p(x\mid x')$} $\Rightarrow$ stat. dist. =
+    $\frac{1}{Z} q$. \textbf{Sampling}: Sample MC's stat. dist. by first doing
+    a burn-in $t_0$ to reach stat. dist.
+
+    \textbf{Idea}: \hl{Approximate intractable $p$ by drawing $m$ samples from
+    MC with stat. dist. $p(\bm{\theta}\mid\bm{y})$ $\Rightarrow$
+    $p(y^\star\mid\bm{x}^\star,\bm{y}) =
+    \E_{p(\cdot\mid\bm{y})}[p(y^\star\mid\bm{x}^\star,\bm{\theta})] =
+    \frac{1}{m}\sum_{i=1}^m p(y^\star\mid\bm{x}^\star,\bm{\theta}_i)$.}
+
+    \textbf{Hoeffding's inequality}: Compute bound on error. $p(|
+    \E_{p(\cdot\mid\bm{y})}[p(y^\star\mid\bm{x}^\star,\bm{\theta})] -
+    \frac{1}{m}\sum_{i=1}^m p(y^\star\mid\bm{x}^\star,\bm{\theta}_i) | >
+    \epsilon) \leq 2\exp(\nicefrac{-2m\epsilon^2}{C^2})$, where $C$ is the
+    upper bound of values (1 for prob. dist.). To get a prob. $\leq \delta$ of
+    error $>\epsilon$, we need $m \geq \nicefrac{\log 2 - \log
+    \delta}{2\epsilon^2}$ samples.
+
+    \textbf{Metropolis-Hastings}: Arbitrary proposal dist. $r(x'\mid x)$.
+    Follow proposal with prob. $\alpha(x'\mid x) = \min \lft\{ 1,
+    \frac{q(x')r(x\mid x')}{q(x)r(x'\mid x)} \rgt\}$ $\Rightarrow$ satisfies
+    DBE to get stat. dist. $\frac{1}{Z} q(x)$. Arbitrary proposal influences
+    how fast we converge to stat. dist. \textbf{Gaussian}: Prob. dist. has form
+    $p(x) = \frac{1}{Z}\exp(-f(x))$ $\Rightarrow$ $\alpha(x'\mid x)=\min\lft\{
+      q, \frac{r(x\mid x')}{r(x'\mid x)} \exp(f(x) - f(x')) \rgt\}$. If
+    $r(x'\mid x) = \mathcal{N}(x';x,\tau\bm{I})$ $\Rightarrow$ $\frac{r(x\mid
+    x')}{r(x'\mid x)} = 1$ (symmetry). If $r$ proposes low energy (high prob)
+    region, acceptance is 1. \textbf{Problem}: Uninformed $\Rightarrow$ Use
+    gradient information (MALA requires full access to $f$).
+  \end{topic}
+
+  \begin{topic}{Bayesian Deep Learning} \textbf{Non-linear dependencies.}
+
+    \textbf{Prior}: $\bm{\theta} \sim \mathcal{N}(\bm{0},\sigma_p^2,\bm{I})$.
+    \textbf{Likelihood}: $y\mid \bm{x}, \bm{\theta} \sim
+    \mathcal{N}(\mu_{\bm{\theta}}(\bm{x}), \sigma^2_{\bm{\theta}}(\bm{x}))$.
+    \hl{\textbf{Homoscedastic}: Same noise for all data points,
+    $\sigma^2_{\bm{\theta}}(\bm{x}) = c$. \textbf{Heteroscedastic}: Varying
+    noise.}
+
+    \textbf{MAP}: $\argmin_{\bm{\theta}} \frac{1}{2\sigma_p^2} \lVert \bm{\theta} \rVert^2 -
+    \sum_{i=1}^n \log \sigma^2_{\bm{\theta}}(\bm{x}_i) + \frac{(y_i -
+    \mu_{\bm{\theta}}(\bm{x}_i))^2}{2\sigma^2_{\bm{\theta}}(\bm{x}_i)}$.
+    Attenuate loss for certain data points by attributing error to large
+    variance.
+
+    Fails to model epistemic uncertainty $\Rightarrow$ VI (Gaussian in
+    expectation) and Monte Carlo or MCMC:
+
+    $\E[y^\star\mid\bm{x}^\star,\bm{y}] \approx \frac{1}{m} \sum_{j=1}^m
+    \mu_{\bm{\theta_j}}(\bm{x}^\star)$.
+
+    $\mathrm{Var}[y^\star\mid\bm{x}^\star,\bm{y}] \approx
+    \text{\hlal{$\frac{1}{m}\sum_{j=1}^m \sigma^2_{\bm{\theta}_j}(\bm{x}^\star)$}} +
+    \text{\hlep{$\frac{1}{m-1} \sum_{j=1}^m (\mu_{\bm{\theta}_j}(\bm{x}^\star) -
+    \bar{\mu}(\bm{x}^\star))^2$}}$
+
+    \textbf{MCMC}: Produce seq. $\bm{\theta}_1,\ldots,\bm{\theta}_T$, then
+    $p(y^\star\mid\bm{x}^\star,\bm{y}) \approx \frac{1}{T} \sum_{j=1}^T
+    p(y^\star\mid\bm{x}^\star,\bm{\theta}_j)$. \textbf{Problem}: Cannot store
+    $T$ times params of network. \textbf{Solution}: Approx. with Gaussian
+    and running mean/var.
+
+    \textbf{MC dropout}: Dropout during inference $\Leftrightarrow$ VI with
+    Bernoulli.
+
+    \textbf{Prob. ensembles}: Train networks on rand. subsets, average.
+
+    \textbf{Calibration}: Well-calibrated $\Leftrightarrow$ confidence
+    (assigned prob.) $\approx$ frequency. \textbf{Reliability diagram}: Bin
+    according to class pred. probs. (assume class 1). Above line:
+    underconfident, below line: overconfident. (No samples $\Rightarrow$ empty
+    bin in diagram). \hleq{$\text{freq}(B_m) = \frac{1}{|B_m|} \sum_{i\in B_m}
+    \mathbb{1}\{Y_i=1\}$}, \hleq{$\text{conf}(B_m) = \frac{1}{|B_m|} \sum_{i\in B_m}
+    p(Y_i=1\mid \bm{x}_i)$}. \textbf{ECE}: avg. deviation from perfect
+    calibration: \hleq{$\ell_{\text{ECE}} = \sum_{m=1}^M \frac{|B_m|}{n}
+    |\text{freq}(B_m) - \text{conf}(B_m)|$}.
+  \end{topic}
+
+  \begin{topic}{Active Learning}
+    \textbf{Decide which data to collect: $\mathcal{NP}$-hard.}
+
+    \textbf{Uncertainty sampling}: Greedily pick points with maximal mutual
+    information $\Rightarrow$ $\bm{x}_{t+1} = \argmax_{\bm{x}}
+    I(f_{\bm{x}};y_{\bm{x}}\mid \bm{y}_{S_t})$. If Gaussian:
+    $\bm{x}_{t+1}=\argmax_{\bm{x}} \nicefrac{\text{\hlep{$\sigma^2_{\bm{x}\mid
+    S_t}$}}}{\text{\hlal{$\sigma_n^2(\bm{x})$}}}$. $\gamma_T =
+    \max_{\bm{x}_{1:T}} I(f(\bm{x}_{1:T});\bm{y}_{1:T})$. Monotone submodular.
+    Constant factor approx: $I(f(\bm{x}_{1:T});\bm{y}_{1:T}) \geq (1-
+    \nicefrac{1}{e}) \gamma_T$ (near-optimal, $1-\nicefrac{1}{e} \approx
+    0.63$).
+
+    \textbf{BALD}: $\bm{x}_{t+1} = \argmax_{\bm{x}}
+    I(y_{\bm{x}};\bm{\theta}\mid\bm{x}_{1:t}, y_{1:t}) = \argmax_{\bm{x}}
+    \text{\hlep{$H[y_{\bm{x}}\mid\bm{x}_{1:t},y_{1:t}]$}} -
+    \text{\hlal{$\E_{\bm{\theta}\mid\bm{x}_{1:t},y_{1:t}}[H[y_{\bm{x}} \mid
+    \bm{\theta}]]$}}$. Want points where the post. is uncertain because all
+    $\bm{\theta}$ are certain about their differing pred. Approximate term 2
+    using VI and MC.
+  \end{topic}
+
+  \begin{topic}{Bayesian Optimization}
+    \textbf{Not only reduce uncertainty, but also maximize objective.}
+    $\bm{x}_{t+1} = \argmax_{\bm{x}} a(x)$.
+
+    \textbf{Regret:} \hl{$R_T = \sum_{t=1}^T (\max_{\bm{x}} f(\bm{x}) -
+    f(\bm{x}_t))$}. Want algorithm with sublinear regret: $\lim_{T\to\infty}
+    \nicefrac{R_T}{T} = 0$. $f^\star = \max_{\bm{x}} f(\bm{x})$.
+
+    \textbf{GP-UCB}: Optimism in the face of uncertainty: pick point where we
+    can hope for best outcome: $a_{\text{UCB}} = \mu_t(\bm{x}) + \beta_t
+    \sigma_t(\bm{x})$. $\mu, \sigma$ from GP. $R_T \in
+    \mathcal{O}^\star(\sqrt{\nicefrac{\gamma_T}{T}})$. \textbf{GP bounds}:
+    Linear: $\gamma_T \in \mathcal{O}(d\log T)$, Gaussian: $\mathcal{O}((\log
+    T)^{d+1})$, Mat\`ern: $\mathcal{O}(T^{\nicefrac{d}{2\nu+d}}(\log
+    T)^{\nicefrac{2\nu}{2\nu+d}})$.
+
+    \textbf{PI}: $a_{\text{PI}}(\bm{x}) = \Phi(\nicefrac{(\mu_t(\bm{x}) -
+    f^\star)}{\sigma_t(\bm{x})})$ is prob. to improve $f^\star$. Greedy.
+
+    \textbf{EI}: $a_{\text{EI}}(\bm{x}) = (\mu_t(\bm{x}) - f^*)
+    \Phi(\nicefrac{(\mu_t(\bm{x}) - f^\star)}{\sigma_t(x)}) + \sigma_t(x)
+    \phi(\nicefrac{(\mu_t(\bm{x})-f^\star)}{\sigma_t})$ is expectation of
+    improvement.
+
+    \textbf{Thompson sampling}: Draw sample from GP and select max.
+  \end{topic}
+
+  \begin{topic}{Markov Decision Processes}
+    \textbf{Env. that makes Markov ass.} (states $\mathcal{X}$, actions
+    $\mathcal{A}$, transitions $p(x'\mid x,a)$, rewards $r(x,a)$).
+    \textbf{Policy}: $\pi$ maps states to actions (induces MC with $p(x'\mid x)
+    = \sum_a \pi(a\mid x) p(x'\mid x,a)$), want to find $\pi$ that max.
+    long-term rewards. Horizon $T$ reward: $\E_\pi[\sum_{t=0}^T r(x_t,a_t)]$.
+    Horizon $\infty$ reward: $\E_\pi[\sum_{t=0}^\infty \gamma^t r(x_t,a_t)]$.
+    \textbf{Geo series}: $\sum_{t=0}^\infty \gamma^t = \nicefrac{1}{1-\gamma}$.
+
+    \hl{$V^\pi(x) = \E_x [\sum_{t=0}^\infty \gamma^t r(X_t,\pi(X_t)) \mid
+    X_0=x]$ $= r(x,\pi(x)) + \gamma \sum_{x'} p(x'\mid x,\pi(x)) V^\pi(x')$
+    (Bellman eq).}
+
+    \hl{$Q(x,a) = r(x,a) + \gamma \sum_{x'} p(x'\mid x,a)V^\pi(x')$. $V(x) = \max_a
+    Q(x,a)$.}
+
+    \textbf{Bellman theorem}: $\pi$ is optimal $\Leftrightarrow$ greedy
+    w.r.t. $V^\pi$.
+
+    \textbf{Policy iteration}: $\pi \Rightarrow V^\pi$, $V \Rightarrow \pi_V$
+    (alternate). \hl{$\pi_V(x) = \argmax_{a} r(x,a) + \gamma \sum_{x'} p(x'\mid
+    x, a) V(x')$} (greedy). Converges monotonically, \hl{guaranteed to
+    converge} in
+    $\mathcal{O}(\nicefrac{|\mathcal{X}|^2|\mathcal{A}|}{(1-\gamma)})$
+    iterations, expensive (computed efficiently by solving single LSoE).
+
+    \textbf{Value iteration}: Dynamic programming: \hl{$V_t(x) = \max_a r(x,a) +
+    \gamma \sum_{x'} p(x'\mid x,a) V_{t-1}(x')$}. Iterates until $\| \bm{v}_t -
+    \bm{v}_{t-1} \|_{\infty} \leq \epsilon$: \hl{$\epsilon$-optimal convergence}, in
+    polynomial in iterations, per iteration: $\mathcal{O}(|\mathcal{X}|^2
+    |\mathcal{A}|)$, inexpensive. Then, pick greedy policy.
+  \end{topic}
+
+  \begin{topic}{Reinforcement Learning}
+    \textbf{Learn within unknown MDP.} \textbf{On-policy}: Learn from own data,
+    \textbf{Off-policy}: Learn from other policy data, \textbf{Model-based}:
+    Learn MDP and solve, \textbf{Model-free}: Learn value function directly.
+    Data points: $\langle x,a,r,x' \rangle$.
+
+    \textbf{Robbins-Monro}: $\sum_{t=0}^\infty x_t = \infty$,
+    $\sum_{t=0}^\infty x_t^2 < \infty$. E.g. $\nicefrac{1}{t}$.
+
+    \textbf{$\epsilon$-greedy} \blue{(based)}: Pick random action with prob.
+    $\epsilon_t$, or best action according to MDP with prob. $1-\epsilon_t$.
+    \hl{Guaranteed to converge to optimal policy if $\epsilon_t$ satisfies RM.}
+    Problem: does not quickly eliminate suboptimal actions.
+
+    \textbf{$R_{\max}$} \blue{(based)}: Solves problem. Add fairy tale
+    $p(x^\star\mid x^\star,a) = 1, r(x^\star, a)=R_{\max}$, assume unexplored
+    go there.
+
+    \textbf{TD-learning} \blue{(on, free)}: \hleq{$V^\pi(x) \gets (1-\alpha_t)
+    V^\pi(x)+\alpha_t (r + \gamma V^\pi(x'))$.} \hl{Guaranteed to converge if
+    $\alpha_t$ satisfies RM and all states are visited infinitely often.} Space:
+    $\mathcal{O}(|\mathcal{X}|)$.
+
+    \textbf{Q-learning} \blue{(off, free)}: \hleq{$Q(x,a) \gets (1-\alpha_t)
+    Q(x,a) + \alpha_t(r+\gamma \max_{a'} Q(x',a'))$.} \hl{Guaranteed to
+    converge if $\alpha_t$ satisfies RM and all state-action pairs are visited
+    infinitely often.} Space: $\mathcal{O}(|\mathcal{X}||\mathcal{A}|)$.
+
+    \textbf{DQN} \blue{(off, free, cont. states)}: GD on
+    $\frac{1}{2}(Q(x,a;\bm{\theta}) - (r - \gamma \max_{a'}
+    Q(x',a';\bm{\theta}^{\text{old}})))^2$ (Bellman error). \textbf{Slow to
+    converge}: maintain constant target network. \textbf{DDQN}: Maximization
+    bias makes DQN overestimate. Solution: 2 Q networks where we take minimum
+    to be value.
+
+    \textbf{Policy search} \blue{(on, free, cont. actions)}: Parametrize
+    $\pi(x; \bm{\theta})$. Maximize expected trajectory reward.
+    $\nabla_{\bm{\theta}} \E_{\tau\sim\pi_{\bm{\theta}}}[r(\tau)] =
+    \E_{t\sim\pi_{\bm{\theta}}}[r(\tau) \nabla_{\bm{\theta}} \log
+    \pi_{\bm{\theta}}(\tau)] = \E_{t\sim\pi_{\bm{\theta}}}[r(\tau) \sum_{t=0}^T
+    \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a_t\mid x_t)]$ $\Rightarrow$ Do
+    not need to know MDP to compute gradient. \textbf{Baselines}: Large
+    variance $\Rightarrow$ introduce baseline:
+    $\E_{\tau\sim\pi_{\bm{\theta}}}[r(\tau)\nabla_{\bm{\theta}} \log
+    \pi_{\bm{\theta}}] = \E_{\tau\sim\pi_{\bm{\theta}}}[(r(\tau) - b(\tau))
+    \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(\tau)]$.
+
+    \textbf{REINFORCE} \blue{(on, free)}: $\bm{\theta} \gets \bm{\theta} + \eta
+    \gamma^t G_t \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a_t\mid x_t)$,
+    where $G_t = r(\tau) - b_t = \sum_{t'=t}^T \gamma^{t'-t} r_t$.
+
+    \textbf{Actor-critic} \blue{(on, free)}: REINFORCE gradient =
+    $\E_{(x,a)\sim\pi_{\bm{\theta}}}[Q(x,a)\nabla_{\bm{\theta}} \log
+    \pi_{\bm{\theta}}(a\mid x)]$. So: parametrize actor $\pi_{\bm{\theta}}$ and
+    critic $Q_{\bm{\theta}}$. Use in each others' update equations:
+
+    $\bm{\theta}_\pi \gets \bm{\theta}_\pi + \eta_t Q(x,a\mid \bm{\theta}_Q) \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a\mid x)$.
+
+    $\bm{\theta}_Q \gets \bm{\theta}_Q - \eta_t (Q(x,a;\bm{\theta}_Q) - r - \gamma Q(x',\pi(x';\bm{\theta}_\pi); \bm{\theta}_Q)) \nabla_{\bm{\theta}}Q(x,a;\bm{\theta})$.
+
+    \textbf{A2C} \blue{(on, free)}: Add value network $V_{\bm{\theta}}$ for the
+    baseline: $A(x,a) = Q(x,a) - V(x,a)$ (advantage function). This centers the
+    Q-values.
+
+    \textbf{DDPG} \blue{(off, free)}: Replace $\max_{a'}
+    Q(x',a';\bm{\theta}^{\text{old}})$ in DQN by $\pi(x';\bm{\theta}_\pi)$,
+    where $\pi$ should follow the greedy policy w.r.t. $Q$. \textbf{Key
+    idea}: If we use a rich enough parameterization of policies, selecting the
+    greedy policy w.r.t. $Q$ is equivalent to $\bm{\theta}_\pi^\star =
+    \argmax_{\bm{\theta}_\pi} \E_{x\sim\mu}[Q(x,\pi(x;\bm{\theta}_\pi);
+    \bm{\theta}_Q)]$. $\mu(x)>0$ is an exploration distribution with full
+    support. This needs det. $\pi$, thus we inject noise for exploration (akin
+    $\epsilon$-greedy).
+
+    \textbf{TD3} \blue{(off, free)}: Add second critic network to address max.
+    bias.
+
+    \textbf{SAC} \blue{(off, free)}: Add entropy regularization to loss
+    $\lambda H(\pi_{\bm{\theta}})$.
+
+    \textbf{Planning}: Det. transition function $x_{t+1} = f(x_t,a_t)$ and
+    reward function $r(x_t,a_t)$. Cannot plan over infinite horizon
+    $\Rightarrow$ \textbf{Key idea}: plan over finite horizon $H$, carry
+    out first action, repeat. Optimize $J_H(a_{t:t+H-1}) = \sum_{t'=t}^{t+H-1}
+    \gamma^{t'-t} r(x_t,a_t)$. Local minima, vanishing/exploding gradient
+    $\Rightarrow$ heuristics $\Rightarrow$ Random shooting ($m$ samples, pick
+    best). Will not work if sparse rewards $\Rightarrow$ Get access to value
+    function to look further: $J_H(a_{t:t+H-1}) = \sum_{t'=t}^{t+H-1}
+    \gamma^{t'-t}r_t + \gamma^HV(x_{t+H})$.
+
+    \textbf{Model-based ML}: Estimate $f$ and $r$ off-policy with supervised
+    learning ($(x_t,a_t) \mapsto (r_t,x_{t+1})$, regression). \textbf{Benefit}:
+    Dramatically decreases sample complexity (need less data). Use MAP estimate
+    $\Rightarrow$ exploited by planning algos $\Rightarrow$ Uncertainty
+    (GP/BNN).
+
+  \end{topic}
+
+\end{multicols*}
+
+\end{document}

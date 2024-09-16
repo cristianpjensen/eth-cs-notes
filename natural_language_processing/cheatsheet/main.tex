@@ -1,0 +1,484 @@
+\documentclass{article}
+
+\usepackage[landscape, a4paper, margin=0.1cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[osf,sc]{mathpazo}
+\usepackage[most]{tcolorbox}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bm,mathtools,nicefrac}
+\usepackage{blindtext}
+\usepackage{derivative}
+\usepackage{nicefrac}
+\usepackage[mathspacing=normal,wordspacing=normal]{savetrees}
+
+\def\score{\mathrm{score}}
+\def\softmax{\textsc{Softmax}}
+\def\eos{\textsc{eos}}
+\def\bos{\textsc{bos}}
+\DeclareMathOperator*{\argmin}{argmin} % no space, limits underneath in displays
+
+\newcommand{\lft}{\mathopen{}\left}
+\newcommand{\rgt}{\aftergroup\mathclose\aftergroup{\aftergroup}\right}
+
+\title{Natural language processing cheatsheet}
+
+\newenvironment{topic}[1]
+{\begin{tcolorbox}[
+  title=#1,
+  breakable,
+  colback=white,
+  colframe=black,
+  fonttitle={\bfseries\sffamily},
+  sharp corners,
+  boxrule=0.5pt,
+  boxsep=0.1cm,
+  top=0cm,
+  bottom=0cm,
+  left=0.1cm,
+  right=0.1cm,
+  enhanced jigsaw,
+]}
+{\end{tcolorbox}}
+
+\parindent0pt
+\parskip2pt
+
+\begin{document}
+
+\setlength{\columnsep}{0.1cm}
+
+\begin{multicols}{3}
+
+\begin{topic}{Backpropagation}
+  \textbf{Linear-time dynamic program for computing derivatives.}
+  \begin{enumerate}
+    \item Write down composite function as a labeled, acyclic, directed
+      hypergraph with intermediate variables as nodes and hyperedges labeled
+      with primitive functions;
+    \item Given input, perform forward propagation;
+    \item Run backpropagation on the graph using forward values.
+      $\pdv{y_i}{x_j} = \sum_{p\in P(j, i)} \prod_{(k\to\ell)\in p}
+      \pdv{z_{\ell}}{z_k}$.
+  \end{enumerate}
+
+  $\sin'(x) = \cos(x)$, $\cos'(x) = -\sin(x)$, $y^x = \exp(x\log(y))$,
+  $\log'(x) = \frac{1}{x}$, $\exp'(x) = \exp(x)$.
+\end{topic}
+
+\begin{topic}{Log-linear modelling}
+  \[
+    \score(y,x) = \bm{\theta}^\top \bm{f}(x,y)
+  .\]
+  \textbf{Result of NLL gradient equal to 0}: \[
+    \sum_{i=1}^n \bm{f}(x_i,y_i) = \sum_{i=1}^n \mathbb{E}_{y\mid x_i,\bm{\theta}}[\bm{f}(x_i,y)]
+  .\]
+
+  \textbf{Hessian} ($\bm{H}_{\bm{\theta}} = \nabla_{\bm{\theta}^\top}
+  \nabla_{\bm{\theta}}$): \[
+    \bm{H}_{\bm{\theta}} \lft( \sum_{i=1}^n -\log p(y_i\mid x_i) \rgt) = \sum_{i=1}^n \mathrm{Cov}_{y\mid x_i,\bm{\theta}}[\bm{f}(x_i,y)]
+  .\]
+  To derive this, first derive the following: \[
+    \bm{\nabla}_{\bm{\theta}^\top} p(y_i\mid x_i) = p(y_i\mid x_i) \lft( \bm{f}(x_i,y_i)^\top - \mathbb{E}_{y'\mid x_i} \lft[ \bm{f}(x_i,y')^\top \rgt] \rgt)
+  .\]
+
+  \textbf{Softmax}: $\softmax(\bm{h})_y = \frac{\exp(
+  \nicefrac{h_y}{T})}{\sum_{y'\in\mathcal{Y}} \exp(
+  \nicefrac{h_{y'}}{T} )}$.
+
+  $T\to 0$: argmax (structured perceptron). $T\to \infty$: uniform.
+  \textbf{Exponential family}: $p(x\mid\bm{\theta}) = \frac{1}{Z(\bm{\theta})} h(x) \exp \lft( \bm{\theta}^\top \bm{\phi}(x) \rgt)$.
+
+  $Z(\bm{\theta})$: partition function. $h(x)$: support. $\bm{\theta}$:
+  parameters. $\bm{\phi}(x)$ feature function.
+
+  \textbf{Advantage}: conjugate priors, compress all data into finite
+  parameters $\bm{\phi}(x)$ without losing information.
+\end{topic}
+
+\begin{topic}{Multi-layer perceptron}
+  \textbf{Problem with log-linear modelling}: Data must be linearly separable.
+  \textbf{Solution}: Hack the non-linearity into the feature function.
+  \textbf{Problem}: We need to know the decision boundary shape a priori.
+  \textbf{Solution}: Learn the non-linear feature function with an MLP: \[
+    \bm{h}_k = \sigma_k \lft( \bm{W}_k^\top \bm{h}_{k-1} \rgt), \hspace{0.75cm} \bm{h}_1 = \sigma_1 \lft( \bm{W}_1^\top \bm{e}(x) \rgt)
+  ,\]
+  Then $\softmax \lft( \bm{\theta}^\top \bm{h}_n \rgt)$ for prob. dist.
+
+  $\bm{e}(x)$ obtained with \textbf{Skip-Gram}: predict whether 2 words are
+  within same context. Positive and negative samples (no normalizer needed).
+  \textbf{Intuition}: need good representation of words for this task that can be used
+  by other tasks.
+
+  \textbf{Derivative}: \[
+    \pdv{\ell}{\bm{W}_k} = \pdv{\ell}{y} \pdv{y}{\bm{h}_n} \lft( \prod_{m=k+1}^n \sigma_m'(\cdots) \bm{W}_m \rgt) \sigma_k'(\cdots) \bm{h}_{k-1}
+  .\]
+\end{topic}
+
+\begin{topic}{Structured prediction}
+  To be able to train a model, we need to compute: \[
+    p(y\mid x) = \frac{\exp \score(y, x)}{Z(x)}, \hspace{0.2cm} Z(x) = \sum_{y' \in \mathcal{Y}} \exp \score(y',x)
+  .\]
+  \textbf{Problem}: $\mathcal{Y}$ is exponentially or infinitely large. This
+  makes $Z(x)$ inefficient/impossible to compute during training, and it is
+  hard to find the best $\hat{y}\in\mathcal{Y}$ during inference.
+  \textbf{Solution}: Design algorithms that make use of the structure of the
+  input and output.
+\end{topic}
+
+\begin{topic}{Language modelling}
+  \begin{align*}
+    p(\bm{y}) &= p(\eos \mid \bm{y}) \cdot \prod_{i=1}^N p(y_i \mid \bm{y}_{<i}) \\
+    p(y_i \mid \bm{y}_{<i}) &= \frac{1}{Z(\bm{y}_{<i})} \exp \score (\bm{y}_{<i}, y_i)
+  .\end{align*}
+
+  \textbf{Problem}: Model is non-tight (total prob. $\neq$ 1) if we have a
+  history that never ends in $\eos$. \textbf{Solution}: Force
+  $p(\eos\mid\bm{y}_{<i}) > \xi > 0$ for every possible history $\bm{y}_{<i}$.
+
+  \textbf{Problem}: infinitely many histories. \textbf{$n$-gram}: $p(y_i\mid
+  \bm{y}_{<i}) = p(y_i\mid y_{i-n+1},\ldots,y_{i-1})$ (only look at last $n-1$
+  word counts). \textbf{Problem}: probability can be 0. \textbf{Solution}:
+  Laplace smoothing. \textbf{Problem}: Related sentences have no dependency.
+  \textbf{Neural $n$-gram} (Bengio et al.): Use embeddings and MLP
+  with $n-1$ history as input and output dist. over next words.
+  \textbf{Problem}: Unrealistic assumption of $n$-grams. \textbf{RNN}:
+  $\bm{h}_i = \sigma( \bm{W}_h \bm{h}_{i-1} + \bm{W}_x \bm{e}(y_{i-1})
+  + \bm{b})$ (encode entire history using hidden states).
+
+  \textbf{Derivative}: \[
+    \pdv{\ell_i}{\bm{W}_h} = \pdv{\ell_i}{y_i} \pdv{y_i}{\bm{h}_N} \sum_{j=1}^i \lft( \prod_{m=j+1}^i \sigma'(\cdots) \bm{W}_h \rgt) \sigma'(\cdots) \bm{h}_{i-1}
+  .\]
+
+  \textbf{Problem}: Vanishing gradient. \textbf{Solution}: LSTM/GRU.
+\end{topic}
+
+\begin{topic}{Semirings}
+  Definition \textbf{monoid} $\langle \mathbb{K}, \odot, \bm{e} \rangle$:
+  \begin{enumerate}
+    \item $\odot$ is associative: $(x\odot y) \odot z = x \odot (y \odot z)$.
+    \item $\bm{e}\in\mathbb{K}$ is the identity element: $x\odot \bm{e} = x$.
+  \end{enumerate}
+
+  Definition \textbf{semiring} $\langle \mathbb{K},\oplus,\otimes,\bm{0},\bm{1}
+  \rangle$:
+  \begin{enumerate}
+    \item $\langle \mathbb{K},\oplus,\bm{0} \rangle$ is a commutative monoid:
+      $x \oplus y = y \oplus x$.
+    \item $\langle \mathbb{K},\otimes,\bm{1} \rangle$ is a monoid.
+    \item $\otimes$ distributes over $\oplus$: $(x \oplus y) \otimes z =
+      (x\otimes z) \oplus (y \otimes z)$ and $z \otimes (x \oplus y) = (z
+      \otimes x) \oplus (z \otimes y)$.
+    \item $\bm{0}$ is an annihilator of $\otimes$: $\bm{0} \otimes x = \bm{0}$
+      and $x \otimes \bm{0} = \bm{0}$.
+  \end{enumerate}
+
+  % Semirings are very useful for generalizing algorithms (that compute the
+  % normalizer to also compute the best output) that only make use of
+  % associativity, commutativity, and distributivity.
+
+  \textbf{Closed}: $x^* = \bigoplus_{n=0}^\infty x^{\otimes n}$. The Kleene
+  star must be in $\mathbb{K}$ and obey the following two axioms: $x^* = \bm{1}
+  \oplus x \otimes x^*$ and $x^* = \bm{1} \oplus x^* \otimes x$.
+
+  \textbf{Boolean}: $\langle \{ 0,1 \}, \lor, \land, 0, 1 \rangle$.
+  \textbf{Viterbi}: $\langle [0,1], \max,\times,0,1 \rangle$.
+  \textbf{Inside}: $\langle \mathbb{R}^+ \cup \{ \infty
+  \},+,\times,0,1 \rangle$, \textbf{Real}: $\langle \mathbb{R} \cup \{
+    \infty \}, \min, +, \infty, 0 \rangle$, \textbf{Tropical}:
+  $\langle \mathbb{R}^+ \cup \{ \infty \}, \min, +,\infty,0 \rangle$,
+  \textbf{Log}: $\langle \mathbb{R} \cup \{ \infty \}, \log(\exp a +
+  \exp b), +, -\infty, 0 \rangle$, \textbf{Expectation}: $\langle
+  \mathbb{R}^2, \langle a_1+b_1, a_2+b_2 \rangle, \langle a_1b_1,
+  a_1b_2 + a_2b_1 \rangle, \langle 0,0 \rangle, \langle 1,0 \rangle
+  \rangle$, \textbf{Counting}: $\langle \mathbb{N}, +, \times, 0, 1 \rangle$.
+\end{topic}
+
+\begin{topic}{Part-of-speech tagging}
+  \textbf{Input}: $\bm{w}\in\Sigma^N$. \textbf{Output}:
+  $\bm{t}\in\mathcal{T}^N$.
+
+  \textbf{CRF}: Classifier that makes use of the structure. (It
+  classifies 1 tag per 1 word while considering the tags of the other
+  words.) We will assume that tags only depend on their immediate
+  neighbors,
+  \begin{align*}
+    \score(\bm{t},\bm{w}) &= \sum_{n=1}^N \score(\langle t_{n-1},t_n \rangle, \bm{w},n) \\
+    \score(\langle t_{n-1},t_n \rangle, \bm{w}, n) &= \mathrm{trans}(t_{n-1},t_n) + \mathrm{em}(w_n,t_n)
+  ,\end{align*}
+
+  We can ``neuralize`` a CRF by making the transition and emission scores the
+  learned weights of the model.
+
+  \textbf{Forward algorithm}: Start at $\textsc{bot}$ and go word by word, tag
+  by tag. (\textbf{Viterbi}: for every node, compute the argmax and keep
+  track). Then, \[
+    \alpha_{n,t_n} \gets \bigoplus_{t_{n-1}\in\mathcal{T}} \exp \score(\langle t_{n-1},t_n \rangle, \bm{w},n) \otimes \alpha_{n-1,t_{n-1}}
+  .\]
+  Return: $\alpha_{N,\textsc{eot}}$. \textbf{Runtime}:
+  $\mathcal{O}(N|\mathcal{T}|^2)$. \textbf{Intuition}: sum over all paths in
+  POS graph.
+
+  \textbf{Forward-backward algorithm} is an instantiation of
+  backpropagation, because it is analogous to the forward and backward
+  pass. It is a sum over products on the paths.
+
+  \textbf{Dijkstra's decoding}: Paths can only get worse $\forall
+  a,b\in\mathbb{K}: a \preceq (b \otimes a)$, 0-closedness). Thus, the first
+  $N$-length tagging popped from the priority queue must be the best.
+  \textbf{Runtime}: $\mathcal{O}(N|\mathcal{T}|^2 + N |\mathcal{T}| \log
+  (N|\mathcal{T}|))$.
+\end{topic}
+
+\begin{topic}{Finite-state automata}
+  Definition \textbf{WFST}: input alphabet $\Sigma$, output alphabet $\Omega$,
+  finite states $Q$, initial states $I\subseteq Q$, final states $F\subseteq
+  Q$, initial state weights $\lambda: I \to \mathbb{K}$, final state weights
+  $\rho: F\to\mathbb{K}$, transitions $\delta\subseteq Q\times(\Sigma \cup \{
+    \epsilon \}) \times (\Omega\cup\{\epsilon\})\times\mathbb{K}\times Q$.
+
+  \textbf{Pathsum} ($\bm{R}_{ik}$ is inner pathsum $i$ to $k$): \[
+    Z(\mathcal{T}) = \bigoplus_{i,k\in Q} \lambda(q_i) \otimes \bm{R}_{ik} \otimes \rho(q_k)
+  .\]
+  Infinite paths because of cycles: need \textbf{Lehmann's algorithm} to
+  compute semiring-sum over inner paths between all nodes under a closed
+  semiring. Recurrence: \[
+    \bm{R}_{ik}^{(j)} \gets \bm{R}_{ik}^{(j-1)} \oplus \bm{R}_{ij}^{(j-1)} \otimes \lft( \bm{R}_{jj}^{(j-1)} \rgt)^* \otimes \bm{R}_{jk}^{(j-1)}
+  .\]
+  Return $\bm{I} \oplus \bm{R}^{(|Q|)}$. \textbf{Runtime}:
+  $\mathcal{O}(|Q|^3)$. \textbf{Intuition}: $\bm{R}_{ik}^{(j)}$ is the
+  semiring-sum over all paths between $i$ and $k$ through $\{ 1,\ldots,j \}$.
+
+  \textbf{Floyd-Warshall} (min path in graph with no negative cycles): \[
+    \bm{R}_{ik}^{(j)} \gets \min \lft\{ \bm{R}_{ik}^{(j-1)}, \bm{R}_{ij}^{(j-1)} + \bm{R}_{jk}^{(j-1)} \rgt\}
+  .\]
+  Return: $\min \lft\{ \bm{I}, \bm{R}^{(|Q|)} \rgt\}$.
+
+  \textbf{WFST composition} $\mathcal{T} = \mathcal{T}_1 \circ \mathcal{T}_2$:
+  $\Sigma^* \xRightarrow{\mathcal{T}_1} \Omega^* \xRightarrow{\mathcal{T}_2}
+  \Xi^*$ with weights such that \[
+    \mathcal{T}(x,y) = \bigoplus_{z\in\Omega^*} \mathcal{T}_1(x,z) \otimes \mathcal{T}_2(z,y)
+  .\]
+\end{topic}
+
+\begin{topic}{Transliteration}
+  Transliteration is the mapping of strings in one character set to strings in
+  another. Formally, we want to compute $p(y\mid x)$ for all $x\in\Sigma^*$ to
+  $y\in\Omega^*$. We use WFSTs to specify it as a globally normalized model. We
+  need three transducers:
+  \begin{enumerate}
+    \item $\mathcal{T}_x$ is the transducer that maps $x$ to $x$;
+    \item $\mathcal{T}_{\bm{\theta}}$ is the transducer that maps any string in
+      $\Sigma^*$ to any string in $\Omega^*$;
+    \item $\mathcal{T}_y$ is the transducer that maps $y$ to $y$.
+  \end{enumerate}
+
+  Compose $\mathcal{T}_x \circ \mathcal{T}_{\bm{\theta}}$ to compute
+  $Z_{\bm{\theta}}(x)$ with Lehmann's. Compose $\mathcal{T}_x \circ
+  \mathcal{T}_{\bm{\theta}} \circ \mathcal{T}_y$ to compute
+  $\score_{\bm{\theta}}(y,x)$.
+\end{topic}
+
+\begin{topic}{Constituency parsing}
+  Definition \textbf{CFG}: Finite non-terminals $\mathcal{N}$, start symbol
+  $S$, terminals $\Sigma$, production rules $\mathcal{R}$ of form $N \to
+  \bm{\alpha}$.
+
+  \textbf{PCFG}: Locally normalized probability distribution
+  $p:\mathcal{R}\to[0,1]$.
+
+  \textbf{WCFG}: Globally normalized with $\score(\bm{t},\bm{w}) =
+  \sum_{r\in\bm{t}} \score(r)$, where $\bm{t}$ is a multiset of rules.
+
+  \textbf{Problem}: Cycles. \textbf{Solution}: A grammar is in CNF if all rules
+  look like $N_1 \to N_2 \; N_3$ or $N \to a$.
+
+  \textbf{Cocke-Kasami-Younger algorithm}: Draw chart. Look at iteratively
+  larger spans, finding children that fill up the entire span. For each span,
+  make sure to check all smaller spans that make up this span, because there
+  might be sneaky rules in the grammar. \[
+    \bm{C}_{i,k,X} \gets \bigoplus_{X\to YZ} \exp \score(X\to YZ) \otimes \bm{C}_{i,j,Y} \otimes \bm{C}_{j,k,Z}
+  .\]
+  Return: $\bm{C}_{1,N+1,S}$. \textbf{Runtime}: $\mathcal{O}(N^3
+  |\mathcal{R}|)$.
+\end{topic}
+
+\begin{topic}{Dependency parsing}
+  There are $(N-1)^{N-2}$ spanning trees with the single root constraint, thus
+  we need an efficient algorithm to compute $Z(\bm{w})$. Scoring
+  function: \[
+    \score(\bm{t},\bm{w}) = \underbrace{\score(r,\bm{w})}_{\bm{\rho}_r} + \sum_{(i\to j)\in\bm{t}} \underbrace{\score(i,j,\bm{w})}_{\bm{A}_{ij}}
+  .\]
+
+  \textbf{Problem with Kirchhoff's MTT}: Undirected graph.
+
+  \textbf{Problem with Tutte's MTT}: No single-root constraint.
+
+  \textbf{Solution Koo MTT}: To compute $Z(\bm{w})$ with single-root
+  constraint, we construct the Laplacian matrix (root scores on first row, sum
+  over columns) (Kirchhoff removes $i$-th row and column), \[
+    \bm{L}_{ij} = \begin{cases}
+      \bm{\rho}_j & i = 1 \;\; \text{\footnotesize (KH and Tutte is without this condition)} \\
+      -\bm{A}_{ij} & i \neq j \\
+      \sum_{k \neq i} \bm{A}_{kj} & \mathrm{otherwise}.
+    \end{cases}
+  \]
+  $Z(\bm{w}) = \mathrm{det}(\bm{L})$. \textbf{Runtime}:
+  $\mathcal{O}(N^3)$.
+
+  \textbf{Chu-Liu-Edmonds algorithm}: (1) Compute \textbf{greedy graph} by
+  taking all max incoming edges for each node. (2) If cycle, treat as single
+  node and \textbf{contract} it by reweighting incoming edges, such that they
+  break the cycle (add weight of all other edges in cycle node). (3) If there
+  are multiple edges emanating from the root, remove (permanently) the edge
+  with the \textbf{lowest swap loss} (weight of current edge $-$ next best
+  incoming edge of child). (4) \textbf{Repeat} until there are no more cycles
+  (cycle nodes may contain smaller cycle nodes). (5) \textbf{Expand} the
+  contractions by deleting the edge from the cycle that is pointed at the node
+  with an edge in the greedy graph that contains this cycle node. (6)
+  \textbf{Repeat} until there are no more cycle nodes, making sure to remove
+  cycles if they come up. \textbf{Runtime}: $\mathcal{O}(N^2).$
+\end{topic}
+
+\begin{topic}{Semantic parsing}
+  \textbf{Lambda calculus}: variables $x,y,z$, lambda operator $(\lambda x.
+  f(x))$, application of two lambda terms $(M \; N)$.
+
+  \textbf{$\beta$-reduction}: $((\lambda x. M) \; N) \to M[x := N]$.
+
+  \textbf{$\alpha$-conversion}: $\lambda x. M[x] \to \lambda y. M[y]$.
+
+  If free variable becomes bound after $\beta$-reduction, first do
+  $\alpha$-conversion.
+
+  % \textbf{Combinatory logic}:
+  % \begin{align*}
+  %   (\mathbf{K} \; x \; y) &= y \\
+  %   (\mathbf{S} \; x \; y \; z) &= (x \; z \; (y \; z)) \\
+  %   (\mathbf{I} \; x) &= x \\
+  %   (\mathbf{B} \; x \; y \; z) &= (x \; (y \; z)) & \text{(composition)} \\
+  %   (\mathbf{T} \; x \; y) &= (y z) & \text{(type-raising)}
+  % .\end{align*}
+
+  \textbf{Combinatory categorial grammar rules}:
+  \begin{align*}
+    X / Y \hspace{0.5cm} Y &\implies X & (>) \\
+    Y \hspace{0.5cm} X \setminus Y &\implies X & (<) \\
+    X / Y \hspace{0.5cm} Y / Z &\implies X / Z & (\mathbf{B}_>) \\
+    Y / Z \hspace{0.5cm} X / Y &\implies X / Z & (\mathbf{B}_<) \\
+    X &\implies T / (T \setminus X) & (\mathbf{T}_>) \\
+    X &\implies T \setminus (T / X) & (\mathbf{T}_<)
+  .\end{align*}
+  CCGs are mildy context-sensitive (because there are infinite non-terminals,
+  any recursive combination of atomic non-terminals and $/,\setminus$), but
+  using only $>$ and $<$ is a context-free grammar. CCGs allow for coordination
+  and cross-serial dependencies.
+
+  If \textbf{lambda calculus with CCG}, first derive the CCG parse tree. Then,
+  combine the $\lambda$ expressions. $M$ on the left and $N$ on the right, then
+  $>$ combines $(M \; N)$ and $<$ combines $(N \; M)$. Iteratively simplify the
+  $\lambda$ expressions of greater spans using the smaller spans.
+
+  \textbf{Linear-indexed grammar}: Mildly context-sensitive grammar is a CFG
+  where the non-terminals have stacks that contain indices from a finite set
+  $I$. Rules have the following form (RHS can be $\epsilon$):
+  \begin{align*}
+    N[\sigma] &\to \bm{\alpha} \; M[\sigma] \; \bm{\beta} \\
+    N[\sigma] &\to \bm{\alpha} \; M[f\sigma] \; \bm{\beta} & \text{(push)} \\
+    N[f\sigma] &\to \bm{\alpha} \; M[\sigma] \; \bm{\beta} & \text{(pop)}
+  .\end{align*}
+\end{topic}
+
+\begin{topic}{Transformers}
+  \textbf{Attention}: Query, key, and values where the query and keys decide
+  how much is ``attended`` to the values (soft-lookup in hashmap).
+  \textbf{Self-attention}: Learn the queries $\bm{W}_Q\in\mathbb{R}^{d\times
+  d}$, keys $\bm{W}_K\in\mathbb{R}^{d\times d}$, and values
+  $\bm{W}_V\in\mathbb{R}^{d\times d}$ from a single input
+  $\bm{X}\in\mathbb{R}^{d\times n}$: \[
+    \textsc{SelfAtt}(\bm{X}) = \softmax \lft( \nicefrac{\lft( \bm{W}_Q^\top \bm{X} \rgt)^\top \lft( \bm{W}_K^\top \bm{X} \rgt)}{\sqrt{d_q}} \rgt) \lft( \bm{W}_V^\top \bm{X} \rgt)^\top
+  .\]
+  \textbf{Runtime}: $\mathcal{O}(nd^2 + dn^2)$. \textbf{Problem}: Permutation
+  equivariant. \textbf{Solution}: Add positional encoding: $\bm{P}_{pi}=\sin(
+  \nicefrac{p}{10000^{\nicefrac{i}{d}}} )$ if $i$ is even, and
+  $\bm{P}_{pi}=\cos( \nicefrac{p}{10000^{\nicefrac{i}{d}}} )$ if $i$ is odd.
+
+  \begin{enumerate}
+    \item \textbf{Encoder}: $\oplus \bm{P} \to \mathrm{MHSA} \to \oplus
+      \to \mathrm{LN} \to \mathrm{MLPs} \to \oplus \to \mathrm{LN}$;
+    \item \textbf{Decoder}: Add linear projection and softmax.
+  \end{enumerate}
+  \textbf{Residual layers} help with gradient problems. \textbf{Layer norm}
+  helps with internal covariate shifts. \textbf{MHSA}: Concatenate heads and
+  project to $\mathbb{R}^d$.
+
+  \textbf{Sequence-to-sequence}: Encode input sequence with $n$ sequential
+  encoders. Then, input this to the decoders together with a representation of
+  previous output tokens (these output a prob. dist. over next tokens).
+
+  \textbf{Problem}: Greedily picking the most probable next token does not
+  necessarily result in the globally maximum output, and we cannot go over
+  every single possible output, which is infinite. \textbf{Solution}:
+  \textbf{Beam search} (keep track of at most $k$ paths at once),
+  \textbf{nucleus sampling} (only consider top $p\%$ probability mass).
+\end{topic}
+
+\begin{topic}{Axes of modelling}
+  \textbf{Bias-variance tradeoff}. High bias: Low model complexity,
+  underfitting, misses correlations in training data. High variance: High model
+  complexity, overfitting, fits too well on the training data (captures noise).
+
+  \textbf{Regularization}: Tradeoff between bias and variance, e.g.,
+  $\ell(\bm{\theta}) + \lambda \| \bm{\theta} \|_2^2$.
+
+  Cross-entropy $\equiv$ NLL. Minimize NLL $\equiv$ MLE. $\hat{\bm{\theta}} =
+  \argmin_{\bm{\theta}\in\Theta} -\log \prod_{(x,y)\in\mathcal{D}}
+  p_{\bm{\theta}}(y\mid x)$.
+  \textbf{MLE problems}: only suitable for probabilistic models, easily
+  overfit if small training dataset.
+
+  \textbf{Precision} = $\frac{\text{true positive}}{\text{predicted
+  positive}}$, \textbf{Recall} = $\frac{\text{true positive}}{\text{true
+  positive} + \text{false negative}}$, \textbf{F1} =
+  $\frac{\text{precision}\cdot\text{recall}}{\text{precision}+\text{recall}}$.
+
+  \textbf{Locally normalized}: $+$ Efficient to train, $-$ Label bias.
+
+  \textbf{Globally normalized}: $+$ Scores at each step can have differing
+  ``importance``. $-$ Requires computation of normalizer, which usually
+  requires independence assumptions.
+\end{topic}
+
+\begin{topic}{Tips}
+  When \textbf{deriving the gradient of a model}, think of which paths exist in
+  the computational graph between the two nodes. Sum over the paths and product
+  within the paths.
+
+  If it is possible to \textbf{reuse terms during backpropagation}, adjust the
+  time complexity to do that.
+
+  \textbf{Linear algebra multiplication complexities}:
+  \begin{enumerate}
+    \item Vector-vector ($\mathbb{R}^{1\times d}$, $\mathbb{R}^{d\times 1}$):
+      $\mathcal{O}(d)$;
+    \item Matrix-vector ($\mathbb{R}^{n\times m}$, $\mathbb{R}^{m\times 1}$):
+      $\mathcal{O}(nm)$;
+    \item Matrix-matrix ($\mathbb{R}^{n\times m}$, $\mathbb{R}^{m\times
+      \ell}$): $\mathcal{O}(nm\ell)$.
+  \end{enumerate}
+
+  \textbf{Activation functions}:
+  \begin{enumerate}
+    \item $\sigma(x) = \frac{1}{1+\exp(-x)}$ ($\mathbb{R} \to [0,1]$), \\
+      $\sigma'(x) = \sigma(x)(1-\sigma(x))$;
+    \item $\mathrm{ReLU}(x) = \max\{0, x\}$ ($\mathbb{R} \to
+      \mathbb{R}_{\geq 0}$), \\ $\mathrm{ReLU}'(x) = \mathbb{1}\{ x > 0 \}$;
+    \item $\tanh(x) = \frac{\exp(x) - \exp(-x)}{\exp(x) + \exp(-x)}$ ($\mathbb{R} \to [-1, 1]$),\\
+      $\tanh'(x) = 1 - \tanh^2(x)$.
+  \end{enumerate}
+
+\end{topic}
+
+\end{multicols}
+
+\end{document}

@@ -17,26 +17,38 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        working_directory: natural_language_processing
+        working_directory: natural_language_processing/summary
+
+    - name: Natural Language Processing (cheatsheet)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: natural_language_processing/cheatsheet
 
     - name: Computer Vision (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        working_directory: computer_vision
+        working_directory: computer_vision/summary
 
     - name: Probabilistic Artificial Intelligence (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
-        working_directory: probabilistic_artificial_intelligence
+        working_directory: probabilistic_artificial_intelligence/summary
+
+    - name: Probabilistic Artificial Intelligence (cheatsheet)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: probabilistic_artificial_intelligence/cheatsheet
 
     - name: Algorithms Lab (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        working_directory: algorithms_lab
+        working_directory: algorithms_lab/summary
 
     - name: Optimization for Data Science (summary)
       uses: xu-cheng/latex-action@v3
@@ -49,51 +61,47 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: optimization_for_data_science/cheatsheet
 
     - name: Machine Perception (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: machine_perception/summary
 
     - name: Machine Perception (cheatsheet)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: machine_perception/cheatsheet
 
     - name: Computational Intelligence Lab (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: computational_intelligence_lab/summary
 
     - name: Advanced Machine Learning (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: advanced_machine_learning/summary
 
     - name: Deep Learning (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
-        latexmk_shell_escape: true
         working_directory: deep_learning/summary
 
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
-        file natural_language_processing/main.pdf | grep -q ' PDF '
-        file computer_vision/main.pdf | grep -q ' PDF '
-        file probabilistic_artificial_intelligence/main.pdf | grep -q ' PDF '
-        file algorithms_lab/main.pdf | grep -q ' PDF '
+        file natural_language_processing/summary/main.pdf | grep -q ' PDF '
+        file natural_language_processing/cheatsheet/main.pdf | grep -q ' PDF '
+        file computer_vision/summary/main.pdf | grep -q ' PDF '
+        file probabilistic_artificial_intelligence/summary/main.pdf | grep -q ' PDF '
+        file probabilistic_artificial_intelligence/cheatsheet/main.pdf | grep -q ' PDF '
+        file algorithms_lab/summary/main.pdf | grep -q ' PDF '
         file optimization_for_data_science/summary/main.pdf | grep -q ' PDF '
         file optimization_for_data_science/cheatsheet/main.pdf | grep -q ' PDF '
         file machine_perception/summary/main.pdf | grep -q ' PDF '
@@ -116,33 +124,23 @@ jobs:
         git clone --depth=1 --branch gh-pages git@github.com:cristianpjensen/eth-cs-notes.git "$GITHUB_WORKSPACE/deploy"
 
         # (*) To add a file, add the following command for that file
-        cp -f natural_language_processing/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing-summary.pdf"
-        cp -f computer_vision/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision-summary.pdf"
-        cp -f probabilistic_artificial_intelligence/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence-summary.pdf"
-        cp -f algorithms_lab/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab-summary.pdf"
-        cp -f optimization_for_data_science/summary/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-summary.pdf"
-        cp -f optimization_for_data_science/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science-cheatsheet.pdf"
-        cp -f machine_perception/summary/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
-        cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-cheatsheet.pdf"
-        cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-summary.pdf"
-        cp -f advanced_machine_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning-summary.pdf"
-        cp -f deep_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning-summary.pdf"
+        cp -f natural_language_processing/summary/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing/summary.pdf"
+        cp -f natural_language_processing/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/natural_language_processing/cheatsheet.pdf"
+        cp -f computer_vision/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computer_vision/summary.pdf"
+        cp -f probabilistic_artificial_intelligence/summary/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence/summary.pdf"
+        cp -f probabilistic_artificial_intelligence/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/probabilistic_artificial_intelligence/cheatsheet.pdf"
+        cp -f algorithms_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/algorithms_lab/summary.pdf"
+        cp -f optimization_for_data_science/summary/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science/summary.pdf"
+        cp -f optimization_for_data_science/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/optimization_for_data_science/cheatsheet.pdf"
+        cp -f machine_perception/summary/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception/summary.pdf"
+        cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception/cheatsheet.pdf"
+        cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab/summary.pdf"
+        cp -f advanced_machine_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning/summary.pdf"
+        cp -f deep_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning/summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
-        # (*) To add a file, add it to the branch
-        git add natural_language_processing-summary.pdf
-        git add computer_vision-summary.pdf
-        git add probabilistic_artificial_intelligence-summary.pdf
-        git add algorithms_lab-summary.pdf
-        git add optimization_for_data_science-summary.pdf
-        git add optimization_for_data_science-cheatsheet.pdf
-        git add machine_perception-summary.pdf
-        git add machine_perception-cheatsheet.pdf
-        git add computational_intelligence_lab-summary.pdf
-        git add advanced_machine_learning-summary.pdf
-        git add deep_learning-summary.pdf
-
+        git add -A
         git commit -m "[github actions] deploy"
         git push
       env:
