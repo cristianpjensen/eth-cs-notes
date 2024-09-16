@@ -13,65 +13,79 @@ jobs:
       uses: actions/checkout@v3
 
       # (*) To add a file, add the following section for it
-    - name: Compile natural language processing summary
+    - name: Natural Language Processing (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         working_directory: natural_language_processing
 
-    - name: Compile computer vision summary
+    - name: Computer Vision (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         working_directory: computer_vision
 
-    - name: Compile probabilistic artificial intelligence
+    - name: Probabilistic Artificial Intelligence (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: probabilistic_artificial_intelligence
 
-    - name: Compile algorithms lab
+    - name: Algorithms Lab (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         working_directory: algorithms_lab
 
-    - name: Compile optimization for data science summary
+    - name: Optimization for Data Science (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: optimization_for_data_science/summary
 
-    - name: Compile optimization for data science cheatsheet
+    - name: Optimization for Data Science (cheatsheet)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: optimization_for_data_science/cheatsheet
 
-    - name: Compile machine perception summary
+    - name: Machine Perception (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: machine_perception/summary
 
-    - name: Compile machine perception cheatsheet
+    - name: Machine Perception (cheatsheet)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: machine_perception/cheatsheet
 
-    - name: Compile computational intelligence lab summary
+    - name: Computational Intelligence Lab (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
         latexmk_shell_escape: true
         working_directory: computational_intelligence_lab/summary
+
+    - name: Advanced Machine Learning (summary)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: advanced_machine_learning/summary
+
+    - name: Deep Learning (summary)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: deep_learning/summary
 
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
@@ -85,10 +99,12 @@ jobs:
         file machine_perception/summary/main.pdf | grep -q ' PDF '
         file machine_perception/cheatsheet/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
+        file advanced_machine_learning/summary/main.pdf | grep -q ' PDF '
+        file deep_learning/summary/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
-        git config --global user.name "Cristian Perez Jensen"
+        git config --global user.name "Cristian Perez Jensen (auto)"
         git config --global user.email "cristianpjensen@gmail.com"
 
         mkdir ~/.ssh
@@ -109,6 +125,8 @@ jobs:
         cp -f machine_perception/summary/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-summary.pdf"
         cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception-cheatsheet.pdf"
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab-summary.pdf"
+        cp -f advanced_machine_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning-summary.pdf"
+        cp -f deep_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning-summary.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
@@ -122,6 +140,8 @@ jobs:
         git add machine_perception-summary.pdf
         git add machine_perception-cheatsheet.pdf
         git add computational_intelligence_lab-summary.pdf
+        git add advanced_machine_learning-summary.pdf
+        git add deep_learning-summary.pdf
 
         git commit -m "[github actions] deploy"
         git push
