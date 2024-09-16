@@ -17,6 +17,7 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: natural_language_processing/summary
 
     - name: Natural Language Processing (cheatsheet)
@@ -29,6 +30,7 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: computer_vision/summary
 
     - name: Probabilistic Artificial Intelligence (summary)
@@ -48,6 +50,7 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: algorithms_lab/summary
 
     - name: Optimization for Data Science (summary)
@@ -67,6 +70,7 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: machine_perception/summary
 
     - name: Machine Perception (cheatsheet)
@@ -79,18 +83,21 @@ jobs:
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: computational_intelligence_lab/summary
 
     - name: Advanced Machine Learning (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: advanced_machine_learning/summary
 
     - name: Deep Learning (summary)
       uses: xu-cheng/latex-action@v3
       with:
         root_file: main.tex
+        latexmk_shell_escape: true
         working_directory: deep_learning/summary
 
       # (*) To add a file, add the PDF filename to the following
