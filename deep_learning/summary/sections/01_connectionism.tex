@@ -1,0 +1,337 @@
+\section{Connectionism}
+
+\subsection{McCulloch-Pitts neuron}
+
+One of the first approaches to modeling functions of nervous functions with an abstract
+mathematical model is the McCulloch-Pitts neuron \citep{mcculloch1943logical}. It treats neurons as
+linear threshold elements, which receive and integrate a large number of inputs and produce a
+Boolean output. More specifically, it receives $\vec{x} \in \{ 0,1 \}^n$ as input and has
+$\vec{\sigma} \in \{ -1, 1 \}^n, \theta \in \R$ as parameters. Its transfer function is formalized
+as \[
+    f[\vec{\sigma}, \theta](\vec{x}) = \mathbb{1}\{ \transpose{\vec{\sigma}} \vec{x} \geq \theta \}.
+\]
+The synapses $\vec{\sigma}$ are inhibitory if $-1$ and excitatory if $+1$. However, the problem
+with this model is that it does not specify how to set or adjust its parameters.
+
+\subsection{Perceptron}
+
+The perceptron \citep{rosenblatt1958perceptron} is the first model to perform supervised learning,
+where patterns are represented as feature vectors $\vec{x} \in \R^d$ and have binary class
+memberships $y \in \{ -1, +1 \}$. \citet*{rosenblatt1958perceptron} proposed to use a linear
+threshold unit with synaptic weights $\vec{w} \in \R^d$ and threshold $b \in \R$, \[
+    f[\vec{w}, b](\vec{x}) = \mathrm{sgn}\lft( \transpose{\vec{w}}\vec{x} + b \rgt),
+\]
+where \[
+    \mathrm{sgn}(z) \doteq
+    \begin{cases}
+        +1 & z > 0  \\
+        0  & z = 0  \\
+        -1 & z < 0.
+    \end{cases}
+\]
+
+This model implicitly induces a decision boundary, where \[
+    \transpose{\vec{w}} \vec{x} + b \condeq 0 \iff \frac{\transpose{\vec{w}}\vec{x}}{\| \vec{w} \|} + \frac{b}{\| \vec{w} \|} \condeq 0.
+\]
+The perceptron thus models the decision boundary as a hyperplane in $\R^n$ with normal vector
+$\nicefrac{\vec{w}}{\| \vec{w} \|}$ and $\nicefrac{-b}{\| \vec{w} \|}$ is the signed distance of
+the hyperplane to the origin.\sidenote{In Hesse normal form, a hyperplane is formulated by \[
+        \transpose{\vec{n}} \vec{x} - d = 0,
+    \]
+    where $\vec{n}$ is a unit vector and $d$ is the shortest distance of the hyperplane to the origin.}
+Furthermore, we can formalize how bad/good the model is for a data point by the signed distance
+function, \[
+    \gamma[\vec{w}, b](\vec{x}, y) = \frac{y \lft( \transpose{\vec{w}} \vec{x} + b \rgt)}{\| \vec{w} \|}.
+\]
+The sign of $\gamma(\cdot, \cdot)$ encodes the correctness of the classification. The following is
+a short proof of this fact,
+\begin{align*}
+    f[\vec{w}, b](\vec{x}) = y & \iff \mathrm{sgn}\lft( \transpose{\vec{w}} \vec{x} + b \rgt) = y               \\
+                               & \iff \mathrm{sgn}\lft( y \lft( \transpose{\vec{w}} \vec{x} + b \rgt) \rgt) = 1 \\
+                               & \iff \mathrm{sgn}\lft( \gamma[\vec{w}, b](\vec{x}, y) \rgt) = 1                \\
+                               & \iff \gamma[\vec{w}, b](\vec{x}, y) > 0.
+\end{align*}
+We define the margin of a classifier on training data $\mathcal{S}$ as the minimum signed distance, \[
+    \gamma[\vec{w}, b](\mathcal{S}) = \min_{(\vec{x}, y) \in \mathcal{S}} \gamma[\vec{w},b](\vec{x}, y).
+\]
+If $\gamma[\vec{w},b](\mathcal{S}) > 0$, then the dataset has been linearly separated by a
+hyperplane, formed by the parameters, \ie, all classifications are correct.
+
+\begin{marginfigure}
+    \centering
+    \incfig{linear-separability}
+    \caption{Linear separability of negative and positive data points.}
+    \label{fig:linear-separability}
+\end{marginfigure}
+
+The version space---see \Cref{fig:version-space}---is defined as the set of all model
+parametrizations that correctly classify the data, \[
+    \mathcal{V}(\mathcal{S}) \doteq \{ (\vec{w}, b) \mid \gamma[\vec{w}, b](\mathcal{S}) > 0 \} \subseteq \R^{n+1}.
+\]
+Hence, $\mathcal{S}$ is linearly separable if and only if $\mathcal{V}(\mathcal{S}) \neq
+    \emptyset$. Adding data points to the dataset can only shrink the version space.
+
+\begin{marginfigure}
+    \centering
+    \incfig{version-space}
+    \caption{In this version space, every line represents a data point's halfspace in which it is correctly classified. As can be seen, adding data points can only shrink the version space.}
+    \label{fig:version-space}
+\end{marginfigure}
+
+\paragraph{The perceptron algorithm.} The groundbreaking aspect of \citep{rosenblatt1958perceptron} is that it specified how to
+iteratively adjust the weights to provably find a solution for a linearly separable
+dataset.\sidenote{A solution is defined as any parameters that correctly classify all data points.}
+Given a dataset $\mathcal{S} = \{ (\vec{x}_i,y_i) \}_{i=1}^s$, the perceptron algorithms aims to
+find some solution $(\vec{w},b) \in \mathcal{V}(\mathcal{S})$. Note that this means that it does
+not aim to find classifiers with small error if $\mathcal{V}(\mathcal{S}) = \emptyset$.
+
+The perceptron algorithm is a mistake-driven algorithm, meaning that it will only consider data
+points that are misclassified by the current parameters. Given a misclassified data point
+$(\vec{x}, y) \in \mathcal{S}$, it has the following update rule,
+\begin{align*}
+    \vec{w} & \gets \vec{w} + y \vec{x} \\
+    b       & \gets b + y.
+\end{align*}
+We keep going through the dataset until every data point is correctly classified---see
+\Cref{alg:perc-alg}. Note that this algorithm will never converge if $\mathcal{S}$ is not linearly
+separable.
+
+\begin{algorithm}[t]
+    \begin{algorithmic}
+        \State $\vec{w} \gets \vec{0}$
+        \State $b \gets 0$
+        \State $\mathrm{mistake} \gets \mathtt{true}$
+        \While{$\mathrm{mistake} = \mathtt{true}$}
+        \State $\mathrm{mistake} \gets \mathtt{false}$
+        \For{$(\vec{x}, y) \in \mathcal{S}$}
+        \If{$f[\vec{w},b](\vec{x}) \neq y$}
+        \State $\vec{w} \gets \vec{w} + y \vec{x}$
+        \State $b \gets b + y$
+        \State $\mathrm{mistake} \gets \mathtt{true}$
+        \EndIf
+        \EndFor
+        \EndWhile
+        \State \Return $\lft( \vec{w}, b \rgt)$
+    \end{algorithmic}
+    \caption{The perceptron algorithm.}
+    \label{alg:perc-alg}
+\end{algorithm}
+
+\paragraph{Proof of convergence.} In order to prove convergence of the perceptron algorithm for linearly separable data, we will
+assume that there is no bias. We denote the weights after $t$ updates of the perceptron algorithm
+(ignoring correctly classified samples) as $\vec{w}_t$.
+
+We will first need the following two lemmas,
+
+\begin{lemma}
+    \label{lem:perc-1}
+
+    Let $\vec{w} \in \R^n$ with $\| \vec{w} \| = 1$ and $\gamma \doteq \gamma[\vec{w}](\mathcal{S}) >
+        0$. (\Ie, $\mathcal{S}$ is $\gamma$-separable.) Then, \[
+        \transpose{\vec{w}} \vec{w}_t \geq t \gamma.
+    \]
+\end{lemma}
+
+\begin{proof}
+    This can easily be shown by a recursion,
+    \begin{align*}
+        \transpose{\vec{w}} \vec{w}_{t+1} & = \transpose{\vec{w}}(\vec{w}_t + y \vec{x}) \margintag{Perceptron update.}                                                                                            \\
+                                          & = \transpose{\vec{w}}\vec{w}_t + y \transpose{\vec{w}}\vec{x} \margintag{Linearity.}                                                                                   \\
+                                          & = \transpose{\vec{w}}\vec{w}_t + \gamma[\vec{w}](\vec{x}) \margintag{$\| \vec{w} \| = 1$.}                                                                             \\
+                                          & \geq \transpose{\vec{w}} \vec{w}_t + \gamma. \margintag{$\gamma = \min_{\vec{x}, y} \gamma[\vec{w}](\vec{x}, y) \leq \gamma[\vec{w}](\vec{x},y), \forall \vec{x}, y$.}
+    \end{align*}
+    Now, it is easy to show the result by induction, starting from $\vec{w}_0 = \vec{0}$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:perc-2}
+
+    Let $R \doteq \max_{\vec{x} \in \mathcal{S}} \| \vec{x} \|$, then \[
+        \| \vec{w}_t \| \leq R \sqrt{t}.
+    \]
+\end{lemma}
+
+\begin{proof}
+    This can easily be shown by a recursion,
+    \begin{align*}
+        \| \vec{w}_{t+1} \|^2 & = \| \vec{w}_t + y \vec{x} \|^2 \margintag{Perceptron update.}                                                                \\
+                              & = \| \vec{w}_t \|^2 + \| y \vec{x} \|^2 + 2 y \transpose{\vec{w}_t} \vec{x} \margintag{Cosine theorem.}                       \\
+                              & \leq \| \vec{w}_t \|^2 + \| \vec{x} \|^2 \margintag{The perceptron update condition is $\gamma[\vec{w}](\vec{x}, y) \leq 0$.} \\
+                              & \leq \| \vec{w}_t \|^2 + R^2.
+    \end{align*}
+    The claim follows by induction, starting from $\vec{w}_0 = \vec{0}$, and taking the square root.
+\end{proof}
+
+\begin{theorem}[\citep{novikoff1962convergence}]
+    Let $\mathcal{S}$ be $\gamma$-separable and $R \doteq \max_{\vec{x} \in \mathcal{S}} \| \vec{x} \|$,
+    then the perceptron algorithm converges in less than $\floor{\nicefrac{R^2}{\gamma^2}}$ steps.
+\end{theorem}
+
+\begin{proof}
+    By \Cref{lem:perc-1,lem:perc-2}, we have the following inequality, \[
+        1 \geq \cos \angle{(\vec{w}, \vec{w}_t)} = \frac{\transpose{\vec{w}} \vec{w}_t}{\| \vec{w}_t \|} \geq \frac{t \gamma}{R \sqrt{t}} = \sqrt{t} \frac{\gamma}{R},
+    \]
+    where $\vec{w} \in \mathcal{V}(\mathcal{S})$. Hence, \[
+        t \leq \frac{R^2}{\gamma^2}.
+    \]
+    Thus, the number of updates is upper bounded. When there are no more updates, there are no more
+    mistakes---we only make updates when we find a mistake. Hence, $\vec{w}_t$ will have converged.
+    Since $t$ is integer, this bound is $\floor{\nicefrac{R^2}{\gamma^2}}$.
+\end{proof}
+
+This theorem does not only guarantee convergence of the perceptron algorithm, but also relates the
+separation margin $\gamma$ to the number of steps necessary for convergence. If $\gamma$ is large,
+it should be easier to find parameters that classify all data points correctly than if $\gamma$ is
+small, because then you have to be very precise; see \Cref{fig:linear-separability}.
+
+However, the problem with this approach is that it requires linear separability of the data, which
+is not fulfilled for simple problems like the XOR, \[
+    \mathcal{S} = \lft\{ \lft( \begin{bmatrix} 0 \\ 0 \end{bmatrix},1 \rgt), \lft( \begin{bmatrix} 1 \\ 1 \end{bmatrix},1 \rgt), \lft( \begin{bmatrix} 0 \\ 1 \end{bmatrix},-1 \rgt), \lft( \begin{bmatrix} 1 \\ 0 \end{bmatrix},-1 \rgt) \rgt\}.
+\]
+
+\paragraph{Number of unique linear classifications.} Assume that we are given a dataset $\mathcal{S} \subset \R^n$ of $s$ points, then we define the set
+of possible linear classifications of this dataset as, \[
+    \mathcal{C}(\mathcal{S}, n) \doteq \lft| \lft\{ y\in \{ -1, +1 \}^s \;\middle|\; \exists_{\vec{w} \in \R^n} \forall_{i \in [s]} \lft[y_i \lft( \transpose{\vec{w}} \vec{x}_i \rgt) > 0\rgt] \rgt\} \rgt|.
+\]
+We assume points to be in general position, which means that any subset $\Xi \subseteq \mathcal{S}$
+with $|\Xi| \leq n$ is linearly independent.\sidenote{This is a very weak condition.}
+
+\begin{theorem}[\citep{cover1965geometrical}]
+    Given $s$ $n$-dimensional points in general position, \[
+        \mathcal{C}(s+1, n) = 2 \sum_{i=0}^{n-1} \begin{pmatrix} s \\ i \end{pmatrix}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    It is easy to show that the initial values are \[
+        \mathcal{C}(1,n) = 2, \quad \mathcal{C}(s, 1) = 2.
+    \]
+    Consider a realizable classification of $s$ points. \Ie, any classification of all $\vec{x} \in
+        \mathcal{S}$ that is linearly separable. This classification has a non-empty version space
+    $\mathcal{V}$. Let $\vec{x}_{s+1}$ be a pattern that we add to $\mathcal{S}$. This gives us two new
+    version spaces, \[
+        \mathcal{V}^+ \doteq \mathcal{V} \cap \lft\{ \vec{w} \;\middle|\; \transpose{\vec{w}} \vec{x}_{s+1} > 0 \rgt\}, \quad \mathcal{V}^- \doteq \mathcal{V} \cap \lft\{ \vec{w} \;\middle|\; -\transpose{\vec{w}} \vec{x}_{s+1} > 0 \rgt\},
+    \]
+    There are two situations,
+    \begin{enumerate}
+        \item $\mathcal{V}^+$ and $\mathcal{V}^-$ are non-empty. Hence, $\vec{x}_{s+1}$ can be
+              classified as either $+1$ or $-1$. This is the case if and only if there is a
+              $\vec{w} \in \mathcal{V}$ such that $\transpose{\vec{w}} \vec{x}_{s+1} = 0$.\sidenote{Because
+                  then we would be able to shift the hyperplane, formed by $\vec{w}$, infinitesimally to
+                  allow arbitrary classification of $\vec{x}_{s+1}$ while keeping all other
+                  classifications the same.} Recall that we want to know the number of classifications of
+              this new dataset $\mathcal{S} \cup \{ \vec{x}_{s+1} \}$. For any classification of
+              $\mathcal{S}$ that is in this situation, we can make two new classifications; one
+              where $\vec{x}_{s+1}$ is classified $+1$ or $-1$. There are $\mathcal{C}(s,n-1)$ such
+              that classifications, because the constraint on $\vec{w}$ makes the problem effectively
+              $(n-1)$-dimensional with $s$ data points. Hence, we gain $2 \mathcal{C}(s,n-1)$ classifications;
+
+        \item $\mathcal{V}^+$ is non-empty and $\mathcal{V}^-$ is empty or $\mathcal{V}^+$ is empty
+              and $\mathcal{V}^-$ is non-empty. In this case, we would only be able to create one new
+              classification for each existing classification, and there are $\mathcal{C}(s,n) -
+                  \mathcal{C}(s,n-1)$ such original classifications. Hence, we gain $\mathcal{C}(s,n) - \mathcal{C}(s,n-1)$ classifications.
+    \end{enumerate}
+    In conclusion, in total we can create
+    \begin{align*}
+        \mathcal{C}(s+1,n) & = \mathcal{C}(s,n) - \mathcal{C}(s,n-1) + 2 \cdot \mathcal{C}(s,n-1) \\
+                           & = \mathcal{C}(s,n) + \mathcal{C}(s,n-1)
+    \end{align*}
+    classifications of $s+1$ data points. The claim follows by induction using Pascal's identity.
+\end{proof}
+
+It turns out that after $s=2n$, there is a steep decrease in number of linear classifications,
+quickly moving toward 0.
+
+\subsection{Parallel distributed processing}
+
+The philosophy behind modern machine learning comes from parallel distributed processing (PDP)
+\citep{rumelhart1986general}. The elements of PDP are the following,
+\begin{enumerate}
+    \item A set of processing units with states of activation, which are the basic building blocks that
+          models consist of;
+    \item Output functions for each unit, which define how the output of the units is computed;
+    \item A pattern of connectivity between units, which defines how the units interact with each other;
+    \item Propagation rules for propagating patterns of activity, which makes the dependence of the units
+          explicit;
+    \item Activation functions for units, which make the model more expressive;
+    \item A learning rule to modify connectivity based on experience, which the training data is used for;
+    \item An environment within which the system must operate, which is formalized by a loss function.
+\end{enumerate}
+All of these elements are design choices that can be changed and experimented with. The fact that we
+still use this wording says much about the impact of PDP.
+
+% \subsection{Multi-layer perceptron}
+%
+% Function: \[
+%     f[\mat{W}, \vec{v}](\vec{x}) = \transpose{\vec{v}} \phi(\mat{W}\vec{x}), \quad \mat{W} \in \R^{d \times n}, \vec{v} \in \R^d.
+% \]
+
+\subsection{Hopfield networks}
+
+The Hopfield model \citep{hopfield1982neural} defines a parameterized energy function via
+second-order interactions between $n$ binary neurons, \[
+    H(\vec{X}) \doteq - \frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} w_ij X_i X_j + \sum_{i=1}^{n} b_i X_i, \quad \vec{X} \in \{ -1, +1 \}^n.
+\]
+The couplings $w_{ij}$ quantify the interaction strength between neurons and the biases $b_i$ act
+as thresholds. We constrain the weights such that \[
+    w_{ii} = 0, w_{ij} = w_{ji}, \quad \forall i,j \in [n].
+\]
+Hopfield networks follow a simple dynamic, \[
+    X_i \gets \begin{cases}
+        +1 & H([\ldots, X_{i-1}, +1, X_{i+1}, \ldots]) \leq H([\ldots, X_{i-1}, -1, X_{i+1}, \ldots]) \\
+        -1 & \text{otherwise}.
+    \end{cases}
+\]
+Hence, $X_i$ becomes the value that minimizes the energy function, given the rest of the state. In
+practice, we do not need to evaluate the full energy function for the update---we only need the
+effective field per neuron, \[
+    H_i \doteq \sum_{j=1}^{n} w_{ij} X_j - b_i.
+\]
+Then, updates can equivalently be expressed as \[
+    X_i \gets \mathrm{sgn}(H_i), \quad \mathrm{sgn}(z) = \begin{cases}
+        +1 & z \geq 0 \\
+        -1 & z < 0.
+    \end{cases}
+\]
+
+The goal of Hopfield networks is to use the update dynamics to evolve noisy stimulus toward a
+target pattern. For example, we might want noisy greyscale images to converge to images of numbers
+$0$--$9$. Given a set of patterns that we wish to memorize, \[
+    \mathcal{S} \subseteq \{ -1, +1 \}^n,
+\]
+Hebbian learning involves setting the weights as outer products, \[
+    w_{ij} = \frac{1}{n} \sum_{t=1}^{s} x_{t,i} x_{t,j} \implies \mat{W} = \frac{1}{n} \sum_{t=1}^{s} \vec{x}_t \transpose{\vec{x}_t}.
+\]
+Intuitively, neurons that are frequently in the same state reinforce each other (positive
+coupling), whereas neurons that are frequently in opposite states repel each other (negative
+coupling).
+
+The minimal requirement of considering a pattern as memorized is that it is meta-stable, \ie, when
+in the state of a pattern, the update rule will not make any updates, \[
+    x_{t,i} \condeq \mathrm{sgn} \lft( \sum_{j=1}^{n} w_{ij}x_{t,j} \rgt).
+\]
+Expanding this with the couplings from Hebbian learning, we get
+\begin{align*}
+    x_{t,i} & \condeq \mathrm{sgn} \lft( \frac{1}{n} \sum_{j=1}^{n} \sum_{r=1}^{s} x_{r,i} x_{r,j} x_{t,j} \rgt)                                        \\
+            & = \mathrm{sgn} \lft( x_{t,i} + \underbrace{\frac{1}{n} \sum_{j=1}^{n} \sum_{r\neq t}^{s} x_{r,i} x_{r,j} x_{t,j}}_{\doteq C_{t,i}} \rgt).
+\end{align*}
+$C_{t,i}$ is the cross-talk between patterns, and ideally $|C_{t,i}| < 1$, for all patterns $t \in [s]$ and indices $i \in [n]$, because then the minimal requirement is fulfilled.
+
+If we assume that the patterns have i.i.d. random signs and we look at the limit $n \to \infty$,
+then we have \[
+    C_{t,i} \sim \mathcal{N}\lft( 0, \frac{s}{n} \rgt).
+\]
+The probability of a single sign being flipped is then \[
+    P[-x_{t,i} C_{t,i} \geq 1] \approx \int_1^{\infty} \exp \lft( - \frac{nz^2}{2s} \rgt) \mathrm{d}z = \frac{1}{2} \lft( 1 - \mathrm{erf}\lft( \sqrt{\nicefrac{n}{2s}} \rgt) \rgt).
+\]
+Hence, the ratio $\nicefrac{s}{n}$ controls the asymptotic error rate. At $\nicefrac{s}{n} \approx
+    0.138$, a phase transition occurs, beyond which an avalanche of errors occur. Requiring a pattern
+to be retrieved with high probability, one gets a sublinear capacity bound of \[
+    s \leq \frac{n}{2 \log_2 n}.
+\]
+
+Recently, research has been done on increasing the capacity of Hopfield networks by making use of
+higher-order energy functions \citep{krotov2016dense,demircigil2017model}. The increased capacity
+is the consequence of increased number of local minima in complex cost functions. Furthermore,
+\citet{ramsauer2020hopfield} have investigated a connection between Hopfield networks and
+transformers.
