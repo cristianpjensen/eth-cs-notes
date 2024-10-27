@@ -1,0 +1,149 @@
+\section{Anomaly detection}
+
+In anomaly detection, we are given a sample of objects $\mathcal{X} \subseteq \R^d$ with a normal
+class $\mathcal{N} \in \mathcal{X}$---the data points that we wish to keep. We wish to construct a
+function $\phi: \mathcal{X} \to \{ 0,1 \}$, such that \[
+    \phi(\vec{x}) = 1 \iff \vec{x} \not\in \mathcal{N}.
+\]
+Formally, an anomaly is an unlikely event. Hence, the strategy is to fit a model of a parametric
+family of distributions to the data $\mathcal{X}$, \[
+    \mathcal{H} = \{ p(\cdot \mid \vec{\theta}) \mid \vec{\theta} \in \Theta \}.
+\]
+Then, we define the anomaly score of $\vec{x}$ as a low probability $p(\vec{x} \mid
+    \vec{\theta}^\star)$ according to the optimal model in this hypothesis class.
+
+Anomaly detection in a high-dimensional space is hard, because the normal class can be very
+complex. The idea is to project $\mathcal{X}$ down to a lower dimensionality and perform anomaly
+detection there---hopefully the projected version of the normal class $\Pi(\mathcal{N})$ is less
+complex. In order to find the optimal linear projection, we will use principal component analysis
+(PCA).
+
+Furthermore, it has been observed that linear projections of high-dimensional distributions onto
+low-dimensional spaces resemble Gaussian distributions. Hence, after performing PCA, we will fit a
+Gaussian mixture model (GMM) to the projected data.
+
+\paragraph{Principal component analysis.}
+
+The goal of PCA is to linearly project $\R^d$ to $\R^{d^-}$ such that the maximum amount of
+variance of the data is preserved.\sidenote{Components with larger variance are more informative.}
+Consider the base case $d^- = 1$. Let $\vec{u} \in \R^d$ with $\| \vec{u} \| = 1$, we project onto
+$\vec{u}$ by inner product, \[
+    \vec{x} \mapsto \transpose{\vec{u}} \vec{x}.
+\]
+The sample mean of the reduced dataset is computed by \[
+    \frac{1}{n} \sum_{i=1}^{n} \transpose{\vec{u}} \vec{x}_i = \transpose{\vec{u}} \bar{\vec{x}},
+\]
+where $\vec{x}$ is the sample mean of the original dataset. Further, the sample variance of the
+reduced dataset is
+\begin{align*}
+    \frac{1}{n} \sum_{i=1}^{n} \lft( \transpose{\vec{u}} \vec{x}_i - \transpose{\vec{u}} \bar{\vec{x}} \rgt)^2 & = \frac{1}{n} \sum_{i=1}^{n} \transpose{\vec{u}} (\vec{x}_i - \bar{\vec{x}}) \transpose{(\vec{x}_i - \bar{\vec{x}})} \vec{u}         \\
+                                                                                                               & = \transpose{\vec{u}} \lft( \frac{1}{n} \sum_{i=1}^{n} (\vec{x} - \bar{\vec{x}}) \transpose{(\vec{x} - \bar{\vec{x}})} \rgt) \vec{u} \\
+                                                                                                               & = \transpose{\vec{u}} \mat{\Sigma} \vec{u},
+\end{align*}
+where $\mat{\Sigma}$ is the covariance matrix of the dataset. Since we want the projection that preserves the maximum variance, we have the following objective, \[
+    \vec{u}^\star \in \argmax_{\| \vec{u} \| = 1} \transpose{\vec{u}} \mat{\Sigma} \vec{u}.
+\]
+The Lagrangian of this problem is \[
+    \mathcal{L}(\vec{u}; \lambda) = \transpose{\vec{u}} \mat{\Sigma} \vec{u} + \lambda \lft( 1 - \| \vec{u} \|^2 \rgt)
+\]
+with gradient \[
+    \pdv{\mathcal{L}(\vec{u}; \lambda)}{\vec{u}} = 2 \mat{\Sigma} \vec{u} - 2 \lambda \vec{u} \overset{!}{=} 0.
+\]
+So, $\vec{u}$ must satisfy $\mat{\Sigma} \vec{u} = \lambda \vec{u}$---$\vec{u}$ is an eigenvector
+of $\mat{\Sigma}$. It is easy to see that this must be the principal eigenvector by rewriting the
+objective,
+\begin{align*}
+    \vec{u}^\star & \in \argmax_{\| \vec{u} \| = 1} \transpose{\vec{u}} \mat{\Sigma} \vec{u} \\
+                  & = \argmax_{\substack{\| \vec{u} \| = 1                                   \\ (\vec{u}, \lambda) \in \mathrm{eig}(\mat{\Sigma})}} \lambda \| \vec{u} \|^2                    \\
+                  & = \argmax_{\substack{\vec{u} \in \R^d                                    \\ (\vec{u}, \lambda) \in \mathrm{eig}(\mat{\Sigma})}} \lambda                                    \\
+                  & = \vec{u}_1.
+\end{align*}
+For $d^- > 1$, the remaining principal components can be computed with a similar idea. Iteratively,
+we factor out the previous principal components and do as above on the transformed dataset. For
+example, to get the second principal component, we first factor out the first principal component, \[
+    \mathcal{X}_1 \doteq \{ \vec{x} - \mathrm{proj}_{\vec{u}_1}(\vec{x}) \mid \vec{x} \in \mathcal{X} \} = \{ \vec{x} - \transpose{\vec{u}_1} \vec{x} \cdot \vec{u}_1 \mid \vec{x} \in \mathcal{X} \} .
+\]
+Then, we do the same as above.
+
+\paragraph{Gaussian mixture model.}
+
+The probability density function (PDF) of a Gaussian mixture model with $k$ components is
+formalized as a convex combination of Gaussians, \[
+    p(\vec{x}; \vec{\theta}) = \sum_{j=1}^{k} \pi_j \mathcal{N}(\vec{x}; \vec{\mu}_j, \mat{\Sigma}_j).
+\]
+The parameters of this model are \[
+    \vec{\theta} = \{ \pi_j, \vec{\mu}_j, \mat{\Sigma}_j \mid j \in [k] \},
+\]
+where $\sum_{j=1}^{k} \pi_j = 1$ and $\{ \mat{\Sigma}_j \mid j \in [k] \}$ are positive definite.
+We fit the parameters of this model by maximizing the log-likelihood,
+\begin{align*}
+    \vec{\theta}^\star & \in \argmax_{\vec{\theta} \in \Theta} \log p(\{ \vec{x}_1, \ldots, \vec{x}_n \}; \vec{\theta})                                    \\
+                       & = \argmax_{\vec{\theta} \in \Theta} \sum_{i=1}^{n} \log p(\vec{x}_i; \vec{\theta})                                                \\
+                       & = \argmax_{\vec{\theta} \in \Theta} \sum_{i=1}^{n} \log \sum_{j=1}^{k} \pi_j \mathcal{N}(\vec{x}_i; \vec{\mu}_j, \mat{\Sigma}_j).
+\end{align*}
+Note that the above is intractable, so we would like to decompose it into tractable terms that can be
+computed. Let's assume that we know from which latent variable each data point was generated, then we
+can compute the MLE of the extended dataset $\{ (\vec{x}_i, z_i) \mid i \in [n] \}$ as
+\begin{align*}
+    \log p(\mat{X}, \vec{z}; \vec{\theta}) & = \sum_{i=1}^{n} \log p(\vec{x}_i, z_i)                                                                            \\
+                                           & = \sum_{i=1}^{n} \log \lft( \pi_{z_i} \mathcal{N}(\vec{x}_i; \vec{\mu}_{z_i}, \mat{\Sigma}_{z_i}) \rgt)            \\
+                                           & = \sum_{i=1}^{n} \log \pi_{z_i} + \sum_{i=1}^{n} \log \mathcal{N}(\vec{x}_i; \vec{\mu}_{z_i}, \mat{\Sigma}_{z_i}),
+\end{align*}
+which is tractable to maximize. Let $q$ be a distribution over $[k]$, then we can rewrite the
+log-likelihood into tractable terms,
+\begin{align*}
+    \log p(\mat{X}; \vec{\theta}) & = \E_{z \sim q} [\log p(\mat{X}; \vec{\theta})]                                                                                                                                                                                            \\
+                                  & = \E_{z \sim q} \lft[ \log \lft( \frac{p(\mat{X}, z; \vec{\theta})}{p(z \mid \mat{X}; \vec{\theta})} \rgt) \rgt]                                                                                                                           \\
+                                  & = \E_{z \sim q} \lft[ \log \lft( \frac{p(\mat{X}, z; \vec{\theta})}{p(z \mid \mat{X}; \vec{\theta})} \frac{q(z)}{q(z)} \rgt) \rgt]                                                                                                         \\
+                                  & = \underbrace{\E_{z \sim q} \lft[ \log \frac{p(\mat{X}, z; \vec{\theta})}{q(z)} \rgt]}_{\doteq M(q, \vec{\theta})} + \underbrace{\E_{z \sim q} \lft[ \log \frac{q(z)}{p(z \mid \mat{X}; \vec{\theta})} \rgt]}_{\doteq E(q, \vec{\theta})}.
+\end{align*}
+
+\begin{algorithm}[t]
+    \begin{algorithmic}[1]
+        \State Initialize $\vec{\theta}_0$
+        \For{$t\in [T]$}
+        \State $q^\star \in \argmin_{q} E(q, \vec{\theta}_{t-1})$
+        \State $\vec{\theta}_t \in \argmax_{\vec{\theta}} M(q^\star, \vec{\theta})$
+        \EndFor
+        \State \Return $\vec{\theta}_T$
+    \end{algorithmic}
+    \caption{The expectation-maximization algorithm, where
+        \begin{align*}
+            M(q, \vec{\theta}) & \doteq \E_{z \sim q} \lft[ \log \frac{p(\mat{X}, z; \vec{\theta})}{q(z)} \rgt]      \\
+            E(q, \vec{\theta}) & \doteq \E_{z \sim q} \lft[ \log \frac{q(z)}{p(z \mid \mat{X}; \vec{\theta})} \rgt].
+        \end{align*}}
+\end{algorithm}
+
+These terms have the following two properties,
+\begin{align*}
+    \log p(\mat{X}; \vec{\theta}) & \geq M(q, \vec{\theta}), \quad \forall q, \vec{\theta}                                                       \\
+    \log p(\mat{X}; \vec{\theta}) & = M(q^\star, \vec{\theta}), \quad q^\star = p(\cdot \mid \mat{X}; \vec{\theta}), \quad \forall \vec{\theta}.
+\end{align*}
+Hence, we can use $M(q^\star, \vec{\theta})$ as an approximation of $\log p(\mat{X}; \vec{\theta})$
+around $\vec{\theta}$.
+
+\begin{theorem}[EM algorithm convergence]
+    Using the expectation-maximization algorithm, $\{ \log p(\vec{x}; \vec{\theta}_t) \}_{t=0}^T$ is non-decreasing.
+\end{theorem}
+
+\begin{proof}
+    Given a data point $\vec{x}$ and current parameters $\vec{\theta}$, we have the following update, \[
+        \vec{\theta}' \in \argmax_{\vec{\theta} \in \Theta} M(q^\star, \vec{\theta}).
+    \]
+    Hence, we have \[
+        \log p(\vec{x}) = M(q^\star, \vec{\theta}) \leq M(q^\star, \vec{\theta}') \leq \log p(\vec{x}; \vec{\theta}').
+    \]
+    Thus, $\{ \log p(\vec{x}; \vec{\theta}_t) \}_{t=0}^T$ is non-decreasing.
+\end{proof}
+
+\paragraph{Summary.}
+
+In conclusion, given a set of data points $\mathcal{X}$ with normal points $\mathcal{N} \subseteq
+    \mathcal{X}$, we train an anomaly detector as follows,
+\begin{enumerate}
+    \item Fit a projector $\pi: \R^d \to \R^{d^-}$ using PCA;
+    \item Fit a probability density function $p(\cdot \mid \vec{\theta})$ with $k$ components to $\{
+              \pi(\vec{x}) \mid \vec{x} \in \mathcal{X} \}$ using the EM algorithm;
+    \item For a point $\vec{x} \in \mathcal{X}$, its ``anomaly score'' is computed by $-\log p(\pi(\vec{x});
+              \vec{\theta})$.
+\end{enumerate}
