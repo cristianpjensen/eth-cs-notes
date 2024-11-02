@@ -1,3 +1,291 @@
 \section{Feedforward networks}
 
-\textit{TODO}
+\subsection{Regression models}
+
+In least squares, we attempt to fit a linear model, \[
+    f[\vec{w}](\vec{x}) = \transpose{\vec{w}}\vec{x},
+\]
+to data points with a mean squared error (MSE) loss, \[
+    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{s} \lft( \transpose{\vec{w}} \vec{x} - y_i \rgt)^2.
+\]
+Summarizing the patterns into a design matrix $\mat{X} \in \R^{d \times s}$ and output vector
+$\vec{y} \in \R^s$, we get the following loss, \[
+    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \| \transpose{\mat{X}} \vec{w} - \vec{y} \|^2.
+\]
+This loss function is convex, so we can find the minimizer by setting the gradient to zero, \[
+    \grad{\ell[\vec{w}](\mathcal{S})}{\vec{w}} = \transpose{\mat{X}} \mat{X} \vec{w} - \transpose{\mat{X}} \vec{y} \condeq \vec{0}.
+\]
+This gives the ordinary least squares estimator (OLSE), \[
+    \vec{w}^\star = \inv{(\transpose{\mat{X}} \mat{X})} \transpose{\mat{X}} \vec{y}.
+\]
+
+In logistic regression, the outputs are binary. Hence, we make use of the sigmoid function $\sigma:
+    \R \to (0,1)$, \[
+    \sigma(z) \doteq \frac{1}{1 + \exp(-z)}.
+\]
+Hence, the model has the following form, \[
+    f[\vec{w}](\vec{x}) = \sigma \lft( \transpose{\vec{w}}\vec{x} \rgt).
+\]
+This outputs the probability of the label of $\vec{x}$ being $1$. We train this model to optimize
+the cross-entropy loss, \[
+    \ell[\vec{w}](\mathcal{S}) = \frac{1}{s} \sum_{i=1}^{s} -\log \sigma \lft( (2y_i - 1) \transpose{\vec{w}} \vec{x}_i \rgt).
+\]
+This problem does not have a closed-form solution, but we can optimize the weights by stochastic
+gradient descent (SGD) with the following gradient, \[
+    \grad{\ell[\vec{w}](\langle \vec{x}_i, y_i \rangle)}{\vec{w}} = \lft( \sigma \lft( \transpose{\vec{w}} \vec{x}_i \rgt) - y_i \rgt) \vec{x}_i.
+\]
+
+\subsection{Layers and units}
+
+A mapping is a function with vectors as input and output. The following function is an example of a
+mapping, \[
+    f[\mat{W}, \vec{b}](\vec{x}) = \phi(\mat{W} \vec{x} + \vec{b}), \quad \mat{W} \in \R^{m \times n}, \vec{b} \in \R^n,
+\]
+where $\phi$ is a pointwise activation function and $m$ is the width of the layer.
+
+Deep neural networks compose maps in sequence, \[
+    G = F^L\lft[ \vec{\theta}^L \rgt] \circ \cdots \circ F^1 \lft[ \vec{\theta}^1 \rgt],
+\]
+where $\vec{\theta}^{\ell}$ are the (adjustable) weights of layer $\ell$. Intuitively, models with
+higher depth are able to extract features with increasing complexity. Such networks induce
+intermediate results (or layer activations), \[
+    \vec{x}^{\ell} \doteq \lft( F^{\ell} \circ \cdots \circ F^{1} \rgt)(\vec{x}) = F^{\ell}\lft( \vec{x}^{\ell-1} \rgt).
+\]
+The intermediate layers are permutation symmetric, meaning that the units within a hidden layer are
+interchangeable if we change the order of the weights accordingly, \[
+    F[\mat{W}, \vec{b}](\vec{x}) = \inv{\mat{P}} \phi(\mat{P}\mat{W}\vec{x} + \mat{P}\vec{b}) = \inv{\mat{P}} F[\mat{P}\mat{W},\mat{P}\vec{b}](\vec{x}),
+\]
+where $\mat{P}$ is a permutation matrix.\sidenote{A permutation matrix $\mat{P} \in \R^{n \times
+            n}$ satisfies the following condition, \[
+        \sum_{i=1}^{n} p_{ij} = \sum_{j=1}^{n} p_{ij} = 1, \quad \forall i, j \in [n].
+    \]} Hence, the parameters are not unique in feedforward networks.
+
+The layers---as presented---differ only in their choice of activation function,
+\begin{itemize}
+    \item Linear activation, \[
+              \phi = \mathrm{Id};
+          \]
+    \item Sigmoid activation, \[
+              \phi = \sigma;
+          \]
+    \item ReLU activation, \[
+              \phi = (z)_+ = \max \{ 0, z \}.
+          \]
+\end{itemize}
+
+An essential part of training neural networks is constructing the loss function. For a regression
+problem, a simple---and popular---choice is the squared error loss, \[
+    \ell[\vec{\theta}](\vec{x}, \vec{y}) = \frac{1}{2} \| \vec{y} - f[\vec{\theta}](\vec{x}) \|^2.
+\]
+For a multi-class classification problem, the final layer must be the softmax, which outputs a
+categorical probability distribution over classes, \[
+    \mathrm{softmax}_i(\vec{z}) = \frac{\exp(z_i)}{\sum_{j=1}^{n} \exp(z_j)}.
+\]
+Usually, this type of model optimizes the cross-entropy loss.
+
+In a perfect world, we would want to minimize the expected risk, \[
+    \E[\ell(y, f[\vec{\theta}](\vec{x}))].
+\]
+However, since we do not have access to the underlying probability distribution of the data, this
+is intractable. Hence, we minimize the empirical risk, \[
+    \frac{1}{s} \sum_{i=1}^{s} \ell(y_i, f[\vec{\theta}](\vec{x}_i)).
+\]
+In practice, we partition the dataset into training and validation sets. Then, we directly minimize
+the empirical risk of the training set, and approximate the expected risk with the validation set.
+
+\subsection{Linear and residual networks}
+
+Linear layers are closed under composition, meaning that we do not gain any representational power
+by increasing the depth. However, linear analysis are nice to work with for theoretical analysis.
+
+Residual layers are formalized as follows, \[
+    F[\mat{W}, \vec{b}](\vec{x}) = \vec{x} + (\phi(\mat{W} \vec{x} + \vec{b}) - \phi(\vec{0})).
+\]
+They have the following property, \[
+    F[\mat{0}, \vec{0}] = \mathrm{Id}.
+\]
+In most architectures, learning the identity map is non-trivial. However, it is desirable to
+incrementally learn a better representation, rather than having to learn it at every layer.
+Intuitively, the residual layer learns how to change its input representation.
+
+A problem with the above formalization is that the input and output must have the same
+dimensionality. This is solved by a projection, \[
+    F[\mat{V}, \mat{W}, \vec{b}](\vec{x}) = \mat{V} \vec{x} + (\phi(\mat{W} \vec{x} + \vec{b}) - \phi(\vec{0})), \quad \mat{V}, \mat{W} \in \R^{m\times n}.
+\]
+
+\citet{he2016deep} showed that increasing model depth with residual layers leads to better
+performance than when using normal layers. This small change allows model depths of up to 100–-200
+layers. DenseNet \citet{zhu2017densenet} makes use of a similar idea of shortcutting information by
+feeding the output of all upstream layer activations to every layer, \[
+    \vec{x}^{\ell+1} = F^{\ell+1}\lft( \vec{x}^\ell, \ldots, \vec{x}^1, \vec{x} \rgt).
+\]
+
+\subsection{Sigmoid networks}
+
+\marginnote{The sigmoid function and hyperbolic tangent, \[
+        \sigma(z) \doteq \frac{1}{1 + \exp(-z)}, \quad \tanh(z) \doteq \frac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)},
+    \]
+    are representationally equivalent, because you can always obtain the one from the other by the
+    following identity, \[
+        \tanh(z) = 2 \sigma(2z) - 1.
+    \]}
+
+We will now look at which functions an MLP with sigmoid activation function, \[
+    g[\vec{v},\mat{W},\vec{b}](\vec{x}) \doteq \transpose{\vec{v}} \sigma(\mat{W}\vec{x} + \vec{b}), \quad \vec{v}, \vec{b} \in \R^m, \mat{W} \in \R^{m\times n},
+\]
+are able to express. The function class of MLPs is formalized by
+\begin{align*}
+    \mathcal{G}_n     & \doteq \bigcup_{m=1}^\infty \mathcal{G}_{n,m}                                                                                                                 \\
+    \mathcal{G}_{n,m} & \doteq \lft\{ g \;\middle|\; g(\vec{x}) = \transpose{\vec{v}} \sigma(\mat{W}\vec{x} + \vec{b}), \vec{v}, \vec{b} \in \R^m, \mat{W} \in \R^{m\times n} \rgt\}.
+\end{align*}
+An alternative way of expressing this is as a linear span of units, \[
+    \mathcal{G}_n = \mathrm{span} \lft\{ \sigma \lft( \transpose{\vec{w}}\vec{x} + b \rgt) \;\middle|\; \vec{w} \in \R^n, b \in \R \rgt\}.
+\]
+
+\begin{definition}[Function distance metric]
+    $d_{\mathcal{K}}$ is a distance metric over a compact set $\mathcal{K}$ induced by the uniform norm, \[
+        d_{\mathcal{K}}(f,g) \doteq \| f - g \|_{\infty,K}, \quad \| f \|_{\infty,\mathcal{K}} \doteq \sup_{\vec{x} \in \mathcal{K}} |f(\vec{x})|.
+    \]
+\end{definition}
+
+\begin{definition}[Function class distance metric]
+    Let $f$ be a function and $\mathcal{G}$ a function class, then their distance is computed as \[
+        d_{\mathcal{K}}(f,\mathcal{G}) \doteq \inf_{g \in \mathcal{G}} d_{\mathcal{K}}(f,g).
+    \]
+\end{definition}
+
+\begin{definition}[Universal function approximator]
+    A function class $\mathcal{F}$ is approximated by function class $\mathcal{G}$ on $\mathcal{K}$ if, and only if, \[
+        d_{\mathcal{K}}(f, \mathcal{G}) = 0, \quad \forall f \in \mathcal{F}.
+    \]
+    If this holds for all compact sets $\mathcal{K}$, then $\mathcal{G}$ is a universal approximator of
+    $\mathcal{F}$.
+\end{definition}
+
+\begin{theorem}[Weierstrass theorem]
+    Polynomials are universal approximators of $\mathcal{C}(\R)$, where $\mathcal{C}(\R)$ is the set
+    of all continuous functions over $\R$.
+\end{theorem}
+
+\begin{theorem}[\citep{leshno1993multilayer}]
+    Let $\phi \in \mathcal{C}^{\infty}(\R)$, but not a polynomial, then \[
+        \mathrm{span}(\{ \phi(ax + b) \mid a,b \in \R \})
+    \]
+    universally approximates $\mathcal{C}(\R)$.
+\end{theorem}
+
+Hence, an MLP with $1$-dimensional input and output is a universal function approximator, if the
+activation function is not a polynomial.
+
+\begin{lemma}[Lifting lemma \citep{pinkus1999approximation}]
+    Let $\phi$ be such that \[
+        \mathrm{span}(\{ \phi(ax + b) \mid a,b \in \R \})
+    \]
+    universally approximates $\mathcal{C}(\R)$, then \[
+        \mathrm{span}\lft( \lft\{ \phi \lft( \transpose{\vec{w}}\vec{x} + b \rgt) \mid \vec{w} \in \R^n, b \in \R \rgt\} \rgt)
+    \]
+    universally approximates $\mathcal{C}(\R^n)$.
+\end{lemma}
+
+Thus, we can lift the previous result into $n$ dimensions, making MLPs universal approximators of
+continuous functions of any dimensionality. Moreover, this does not only hold for the sigmoid
+function, but for any smooth activation function that is not a polynomial.
+
+However, this does not give us any insights into how depth affects performance, because the theorem
+assumes a single hidden layer of arbitrary width. Also, it does not provide a bound on the width of
+the hidden layer in order to achieve some desired error.
+
+\begin{theorem}[\citep{barron1993universal}]
+    For every $f: \R^n \to \R$ with finite $\mathcal{C}_f$ and any $r > 0$, there is a sequence of one hidden layer MLPs $(g_m)_{m \in \mathbb{N}}$ such that \[
+        \int_{r \mathcal{B}} (f(\vec{x}) - g_m(\vec{x}))^2 \mu(d \vec{x}) \leq \bigo{\frac{1}{m}},
+    \]
+    where $r \mathbb{B} \doteq \{ \vec{x} \in \R^n \mid \| \vec{x} \| \leq r \}$ and $\mu$ is any
+    probability measure on $r \mathbb{B}$.
+\end{theorem}
+
+Hence, if we relax the notion of approximation to squared error over a ball with radius $r$, we
+gain a decay of $\nicefrac{1}{m}$ for the approximation error. Further, the approximation error
+bound does not depend on the input dimensionality $n$.
+
+\subsection{ReLU networks}
+
+The ReLU activation function is defined as \[
+    (z)_+ \doteq \max \{ 0,z \}.
+\]
+Consider a layer of $m$ ReLU units on a fixed input $\vec{x}$. In this situation, each unit is
+either active or inactive, where active means that its input is positive, \[
+    \mathbb{1}\{ \mat{W} \vec{x} + \vec{b} > 0 \} \in \{ 0,1 \}^m.
+\]
+In this way, we can partition the input space into cells that have the same activation pattern, \[
+    \mathcal{X}_{\vec{\kappa}} \doteq \{ \vec{x} \mid \mathbb{1}\{ \mat{W} \vec{x} + \vec{b} > 0 \} = \vec{\kappa} \}.
+\]
+We can measure the complexity of a network as the amount of these cells it has. Firstly, we have
+the trivial upper bound $|\{ \mathbb{1}\{ \mat{W} \vec{x} + \vec{b} > 0 \} \mid \vec{x} \in \R^n
+    \}| \leq 2^m$. However, we would like to obtain a stricter bound. We can represent each hidden unit
+as a hyperplane $\transpose{\vec{w}_i}\vec{x} + b_i$. On one side the unit would be active and
+inactive on the other. Geometrically, we can thus think of it as a space, where each hidden unit
+represents a hyperplane. The connected regions of these hyperplanes are the activation patterns.
+
+\begin{marginfigure}
+    \centering
+    \incfig{connected-regions}
+    \caption{Connected regions, partitioned according to activation pattern. Each hyperplane represents a hidden unit. This shows an MLP with 2-dimensional input and 3-dimensional hidden layer.}
+    \label{fig:connected-regions}
+\end{marginfigure}
+
+\begin{theorem}[\citep{zaslavsky1975facing}]
+    Let $\mathcal{H}$ be a set of $m$ hyperplanes in $\R^n$. Denote by $R(\mathcal{H})$ the number of connected regions of $\R^n \backslash \mathcal{H}$, then \[
+        R(\mathcal{H}) \leq \sum_{i=0}^{\min \{ n,m \}} \begin{pmatrix} m \\ i \end{pmatrix} \doteq R(m).
+    \]
+    This upper bound is attained by hyperplanes in general position.
+\end{theorem}
+
+This gives us a tighter bound on the number of activation patterns.
+
+\begin{theorem}[\citep{montufar2014number}]
+    Consider a ReLU network with $L$ layers of width $m > n$. The number of linear regions is lower bounded by \[
+        R(m, L) \geq R(m) \lft\lfloor\frac{m}{n}\rgt\rfloor^{n(L-1)}.
+    \]
+\end{theorem}
+
+Finally we have a result that relates model complexity to layer depth. By letting the amount of
+possible activation patterns represent complexity, this is a good argument for why deep networks
+tend to perform well.
+
+\begin{theorem}[\citep{shekhtman1982piecewise}]
+    Piecewise linear functions are dense in $\mathcal{C}([0,1])$.
+\end{theorem}
+
+\begin{theorem}[Lebesgue]
+    A piecewise linear function with $m$ pieces can be written as \[
+        g(x) = ax + b + \sum_{i=1}^{m-1} c_i(x - x_i)_+.
+    \]
+\end{theorem}
+
+\begin{marginfigure}
+    \centering
+    \incfig{piecewise-linear-approx}
+    \caption{Piecewise linear approximation of a continuous function.}
+    \label{fig:piecewise-linear-approx}
+\end{marginfigure}
+
+Hence, we can rewrite any piecewise linear function with $m$ pieces as a sum of $m-1$ ReLUs. In 1
+dimension, we can approximate any function by uniformly spacing out points on the function and
+connecting them as a piecewise linear function---see \Cref{fig:piecewise-linear-approx}. We can
+lower approximation error by increasing the number of units, approaching $0$ as $m \to \infty$.
+Using the lifting lemma, we get the following result.
+
+\begin{theorem}[ReLU universality]
+    Networks with one hidden layer of ReLU units are universal function approximators.
+\end{theorem}
+
+% \begin{theorem}
+%     Every continuous piecewise linear function $g: \R^n \to \R$ can be written as a signed sum of
+%     $k$-Hinges with $k \leq n+1$, where a $k$-Hinge is \[
+%         g(\vec{x}) = \max_{j=1}^k \transpose{\vec{w}_j}\vec{x} + b_j.
+%     \]
+% \end{theorem}
+%
+% \begin{theorem}
+%     Every continuous piecewise linear function $f$ can be written as a difference of two polyhedral functions.
+% \end{theorem}
