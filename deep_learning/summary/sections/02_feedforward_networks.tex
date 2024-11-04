@@ -6,7 +6,7 @@ In least squares, we attempt to fit a linear model, \[
     f[\vec{w}](\vec{x}) = \transpose{\vec{w}}\vec{x},
 \]
 to data points with a mean squared error (MSE) loss, \[
-    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{s} \lft( \transpose{\vec{w}} \vec{x} - y_i \rgt)^2.
+    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{s} \lft( \transpose{\vec{w}} \vec{x}_i - y_i \rgt)^2.
 \]
 Summarizing the patterns into a design matrix $\mat{X} \in \R^{d \times s}$ and output vector
 $\vec{y} \in \R^s$, we get the following loss, \[

@@ -1,0 +1,135 @@
+\section{Gradient-based learning}
+
+\subsection{Backpropagation}
+
+In order to make use of gradient-based learning, we first need to compute the gradient.
+Backpropagation is an algorithm that allows the computation of any function, if we know the
+gradient of all basic blocks of the function.
+
+% In the end, we want to compute the gradient \wrt the parameters, \[
+%     \grad{\ell(\vec{y}, F[\vec{\theta}](\vec{x}))}{\vec{\theta}}.
+% \]
+We assume that we are differentiating the following function, \[
+    F[\vec{\theta}](\vec{x}) \doteq \lft( F^L \circ \cdots \circ F^1 \rgt)(\vec{x}),
+\]
+with the following hidden layer, \[
+    \vec{h}^{\ell} \doteq F^{\ell} \lft[ \vec{\theta}^{\ell} \rgt] \lft(\vec{h}^{\ell-1} \rgt), \quad \vec{h}^{0} = \vec{x}.
+\]
+The following intermediate gradient is essential for computing the gradients of the parameters, \[
+    \vec{\delta}^{\ell} = \pdv{\ell(\vec{y}, F[\vec{\theta}](\vec{x}))}{\vec{h}^{\ell}}.
+\]
+It has the following recurrence relationship (and base case),
+\begin{align*}
+    \vec{\delta}^{L}    & = \pdv{\ell(\vec{y}, \hat{\vec{y}})}{\hat{\vec{y}}}, \quad \hat{\vec{y}} = F[\vec{\theta}](\vec{x}) \\
+    \vec{\delta}^{\ell} & = \transpose{\lft[ \frac{\vec{h}^{\ell+1}}{\vec{h}^{\ell}} \rgt]} \vec{\delta}^{\ell+1}.
+\end{align*}
+These can thus be computed efficiently in linear time with dynamic programming. Then, to compute the
+parameter gradient of the $\ell$-th layer, we use the chain rule, \[
+    \pdv{\ell(\vec{y}, F[\vec{\theta}](\vec{x}))}{\vec{\theta}^{\ell}} = \vec{\delta}^{\ell} \pdv{\vec{h}^{\ell}}{\vec{\theta}^{\ell}}.
+\]
+
+\subsection{Gradient descent}
+
+Gradient descent is a gradient-based learning algorithm with the following update rule, \[
+    \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h\lft( \vec{\theta}^t \rgt)}{}, \quad \eta > 0 \margintag{$h \doteq \ell \circ F$.}
+\]
+
+A key insight of analysis into the behavior of gradient descent is that it can only be successful
+if the gradients change slowly. This is formalized by smoothness.
+
+\begin{definition}[Smoothness]
+    $h$ is $L$-smooth if there exists $L > 0$ such that \[
+        \| \grad{h(\vec{\theta}_1)}{} - \grad{h(\vec{\theta}_2)}{} \| \leq L \| \vec{\theta}_1 - \vec{\theta}_2 \|, \quad \forall \vec{\theta}_1, \vec{\theta}_2 \in \Theta.
+    \]
+    This is equivalent to the following condition, \[
+        \| \hess{h(\vec{\theta})}{} \|_2 \leq L, \quad \forall \vec{\theta} \in \Theta.
+    \]
+\end{definition}
+
+From the Taylor series expansion, we have
+\begin{align*}
+    h(\vec{\theta}_2) - h(\vec{\theta}_1) & = \transpose{\grad{h(\vec{\theta}_1)}{}} (\vec{\theta}_2 - \vec{\theta}_1) + \frac{1}{2} \transpose{(\vec{\theta}_2 - \vec{\theta}_1)} \hess{h(\vec{\theta}_1)}{} (\vec{\theta}_2 - \vec{\theta}_1)           \\
+                                          & = -\eta \| \grad{h(\vec{\theta}_1)}{} \|^2 + \frac{1}{2} \transpose{(\vec{\theta}_2 - \vec{\theta}_1)} \hess{h(\vec{\theta}_1)}{} (\vec{\theta}_2 - \vec{\theta}_1) \margintag{Gradient descent update rule.} \\
+                                          & \leq -\eta \| \grad{h(\vec{\theta}_1)}{} \|^2 + \frac{L}{2} \| \vec{\theta}_2 - \vec{\theta}_1 \|^2 \margintag{Spectral norm condition of smoothness.}                                                        \\
+                                          & = -\eta \| \grad{h(\vec{\theta})_1}{} \|^2 + \frac{L \eta^2}{2} \| h(\vec{\theta})_1 \|^2 \margintag{Update rule of gradient descent.}                                                                        \\
+                                          & = - \eta \lft( 1 - \frac{L \eta}{2} \rgt) \| \grad{h(\vec{\theta}_1)}{} \|^2.
+    \intertext{A strict decrease in $h$ is guaranteed if $\eta < \nicefrac{2}{L}$, hence we choose $\eta = \nicefrac{1}{L}$,}
+                                          & = -\frac{1}{2L} \| \grad{h(\vec{\theta}_1)}{} \|^2.
+\end{align*}
+As a result, we obtain sufficient decrease, \[
+    h(\vec{\theta}_2) = h(\vec{\theta}_1) - \frac{1}{2L} \| \grad{h(\vec{\theta}_1)}{} \|^2.
+\]
+
+\begin{lemma}[Convergence of gradient descent on smooth functions]
+    Let $h$ be $L$-smooth, then gradient descent with stepsize $\eta = \nicefrac{1}{L}$ will reach an $\epsilon$-critical point ($\| \grad{h(\vec{\theta})}{} \| \leq \epsilon$) in at most \[
+        T = \frac{2L}{\epsilon^2} \lft( h\lft(\vec{\theta}^0\rgt) - h(\vec{\theta}^{\star}) \rgt).
+    \]
+\end{lemma}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+\begin{definition}[PL-inequality]
+    $h$ satisfies the PL-inequality with $\mu > 0$ if \[
+        \frac{1}{2} \| \grad{h(\vec{\theta})}{} \|^2 \geq \mu(h(\vec{\theta}) - h(\vec{\theta}^\star)), \quad \forall \vec{\theta} \in \Theta.
+    \]
+\end{definition}
+
+\begin{lemma}
+    Let $h$ be differentiable, $L$-smooth, and $\mu$-PL. Then, gradient descent with stepsize $\eta = \nicefrac{1}{L}$ converges at a geometric rate, \[
+        h\lft( \vec{\theta}^T \rgt) - h(\vec{\theta}^\star) \leq \lft( 1 - \frac{\mu}{L} \rgt)^T \lft( h\lft( \vec{\theta}^0 \rgt) - h(\vec{\theta}^\star) \rgt).
+    \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        h \lft( \vec{\theta}^T \rgt) - h \lft( \vec{\theta}^{T-1} \rgt) & \leq -\frac{1}{2L} \lft\| \grad{h\lft( \vec{\theta}^T \rgt)}{} \rgt\|^2 \margintag{Sufficient decrease.}        \\
+                                                                        & \leq -\frac{\mu}{L} \lft( h \lft( \vec{\theta}^T \rgt) - h(\vec{\theta}^\star) \rgt) \margintag{PL-inequality.} \\
+    \end{align*}
+    Subtracting $h(\vec{\theta}^\star)$ from both sides yields \[
+        h \lft( \vec{\theta}^T \rgt) - h(\vec{\theta}^\star) \leq \lft( 1 - \frac{\mu}{L} \rgt) \lft( h \lft( \vec{\theta}^T \rgt) - h(\vec{\theta}^\star) \rgt).
+    \]
+    The result follows from a trivial induction.
+\end{proof}
+
+\subsection{Acceleration and adaptivity}
+
+Nesterov acceleration is a method that achieves better theoretical guarantees than vanilla gradient
+descent,
+\begin{align*}
+    \vec{\chi}^{t+1}   & = \vec{\theta}^t + \beta \lft( \vec{\theta}^t - \vec{\theta}^{t-1} \rgt) \margintag{Extrapolation step.} \\
+    \vec{\theta}^{t+1} & = \vec{\chi}^{t+1} - \eta \grad{h \lft( \vec{\chi}^{t+1} \rgt)}{}. \margintag{Gradient descent step.}
+\end{align*}
+
+The intuition behind momentum is that if the gradient is stable, gradient descent can make bolder
+steps. A simple method making use of this is the Heavy Ball method, \[
+    \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h\lft( \vec{\theta}^t \rgt)}{} + \beta \lft( \vec{\theta}^t - \vec{\theta}^{t-1} \rgt), \quad \beta \in [0,1].
+\]
+Assuming a constant gradient $\vec{\delta}$, we have the following update, \[
+    \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \lft( \sum_{\tau=1}^{t-1} \beta^{\tau} \rgt) \vec{\delta}.
+\]
+Thus, we see that that the learning rate increases in the case of a constant gradient.
+
+In adaptivity, we realize that we want parameter-specific learning rates, since different
+parameters behave differently. It defines the following, \[
+    \gamma_i^t = \gamma_i^{t-1} + \lft[ \partial_i h \lft( \vec{\theta}^t \rgt) \rgt]^2.
+\]
+We then have a parameter-specific update rule, \[
+    \theta_i^{t+1} = \theta_i^t - \eta_i^t \partial_i h\lft( \vec{\theta}^t \rgt), \quad \eta_i^t \doteq \frac{\eta}{\sqrt{\gamma_i^t} + \delta}.
+\]
+
+Adam \citep{kingma2014adam} combines these two,
+\begin{align*}
+    \vec{g}_t      & = \beta \vec{g}_{t-1} + (1-\beta) \grad{h(\vec{\theta}_t)}{}, \quad \beta \in [0,1] \margintag{Moving average (smooth gradient estimator).}                                                    \\
+    \vec{\gamma}_t & = \alpha \vec{\gamma}_{t-1} + (1-\alpha) \grad{h(\vec{\theta}_t)}{}^{\odot 2}, \quad \alpha \in [0,1]. \margintag{Exponential averaging (measure of stability in the optimization landscape).}
+\end{align*}
+The update rule is then \[
+    \vec{\theta}_{t+1} = \vec{\theta}_t - \vec{\eta}_t \odot \vec{g}_t, \quad \vec{\eta}_t = \frac{1}{\sqrt{\vec{\gamma}_t} + \delta}.
+\]
+
+\subsection{Stochastic gradient descent}
+
+When the dataset is too large, computing the full gradient is infeasible. Stochastic gradient
+descent solves this by computing the gradient only \wrt a single data point at each timestep.
+
