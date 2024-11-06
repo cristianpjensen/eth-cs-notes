@@ -1,0 +1,134 @@
+\section{Convolutional networks}
+
+\subsection{Convolutions}
+
+\begin{definition}[Integral operator]
+    \[
+        (Tf)(u) \doteq \int_{t_1}^{t_2} H(u,t) f(t) \mathrm{d}t, \quad -\infty \leq t_1 < t_2 \leq \infty.
+    \]
+\end{definition}
+
+\begin{definition}[Fourier transform]
+    \[
+        (\mathcal{F} f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi i t u} f(t) \mathrm{d}t. \margintag{Special case of integral operator with $H(u,t) = e^{-2 \pi itu}, t_1 = -\infty, t_2=\infty$.}
+    \]
+\end{definition}
+
+\begin{definition}[Convolution]
+    \[
+        (f * h)(u) \doteq \int_{-\infty}^\infty h(u-t)f(t) \mathrm{d}t. \margintag{Special case of integral operator with $H(u,t) = h(u-t), t_1=-\infty, t_2=\infty$.}
+    \]
+\end{definition}
+
+\begin{lemma}[Convolution is commutative]
+    \[
+        f * h = h * f, \quad \forall f, h.
+    \]
+\end{lemma}
+
+\begin{proof}
+    Let $u \in \R$, then
+    \begin{align*}
+        (h * f)(u) & \doteq \int_{-\infty}^\infty h(u-t) f(t) \mathrm{d}t                             \\
+                   & = \int_{\infty}^{-\infty} h(v) f(u-v) (-\mathrm{d}v) \margintag{$v \doteq u-t$.} \\
+                   & = \int_{-\infty}^\infty h(v) f(u-v) \mathrm{d}v.
+    \end{align*}
+\end{proof}
+
+\begin{lemma}[Convolution is shift-equivariant]
+    Let $f_{\delta}$ denote a shifted function, \[
+        f_{\delta}(t) \doteq f(t+\delta).
+    \]
+    The convolution is shift-equivariant, \[
+        f_{\delta} * h = (f * h)_{\delta}.
+    \]
+\end{lemma}
+
+\begin{proof}
+    Let $u,\delta \in \R$, then
+    \begin{align*}
+        (f_{\delta} * h)(u) & = \int_{-\infty}^\infty h(u-t) f(t-\delta) \mathrm{d}t                               \\
+                            & = \int_{-\infty}^\infty h(u+\delta-v) f(v) \mathrm{d}v \margintag{$v = t - \delta$.} \\
+                            & = (f * h)(u + \delta)                                                                \\
+                            & = (f * h)_{\delta}(u).
+    \end{align*}
+\end{proof}
+
+The convolutional operator can be computed via the Fourier transform, \[
+    \mathcal{F}(f * h) = \mathcal{F} f \cdot \mathcal{F} h.
+\]
+In the discrete case, this allows computing the convolution with the Fast Fourier Transform
+algorithm---however, this is not very useful for machine learning.
+
+\begin{theorem}
+    Any linear shift-equivariant transformation can be written as a convolution with a suitable kernel.
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+\begin{definition}[Discrete convolution]
+    Let $f,h: \Z \to \R$, then \[
+        (f * h)[u] \doteq \sum_{t=-\infty}^{\infty} h[t] f[u-t].
+    \]
+\end{definition}
+
+Typically, the kernel $h$ has support over a finite window, such that $h[t] = 0, \forall t \not\in
+    [t_{\min}, t_{\max}]$. Then, the sum can be truncated, \[
+    (f * h)[u] \doteq \sum_{t=t_{\min}}^{t_{\max}} h[t] f[u-t].
+\]
+
+\begin{definition}[Cross-correlation]
+    Let $f,h: \Z \to \R$, then \[
+        (h \star f)[u] \doteq \sum_{t=-\infty}^{\infty} h[t] f[u+t].
+    \]
+\end{definition}
+
+\begin{remark}
+    This is equivalent to convolution with a flipped kernel, \[
+        (h \star f) = (\bar{h} * f), \quad \bar{h}[t] \doteq h[-t].
+    \]
+\end{remark}
+
+Toeplitz matrix $\mat{H}_n^h \in \R^{(n + m - 1) \times n}$ is a matrix, where $h_i$ is on the
+$i$-th diagonal, \[
+    \mat{H}_n^h \doteq \begin{bmatrix}
+        h_1    & 0      & 0      & 0      & \cdots & 0      & 0       \\
+        h_2    & h_1    & 0      & 0      & \cdots & 0      & 0       \\
+        h_3    & h_2    & h_1    & 0      & \cdots & 0      & 0       \\
+        \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots  \\
+        0      & 0      & 0      & 0      & \cdots & h_m    & h_{m-1} \\
+        0      & 0      & 0      & 0      & \cdots & 0      & h_m
+    \end{bmatrix}.
+\]
+Convolution is equivalent to applying this matrix to a vectorized $\vec{f} \in \R^n$, \[
+    f * h = \mat{H}_n^h \begin{bmatrix} f_1 \\ \vdots \\ f_n \end{bmatrix}.
+\]
+This is effectively a proof that the convolutional operator is linear.
+
+\subsection{Convolutional layers}
+
+The goal of convolutional layers is to exploit translational equivariance of data, such as images.
+Furthermore, convolutional layers have higher statistical efficiency than fully connected layers,
+because of weight sharing. In order to achieve this, we can learn the parameters of the kernel.
+
+In order to apply convolutions to images, we need to define the operation on 2-dimensional data, \[
+    (\mat{I} * \mat{W})[i,j] = \sum_{k=-\infty}^{\infty} \sum_{\ell=-\infty}^{\infty} \mat{I}[i-k,j-\ell] \mat{W}[k,\ell].
+\]
+In general, the data has channels. So, in practice, we learn multiple convolutional filters---one
+for every pair of input-output channel. The output channel is then computed as the sum over its
+corresponding kernels with all input channels.
+
+We interleave convolutional layers with non-linearities and pooling layers, which downsample the
+input, \[
+    \mat{I}'[i,j] = \max \{ \mat{I}[i+k,j+\ell] \mid k, \ell \in [0, r) \},
+\]
+where $r$ is the window size. In general, convolutional networks have a pyramid structure, where
+the data gets iteratively downsampled.
+
+TODO: Gradients.
+
+% \subsection{Computer vision}
+%
+% \subsection{Natural language processing}
