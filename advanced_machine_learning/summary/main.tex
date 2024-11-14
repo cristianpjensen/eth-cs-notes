@@ -3,6 +3,9 @@
 \input{../../settings}
 \input{../../commands}
 
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz/]
+
 \title{Advanced Machine Learning}
 \author{Cristian Perez Jensen}
 
@@ -25,6 +28,12 @@
 
 \newpage
 \input{sections/3_density_estimation}
+
+\newpage
+\input{sections/4_linear_regression}
+
+\newpage
+\input{sections/5_causality}
 
 \newpage\cleardoublepage
 \bibliography{main}

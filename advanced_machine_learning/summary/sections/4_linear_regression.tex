@@ -1,0 +1,128 @@
+\section{Regression}
+
+In regression, we try to estimate a function $f: \R^d \to \R$ that best fits a given dataset $\{
+    (\vec{x}_i, y_i) \}_{i=1}^n \subseteq \R^d \times \R$. \Ie, we try to minimize the following loss
+function, \[
+    \ell(\vec{\beta}) = \frac{1}{n} \sum_{i=1}^{n} \lft\| f(\vec{x}_i) - y_i \rgt\|^2.
+\]
+
+\subsection{Linear regression}
+
+In linear regression, we assume the underlying data to be linear with a fixed noise, \[
+    Y \mid \vec{X} = \vec{x} \sim \mathcal{N} \lft( \transpose{\vec{\beta}_\star} \vec{x}, \sigma^2 \rgt)
+\]
+for some ground truth $\vec{\beta}_\star$. We parametrize $f$ as a linear function, \[
+    f(\vec{x}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{x}.
+\]
+Under these assumptions, the minimizer of the loss function is analytically tractable---the
+ordinary least squares estimator (OLSE), \[
+    \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \transpose{\mat{X}} \vec{y},
+\]
+where $\mat{X} \in \R^{d \times n}$ is the design matrix with respective outputs $\vec{y} \in
+    \R^n$.
+
+In practice, it is important to remove outliers, because linear models can be heavily influenced by
+them. Also, the data should be standardized, such that all features are on the same scale, because
+differences in scale can make matrix inversion unstable.
+
+TODO: Curse of dimensionality \citep{sur2019modern}, \Cref{fig:overestimation,fig:overconfidence}.
+
+\begin{marginfigure}
+    \begin{tikzpicture}
+        \begin{axis}[%
+            width=\textwidth,
+            % xmin=0,
+            % xmax=810,
+            % ymin=-20,
+            % ymax=20]
+            \addplot [scatter, only marks] table [x=index, y=w_hat, col sep=comma] {data/log_reg_estimator_indices.csv};
+            \addplot [only marks, mark=square, mark size=0.1pt, fill=black, draw=black] table [x=index, y=w_star, col sep=comma] {data/log_reg_estimator_indices.csv};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{$\vec{\beta}^\star$ is shown as a black line and $\hat{\vec{\beta}}$ is indicated by the marks. As can be seen, $\hat{\vec{\beta}}$ is overestimated for the first 200 indices, where $\vec{\beta}^\star_i \neq 0$.}
+    \label{fig:overestimation}
+\end{marginfigure}
+
+\begin{marginfigure}
+    \begin{tikzpicture}
+        \begin{axis}[%
+            width=\textwidth,
+            % xmin=0,
+            % xmax=1,
+            % ymin=0,
+            % ymax=1]
+            \addplot [scatter, only marks] table [x=true_prob, y=pred_prob, col sep=comma] {data/log_reg_estimator_overconfident.csv};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{True \vs predicted probability---the estimator is overconfident in its predictions.}
+    \label{fig:overconfidence}
+\end{marginfigure}
+
+Further, if features are collinear, then the model might only learn the correlation with the target
+variable of one of them and discard the other. In addition, some singular values will equal zero.
+This makes matrix inversion unstable. This can easily be shown by considering the singular value
+decomposition $\mat{X} = \mat{U} \mat{D} \transpose{\mat{V}}$, then
+\begin{align*}
+    \hat{\vec{\beta}} & = \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \transpose{\mat{X}} \vec{y}                                                                                     \\
+                      & = \inv{\lft( \mat{V} \transpose{\mat{D}} \transpose{\mat{U}} \mat{U} \mat{D} \transpose{\mat{V}} \rgt)} \mat{V} \transpose{\mat{D}} \transpose{\mat{U}} \vec{y} \\
+                      & = \inv{\lft( \mat{V} \transpose{\mat{D}} \mat{D} \transpose{\mat{V}} \rgt)} \mat{V} \transpose{\mat{D}} \transpose{\mat{U}} \vec{y}                             \\
+                      & = \mat{V} \transpose{\lft( \inv{\mat{D}} \rgt)} \inv{\mat{D}} \transpose{\mat{V}} \mat{V} \transpose{\mat{D}} \transpose{\mat{U}} \vec{y}                       \\
+                      & = \mat{V} \transpose{\lft( \inv{\mat{D}} \rgt)} \inv{\mat{D}} \transpose{\mat{D}} \transpose{\mat{U}} \vec{y}                                                   \\
+                      & = \mat{V} \inv{\mat{D}} \transpose{\mat{U}} \vec{y}.
+\end{align*}
+The inversion of $\mat{D}$ is unstable if the singular values are small. The solution to this is to
+remove collinear features and/or to add regularization.
+
+Consider the mean-squared error loss. The risk (expected loss) can be decomposed as follows into
+bias, variance, and noise terms, \[
+    \E \lft[ \lft( f(\vec{x}) - y \rgt)^2 \rgt] = \underbrace{\lft( \E[f(\vec{x})] - \E[y] \rgt)^2}_{\text{squared bias}} + \underbrace{\Var[f(\vec{x})]}_{\text{variance}} + \underbrace{\E \lft[ \lft( \E[y] - y \rgt)^2 \rgt]}_{\text{noise}}.
+\]
+The OLSE is the minimum variance unbiased estimator.\sidenote{This is proven by the Gauss-Markov
+    theorem.} However, this does not mean it is the best, because introducing some bias may
+considerably decrease the variance. Bayesianism adds bias by introducing a prior---priors often
+induce a regularizing term.\sidenote{\Eg, a Gaussian prior induces an $\ell_2$-norm regularizing
+    term.}
+
+\subsection{Polynomial regression}
+
+In polynomial regression, we construct a feature function of all possible polynomials, \eg, \[
+    \phi([x_1, x_2]) = [1, x_1, x_2, x_1^2, x_1 x_2, x_2^2, x_1^3, x_1^2 x_2, \ldots].
+\]
+We then perform linear regression in this space, \[
+    \psi(\vec{x}; \vec{\beta}) = \langle \vec{\beta}, \phi(\vec{x}) \rangle.
+\]
+The problem is that this space is infinitely dimensional, and the inner product is ill-defined in
+an infinitely dimensional space.\sidenote{This is due to $\langle \phi(\vec{x}), \phi(\vec{x}')
+    \rangle = \infty$ for some $\vec{x}, \vec{x}'$, \eg, $\vec{x} = \vec{x}' = [1,1]$.} We can solve
+this by transforming the vector such that inner products cannot diverge by introducing a
+data-dependent scalar, \[
+    \phi(\vec{x}) = \alpha(\vec{x}) \cdot \tilde{\phi}(\vec{x}), \quad \alpha(\vec{x}) > 0. \margintag{$\tilde{\phi}$ contains all polynomials in this equation.}
+\]
+An inner product \wrt this feature function is a valid inner product. Such transformations can have
+a closed form for the inner product, called kernelization. Commonly, the radial basis function
+(RBF) kernel is used, \[
+    \langle \phi(\vec{x}), \phi(\vec{x}') \rangle = \exp \lft( -\frac{\| \vec{x} - \vec{x}' \|^2}{2 \sigma^2} \rgt), \quad \sigma \in \R.
+\]
+Let $\mat{\Phi} \in \R^{n \times \infty}$ contain all feature vectors, then the OLSE for polynomial
+regression can be computed by \[
+    \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \vec{y}, \quad \mat{\Phi \in \R^{n\times \infty}}.
+\]
+However, $\transpose{\mat{\Phi}} \mat{\Phi}$ cannot be computed, because it is $\infty \times
+    \infty$-dimensional. We can fix this by observing that $\mat{\Phi} \transpose{\mat{\Phi}} \in \R^{n
+        \times n}$ and rewriting the OLSE as
+\begin{align*}
+    \hat{\vec{\beta}} & = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \vec{y}                                                                                                   \\
+                      & = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt) \inv{\lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt)} \vec{y} \\
+                      & = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \mat{\Phi} \transpose{\mat{\Phi}} \inv{\lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt)} \vec{y}             \\
+                      & = \transpose{\mat{\Phi}} \inv{\lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt)} \vec{y}.
+\end{align*}
+Let $\mat{K} = \mat{\Phi} \transpose{\mat{\Phi}}$, then it only contains kernel evaluations---$k_{ij} = \langle \phi(\vec{x}_i), \phi(\vec{x}_j) \rangle$. The next problem is that $\transpose{\mat{\Phi}}$ is still infinitely dimensional. However, this is not a problem, since when we want to make a prediction, we do the following,
+\begin{align*}
+    \psi(\hat{\vec{x}}) & = \langle \phi(\hat{\vec{x}}), \hat{\vec{\beta}} \rangle                        \\
+                        & = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}} \inv{\mat{K}} \vec{y}.
+\end{align*}
+Let $\vec{k}(\hat{\vec{x}}) = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}}$, then it only contains kernel evaluations with the new point---$k_i(\hat{\vec{x}}) = \langle \phi(\hat{\vec{x}}), \phi(\vec{x}_i) \rangle$. In conclusion, we can make predictions by \[
+    \psi(\hat{\vec{x}}) = \vec{k}(\hat{\vec{x}}) \inv{\mat{K}} \vec{y}, \quad \vec{k}(\hat{\vec{x}}) \in \R^{1 \times n}, \mat{K} \in \R^{n \times n}, \vec{y} \in \R^n.
+\]
+However, the problem with this approach is that it takes $O(n^3)$ to make a prediction---it scales
+in the amount of data points.
