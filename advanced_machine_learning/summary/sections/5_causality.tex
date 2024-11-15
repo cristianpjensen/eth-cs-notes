@@ -1,19 +1,69 @@
 \section{Causality}
 
-Reverse causality, third-cause fallacy, bidirectional causation.
+In general, models do not distinguish between causal and non-causal factors in the feature space.
+Therefore, they might identify non-causal factors as highly correlating with the output variable.
+\Eg, when classifying images as either depicting a cow or a camel, the model might identify the
+background as an important feature, because cows are usually in grass and camels are usually in the
+desert. However, if this classifier were to see a cow with a different background, it would fail.
 
-Domain shift, shortcut learning.
+The following are examples of causal fallacies, where one might conclude that $X$ causes $Y$,
+\begin{itemize}
+    \item Reverse causality, where $Y$ actually predicts $X$ and not the other way around;
+    \item Third-cause fallacy, where there is a confounding factor $Z$ that influences both $X$ and $Y$;
+    \item Bidirectional causation, where $X$ influence each other;
+\end{itemize}
+
+A domain shift happens when the test samples are drawn from a different distribution than the
+training samples. \Eg, COVID-19 detection models trained on a western population might not perform
+well on an eastern population.
+
+Shortcut learning happens when there is a spurious correlation between causal and non-causal
+features in the training dataset. The resulting estimator abuses the non-causal features to
+generalize in the testing dataset. The solution to this is to encode the features such that they do
+not depend on the environment.
 
 \subsection{Counterfactual invariance}
 
-We want to study the causal relationship between variables $X$ and $Y$.
+\begin{marginfigure}
+    \centering
+    \incfig{causal-graph}
+    \caption{Causal graph.}
+    \label{fig:causal-graph}
+\end{marginfigure}
 
-Causal graph.
+\begin{marginfigure}
+    \centering
+    \incfig{anti-causal-graph}
+    \caption{Anti-causal graph.}
+    \label{fig:anti-causal-graph}
+\end{marginfigure}
 
-Causal graph of anti-causal scenario.
+Let $\vec{X}$ be the feature vector representing the object and let $Y$ be a target variable of
+interest, and let $f$ be the function that estimates $Y$ from $\vec{X}$. Further, let $\vec{W}$
+describe features that influence $\vec{X}$, but should not influence the estimator $f$. Let a
+counterfactual be denoted as $\vec{X}(\vec{w})$, which is the feature vector we would have obtained
+if we would have had $\vec{W} = \vec{w}$, after the fact. Then, the estimator $f$ is
+counterfactually invariant if \[
+    f(\vec{X}(\vec{w})) = f(\vec{X}(\vec{w}')), \quad \forall \vec{w}, \vec{w}' \in \mathrm{range}(\vec{W}).
+\]
+In words, $f$ is not influenced by the value of $\vec{W}$. One way of obtaining a counterfactually
+invariant estimator is by extending the training dataset to contain enough counterfactuals. This
+can, for example, be achieved by data augmentation. However, this is not always possible.
 
-Confounding and selection.
+Let $\vec{X}_{\vec{A}}$ be the parts of $\vec{X}$ causally influenced by $\vec{A}$, and let
+$\vec{A}^\perp$ be the set of variables independent of $\vec{A}$. Then, $f$ is counterfactually
+invariant if and only if $f$ only depends on $\vec{X}_{\vec{W}^\perp}$.
 
-Necessary conditions for counterfactual invariance.
+\begin{theorem}[Necessary conditions for counterfactual invariance \citep{veitch2021counterfactual}]
+    If $f$ is a counterfactually invariant predictor, then
+    \begin{itemize}
+        \item In the anti-causal scenario, $f(\vec{X}) \perp \vec{W} \mid Y$;
+        \item In the causal scenario without selection (but possibly confounded), $f(\vec{X}) \perp \vec{W}$;
+        \item In the causal scenario without confoundedness (but possibly with selection), $f(\vec{X}) \perp
+                  \vec{W} \mid Y$, as long as $\vec{X} \perp Y \mid \vec{X}_{\vec{W}^\perp}, \vec{W}$.
+    \end{itemize}
+\end{theorem}
 
-d-separation.
+\begin{proof}
+    This can be proven by using d-separation.
+\end{proof}
