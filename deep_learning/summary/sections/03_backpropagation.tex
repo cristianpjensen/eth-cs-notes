@@ -119,7 +119,8 @@ We then have a parameter-specific update rule, \[
     \theta_i^{t+1} = \theta_i^t - \eta_i^t \partial_i h\lft( \vec{\theta}^t \rgt), \quad \eta_i^t \doteq \frac{\eta}{\sqrt{\gamma_i^t} + \delta}.
 \]
 
-Adam \citep{kingma2014adam} combines these two,
+Adam (\textit{\textbf{Ada}ptive \textbf{M}oment Estimation}) \citep{kingma2014adam} combines these
+two,
 \begin{align*}
     \vec{g}_t      & = \beta \vec{g}_{t-1} + (1-\beta) \grad{h(\vec{\theta}_t)}{}, \quad \beta \in [0,1] \margintag{Moving average (smooth gradient estimator).}                                                    \\
     \vec{\gamma}_t & = \alpha \vec{\gamma}_{t-1} + (1-\alpha) \grad{h(\vec{\theta}_t)}{}^{\odot 2}, \quad \alpha \in [0,1]. \margintag{Exponential averaging (measure of stability in the optimization landscape).}

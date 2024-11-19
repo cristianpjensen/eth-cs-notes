@@ -5,7 +5,7 @@
 In least squares, we attempt to fit a linear model, \[
     f[\vec{w}](\vec{x}) = \transpose{\vec{w}}\vec{x},
 \]
-to data points with a mean squared error (MSE) loss, \[
+to data points with a MSE (\textit{\textbf{M}ean \textbf{S}quared \textbf{E}rror}) loss, \[
     \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{s} \lft( \transpose{\vec{w}} \vec{x}_i - y_i \rgt)^2.
 \]
 Summarizing the patterns into a design matrix $\mat{X} \in \R^{d \times s}$ and output vector
@@ -15,7 +15,8 @@ $\vec{y} \in \R^s$, we get the following loss, \[
 This loss function is convex, so we can find the minimizer by setting the gradient to zero, \[
     \grad{\ell[\vec{w}](\mathcal{S})}{\vec{w}} = \transpose{\mat{X}} \mat{X} \vec{w} - \transpose{\mat{X}} \vec{y} \condeq \vec{0}.
 \]
-This gives the ordinary least squares estimator (OLSE), \[
+This gives the OLSE (\textit{\textbf{O}rdinary \textbf{L}east \textbf{S}quares
+    \textbf{E}stimator}), \[
     \vec{w}^\star = \inv{(\transpose{\mat{X}} \mat{X})} \transpose{\mat{X}} \vec{y}.
 \]
 
@@ -30,8 +31,8 @@ This outputs the probability of the label of $\vec{x}$ being $1$. We train this 
 the cross-entropy loss, \[
     \ell[\vec{w}](\mathcal{S}) = \frac{1}{s} \sum_{i=1}^{s} -\log \sigma \lft( (2y_i - 1) \transpose{\vec{w}} \vec{x}_i \rgt).
 \]
-This problem does not have a closed-form solution, but we can optimize the weights by stochastic
-gradient descent (SGD) with the following gradient, \[
+This problem does not have a closed-form solution, but we can optimize the weights by SGD
+(\textit{\textbf{S}tochastic \textbf{G}radient \textbf{D}ecent}) with the following gradient, \[
     \grad{\ell[\vec{w}](\langle \vec{x}_i, y_i \rangle)}{\vec{w}} = \lft( \sigma \lft( \transpose{\vec{w}} \vec{x}_i \rgt) - y_i \rgt) \vec{x}_i.
 \]
 
@@ -68,7 +69,7 @@ The layers---as presented---differ only in their choice of activation function,
     \item Sigmoid activation, \[
               \phi = \sigma;
           \]
-    \item ReLU activation, \[
+    \item ReLU (\textit{\textbf{Re}ctifier \textbf{L}inear \textbf{U}nit}) activation, \[
               \phi = (z)_+ = \max \{ 0, z \}.
           \]
 \end{itemize}
@@ -130,7 +131,8 @@ feeding the output of all upstream layer activations to every layer, \[
         \tanh(z) = 2 \sigma(2z) - 1.
     \]}
 
-We will now look at which functions an MLP with sigmoid activation function, \[
+We will now look at which functions an MLP (\textit{\textbf{M}ulti-\textbf{L}ayer
+    \textbf{P}erceptron}) with sigmoid activation function, \[
     g[\vec{v},\mat{W},\vec{b}](\vec{x}) \doteq \transpose{\vec{v}} \sigma(\mat{W}\vec{x} + \vec{b}), \quad \vec{v}, \vec{b} \in \R^m, \mat{W} \in \R^{m\times n},
 \]
 are able to express. The function class of MLPs is formalized by
