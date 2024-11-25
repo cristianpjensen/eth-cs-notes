@@ -6,99 +6,166 @@ would explode in the number of parameters. RNNs (\textit{\textbf{R}ecurrent \tex
     \textbf{N}etworks}) process the data sequentially, where each timestep depends on its entire
 history. Let $\vec{x}^1, \ldots, \vec{x}^T$ denote the observed input sequence, RNNs compute the
 sequence of activations recursively, \[
-    \vec{z}^t \doteq F[\vec{\theta}]\lft( \vec{z}^{t-1}, \vec{x}^t \rgt), \quad \vec{z}^0 = \vec{0}.
+    \vec{z}_t \doteq F[\vec{\theta}]\lft( \vec{z}_{t-1}, \vec{x}_t \rgt), \quad \vec{z}_0 = \vec{0}.
 \]
 Dependent on the application, we can compute output variables from these activations, \[
-    y^t \doteq G[\vec{\varphi}]\lft( \vec{z}^t \rgt).
+    \vec{y}_t \doteq G[\vec{\varphi}]\lft( \vec{z}_t \rgt).
 \]
 For example, in same length sequence-to-sequence prediction, $y^t$ will denote the output token at
 the $t$-th timestep; in autoregressive modeling, $y^t$ predicts the next input token $x^{t+1}$; and
 in sequence classification, the final output $y^T$ predicts the classification of the entire
 sequence.
 
+\marginnote{RNNs can be extended by bidirectional RNNs \citep{schuster1997bidirectional}, which apply
+    two RNNs---forward and backward. The outputs of the two RNNs are concatenated, such
+    that every hidden state captures the full sequence.
+
+    Furthermore, stacked RNNs \citep{joulin2015inferring} increases modeling power by connecting layers
+    horizontally, \[
+        \vec{z}_{t,\ell} = \phi(\mat{U}_{\ell} \vec{z}_{t-1,\ell} + \mat{V}_{\ell} \vec{z}_{t,\ell-1}), \quad \vec{z}_{t,0} = \vec{x}_t.
+    \]
+    Alternatively, the recurrence function $F$ can be replaced by a deep MLP.}
+
 The simplest RNN architecture is the Elman RNN \citep{elman1990finding},
 \begin{align*}
-    F[\mat{U}, \mat{V}](\vec{z}, \vec{x}) & = \phi(\mat{U} \vec{z} + \mat{V} \vec{x}), \quad \mat{U} \in \R^{m \times m}, \mat{V} \in \R^{m \times n} \\
-    G[\mat{W}](\vec{z})                   & = \psi(\mat{W} \vec{z}), \quad \mat{W} \in \R^{q \times m}.
+    F[\mat{U}, \mat{V}](\vec{z}, \vec{x}) & = \phi(\mat{U} \vec{z} + \mat{V} \vec{x}), & \mat{U} \in \R^{m \times m}, \mat{V} \in \R^{m \times n} \\
+    G[\mat{W}](\vec{z})                   & = \psi(\mat{W} \vec{z}),                   & \mat{W} \in \R^{q \times m}.
 \end{align*}
-However, this model has difficulties modeling large-range dependencies, as will become apparent from the gradients.
-
-Let \[
-    L \doteq \sum_{t=1}^{T} \ell^t, \quad \ell^t \doteq \ell \lft( \hat{\vec{y}}^t, \vec{y}^t \rgt).
+However, this model has difficulties modeling large-range dependencies, as will become apparent
+from the gradients. Let \[
+    L \doteq \sum_{t=1}^{T} \ell(\hat{\vec{y}}_t, \vec{y}_t).
 \]
-
+Then, we have the following gradients \wrt the recurrence weights,
 \begin{align*}
-    \pdv{L}{w_{ki}} & = \sum_{t=1}^{T} \pdv{\ell^t}{y^t_k} \psi'\lft( \transpose{\vec{w}_k} \vec{z}^t \rgt) z^t_i                                             \\
-    \pdv{L}{v_{ij}} & = \sum_{t=1}^{T} \pdv{\ell^t}{z^t_i} \phi' \lft( \transpose{\vec{w}}_i \vec{z}^{t-1} + \transpose{\vec{v}_i} \vec{x}^t \rgt) x_j^t      \\
-    \pdv{L}{u_{ij}} & = \sum_{t=1}^{T} \pdv{\ell^t}{z^t_i} \phi' \lft( \transpose{\vec{w}}_i \vec{z}^{t-1} + \transpose{\vec{v}_i} \vec{x}^t \rgt) z_j^{t-1}.
+    \pdv{L}{\mat{U}} & = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{U}}  \\
+    \pdv{L}{\mat{V}} & = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{V}}. \\
 \end{align*}
-
-Backpropagation through time \citep{werbos1990backpropagation} for gradient computation...
-Gradient...
-
-Instability of BPTT by showing that it will likely explode or vanish...
-
-Bidirectional RNNs \citep{schuster1997bidirectional} to capture full sequence at every timestep...
-
-Stacked RNNs \citep{joulin2015inferring}... Alternatively, replace $F$ by a deep MLP...
+We can compute the gradients \wrt the hidden states as follows,
+\begin{align*}
+    \pdv{L}{\vec{z}_t} & = \sum_{i=1}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\vec{z}_t}                                                                                       \\
+                       & = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_t}                                                \\
+                       & = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \pdv{\vec{z}_i}{\vec{z}_t}                     \\
+                       & = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \prod_{j=t+1}^i \pdv{\vec{z}_j}{\vec{z}_{j-1}} \\
+                       & = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \prod_{j=t+1}^i \dot{\mat{\Phi}}_j \mat{U},
+\end{align*}
+where \[
+    \dot{\mat{\Phi}}_j = \mathrm{diag} \lft( \phi'(\mat{U} \vec{z}_{j-1} + \mat{V}\vec{x}_j) \rgt).
+\]
+This gradient is only stable if \[
+    \lft\| \pdv{\vec{z}_j}{\vec{z}_{j-1}} \rgt\|_2 = \lft\| \dot{\mat{\Phi}}_j \mat{U} \rgt\|_2 = 1,
+\]
+which is almost never the case. Assuming bounded gradient norm $\| \dot{\mat{\Phi}}_j \| \leq
+    \alpha$---which holds for most activation functions,\sidenote{\Eg, $\sigma'(z) \leq
+        \nicefrac{1}{4}$.} \[
+    \lft\| \pdv{\vec{z}_i}{\vec{z}_t} \rgt\|_2 \leq (\alpha \lft\| \mat{U} \rgt\|_2)^{i-t} = (\alpha \sigma_1(\mat{U}))^{i-t}.
+\]
+So, the gradient will vanish if $\sigma_1(\mat{U}) \geq \nicefrac{1}{\alpha}$. An analogous
+argument can be made for exploding gradients.
 
 \subsection{Gated memory}
 
 Long-range dependencies are hard to memorize for the Elman RNN due to the instability of the
-gradient... Idea: Avoid short-term fluctuations by more directly controlling when memory is kept
-and when it is overwritten... LSTM \citep{schmidhuber1997long} and GRU \citep{cho2014learning}...
-Gating... \[
-    \vec{z} = \sigma(\mat{G} \vec{\zeta}) \odot \vec{z}.
+gradient. LSTM (\textit{\textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory})
+\citep{schmidhuber1997long} and GRU (\textit{\textbf{G}ated \textbf{R}ecurrent \textbf{U}nit})
+\citep{cho2014learning} avoid short-term fluctuations by more directly controlling when memory is
+kept and when it is overwritten. It does so by making use of gating, \[
+    \vec{z} = \vec{\sigma} \odot \vec{z}, \quad \vec{\sigma} \in (0,1)^m, \vec{z} \in \R^m.
 \]
-Now learning involves understanding what new and old information is relevant for later timesteps...
+When $\sigma_i \to 0$, $z_i$ is forgotten and when $\sigma_i \to 1$, $z_i$ is preserved. By
+combining gates in smart ways, learning involves understanding what new information is relevant and
+trading off its relevance with store information. The LSTM works as follows,
+\begin{align*}
+    \vec{z}_t     & = \sigma \lft( \mat{F} \tilde{\vec{x}}_t \rgt) \odot \vec{z}_{t-1} + \sigma \lft( \mat{G} \tilde{\vec{x}}_t \rgt) \odot \tanh \lft( \mat{V}\tilde{\vec{x}}_t \rgt), \quad \tilde{\vec{x}}_t = \lft[ \vec{\zeta}_{t-1}, \vec{x}_t \rgt] \\
+    \vec{\zeta}_t & = \sigma \lft( \mat{H} \tilde{\vec{x}}_t \rgt) \odot \tanh \lft( \mat{U} \vec{z}_t \rgt).
+\end{align*}
+Here, $\vec{z}_t$ is called the cell state and $\vec{\zeta}_t$ is the hidden state. This mechanism has the following components,
+\begin{itemize}
+    \item $\sigma(\mat{F}\tilde{\vec{x}}_t)$ is the forget gate and computes what information should be discarded from the previous cell state;
+    \item $\tanh(\mat{V}\tilde{\vec{x}}_t)$ is the input gate and computes new information;
+    \item $\sigma(\mat{G}\tilde{\vec{x}}_t)$ is the gate gate and computes what of the new information should be stored;
+    \item $\sigma(\mat{H} \tilde{\vec{x}}_t)$ is the output gate and has the role of determining what information from the cell state should be put in the hidden state;
+    \item $\tanh(\mat{U} \vec{z}_t)$ computes what information should be given to the hidden state.
+\end{itemize}
 
-LSTM...
+The GRU combines the forget and input gates as a convex combination,
 \begin{align*}
-    \vec{z}^t     & = \sigma \lft( \mat{F} \tilde{\vec{x}}^t \rgt) \odot \vec{z}^{t-1} + \sigma \lft( \mat{G} \tilde{\vec{x}}^t \rgt) \odot \tanh \lft( \mat{V}\tilde{\vec{x}}^t \rgt), \quad \tilde{\vec{x}}^t = \lft[ \vec{\zeta}^{t-1}, \vec{x}^t \rgt] \\
-    \vec{\zeta}^t & = \sigma \lft( \mat{H} \tilde{\vec{x}}^t \rgt) \odot \tanh \lft( \mat{U} \vec{z}^t \rgt).
+    \vec{z}_t         & = \vec{\sigma} \odot \vec{z}_{t-1} + (1 - \vec{\sigma}) \odot \vec{\zeta}_t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \tilde{\vec{x}}_t \rgt), \tilde{\vec{x}}_t = \lft[ \vec{z}_{t-1}, \vec{x}_t \rgt] \\
+    \intertext{However, the computation of new storage remains complex,}
+    \tilde{\vec{z}}_t & = \tanh \lft( \mat{V} \lft[ \vec{\zeta}_t \odot \vec{z}_{t-1}, \vec{x}_t \rgt] \rgt)                                                                                                                     \\
+    \vec{\zeta}_t     & = \sigma \lft( \mat{H} \lft[ \vec{z}_{t-1}, \vec{x}_t \rgt] \rgt).
 \end{align*}
-GRU...
-\begin{align*}
-    \vec{z}^t         & = \vec{\sigma} \odot \vec{z}^{t-1} + (1 - \vec{\sigma}) \odot \vec{\zeta}^t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \tilde{\vec{x}}^t \rgt), \tilde{\vec{x}}^t = \lft[ \vec{z}^{t-1}, \vec{x}^t \rgt] \\
-    \tilde{\vec{z}}^t & = \tanh \lft( \mat{V} \lft[ \vec{\zeta}^t \odot \vec{z}^{t-1}, \vec{x}^t \rgt] \rgt)                                                                                                                     \\
-    \vec{\zeta}^t     & = \sigma \lft( \mat{H} \lft[ \vec{z}^{t-1}, \vec{x}^t \rgt] \rgt).
-\end{align*}
-$\vec{\zeta}^t$ can be computed implicitly...
+$\vec{\zeta}_t$ can be computed implicitly without any additional recursion. The advantage of this over LSTM is that it only has 3 weight matrices, instead of 5.
 
 \subsection{Linear recurrent models}
 
-Linear recurrent models \citep{feng2024were}... \[
-    \vec{z}^t = \vec{\sigma} \odot \vec{z}^{t-1} + (1-\vec{\sigma}) \odot \mat{V} \vec{x}^t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \vec{x}^t \rgt).
+The LRU (\textit{\textbf{L}inear \textbf{R}ecurrent \textbf{M}odel}) \citep{feng2024were}
+simplifies the LSTM and GRU recurrence functions to be linear, such that it can exploit fast
+parallel sequence processing for training, \[
+    \vec{z}_t = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \mat{V} \vec{x}_t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \vec{x}_t \rgt).
 \]
-This allows for prefix scan parallelism, which allows for $\bigo{\log n}$ runtime, instead of
-$\bigo{n}$.
+This allows for prefix scan parallelism, which allows for $\bigo{\log n}$ runtime during training,
+instead of $\bigo{n}$. This might bridge the gap to the performance of transformers.\sidenote{In
+    general, transformers perform better than RNNs because the training of transformers can be
+    parallelized. On the other hand, RNNs could be preferable, because transformers have runtime
+    quadratic in the context length at every step, whereas RNNs have already encoded the full history
+    in the hidden state. As a result, RNNs are faster during inference.}
 
-Diagonalize over complex numbers... Parameterize such that it will not explode or vanish...
+We will now look at how we can ensure that gradients do not vanish in linear systems
+\citep{orvieto2023resurrecting}. The LRU hidden state evolution is a discrete time linear system, \[
+    \vec{z}_{t+1} = \mat{A} \vec{z}_t + \mat{B} \vec{x}_t, \quad \mat{A} \in \R^{m \times m}, \mat{B} \in \R^{m \times n}.
+\]
+Let the following be the diagonalization of $\mat{A}$ over the complex numbers,\sidenote{Most
+    matrices can be diagonalized over the complex numbers.} \[
+    \mat{A} = \mat{P} \mat{\Lambda} \inv{\mat{P}}, \quad \mat{\Lambda} = \mathrm{diag}(\lambda_1, \ldots, \lambda_m), \lambda_i \in \mathbb{C}.
+\]
+We can then perform a change of basis, \[
+    \vec{\zeta}_{t+1} = \mat{\Lambda} \vec{\zeta}_t + \mat{C} \vec{x}_t, \quad \vec{\zeta}_t = \inv{\mat{P}} \vec{z}_t, \mat{C} = \inv{\mat{P}} \mat{B}.
+\]
+The stability of this linear system requires the modulus of the eigenvalues to be bounded, \[
+    \max_j |\lambda_j| \leq 1, \quad |a+bi| \doteq \sqrt{a^2 + b^2}. \margintag{One can represent any complex number in polar coordinates form via modulus $r$ and phase $\phi$, \[ z = r(\cos(\phi) + \sin(\phi) i), \quad r = |z| \geq 0, \phi \in [0, 2\pi). \]}
+\]
+Thus, we want to parametrize $\lambda_i$, such that their moduli can only exist within $(0,1)$. We
+can do this by parametrizing $\lambda_i$ with two numbers $\nu_i,\phi_i \in \R$ in the following
+way,
+\begin{align*}
+    \lambda_i & = \exp(-\exp(\nu_i) + \phi_i i)                                                                                     \\
+              & = \exp(-\exp(\nu_i)) \exp(\phi_i i)                                                                                 \\
+              & = \exp(-\exp(\nu_i)) (\cos (\phi_i) + \sin(\phi_i) i). \margintag{$\exp(\theta i) = \cos(\theta) + \sin(\theta)i$.}
+\end{align*}
+So, we have $r_i = \exp(-\exp(\nu_i)) \in (0,1)$. At initialization, we can then sample \[
+    \phi_i \sim \mathrm{Unif}([0,2\pi]), \quad r_i \sim \mathrm{Unif}(I), \quad I \subseteq [0,1].
+\]
+We can compute $\nu_i = \log(-\log r_i)$.
 
 The advantage of such a simple recurrence unit is that it provides a clean understanding of long
 range and short range dependencies, there is no requirement for mixing of channels, and
 parallelization during training. Furthermore, we do not lose any representational power, because we
 can move all power to the output map. The resulting model is provably universal as a
-sequence-to-sequence map.
+sequence-to-sequence map \citep{feng2024were}.
 
 \subsection{Sequence learning}
 
-Step-by-step prediction... \[
-    p \lft( \vec{y}^{1:T} \mid \vec{x}^{1:T} \rgt) = \prod_{t=1}^T p \lft( y^t \mid \vec{x}^{1:T}, \vec{y}^{1:t-1} \rgt).
+In sequence learning, we want to generate a sequence step-by-step, given another sequence. This
+induces the following probability distribution, \[
+    p \lft( \vec{y}_{1:n} \mid \vec{x}_{1:m} \rgt) = \prod_{i=1}^n p \lft( y_i \mid \vec{x}_{1:m}, \vec{y}_{1:i-1} \rgt).
 \]
-Sequence-to-sequence mapping \citep{sutskever2014sequence} is usually done by mapping the input
+Sequence-to-sequence mapping \citep{sutskever2014sequence} is generally done by mapping the input
 sequence to a latent representation, \[
-    \vec{x}^1, \ldots, \vec{x}^T \mapsto \vec{\zeta},
+    x_1, \ldots, x_m \mapsto \vec{\zeta},
 \]
 which can be computed by an encoder RNN. Then, at every timestep, we compute a latent
-representation of everything generated until now, \[
-    \vec{x}^{1}, \ldots, \vec{x}^{t-1} \mapsto \vec{z}^{t-1}.
+representation of everything generated until now, which can be computed by a decoder RNN with
+$\vec{z}_0 = \vec{\zeta}$, \[
+    \vec{\zeta}, y_{1}, \ldots, y_{t-1} \mapsto \vec{z}_{t-1}.
 \]
 These are then combined to compute a distribution over next tokens, \[
-    \vec{z}^{t-1} \mapsto \vec{\mu}^t, \quad y^t \sim p\lft( \vec{\mu}^t \rgt).
+    \vec{z}_{t-1} \mapsto \vec{\mu}_t, \quad y_t \sim p\lft( \vec{\mu}_t \rgt). \margintag{Usually, $\vec{\mu}_t$ is a categorical distribution over tokens, computed by a softmax.}
 \]
-Teacher forcing \citep{williams1989learning}...
-
-Lossy compression of input sequence... Want to look back at the input sequence while generating
-output sequence... Attention \citep{bahdanau2014neural}! Also provides intuition...
-
+The problem with this approach is that $\vec{\zeta}$ will be a lossily compressed version of the
+input sequence. We would want the decoder to be able to look back at the input sequence while
+generating the output sequence. \citet{bahdanau2014neural} solved this by introducing the attention
+mechanism into this framework, where attention is used on top of the RNN encoder, \[
+    a_{ij} = \mathrm{softmax}_j(\mathrm{MLP}(\vec{z}_{i-1}, \vec{\zeta}_{j})).
+\]
+This mechanism makes intuitive sense, because it allows for alignment between source and target
+sequence.
