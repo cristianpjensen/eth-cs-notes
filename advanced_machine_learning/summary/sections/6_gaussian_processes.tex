@@ -1,0 +1,157 @@
+\section{Gaussian processes}
+
+Let the inputs be $\mat{X} \in \R^{n \times d}$, the outputs be $\vec{y} \in \R^n$, and the weight
+matrix be $\vec{\beta} \in \R^d$, then linear regression models the generative process as \[
+    \vec{y} = \mat{X} \vec{\beta} + \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N} \lft( \vec{0}, \sigma^2 \mat{I} \rgt).
+\]
+This is equivalent to defining a Gaussian over the predictions, \[
+    \vec{y} \mid \mat{X}, \vec{\beta} \sim \mathcal{N} \lft( \mat{X} \vec{\beta}, \sigma^2 \mat{I} \rgt).
+\]
+BLR (\textit{\textbf{B}ayesian \textbf{L}inear \textbf{R}egression}) extends linear regression by
+defining a prior over the regression coefficients, \[
+    \vec{\beta} \sim \mathcal{N} \lft( \vec{0}, \inv{\mat{\Lambda}} \rgt), \quad \mat{\Lambda} \in \R^{d \times d}.
+\]
+The posterior can be analytically computed as \[
+    \vec{\beta} \mid \mat{X}, \vec{y} \sim \mathcal{N}\lft( \vec{\mu}, \mat{\Sigma} \rgt),
+\]
+where \[
+    \vec{\mu} = \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y}, \quad \mat{\Sigma} = \sigma^2 \inv{\lft( \transpose{\mat{X}} \mat{X} + \sigma^2 \mat{\Lambda} \rgt)}.
+\]
+
+\begin{proof}
+    \begin{align*}
+        p(\vec{\beta} \mid \mat{X}, \vec{y}) & \propto p(\vec{y} \mid \mat{X}, \vec{\beta}) \cdot p(\vec{\beta}) \margintag{Bayes' rule.}                                                                                                                                                                                                                          \\
+                                             & = \mathcal{N}\lft( \vec{y}; \mat{X} \vec{\beta}, \sigma^2 \mat{I} \rgt) \cdot \mathcal{N} \lft( \vec{\beta}; \vec{0}, \inv{\mat{\Lambda}} \rgt)                                                                                                                                                                     \\
+                                             & \propto \exp \lft( -\frac{1}{2} \lft( \frac{1}{\sigma^2} \| \vec{y} - \mat{X} \vec{\beta} \|^2 + \transpose{\vec{\beta}} \mat{\Lambda} \vec{\beta} \rgt) \rgt)                                                                                                                                                      \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \frac{1}{\sigma^2} \lft( \| \vec{y} \|^2 + \| \mat{X} \vec{\beta} \|^2 - 2 \transpose{\vec{y}} \mat{X} \vec{\beta} \rgt) + \transpose{\vec{\beta}} \mat{\Lambda} \vec{\beta} \rgt) \rgt) \margintag{Cosine theorem.}                                                                \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \frac{1}{\sigma^2} \transpose{\vec{y}}\vec{y} + \frac{1}{\sigma^2} \transpose{\vec{\beta}} \transpose{\mat{X}} \mat{X} \vec{\beta} - \frac{2}{\sigma^2} \transpose{\vec{y}} \mat{X} \vec{\beta} + \transpose{\vec{\beta}} \mat{\Lambda} \vec{\beta} \rgt) \rgt)                     \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \transpose{\vec{\beta}} \lft( \frac{1}{\sigma^2} \transpose{\mat{X}} \mat{X} + \mat{\Lambda} \rgt) \vec{\beta} - \frac{2}{\sigma^2} \transpose{\vec{y}} \mat{X} \vec{\beta} + \frac{1}{\sigma^2} \transpose{\vec{y}} \vec{y} \rgt) \rgt)                                            \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \transpose{\vec{\beta}} \inv{\mat{\Sigma}} \vec{\beta} - \frac{1}{\sigma^2} \transpose{\vec{\beta}} \transpose{\mat{X}} \vec{y} - \frac{1}{\sigma^2} \transpose{\vec{y}} \mat{X} \vec{\beta} + \frac{1}{\sigma^2} \transpose{\vec{y}} \vec{y} \rgt) \rgt)                           \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \transpose{\vec{\beta}} \inv{\mat{\Sigma}} \lft( \vec{\beta} - \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y} \rgt) - \frac{1}{\sigma^2} \transpose{\vec{y}} \mat{X} \lft( \vec{\beta} - \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y} \rgt) \rgt) \rgt) \\
+                                             & = \exp \lft( -\frac{1}{2} \lft( \lft( \vec{\beta} - \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y} \rgt) \inv{\mat{\Sigma}} \lft( \vec{\beta} - \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y} \rgt) \rgt) \rgt)                                                                          \\
+                                             & \propto \mathcal{N} \lft( \vec{\beta}; \frac{1}{\sigma^2} \mat{\Sigma} \transpose{\mat{X}} \vec{y}, \mat{\Sigma} \rgt).
+    \end{align*}
+\end{proof}
+
+In general, we do not know the true weights that generated the data points. But, we can now define
+a joint distribution over output variables with unknown weights, \[
+    \vec{y} \mid \mat{X} \sim \mathcal{N}\lft( \vec{0}, \mat{X} \inv{\mat{\Lambda}} \transpose{\mat{X}} + \sigma^2 \mat{I} \rgt).
+\]
+
+\begin{proof}
+    As we saw earlier, we compute outputs as follows, \[
+        \vec{y} = \mat{X} \vec{\beta} + \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}\lft( \vec{0}, \sigma^2 \mat{I} \rgt).
+    \]
+    However, now the weights are unknown, so we make use of its prior to compute the distribution over
+    $\vec{y}$,
+    \begin{align*}
+        \E[\vec{y}]           & = \E[\mat{X} \vec{\beta} + \vec{\epsilon}]                                                                                                                                                                                                                                                                                         \\
+                              & = \mat{X} \E[\vec{\beta}] + \E[\vec{\epsilon}]                                                                                                                                                                                                                                                                                     \\
+                              & = \vec{0}.                                                                                                                                                                                                                                                                                                                         \\
+        \mathrm{Cov}[\vec{y}] & = \E\lft[ (\mat{X} \vec{\beta} + \vec{\epsilon}) \transpose{(\mat{X} \vec{\beta} + \vec{\epsilon})} \rgt]                                                                                                                                                                                                                          \\
+                              & = \E\lft[ \mat{X}\vec{\beta} \transpose{\vec{\beta}} \transpose{\mat{X}} \rgt] + \E \lft[ \mat{X} \vec{\beta} \transpose{\vec{\epsilon}} \rgt] + \E \lft[ \vec{\epsilon} \transpose{\vec{\beta}} \transpose{\mat{X}} \rgt] + \E \lft[ \vec{\epsilon} \transpose{\vec{\epsilon}} \rgt]                                              \\
+                              & = \mat{X} \E \lft[ \vec{\beta} \transpose{\vec{\beta}} \rgt] \transpose{\mat{X}} + \mat{X} \E \lft[ \vec{\beta} \rgt] \E \lft[ \transpose{\vec{\epsilon}} \rgt] + \E[\vec{\epsilon}] \E \lft[ \transpose{\vec{\beta}} \rgt] \transpose{\mat{X}} + \sigma^2 \mat{I} \margintag{$\vec{\beta}$ and $\vec{\epsilon}$ are independent.} \\
+                              & = \mat{X} \inv{\mat{\Lambda}} \transpose{\mat{X}} + \sigma^2 \mat{I}.
+    \end{align*}
+\end{proof}
+
+GPs (\textit{\textbf{G}aussian \textbf{P}rocesses}) generalize BLR by observing that we can
+kernelize the covariance matrix, \[
+    k(\vec{x}_i, \vec{x}_j) = \transpose{\vec{x}_i} \inv{\mat{\Lambda}} \vec{x}_j.
+\]
+We could instead use any other kernel function to model other functions.
+
+\subsection{Kernels}
+
+Kernel functions specify the similarity between any two data points. They encode assumptions about
+the function that is to be learned.
+
+\begin{definition}[Kernel function]
+    A kernel function $k: \mathcal{X} \times \mathcal{X} \to \R$ over $\mathcal{X} \subset \R$ must satisfy the following properties,
+    \begin{gather*}
+        k(\vec{x}, \vec{x}') = k(\vec{x}', \vec{x}) \margintag{Symmetry.} \\
+        \int k(\vec{x}, \vec{x}') f(\vec{x}) f(\vec{x}') \mathrm{d}\vec{x} \mathrm{d}\vec{x}' \geq 0, \quad \forall f \in L_2. \margintag{Positive semi-definiteness.}
+    \end{gather*}
+\end{definition}
+
+\begin{definition}[Stationary and isotropic]
+    A kernel $k(\vec{x}, \vec{x}')$ is stationary if it only depends on $\vec{x} - \vec{x}'$. Further,
+    it is isotropic if it only depends on $\| \vec{x} - \vec{x}' \|_2$.
+\end{definition}
+
+The following are common kernels,
+\begin{align*}
+    k(\vec{x}, \vec{x}') & = \transpose{\vec{x}} \vec{x}' \margintag{Linear kernel.}                                                                                                             \\
+    k(\vec{x}, \vec{x}') & = \lft( \transpose{\vec{x}}\vec{x}' + 1 \rgt)^p,                 &  & p \in \mathbb{N} \margintag{Polynomial kernel.}                                                 \\
+    k(\vec{x}, \vec{x}') & = \exp \lft( -\frac{\| \vec{x} - \vec{x}' \|_2^2}{\ell^2} \rgt), &  & \ell \in \R \margintag{RBF (\textit{\textbf{R}adial \textbf{B}asis \textbf{F}unction}) kernel.} \\
+    k(\vec{x}, \vec{x}') & = \tanh \lft( \kappa \transpose{\vec{x}}\vec{x}' \rgt) - b,      &  & \kappa, b \in \R \margintag{Sigmoid kernel.}
+\end{align*}
+Different kernels have different invariance properties, such as invariance to rotation or
+translation. In order to learn invariances from data, many samples are needed. So, it
+might be better to encode them if we know them a priori.
+
+Given two kernel functions $k_1, k_2$ defined on the same data space and positive scalar $c > 0$,
+the following are also valid kernels,
+\begin{align*}
+    k(\vec{x}, \vec{x}') & = k_1(\vec{x}, \vec{x}') + k_2(\vec{x}, \vec{x}')     \\
+    k(\vec{x}, \vec{x}') & = k_1(\vec{x}, \vec{x}') \cdot k_2(\vec{x}, \vec{x}') \\
+    k(\vec{x}, \vec{x}') & = c \cdot k_1(\vec{x}, \vec{x}')                      \\
+    k(\vec{x}, \vec{x}') & = \exp(k_1(\vec{x}, \vec{x}')).
+\end{align*}
+In practice, the kernels are often composed together and hyperparameters are determined by
+performance on a held out validation dataset.
+
+\subsection{Prediction}
+
+As we saw earlier in the case of BLR, the marginal is jointly Gaussian, \[
+    \begin{bmatrix} \vec{y} \\ y^\star \end{bmatrix} \mid \mat{X}, \vec{x}^\star \sim \mathcal{N}\lft(
+    \vec{0},
+    \begin{bmatrix}
+        \mat{K} + \sigma^2 \mat{I}      & \vec{k}(\mat{X}, \vec{x}^\star) \\
+        \vec{k}(\vec{x}^\star, \mat{X}) & k(\vec{x}^\star, \vec{x}^\star)
+    \end{bmatrix} \rgt).
+\]
+
+\begin{theorem}[Conditional Gaussian distribution]
+    Given \[
+        \begin{bmatrix} \vec{x}_1 \\ \vec{x}_2 \end{bmatrix}
+        \sim \mathcal{N} \lft(
+        \begin{bmatrix} \vec{\mu}_1 \\ \vec{\mu}_2 \end{bmatrix},
+        \begin{bmatrix}
+                \mat{\Sigma}_{11} & \mat{\Sigma}_{12} \\
+                \mat{\Sigma}_{21} & \mat{\Sigma}_{22}
+            \end{bmatrix} \rgt).
+    \]
+    Then, the conditional Gaussian is given by \[
+        \vec{x}_2 \mid \vec{x}_1 = \vec{z} \sim \mathcal{N}\lft( \vec{\mu}_2 + \mat{\Sigma}_{21} \inv{\mat{\Sigma}_{11}} (\vec{z} - \vec{\mu}_1), \mat{\Sigma}_{22} - \mat{\Sigma}_{21} \inv{\mat{\Sigma}_{11}} \mat{\Sigma}_{12} \rgt).
+    \]
+\end{theorem}
+
+\begin{marginfigure}
+    \begin{tikzpicture}
+        \begin{axis}[width=\textwidth, height=\textwidth, scale only axis, every axis plot post/.append style={black}, xmin=0, xmax=10, legend pos={north west}]
+            \addplot [only marks, fill=black, draw=black] table [x=x, y=y, col sep=comma] {data/gp_observations.csv};
+            \addlegendentry{Observations}
+
+            \addplot [no markers, thick] table [x=x, y=mean_pred, col sep=comma] {data/gp_prediction.csv};
+            \addlegendentry{GP mean}
+            \addplot [dashed] table [x=x, y=true_gen, col sep=comma] {data/gp_prediction.csv};
+            \addlegendentry{$f(x) = x \cdot \sin(x)$}
+
+            \addplot [name path=upper1,draw=none] table [x=x,y expr=\thisrow{mean_pred}+2*\thisrow{std_pred}, col sep=comma] {data/gp_prediction.csv};
+            \addplot [name path=lower1,draw=none] table [x=x,y expr=\thisrow{mean_pred}-2*\thisrow{std_pred}, col sep=comma] {data/gp_prediction.csv};
+            \addplot [fill=black, fill opacity=0.1] fill between [of=upper1 and lower1];
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Fitted Gaussian process (RBF kernel, $\ell = 1.86$) with its $95\%$ confidence interval. }
+    \label{fig:gp}
+\end{marginfigure}
+
+Using the above theorem, we can easily compute the predictive distribution, \[
+    y^\star \mid \vec{x}^\star, \mat{X}, \vec{y} \sim \mathcal{N}\lft( \transpose{\vec{k}} \inv{\lft( \mat{K} + \sigma^2 \mat{I} \rgt)} \vec{y}, c - \transpose{\vec{k}} \inv{\lft( \mat{K} + \sigma^2 \mat{I} \rgt)} \vec{k} \rgt),
+\]
+where \[
+    \mat{K} = \mat{K}(\mat{X}, \mat{X}), \quad \vec{k} = \vec{k}(\mat{X}, \vec{x}^\star), \quad c = k(\vec{x}^\star, \vec{x}^\star).
+\]
+Now, we can compute a prediction along with its uncertainty. However, the problem with this
+approach is that it has $\bigo{n^3}$ runtime.
