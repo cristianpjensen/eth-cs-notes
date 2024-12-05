@@ -1,0 +1,61 @@
+\section{Transformers}
+
+\subsection{Self-attention}
+
+Let $\mat{X} \in \R^{T \times d}$ denote the input embeddings and $\mat{\Xi} \in \R^{T \times d_v}$
+the output embeddings. The problem with $\mat{X}$ is that the embeddings are non-contextual---each
+embedding has no information about its neighbors. Self-attention aims to contextualize the
+embeddings in $\mat{\Xi}$.
+
+It does so by computing queries, keys, and values by linear projections of the input, \[
+    \mat{Q} = \mat{X} \mat{W}_Q, \quad \mat{K} = \mat{X} \mat{W}_K, \quad \mat{V} = \mat{X} \mat{W}_V,
+\]
+where $\mat{W}_Q, \mat{W}_K \in \R^{d \times d_k}$ and $\mat{W}_V \in \R^{d \times d_v}$.
+Intuitively, for each timestep, the queries represent what information is missing, the keys
+represent the information that is offered, and the values are the actual information.
+
+The attention mechanism is computed as follows, \[
+    \mat{A} = \mathrm{softmax}\lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt), \quad \mat{\Xi} = \mat{A} \mat{V}. \margintag{Softmax is performed row-wise. The division by $\sqrt{d_k}$ is necessary because $\Var[\vec{x} \cdot \vec{y}] = d$, where $\vec{x}, \vec{y} \sim \mathcal{N}(\vec{0}, \mat{I}_d)$. We want to recover unit variance.} \\
+\]
+Here, $\mat{A} \in \R^{T\times T}$ is the attention matrix---$\vec{a}_i$ is a convex combination
+that tells us how much attention the $i$-th timestep pays to each other timestep.
+
+The contextualized outputs are convex combinations of values, \[
+    \vec{\xi}_i = \sum_{t=1}^{T} \mathrm{softmax}_t(\vec{\omega}_i) \vec{v}_i, \quad \omega_{it} \propto \transpose{\vec{q}_i} \vec{k}_t.
+\]
+This makes intuitive sense, because the weight of the $t$-th timestep for timestep $i$ depends on
+the alignment between $\vec{q}_i$ and $\vec{k}_t$. Furthermore, $\vec{\xi}_i$ depends only on its
+corresponding query and all other key-value pairs. In a sense, the attention mechanism is a
+soft-dictionary lookup.
+
+TODO: Multi-headed self-attention.
+
+\subsection{Cross-attention}
+
+TODO
+
+\subsection{Positional encoding}
+
+TODO
+
+\subsection{Layer normalization}
+
+TODO
+
+\subsection{Residual layers}
+
+TODO
+
+\subsection{Architecture}
+
+TODO: Encoder/decoder.
+
+TODO: Figure.
+
+\subsection{BERT}
+
+TODO
+
+\subsection{Vision transformers}
+
+TODO: Image patches as tokens...

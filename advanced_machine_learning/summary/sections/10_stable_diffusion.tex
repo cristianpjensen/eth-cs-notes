@@ -1,0 +1,113 @@
+\section{Stable diffusion}
+
+\begin{figure}
+    \centering
+    \incfig{stable-diffusion-architecture}
+    \caption{Architecture of stable diffusion.}
+    \label{fig:stable-diffusion-architecture}
+\end{figure}
+
+\subsection{Diffusion models}
+
+An SDE (\textit{\textbf{S}tochastic \textbf{D}ifferential \textbf{E}quation}) is a differential
+equation in which one or more terms is a stochastic process, resulting in a solution that is also
+stochastic. Typically, the SDE of a diffusion process is of the following form, \[
+    \mathrm{d}\vec{X}_t = \vec{\mu}(\vec{X}_t, t) \mathrm{d}t + \sigma(\vec{X}_t, t) \mathrm{d}\vec{W}_t,
+\]
+where $\vec{W}_t$ is a Wiener process (or Brownian motion). This equations tells us that the change
+in $\vec{X}_t$ is driven by a deterministic factor $\vec{\mu}(\vec{X}_t,t)$ and a stochastic factor
+$\sigma(\vec{X}_t, t) d\vec{W}_t$. Note that $\vec{\mu}(\cdot, \cdot)$ and $\sigma(\cdot, \cdot)$
+induce a probability distribution over time, $p_t$ of $\vec{X}_t$.
+
+\citet{anderson1982reverse} showed that the reverse SDE of the diffusion process can be computed as follows, \[
+    \mathrm{d}\vec{X}_t = \lft[ \vec{\mu}(\vec{X}_t, t) - \sigma^2(\vec{X}_t, t) \grad{\log p_t(\vec{X}_t)}{\vec{X}} \rgt] \mathrm{d}t + \sigma(\vec{X}_t, t)\mathrm{d}\bar{\vec{W}}_t,
+\]
+where $\bar{\vec{W}}_t$ is a standard Wiener process when time flows backwards from $T$ to $0$, and
+$\mathrm{d}t$ is an infinitesimal negative timestep.
+
+Using the DDPM scheduler, diffusion models have the following forward process, \[
+    \vec{x}_{t+1} = \sqrt{1-\beta_t} \vec{x}_t + \sqrt{\beta_t} \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
+\]
+Conditioned on $\vec{x}_t$, we can reconstruct $\vec{x}_{t-1}$ as follows with a predicted noise
+$\vec{\epsilon}_{\vec{\theta}}$,
+\begin{equation}
+    \label{eq:denoising}
+    \vec{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1-\alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sqrt{1-\alpha_t} \vec{z}, \quad \vec{z} \sim \mathcal{N}(\vec{0}, \mat{I}),
+\end{equation}
+where $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{\tau=1}^t \alpha_t$. Thus, we need to
+learn this function.
+
+It can be shown that a diffusion model with the DDPM scheduler is an approximation of a
+discretization of the following SDE, \[
+    \mathrm{d}\vec{x}_t = -\frac{1}{2}\beta_t \vec{x}_t \mathrm{d}t + \sqrt{\beta_t} \mathrm{d}\vec{w}_t. \margintag{Drift term $\vec{\mu}(\vec{x}_t, t) \doteq -\frac{1}{2}\beta_t \vec{x}_t$; diffusion term $\sigma(t) \doteq \sqrt{\beta_t}$. $\mathrm{d}\vec{w}_t$ is a Gaussian with variance $\mathrm{d}$t. We can show that this approximates the diffusion model by discretizing, \begin{align*} \vec{x}_{t+1} - \vec{x}_t & = -\frac{1}{2}\beta_t \vec{x}_t + \sqrt{\beta_t} \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}) \\ \vec{x}_{t+1} & = \lft( 1 - \frac{1}{2} \beta_t \rgt) \vec{x}_t + \sqrt{\beta_t} \vec{\epsilon} \\ & \approx \sqrt{1-\beta_t} \vec{x}_t + \sqrt{\beta_t} \vec{\epsilon}. \end{align*}}
+\]
+The reverse process is thus given by the following reverse SDE, \[
+    \mathrm{d}\vec{x}_t = \lft[ -\frac{1}{2} \beta_t \vec{x}_t - \beta_t \grad{\log p(\vec{x}_t)}{\vec{x}_t} \rgt] \mathrm{d}t + \sqrt{\beta_t} \mathrm{d}\tilde{\vec{w}}_t.
+\]
+
+In practice, we train a diffusion model by randomly sampling $\vec{x}_0 \sim p_0, t \sim
+    \mathrm{Unif}([T]), \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$ and performing a gradient
+step on the following loss function, \[
+    \ell = \lft\| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}\lft(\sqrt{1-\beta_t} \vec{x}_0 + \sqrt{\beta_t} \vec{\epsilon} \rgt) \rgt\|^2.
+\]
+We can sample by iteratively denoising using \Cref{eq:denoising}, starting from $\vec{x}_T \sim
+    \mathcal{N}(\vec{0}, \mat{I})$.
+
+\subsection{U-net}
+
+U-nets \citep{ronneberger2015u} are models used for image-to-image translation tasks. In the case
+of diffusion models, we have such a task, where we get $\vec{x}_t$ as input and want to predict
+$\vec{\epsilon}$. This framework is used to model $\vec{\epsilon}_{\vec{\theta}}$. U-nets work by
+downsampling the input in stages and then upsampling back to the original space in the same stages.
+At every step of upsampling, the output of the corresponding downsampling step is concatenated to
+its input. In this way, we get low-level and high-level information.
+
+\subsection{Latent diffusion models}
+
+Stable diffusion \citep{rombach2022high} performs diffusion modeling in the latent space of a
+pretrained VAE \citep{kingma2013auto}. During training, we thus first map the input image
+$\vec{x}_0 \in \R^d$ to its latent encoding, \[
+    \vec{z}_0 = \bm{\mathcal{E}}(\vec{x}_0), \quad \vec{z}_0 \in \R^{d'}, \quad d' \ll d.
+\]
+Then, we use the same loss function as above, where we sample a random timestep and noise, \[
+    \ell = \lft\| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}\lft(\sqrt{1-\beta_t} \vec{z}_0 + \sqrt{\beta_t} \vec{\epsilon} \rgt) \rgt\|^2, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}_{d'}).
+\]
+Then, during inference, we sample a noise vector in the latent space $\vec{z}_T \sim
+    \mathcal{N}(\vec{0}, \mat{I}_{d'})$ and denoise using \Cref{eq:denoising} to get
+$\tilde{\vec{z}}_0$. Lastly, we decode the latent vector back into pixel space, \[
+    \tilde{\vec{x}}_0 = \bm{\mathcal{D}}(\tilde{\vec{z}}_0).
+\]
+This process requires a well-behaving latent space, so the regularization term that the VAE
+framework places on the latent space is very important.
+
+\subsection{Text embeddings}
+
+In order to perform text-to-image generation, we will need a continuous high-dimensional
+representation of the input text. For this, we use CLIP \citep{radford2021learning}. CLIP trains
+image and text transformer models to align text-image pairs. Because of this, they contain more
+semantic embeddings than other methods of training models to obtain text embeddings. Given a text
+input sequence of size $T_c$, the CLIP text model returns a sequence of embeddings, \[
+    \mat{C} \in \R^{T_c \times d_c}. \margintag{We denote this matrix by $\mat{C}$, because we use it for conditioning.}
+\]
+This sequence is contextualized, because CLIP makes use of self-attention.
+
+\subsection{Cross-attention}
+
+Now the question becomes how to condition a U-net on the input text sequence $\mat{C} \in \R^{T_c
+        \times d_c}$. Stable diffusion \citep{rombach2022high} does this by making use of cross-attention
+blocks, which it places at the end of every downsampling stage of the U-net. It first rearranges
+the output of the downsampling block into timesteps, \[
+    \mat{X} \in \R^{T \times d}.
+\]
+Then, it computes queries from $\mat{X}$, and keys and values from $\mat{C}$,
+\begin{align*}
+    \mat{Q} & = \mat{X} \mat{W}_Q, \quad \mat{W}_Q \in \R^{d_k \times d}    \\
+    \mat{K} & = \mat{C} \mat{W}_K, \quad \mat{W}_K \in \R^{d_k \times d_c}  \\
+    \mat{V} & = \mat{C} \mat{W}_V, \quad \mat{W}_V \in \R^{d_v \times d_c}.
+\end{align*}
+It uses these to perform the attention mechanism with a residual connection, \[
+    \mat{\Xi} = \mat{X} + \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt) \mat{V},
+\]
+where $\mat{\Xi}$ denotes the conditioned representation of $\mat{X}$. Note that this architecture
+is agnostic to the type of the condition. As long as we can embed the conditioning variable, we can
+condition on it in this way---\eg, we can additionally condition on images \citep{ye2023ip}.
