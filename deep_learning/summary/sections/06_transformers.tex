@@ -28,34 +28,150 @@ the alignment between $\vec{q}_i$ and $\vec{k}_t$. Furthermore, $\vec{\xi}_i$ de
 corresponding query and all other key-value pairs. In a sense, the attention mechanism is a
 soft-dictionary lookup.
 
-TODO: Multi-headed self-attention.
+\begin{marginfigure}
+    \includegraphics[width=\textwidth]{figures/mhsa}
+    \caption{Multi-headed self-attention \citep{vaswani2017attention}.}
+    \label{fig:mhsa}
+\end{marginfigure}
+
+MHSA (\textit{\textbf{M}ulti-\textbf{H}eaded \textbf{S}elf-\textbf{A}ttention}) computes multiple
+attention mechanism in parallel---see \Cref{fig:mhsa}. Let $h$ be the number of heads, then we
+first compute $h$ queries, keys, and values for each input token.\sidenote{In practice, we use
+    three---not $3 \cdot h$---linear layers for the query, key, and value representations, where the
+    output is $h \cdot d_k$-dimensional. We can chunk this output to get the corresponding
+    representations for each head. This makes PyTorch---or any other library---compute the heads in
+    parallel.} Then, we apply attention $h$ times using these representations and concatenate the
+outputs into a single vector. Lastly, we perform a linear layer to combine the outputs of the
+heads.
 
 \subsection{Cross-attention}
 
-TODO
+A cross-attention layer takes two sequences as inputs, \[
+    \mat{A} \in \R^{T_a \times d_a}, \quad \mat{B} \in \R^{T_b \times d_b}.
+\]
+Then, it computes the queries from $\mat{A}$ and the keys and values from $\mat{B}$, \[
+    \mat{Q} = \mat{A} \mat{W}_Q, \quad \mat{K} = \mat{B} \mat{W}_K, \quad \mat{V} = \mat{B} \mat{W}_V,
+\]
+where $\mat{W}_Q \in \R^{d_a \times d_k}$, $\mat{W}_K \in \R^{d_b \times d_k}$, and $\mat{W}_V \in
+    \R^{d_b \times d_v}$. Then, we can apply (multi-headed) attention to these representations. This is
+an effective way of giving additional sequence data $\mat{B}$ to a sequence $\mat{A}$.
 
 \subsection{Positional encoding}
 
-TODO
+The attention mechanism is permutation equivariant, which means that the order of input tokens does
+not influence the output. So, we need a way of reintroducing the sequence structure to this
+mechanism. We do this by defining a positional encoding matrix $\mat{P} \in \R^{T \times d}$ and
+adding it to the input sequence, $\mat{X} + \mat{P}$. One way of defining this matrix is as
+follows, \[
+    p_{tk} =
+    \begin{cases}
+        \sin(t \omega_k) & k \mod 2 = 0  \\
+        \cos(t \omega_k) & k \mod 2 = 1.
+    \end{cases},
+    \quad
+    \omega_k \doteq C^{\nicefrac{k}{d}}. \margintag{$C=10^4$.}
+\]
+A heatmap representation of this matrix can be seen in \Cref{fig:pe}.
 
-\subsection{Layer normalization}
+\begin{marginfigure}
+    \includegraphics[width=\textwidth]{figures/positional-encoding}
+    \caption{Positional encoding matrix, represented as a heatmap.}
+    \label{fig:pe}
+\end{marginfigure}
 
-TODO
+\subsection{Machine translation}
 
-\subsection{Residual layers}
+The transformer \citep{vaswani2017attention} was the first architecture to show that attention can
+be used effectively in machine learning. \citet{vaswani2017attention} designed an encoder and an
+autoregressive decoder for machine translation---see \Cref{fig:transformer-arch}. The encoder works
+by applying an MHSA layer and a pointwise MLP layer $N$ times in an alternating fashion. In
+addition, it also employs residual connections \citep{he2016deep} and layer normalization
+\citep{lei2016layer}. These are essential for effectively backpropagating gradients and ensuring
+stability. Furthermore, it also makes use of positional encoding to preserve order information. Let
+$\mat{X} \in \R^{T \times d}$ denote the input of the encoder and $\mat{\Xi} \in \R^{T \times d}$
+its output.
 
-TODO
+\begin{marginfigure}
+    \includegraphics[width=\textwidth]{figures/transformer-architecture}
+    \caption{Architecture of the transformer \citep{vaswani2017attention}. The left side is called the encoder, which encodes the input sentence. The right side is called the decoder, which uses cross-attention to incorporate information from the source sequence in the prediction of the target sequence. The model works in an autoregressive manner, which means that the next token is predicted from the history until an end-of-sentence token is predicted.}
+    \label{fig:transformer-arch}
+\end{marginfigure}
 
-\subsection{Architecture}
+Furthermore, the decoder works in an autoregressive manner, which means that it computes the output
+tokens one-by-one. The decoder first receives the history of previously generated tokens
+$\mat{Y}_{1:t-1}$ and contextualizes it using an MHSA layer. Let $\mat{\Upsilon}_{1:t-1}$ denote
+the output of the MHSA layer. Then, a multi-headed cross-attention layer receives $\mat{\Xi}$ as
+input and aligns $\mat{\Upsilon}_{1:t-1}$ with it. Lastly, a pointwise MLP is applied. It performs
+these steps $N$ times. Again, the decoder makes use of residual connections and layer normalization
+to ensure stability of the gradient and output.
 
-TODO: Encoder/decoder.
-
-TODO: Figure.
+The advantage of this architecture is that---unlike RNNs---we do not need to memorize tokens in the
+hidden state, because we can look back at the full sequence at every step. However, this has the
+disadvantage that we need to look at the full sequence at every step, instead of having all
+information encoded in a precomputed hidden state. Furthermore, transformers allow for easy scaling
+up by simply increasing the number of heads, hidden dimensionality, or the number of
+encoders/decoders.
 
 \subsection{BERT}
 
-TODO
+BERT (\textit{\textbf{B}idirectional \textbf{E}ncoder \textbf{R}epresentations from
+    \textbf{T}ransformers}) \citep{devlin2018bert} is a transformer-based pretrained LM that can be
+used for finetuning on downstream natural language processing tasks. BERT first tokenizes its input
+sequence using WordPiece tokenization \citep{wu2016google} and prepends it with a \texttt{[CLS]}
+token. Further, it makes use of the encoder blocks from the transformer architecture to
+contextualize its input tokens. When the weights of these encoders are pretrained, we can place
+additional layers on top of the encoders that operate on BERT's contextualized tokens. We then
+finetune the weights of the full model on the specific task we are interested in.
 
-\subsection{Vision transformers}
+BERT's pre-training consists of two stages:
+\begin{enumerate}
+    \item Predicting masked out tokens using its left and right context as input.\sidenote{This is also known
+              as the Cloze test \citep{taylor1953cloze}. Cloze tests require the ability to understand the
+              context and vocabulary in order to identify the correct language or part of speech that belongs in
+              the deleted passages.}\sidenote{BERT masks 15\% of tokens, of which 80\% is replaced by
+              \texttt{[MASK]}, 10\% is replaced by a random token, and 10\% is left unchanged.} The task is
+          performed by passing the representation of the masked token to a model that predicts which token
+          was originally there. This was previously not easy to do with RNNs, because they can only process
+          sequences left-to-right or right-to-left;
+    \item Binary next sentence classification, where the model must classify two sentences as being
+          consecutive or not, where the two sentences are separated by a \texttt{[SEP]}-token as input to the
+          encoders. In order to make classification possible, the \texttt{[CLS]}-token is appended to the
+          input tokens and its representation is used for the final prediction network.
+\end{enumerate}
+The first stage trains BERT's understanding of language, whereas the second stage enables BERT to infer relationships
+between sentences, which is important for tasks like question-answering.
 
-TODO: Image patches as tokens...
+Lastly, we can finetune the parameters of BERT with a small ground truth dataset to a large variety
+of tasks. \Eg,
+\begin{itemize}
+    \item Question answering, where a question and a context passage is provided with a \texttt{[SEP]}-token
+          separating them. Each token is passed to start and end token classifiers, which predict how likely
+          each token is to be the start and end of the answer. Using these classifiers, we can extract the
+          answer from the passage;
+    \item Part-of-speech tagging, where each token embedding is passed to a classification model, which
+          outputs a distribution over part-of-speech tags;
+    \item Sentiment classification, where the representation of the \texttt{[CLS]}-token is passed to a
+          binary classification model that predicts whether the sentence is positive or negative.
+\end{itemize}
+
+\subsection{Vision transformer}
+
+ViT (\textit{\textbf{Vi}sion \textbf{T}ransformer}) \citep{dosovitskiy2020image} adapts the
+transformer architecture to images by treating patches of an input image as its tokens.
+\citet{dosovitskiy2020image} showed the effectiveness of this approach by adapting the transformer
+architecture to an image classification task. ViT computes the input tokens by vectorizing $16
+    \times 16$ patches of the input image and linearly projecting them to a token space. Further, a
+\texttt{[CLS]}-token is prepended to the sequence of tokens. Then, ViT employs the encoder
+architecture of the transformer to contextualize its input representations. Finally, the
+contextualized embedding of the \texttt{[CLS]}-token is passed to a classification network that
+predicts the class of the input image.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/vit}
+    \caption{Architecture of the vision transformer \citep{dosovitskiy2020image}.}
+    \label{fig:vit}
+\end{figure}
+
+A possible reason for this model's effectiveness is that this architecture carries less inductive
+bias than CNN-based models. In general, this seems to be beneficial for very large datasets.
