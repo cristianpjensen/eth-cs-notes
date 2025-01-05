@@ -1,0 +1,252 @@
+\section{Tricks of the trade}
+
+\subsection{Parameter initialization}
+
+After defining a model, we have to choose how to initialize the parameters of that model. We could
+initialize it by a Gaussian or a uniform distribution with a fixed variance, \[
+    \vec{\theta} \sim \mathcal{N}(0, \sigma^2), \quad \vec{\theta} \sim \mathrm{Unif} \lft( \lft[ -\sqrt{3}\sigma, \sqrt{3}\sigma \rgt] \rgt).
+\]
+
+There are many initialization schemes that aim to set the weights in a smarter way---they turn out
+to be crucial to the convergence of the model. Consider a linear layer with parameters $\mat{W} \in
+    \R^{m \times n}$, \[
+    f(\vec{x}) = \mat{W} \vec{x}.
+\]
+The following schemes depend on the number of in- and output elements to initialize $\mat{W}$,
+generally assume that the elements of $\vec{x}$ are uncorrelated and have standard deviation
+$\gamma$, and take the form above with a set $\sigma$,
+\begin{itemize}
+    \item LeCun initialization \citep{lecun2002efficient} aims to preserve the input variance, \[
+              \sigma = \frac{1}{\sqrt{n}}.
+          \]
+          Then,
+          \begin{align*}
+              \Var[(\mat{W} \vec{x})_i] & = \E \lft[ \lft( \transpose{\vec{w}_i} \vec{x} \rgt)^2 \rgt]                 \\
+                                        & = \E \lft[ \transpose{\vec{w}_i} \vec{x} \transpose{\vec{x}} \vec{w}_i \rgt] \\
+                                        & = \gamma \E \lft[ \| \vec{w}_i \|^2 \rgt]                                    \\
+                                        & = \gamma \sum_{j=1}^{n} \E\lft[w_{ij}^2\rgt]                                 \\
+                                        & = \gamma.
+          \end{align*}
+          Thus, input variance is preserved;
+
+    \item Xavier---or Glorot---initialization \citep{glorot2010understanding} aims to normalize the magnitude
+          of the gradient, \[
+              \sigma = \sqrt{\frac{2}{n+m}}.
+          \]
+          Intuitively, the reason for the definition of $\sigma$ is that backpropagation combines an upstream
+          $n$-dimensional input vector and backpropagated downstream $m$-dimensional output vector;
+
+    \item Kaiming---or He---initialization \citep{he2015delving} is designed to be used together with the
+          ReLU activation function by observing that only half of the units are activated in expectation, \[
+              \sigma = \sqrt{\frac{2}{n}};
+          \]
+    \item Orthogonal initialization \citep{saxe2013exact,hu2020provable} does not assume the weights to be
+          i.i.d., but instead considers the weights holistically per layer. It initializes $\mat{W}$ to be an
+          orthogonal matrix. This offers benefits to forward and backpropagation, because the eigenvalues are
+          equal to $\pm 1$.
+\end{itemize}
+
+\subsection{Weight decay}
+
+Weight decay introduces a term to gradient descent that moves $\vec{\theta}$ toward the origin,
+\begin{align*}
+    \vec{\theta}_{t+1} & = \vec{\theta}_t - \eta \lft( \grad{\ell(\vec{\theta}_t)}{} - \mu \vec{\theta}_t \rgt) \\
+                       & = \lft( 1-\eta\mu \rgt) \vec{\theta}_t - \grad{\ell(\vec{\theta}_t)}{}.
+\end{align*}
+This is equivalent to traditional gradient descent with $\ell_2$-regularization, \[
+    \ell_{\mu}(\vec{\theta}) = \ell(\vec{\theta}) + \frac{\mu}{2} \| \vec{\theta} \|^2, \quad \| \vec{\theta} \|^2 = \sum_{l=1}^{L} \| \mat{W}_l \|_F^2.
+\]
+From a Bayesian perspective, this introduces a prior for the weights to have a small absolute value
+and helps combat overfitting.\sidenote{In combination with linear regression, this is called Ridge
+    regression.} It can also be viewed as the Lagrangian of a convex program minimizing
+$\ell(\vec{\theta})$ with constraint $\| \vec{\theta} \| \leq \mu$.
+
+\begin{marginfigure}[4cm]
+    \centering
+    \incfig{l2-landscape}
+    \caption{Loss landscape of an $\ell_2$-regularized function.}
+    \label{fig:l2-landscape}
+\end{marginfigure}
+
+Let $\vec{\theta}^\star \in \argmin_{\vec{\theta}} \ell(\vec{\theta})$, it is interesting to look
+at how the optimum changes when we instead optimize $\ell(\vec{\theta}) + \frac{\mu}{2} \|
+    \vec{\theta} \|^2$. To answer this, we first make a second-order Taylor approximation around the
+optimum, \[
+    \ell(\vec{\theta}) \approx \ell(\vec{\theta}^\star) + \transpose{(\vec{\theta} - \vec{\theta}^\star)} \hess{\ell(\vec{\theta}^\star)}{} (\vec{\theta} - \vec{\theta}^\star). \margintag{The first-order term disappears because the gradient at an optimum is zero.}
+\]
+The gradient of the $\ell_2$-regularized $\ell_{\mu}$---using the above approximation---is written
+as
+\begin{align*}
+    \grad{\ell_{\mu}(\vec{\theta})}{} & = \grad{\ell(\vec{\theta})}{} + \mu \vec{\theta}                                                                                   \\
+                                      & \approx \hess{\ell(\vec{\theta}^\star)}{} (\vec{\theta} - \vec{\theta}^\star) + \mu \vec{\theta}                                   \\
+                                      & = \lft( \hess{\ell(\vec{\theta}^\star)}{} + \mu \mat{I} \rgt) \vec{\theta} - \hess{\ell(\vec{\theta}^\star)}{} \vec{\theta}^\star.
+\end{align*}
+A necessary property of the optimum of $\ell_{\mu}$ is $\grad{\ell_{\mu}(\vec{\theta}_{\mu}^\star)}{} \condeq \vec{0}$, \[
+    \lft( \hess{\ell(\vec{\theta}^\star)}{} + \mu \mat{I} \rgt) \vec{\theta}_{\mu}^\star = \hess{\ell(\vec{\theta}^\star)}{} \vec{\theta}^\star.
+\]
+Hence, \[
+    \vec{\theta}^\star_{\mu} = \inv{\lft( \hess{\ell(\vec{\theta}^\star)}{} + \mu \mat{I} \rgt)} \hess{\ell(\vec{\theta}^\star)}{} \vec{\theta}^\star.
+\]
+Let $\hess{\ell(\vec{\theta}^\star)}{} = \transpose{\mat{Q}} \mat{\Lambda} \mat{Q}$, then
+\begin{align*}
+    \vec{\theta}_{\mu}^\star         & = \inv{\lft( \transpose{\mat{Q}}\mat{\Lambda}\mat{Q} + \mu \transpose{\mat{Q}}\mat{Q} \rgt)} \transpose{\mat{Q}}\mat{\Lambda}\mat{Q}\vec{\theta}^\star \\
+                                     & = \transpose{\mat{Q}} \inv{(\mat{\Lambda} + \mu\mat{I})} \mat{Q} \transpose{\mat{Q}} \mat{\Lambda} \mat{Q} \vec{\theta}^\star                          \\
+                                     & = \transpose{\mat{Q}} \inv{(\mat{\Lambda} + \mu\mat{I})} \mat{\Lambda} (\mat{Q} \vec{\theta}^\star)                                                    \\
+    \mat{Q} \vec{\theta}_{\mu}^\star & = \inv{(\mat{\Lambda} + \mu\mat{I})} \mat{\Lambda} (\mat{Q} \vec{\theta}^\star).
+\end{align*}
+So, under basis $\mat{Q}$, the optimum of $\ell_{\mu}$ is \[
+    \vec{\theta}_{\mu}^\star = \mathrm{diag} \lft( \frac{\lambda_i}{\lambda_i + \mu} \rgt) \vec{\theta}^\star.
+\]
+\Ie, the new solution scales each axis based on its sensitivity. If $\lambda_i$ is large, then
+$\nicefrac{\lambda_i}{\lambda_i + \mu} \approx 1$, so the solution does not change much in that
+direction---this matches the intuition that if the loss function is sensitive in a direction, the new
+solution will not change much in that direction.
+
+\subsection{Early stopping}
+
+In early stopping, we hold out a validation dataset, which is used for assessing generalization
+during training. If the validation error has not decreased for the past $p$ checks, we stop
+training. Generally, the validation error is computed after every training epoch. This helps combat
+overfitting, because it does not allow the model to fit on the noise in the training data. Here, we
+make the assumption that the signal in the data is learned first and then the noise, because the
+signal contributes more to decreasing the loss function than the noise.
+
+With a crude analysis, one can show that this is theoretically equivalent to weight decay if we
+stop at $t \approx \nicefrac{\eta}{\mu}$.
+
+\subsection{Dropout}
+
+Dropout \citep{srivastava2014dropout} randomly disables a subset of the model's weights during
+training---as a result, units become less dependent on one another. Instead of units being
+specialized and the model being highly dependent on specific units, the units stabilize to being
+generally useful to the task.
+
+There are two views in which one can see dropout---(1) a regularization method and (2) an ensemble
+of networks defined by a binary mask $\vec{b} \in \{ 0,1 \}^n$ of whether a weight is activated or
+not, \[
+    p[\vec{w}](\vec{y} \mid \vec{x}) = \sum_{\vec{b} \in \{ 0,1 \}^n} p(\vec{b}) p[\vec{w} \odot \vec{b}](\vec{y} \mid \vec{x}), \quad p(\vec{b}) = \prod_{i=1}^n \pi^{b_i}_i (1-\pi)^{1-b_i},
+\]
+where $\pi_i$ is the probability of weight $i$ being activated. In order to prevent having to
+evaluate hundreds of sampled networks, we can use the heuristic of scaling the weights by their
+dropout probability, \[
+    \tilde{\theta}_i \gets \pi_i \theta_i.
+\]
+
+\subsection{Normalization}
+
+The goal of normalization is to make all units more similar, such that optimization is easier. Let
+$f: \R^d \to \R$ be some layer in a model. This layer can be normalized by \[
+    \bar{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
+\]
+As a result, $\E[\bar{f}(\vec{x})] = 0$ and $\Var[\bar{f}(\vec{x})] = 1$. However, this removes 2
+degrees of freedom---bias and variance---which might be important to the model. To introduce bias
+and variance back, we explicitly parametrize them, \[
+    \bar{f}[\mu, \gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x}).
+\]
+In general, $\E[f]$ and $\Var[f]$ are expensive to compute due to a large amount of data. Let
+$\mathcal{B}$ be a mini-batch, then a BN (\textit{\textbf{B}atch \textbf{N}ormalization}) layer
+estimates them by
+\begin{align*}
+    \E[f(\vec{x})]   & \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} f(\vec{x})                                 \\
+    \Var[f(\vec{x})] & \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} \lft( f(\vec{x}) - \E[f(\vec{x})] \rgt)^2.
+\end{align*}
+Then, we re-introduce bias and variance by adding $\mu$ and $\gamma$ parameters as above.
+
+Normalization is very effective and even essential in some model types---the question is why it is
+so effective. Historically, many believed that it helps to combat covariance shift, however, this
+is no longer believed to be true. The modern motivation for normalization is as follows. Let
+$g[\mu, \gamma]$ be a BN layer, $h[\vec{w}]$ a linear layer, and $\phi$ a non-linearity and compose
+a block as $f = \phi \circ g[\mu, \gamma] \circ h[\vec{w}]$. Then,
+\begin{align*}
+    f(\vec{x}) & = \phi \lft( \mu + \gamma \frac{\transpose{\vec{w}} \vec{x} - \E\lft[ \transpose{\vec{w}}\vec{x} \rgt]}{\sqrt{\Var\lft[ \transpose{\vec{w}}\vec{x} \rgt]}} \rgt)                   \\
+               & = \phi \lft( \mu + \gamma \frac{\transpose{\vec{w}} (\vec{x} - \E[\vec{x}])}{\| \vec{w} \|_{\mat{\Sigma}}} \rgt), \quad \mat{\Sigma} = \E \lft[ \vec{x} \transpose{\vec{x}} \rgt]. \\
+    \intertext{Assume $\E[\vec{x}] = \vec{0}$,}
+               & = \phi \lft( \mu + \gamma \frac{\transpose{\vec{w}}\vec{x}}{\| \vec{w} \|_2} \frac{\| \vec{w} \|_2}{\| \vec{w} \|_{\mat{\Sigma}}} \rgt)                                            \\
+               & = \phi \lft( \mu + \gamma \transpose{\lft( \frac{\vec{w}}{\| \vec{w} \|_2} \rgt)} \vec{x} \frac{\| \vec{w} \|_{\mat{I}}}{\| \vec{w} \|_{\mat{\Sigma}}} \rgt).
+\end{align*}
+Effectively, the weight vector is normalized and the result is scaled by the discrepancy between
+$\| \vec{w} \|_{\mat{I}}$ and $\| \vec{w} \|_{\mat{\Sigma}}$. Practically, it has been found that $\mu$
+is not as important as $\gamma$.
+
+LN (\textit{\textbf{L}ayer \textbf{N}ormalization}) \citep{lei2016layer} differs from BN in the way
+that it estimates the mean and variance. Instead of computing them over the batch dimension, it
+does so over the feature dimension, \[
+    \E[\vec{x}] \approx \frac{1}{d} \sum_{j=1}^{d} x_j, \quad \Var[\vec{x}] \approx \frac{1}{d} \sum_{j=1}^{d} (x_j - \E[\vec{x}])^2.
+\]
+Each sample is thus normalized with different means and variances. The advantage is that the
+normalization is defined independently from the mini-batch size. Generally, BN is used in computer
+vision, whereas LN is used in natural language processing.
+
+\subsection{Weight normalization}
+
+In weight normalization, the weights are normalized before applying them, \[
+    f[\vec{v}, \gamma](\vec{x}) = \phi \lft( \transpose{\vec{w}}\vec{x} \rgt), \quad \vec{w} = \frac{\gamma}{\| \vec{v} \|_2} \vec{v}.
+\]
+As we have seen before, this is equivalent to applying normalization if $\frac{\| \vec{w}
+    \|_{\mat{I}}}{\| \vec{w} \|_{\mat{\Sigma}}} = 1$.
+
+\begin{marginfigure}
+    \centering
+    \incfig{weight-norm-projection}
+    \caption{When using weight normalization, the direction of $\vec{w}$ is projected out at every update step.}
+    \label{fig:weight-norm-projection}
+\end{marginfigure}
+
+The gradients of the parameters are computed as follows,
+\begin{align*}
+    \pdv{\ell}{\gamma}  & = \pdv{\ell}{\vec{w}} \pdv{\vec{w}}{\gamma}                                                                                                                                                 \\
+                        & = \pdv{\ell}{\vec{w}} \frac{\vec{v}}{\| \vec{v} \|}.                                                                                                                                        \\
+    \pdv{\ell}{\vec{v}} & = \pdv{\ell}{\vec{w}} \pdv{\vec{w}}{\vec{v}}                                                                                                                                                \\
+                        & = \gamma \pdv{\ell}{\vec{w}} \lft( \frac{1}{\| \vec{v} \|} \mat{I} + \lft( \pdv*{\frac{1}{\| \vec{v} \|}}{\vec{v}} \rgt) \transpose{\vec{v}} \rgt)                                          \\
+                        & = \gamma \pdv{\ell}{\vec{w}} \lft( \frac{1}{\| \vec{v} \|} \mat{I} - \frac{\vec{v} \transpose{\vec{v}}}{\| \vec{v} \|^3} \rgt)                                                              \\
+                        & = \frac{\gamma}{\| \vec{v} \|} \pdv{\ell}{\vec{w}} \lft( \mat{I} - \frac{\vec{w} \transpose{\vec{w}}}{\gamma^2} \rgt) \margintag{$\frac{\vec{v}}{\| \vec{v} \|} = \frac{\vec{w}}{\gamma}$.} \\
+                        & = \frac{\gamma}{\| \vec{v} \|} \pdv{\ell}{\vec{w}} \lft( \mat{I} - \frac{\vec{w} \transpose{\vec{w}}}{\| \vec{w} \|^2} \rgt). \margintag{$\| \vec{w} \| = \gamma$.}
+\end{align*}
+Here, $\mat{I} - \frac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|_2^2}$ is a projection matrix onto
+the complement of $\vec{w}$---the direction of $\vec{w}$ is projected out at every update step, as
+shown in \Cref{fig:weight-norm-projection}.
+
+\subsection{Data augmentation}
+
+Transform the data with transformations that the model should be invariant to and pass it to the
+model during training---the model learns the invariances of the data rather than that we have to
+design the architecture as such. Let $\{ \tau_k \}_{k=1}^K$ be transformations, then the dataset is
+extended in the following way, \[
+    \{ (\vec{x}_i, y_i) \}_{i=1}^n \mapsto \bigcup_{k=1}^K \{ (\tau_k(\vec{x}_i), y_i) \}_{i=1}^n.
+\]
+In practice during training, the transformations are done on the fly, because they are usually
+cheap.
+
+\subsection{Label smoothing}
+
+Classifiers are generally not good at dealing with mislabeled data, so we smooth the labels out by
+replacing them with noisy probability distributions, \[
+    y \mapsto \mat{\Pi} \vec{e}_y \in \Delta^{k-1},
+\]
+where $k$ is the number of output classes. Here, $\mat{\Pi}$ is a confusion matrix that defines how
+the ``smoothed'' distribution of each label is defined. This distribution is then used in the
+cross-entropy loss. This concept can be generalized to any type of label by simply adding noise.
+
+\subsection{Distillation}
+
+In model distillation \citep{hinton2015distilling}, we have a teacher and a student model, where
+the student attempts to match the teacher's outputs. The idea is that a teacher's knowledge lies in
+its outputs, so we should be able to condense this information into a shallower model if we make
+use of its outputs. In practice, we generate a lot of data with the teacher model and train the
+student on it.
+
+In a classification setting, we train the student to match the probability distribution of the
+teacher. Let $F$ be the teacher, $G$ its student and denote by $F_y$ the logit of the teacher of
+class $y$, then we use the cross-entropy loss between the teacher's and student's output logits, \[
+    \ell(\vec{x}) = \sum_{y\in \mathcal{Y}} \frac{\exp(\nicefrac{F_y(\vec{x})}{T})}{\sum_{y'\in \mathcal{Y}} \exp(\nicefrac{F_{y'}(\vec{x})}{T})} \log \lft( \frac{\exp(\nicefrac{G_{y}(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{G_{y'}(\vec{x})}{T})} \rgt).
+\]
+\citet{hinton2015distilling} suggested using a ``tempered'' cross-entropy loss, \[
+    \ell(\vec{x}) = \sum_{y\in \mathcal{Y}} \frac{\exp(\nicefrac{F_y(\vec{x})}{T})}{\sum_{y'\in \mathcal{Y}} \exp(\nicefrac{F_{y'}(\vec{x})}{T})} \lft( \frac{1}{T} G_y(\vec{x}) - \log \sum_{y' \in \mathcal{Y}} \exp(\nicefrac{G_{y'}(\vec{x})}{T}) \rgt).
+\]
+Here, the distillation loss is ``tempered'' by a temperature parameter $T > 0$. Typically, the
+teacher is trained with $T = 1$. However, often the teacher gets overconfident in its predictions,
+so we can set $T > 1$ to soften its outputs. Deriving the gradient is trivial, \[
+    \pdv{\ell}{G_y} = \frac{1}{T} \lft( \frac{\exp(\nicefrac{F_y(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{F_{y'}(\vec{x})}{T})} - \frac{\exp(\nicefrac{G_y(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{G_{y'}(\vec{x})}{T})} \rgt).
+\]
+Notice that the gradient is a difference of tempered logits.
+
