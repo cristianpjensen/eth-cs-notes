@@ -1,0 +1,105 @@
+\section{Neural tangent kernel}
+
+\paragraph{Linearized models.}
+
+We can linearize a model $f[\vec{\theta}]$ by a first-order Taylor approximation over the
+parameters $\vec{\theta}_0$, \[
+    f[\vec{\theta}] \approx f[\vec{\theta}_0] + \langle \grad{f[\vec{\theta}_0]}{}, \vec{\theta} - \vec{\theta}_0 \rangle, \quad \vec{\theta} \in \R^P.
+\]
+In this way, we can define a linear model with parameters $\vec{\beta}$, \[
+    h[\vec{\beta}](\vec{x}) \doteq f[\vec{\theta}_0](\vec{x}) + \transpose{\vec{\beta}} \grad{f[\vec{\theta}_0](\vec{x})}{}.
+\]
+Here, $\grad{f[\vec{\theta}]}{}: \R^d \times \R^p$ can be seen as constructing a $p$-dimensional
+feature vector and $h[\vec{\beta}]$ a linear model over those features---we have a kernel method
+with the following kernel, \[
+    k(\vec{x}, \vec{x}') \doteq \transpose{\grad{f[\vec{\theta}_0](\vec{x})}{}} \grad{f[\vec{\theta}_0](\vec{x}')}{}.
+\]
+Assuming that we want to minimize the mean-squared error, \[
+    \ell(\vec{\beta}) \doteq \frac{1}{2} \| \vec{f} + \mat{\Phi} \vec{\beta} - \vec{y} \|^2, \quad \mat{\Phi} \doteq [\grad{f[\vec{\theta}_0](\vec{x}_1)}{}, \ldots, \grad{f[\vec{\theta}_0](\vec{x}_n)}{}] \in \R^{n \times p},
+\]
+we get the following unique solution, \[
+    \vec{\beta}^\star = \transpose{\mat{\Phi}} \inv{\mat{K}} (\vec{y} - \vec{f}), \quad \mat{K} \doteq \mat{\Phi} \transpose{\mat{\Phi}}.
+\]
+And, we make predictions by \[
+    h^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \inv{\mat{K}} (\vec{y} - \vec{f}), \quad \vec{k}(\vec{x}) \doteq [k(\vec{x}, \vec{x}_1), \ldots, k(\vec{x}, \vec{x}_n)] \in \R^n.
+\]
+We now have a linearized network---along with a way of evaluating it---which is simply an
+approximation of a model with parameters $\vec{\theta}_0$.
+
+\paragraph{Training dynamics.}
+
+Consider the case where we wish to minimize the mean-squared error, \[
+    \ell(\vec{\theta}) = \frac{1}{2} \| \vec{f}[\vec{\theta}] - \vec{y} \|^2, \quad \vec{f}[\vec{\theta}] \doteq [f[\vec{\theta}](\vec{x}_1), \ldots, f[\vec{\theta}](\vec{x}_n)].
+\]
+We optimize the model parameters by gradient descent, \[
+    \vec{\theta}_{t+1} = \vec{\theta}_t - \eta \grad{\ell(\vec{\theta}_t)}{}.
+\]
+We can derive the ordinary differential equation of this process by rearranging the above,
+\begin{align*}
+    \frac{\vec{\theta}_{t+1} - \vec{\theta}_t}{\eta} & = - \grad{\ell(\vec{\theta}_t)}{}                                                                         \\
+    \odv{\vec{\theta}_t}{t}                          & = - \grad{\ell(\vec{\theta}_t)}{} \margintag{$\eta$ is the stepsize and we turn it into continuous time.} \\
+                                                     & = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) \grad{f[\vec{\theta}_t](\vec{x}_i)}{}               \\
+                                                     & \doteq \dot{\vec{\theta}}_t.
+\end{align*}
+We can also consider the functional gradient flow for a data point $\vec{x}_j$,
+\begin{align*}
+    \dot{f}(\vec{x}_j) & \doteq \grad{f[\dot{\vec{\theta}}_t](\vec{x}_j)}{}                                                                                                      \\
+                       & = \transpose{\dot{\vec{\theta}}_t} \grad{f[\vec{\theta}_t](\vec{x}_j)}{}                                                                                \\
+                       & = \transpose{\lft( \sum_{i=1}^{n} (y_i - f[\vec{\theta}](\vec{x}_i)) \grad{f[\vec{\theta}_t](\vec{x}_i)}{} \rgt)} \grad{f[\vec{\theta}_t](\vec{x}_j)}{} \\
+                       & = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) \transpose{\grad{f[\vec{\theta}_t](\vec{x}_i)}{}} \grad{f[\vec{\theta}_t](\vec{x}_j)}{}           \\
+                       & = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) k[\vec{\theta}_t](\vec{x}_i, \vec{x}_j).
+\end{align*}
+This can also be written in matrix form as \[
+    \dot{\vec{f}} = \mat{K}[\vec{\theta}_t] (\vec{y} - \vec{f}).
+\]
+This shows that the kernel governs the evolution of the joint sample predictions.
+
+Now we can analyze how gradient descent behaves---it is entirely dependent on the kernel. However,
+it only works if the Taylor approximation is accurate---this is only the case for $\vec{\theta}$
+close to $\vec{\theta}_0$. Whereas the linearized model treats $\vec{\theta}_0$ as fixed in this
+sense, this approximation does not necessarily need to remain valid during the training dynamics of
+gradient descent.
+
+\paragraph{Infinite width.}
+
+In practice, it has been found that as the width of a model is scaled, the parameters stay close to
+their initialization during gradient descent. One can prove that if the model is scaled to infinite
+width---\ie, $p \to \infty$----then the parameters stay close to initialization. As a result, the
+feature function $\grad{f[\vec{\theta}](\vec{x})}{}$ does not change significantly with
+$\vec{\theta}$. Since the gradient is essentially static, the effective kernel also remains fixed, \[
+    k(\vec{x}, \vec{x}') = \transpose{\grad{f[\vec{\theta}](\vec{x})}{}} \grad{f[\vec{\theta}](\vec{x}')}{}.
+\]
+This is called the NTK (\textit{\textbf{N}eural \textbf{T}angent \textbf{K}ernel})
+\citep{jacot2018neural}. Under these training dynamics, minimizing the mean-squared error equates
+to solving a kernel regression problem with $k$ as we saw above. This provides analytical insight
+into why overparametrization works so well in practice and why such models generalize, despite
+having the obvious ability to overfit.
+
+\paragraph{NTK of an infinite-width MLP.}
+
+Consider an MLP with $L$ layers and $m_l$ denoting the number of parameters in layer $l \in [L]$,
+where we initialize the parameters by \[
+    w^l_{ij} \sim \mathcal{N}\lft( 0, \frac{\sigma_w}{\sqrt{m_l}} \rgt), \quad b^l_{i} \sim \mathcal{N}\lft( 0, \frac{\sigma_b}{\sqrt{m_l}} \rgt). \margintag{LeCun initialization.}
+\]
+Now consider the case where $m_l \to \infty$ for all $l \in [L]$. Under suitable conditions, it can
+be shown that with the above scaling, the initial NTK converges to a deterministic limit
+$k_\infty$. The kernel limit depends only on the law of initialization and not the actual
+initialized values. Effectively, there is only one possible initial infinite-width network. With a
+few additional assumptions, it can also be shown that $\vec{\theta}_t$ converges uniformly to
+$k_\infty$.
+
+In other words, the NTK remains constant under gradient flow---NTK constancy, \[
+    \pdv{k[\vec{\theta}_t]}{t} = \vec{0}.
+\]
+When NTK constancy holds, learning in the infinite width limit is equivalent to the linearized
+model. As a result, the solution to NTK learning can be expressed as \[
+    f_\infty(\vec{x}) = \transpose{\vec{k}_\infty(\vec{x})} \inv{\mat{K}_\infty} (\vec{y} - \vec{f}).
+\]
+
+\citet{bietti2019inductive} showed that the NTK of a two-layer MLP with a ReLU activation function
+can analytically be written as \[
+    k_\infty(\vec{x}, \vec{x}') = \| \vec{x} \| \| \vec{x}' \| \kappa \lft( \frac{\transpose{\vec{x}}\vec{x}'}{\| \vec{x} \| \| \vec{x}' \|} \rgt),
+\]
+where \[
+    \kappa(u) \doteq \frac{2u}{\pi} \lft( \pi - \arccos(u) \rgt) + \frac{\sqrt{1-u^2}}{\pi}.
+\]
