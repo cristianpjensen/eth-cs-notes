@@ -1,0 +1,202 @@
+\section{Bayesian learning}
+
+Starting from a prior $p(\vec{\theta})$, we want to compute or approximate the posterior
+$p(\vec{\theta} \mid \mathcal{D})$. The ultimate goal is the Bayesian predictive distribution, \[
+    f(\vec{x}) = \int p(\vec{\theta}\mid \mathcal{D}) f[\vec{\theta}](\vec{x}) \mathrm{d}\vec{\theta},
+\]
+where the posterior can be defined via Bayes' rule, \[
+    p(\vec{\theta} \mid \mathcal{D}) = \frac{p(\mathcal{D}\mid \vec{\theta}) p(\vec{\theta})}{p(\mathcal{D})}, \quad p(\mathcal{D}) = \int p(\vec{\theta}) p(\mathcal{D}\mid \vec{\theta}) \mathrm{d}\vec{\theta}.
+\]
+The evidence $p(\mathcal{D})$ is often intractable, but we often do not need it when unnormalized
+probabilities are sufficient.
+
+The isotropic Gaussian is a common prior, \[
+    p(\vec{\theta}) = \mathcal{N}(\vec{\theta}, \sigma^2 \mat{I}).
+\]
+Optimizing this prior leads to a weight decay term as we have seen before,
+\begin{align*}
+    \vec{\theta}^\star & = \argmax_{\vec{\theta} \in \Theta} p(\vec{\theta} \mid \mathcal{D})                                                                                                                                                                 \\
+                       & = \argmax_{\vec{\theta} \in \Theta} p(\mathcal{D}\mid \vec{\theta}) p(\vec{\theta}) \margintag{$p(\mathcal{D})$ is a constant \wrt $\vec{\theta}$.}                                                                                  \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) - \log p(\vec{\theta}) \margintag{The logarithm is increasing.}                                                                                             \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) - \log p(\vec{\theta})                                                                                                                                      \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2 \margintag{Plug in the definition of the Gaussian and remove all terms which are constant \wrt $\vec{\theta}$.} \\
+                       & = \circledast
+\end{align*}
+
+Further assume that we have data that is described by a function $f^\star: \mathcal{X} \to
+    \mathcal{Y}$ with normal noise, \[
+    y_i = f^\star(\vec{x}_i) + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \gamma^2).
+\]
+We get the following negative log likelihood,
+\begin{align*}
+    -\log p(\mathcal{D}\mid\vec{\theta}) & = -\sum_{i=1}^{n} \log p(y_i \mid \vec{x}_i, \vec{\theta})                                                                                                                                                      \\
+                                         & \propto -\sum_{i=1}^{n} \frac{1}{2 \gamma^2} (y_i - f[\vec{\theta}](\vec{x}_i))^2 \margintag{We modeled $y_i \sim \mathcal{N}(f^\star(\vec{x}_i), \gamma^2)$ and $f[\vec{\theta}]$ must approximate $f^\star$.} \\
+                                         & = -\frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2.
+\end{align*}
+So, the final optimization problem becomes \[
+    \circledast = \argmin_{\vec{\theta} \in \Theta} -\frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2 + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2.
+\]
+
+Finally, the question becomes how we sample parameters from the posterior $p(\vec{\theta} \mid
+    \mathcal{D})$ to approximate the predictive distribution, \[
+    f(\vec{x}) \approx \sum_{i=1}^{m} \frac{p\lft( \vec{\theta}^{(i)} \;\middle|\; \mathcal{D} \rgt)}{\sum_{j=1}^{m} p \lft( \vec{\theta}^{(j)} \;\middle|\; \mathcal{D} \rgt)} f\lft[ \vec{\theta}^{(i)} \rgt](\vec{x})
+\]
+
+\subsection{Markov chain Monte Carlo}
+
+MCMC (\textit{\textbf{M}arkov \textbf{C}hain \textbf{M}onte \textbf{C}arlo}) is the standard method
+of sampling from a high-dimensional posterior distribution. It does so by defining a Markov chain
+in the parameter space, where the stationary distribution is equal to the posterior---when sampling
+a random sequence of parameters, we converge that we are at any parameter pair with the probability
+of its posterior. If we can construct such a Markov chain, we can sample the posterior by running
+the Markov chain for long enough---this period is known as the burn-in period. Further note that
+close parameters in the Markov chain are highly correlated, so we cannot take nearby samples as
+independent draws from the posterior.
+
+\subsection{Metropolis-Hastings}
+
+\begin{lemma} \label{lem:dbe}
+    If a Markov chain, described by its kernel $\Pi: \Theta \to \Delta(\Theta)$, satisfies the DBE (\textit{\textbf{D}etailed \textbf{B}alance \textbf{E}quation}), \[
+        q(\vec{\theta}) \Pi(\vec{\theta}' \mid \vec{\theta}) = q(\vec{\theta}') \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}' \in \Theta,
+    \]
+    then the Markov chain is time reversible and has the posterior distribution $q$.
+\end{lemma}
+
+Using \Cref{lem:dbe}, we can thus guarantee that the stationary distribution of the Markov chain is
+the posterior if we have \[
+    p(\vec{\theta} \mid \mathcal{D}) \Pi(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{D}) \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}' \in \Theta.
+\]
+
+MH (\textit{\textbf{M}etropolis-\textbf{H}astings}) starts with sampling from an arbitrary Markov
+kernel $\tilde{\Pi}$ and modifies the transition probability with an acceptance (or rejection) step
+to achieve an effective kernel $\Pi$ that satisfies the DBE. Let $\alpha(\cdot \mid \cdot)$ be the
+acceptance function, and construct $\Pi$ as \[
+    \Pi(\vec{\theta}' \mid \vec{\theta}) = \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta}) \alpha(\vec{\theta}' \mid \vec{\theta}).
+\]
+Intuitively, $\tilde{\Pi}$ makes a suggestion and $\alpha$ accepts or rejects it,
+probabilistically. Then, we need to construct $\alpha$ such that it satisfies the DBE, \[
+    p(\vec{\theta}\mid \mathcal{D}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta}) \alpha(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}') \alpha(\vec{\theta} \mid \vec{\theta}')
+\]
+The acceptance function must satisfy a one-sided structure, \[
+    \alpha(\vec{\theta}' \mid \vec{\theta}) = 1 \lor \alpha(\vec{\theta} \mid \vec{\theta}') = 1.
+\]
+Thus, the following is the only choice of $\alpha$, \[
+    \alpha(\vec{\theta} \mid \vec{\theta}') = \min \lft\{ 1, \frac{p(\vec{\theta} \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta})}{p(\vec{\theta}' \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}')} \rgt\}.
+\]
+If $\tilde{\Pi}$ is symmetric, then the acceptance probability is simply the ratio of posteriors.
+
+A potential problem with this approach is that while the Markov chain is guaranteed to converge to
+the posterior as its stationary distribution, this might take arbitrarily long---the burn-in period
+can be impractically costly. This is due to poor initial kernels $\tilde{\Pi}$ leading to very high
+rejection probabilities.
+
+\subsection{Hamiltonian Monte Carlo}
+
+HMC (\textit{\textbf{H}amiltonian \textbf{M}onte \textbf{C}arlo}) is an MCMC method for obtaining
+posterior averages. Consider an energy function---or loss function---equal to the negative log
+posterior, \[
+    E(\vec{\theta}) \doteq -\sum_{\vec{x}, y} \log p[\vec{\theta}](y \mid \vec{x}) - \log p(\vec{\theta}).
+\]
+The Hamiltonian is defined as the energy function, augmented with a momentum vector $\vec{v}$ and a
+corresponding energy term, \[
+    H(\vec{\theta}, \vec{v}) \doteq E(\vec{\theta}) + \frac{1}{2} \transpose{\vec{v}}\inv{\mat{M}} \vec{v}.
+\]
+The joint probability of $\vec{\theta}$ and $\vec{v}$ is given by a Gibbs distribution, \[
+    p(\vec{\theta}, \vec{v}) \propto \exp \lft( -H(\vec{\theta}, \vec{v}) \rgt).
+\]
+We get the following two coupled differential equations---Hamiltonian dynamics, \[
+    \dot{\vec{v}} = -\grad{E(\vec{\theta})}{}, \quad \dot{\vec{\theta}} = \vec{v}.
+\]
+HMC discretizes this dynamic with a stepsize $\eta$,
+\begin{align*}
+    \vec{\theta}_{t+1} & = \vec{\theta}_t + \eta \vec{v}_t              \\
+    \vec{v}_{t+1}      & = \vec{v}_t - \eta \grad{E(\vec{\theta}_t)}{}.
+\end{align*}
+Although very slowly, HMC samples from the posterior by following these dynamics. Note that it is
+very similar to gradient descent with momentum---we essentially sample the posterior by following
+momentum-based gradient descent dynamics.\sidenote{As a result, optimization with momentum gradient descent results in a
+    single sample approximation of the predictive distribution.} However, this approach requires the full
+gradient, which is often intractable in practice.
+
+\subsection{Langevin dynamics}
+
+\marginnote{See the following video for a visualization of the sampling process with Langevin dynamics---\url{https://www.youtube.com/watch?v=cVn0kru3hL8}.}
+
+Langevin dynamics extends HMC by introducing friction,
+\begin{align*}
+    \dot{\vec{\theta}} & = \vec{v}                                                                                                             \\
+    \mathrm{d}\vec{v}  & = - \grad{E(\vec{\theta})}{} \mathrm{d}t - \mat{B} \vec{v} \mathrm{d}t + \mathcal{N}(\vec{0}, 2 \mat{B} \mathrm{d}t).
+\end{align*}
+Intuitively, the friction reduces the momentum and ``dissipates'' kinetic energy and the Wiener noise
+process injects stochasticity. As with HMC, we can discretize the above process,
+\begin{align*}
+    \vec{\theta}_{t+1} & = \vec{\theta}_t + \eta \vec{v}_t                                                                                           \\
+    \vec{v}_{t+1}      & = (1-\eta \gamma) \vec{v}_t - \eta s \grad{\tilde{E}(\vec{\theta})}{} + \sqrt{2 \gamma \eta} \mathcal{N}(\vec{0}, \mat{I}).
+\end{align*}
+Here, $\tilde{E}$ is a stochastic potential function, which includes an empirical loss over a random
+mini-batch of the data. The first term introduces friction, which leads to an exponential damping
+with time.
+
+\subsection{Gaussian processes}
+
+GPs (\textit{\textbf{G}aussian \textbf{P}rocesses}) are one of the few fully tractable Bayesian
+methods. It starts from a continuous stochastic process over the input domain $\mathcal{X}$, \[
+    \{ f(\vec{x}) \mid \vec{x} \in \mathcal{X} \},
+\]
+where each $f(\vec{x})$ is a real random variable. $f$ is a GP if for every finite subset $\{
+    \vec{x}_1, \ldots \vec{x}_n \} \subset \mathcal{X}$, the resulting finite marginal is jointly
+normally distributed, \[
+    \begin{bmatrix} f(\vec{x}_1) \\ \vdots \\ f(\vec{x}_n) \end{bmatrix} \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma}).
+\]
+The mean $\vec{\mu}$ can be computed by a deterministic regression, whereas the covariance matrix
+$\mat{\Sigma}$ introduces stochasticity to the prediction. When given a finite dataset, the
+covariance matrix can be fully evaluated using a kernel function, \[
+    \sigma_{ij} = k(\vec{x}_i, \vec{x}_j), \quad k: \mathcal{X} \times \mathcal{X} \to \R.
+\]
+The kernel function can be seen as a prior over function space that describes how related the
+output values corresponding to two input values should be. \Eg, we might want to encode that close
+input values should result in close output values---then you might want to use the RBF kernel, \[
+    k(\vec{x}, \vec{x}') = \exp \lft( -\gamma \| \vec{x} - \vec{x}' \|^2 \rgt).
+\]
+
+\paragraph{Linear networks.}
+
+Assume we have $n$ $d$-dimensional inputs. Consider a single linear unit $\vec{w} \in \R^d$ with a
+random Gaussian weight vector, \[
+    \vec{w} \sim \mathcal{N}\lft( \vec{0}, \frac{\sigma^2}{d} \mat{I}_d \rgt).
+\]
+The outputs can be written as $y_i = \transpose{\vec{w}} \vec{x}_i$ for all $i \in [n]$, or in a
+vectorized form, \[
+    \vec{y} = \mat{X} \vec{w}, \quad \mat{X} \in \R^{n \times d}.
+\]
+Note that this is a Gaussian vector, \[
+    \vec{y} \sim \mathcal{N}\lft( \vec{0}, \frac{\sigma^2}{d} \transpose{\mat{X}} \mat{X} \rgt).
+\]
+Hence, this is a Gaussian process with the following kernel, \[
+    k(\vec{x}, \vec{x}') = \frac{\sigma^2}{n} \transpose{\vec{x}}\vec{x}'.
+\]
+We can do this for multiple units, because the preactivations of units in the same layer are
+independent, conditioned on the input.
+
+If we increase the depth of this network, we do not get the same effect in general. However, a deep
+preactivation process is ``near normal'' for high-dimensional inputs. This can be made rigorous
+with a multivariate version of the central limit theorem.
+
+\paragraph{Non-linear networks.}
+
+By introducing non-linear activation functions into the network, the activations are no longer
+Gaussian. However, due to the central limit theorem, they get are effectively turned back into
+Gaussians when they propagate to the next layer. The mean function can be computed by \[
+    \mu \lft( \vec{x}^{\ell+1} \rgt) = \E \lft[ \phi \lft( \mat{W}^{\ell} \vec{x}^\ell \rgt) \rgt].
+\]
+This might need to be computed using numerical integration. The kernel can be defined recursively, \[
+    k^{\ell}_{ij} = \E \lft[ \phi\lft( \vec{x}_{i}^{\ell-1} \rgt) \phi\lft( \vec{x}_j^{\ell-1} \rgt) \rgt].
+\]
+We can now use kernel regression, \[
+    f^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \mat{K}^{-1} \vec{y}, \quad \mat{K} = \mat{K}^{L}.
+\]
+In conclusion, deep neural networks can be thought of as GPs in the infinite-width limit. The
+advantage is that we can use wide random layers without the need for training, we can quantify
+uncertainty, and we can leverage techniques from kernel machines. However, in general, it is not
+feasible to compute $f^\star$ and store $\mat{K}^{\ell}$. Furthermore, the expectations need to be
+computed, which is much less efficient than optimizing weights with gradient descent.

@@ -1,6 +1,6 @@
 \section{Neural tangent kernel}
 
-\paragraph{Linearized models.}
+\subsection{Linearized models}
 
 We can linearize a model $f[\vec{\theta}]$ by a first-order Taylor approximation over the
 parameters $\vec{\theta}_0$, \[
@@ -26,7 +26,7 @@ And, we make predictions by \[
 We now have a linearized network---along with a way of evaluating it---which is simply an
 approximation of a model with parameters $\vec{\theta}_0$.
 
-\paragraph{Training dynamics.}
+\subsection{Training dynamics}
 
 Consider the case where we wish to minimize the mean-squared error, \[
     \ell(\vec{\theta}) = \frac{1}{2} \| \vec{f}[\vec{\theta}] - \vec{y} \|^2, \quad \vec{f}[\vec{\theta}] \doteq [f[\vec{\theta}](\vec{x}_1), \ldots, f[\vec{\theta}](\vec{x}_n)].
@@ -60,7 +60,7 @@ close to $\vec{\theta}_0$. Whereas the linearized model treats $\vec{\theta}_0$ 
 sense, this approximation does not necessarily need to remain valid during the training dynamics of
 gradient descent.
 
-\paragraph{Infinite width.}
+\subsection{Infinite width}
 
 In practice, it has been found that as the width of a model is scaled, the parameters stay close to
 their initialization during gradient descent. One can prove that if the model is scaled to infinite
@@ -75,7 +75,7 @@ to solving a kernel regression problem with $k$ as we saw above. This provides a
 into why overparametrization works so well in practice and why such models generalize, despite
 having the obvious ability to overfit.
 
-\paragraph{NTK of an infinite-width MLP.}
+\subsection{NTK of an infinite-width MLP}
 
 Consider an MLP with $L$ layers and $m_l$ denoting the number of parameters in layer $l \in [L]$,
 where we initialize the parameters by \[
