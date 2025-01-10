@@ -1,0 +1,136 @@
+\section{Statistical learning theory}
+
+\subsection{Vapnik-Chervonenkis theory of machine learning}
+
+Let $\mathcal{F}$ be a function class and consider its functions $f \in \mathcal{F}$ to be binary
+classifiers. Then, the following denotes the set of possible classification outcomes over a dataset
+$\mathcal{D} \subseteq \mathcal{X} \times \mathcal{Y}$ with $n$ datapoints, \[
+    \mathcal{F}(\mathcal{D}) \doteq \{ [f(\vec{x}_1), \ldots, f(\vec{x}_n)] \mid f \in \mathcal{F} \}, \quad f: \mathcal{X} \to \{ 0,1 \}.
+\]
+Furthermore, the following denotes the maximal number of different classifications of a dataset of
+size $n$ that can be realized by functions in $\mathcal{F}$, \[
+    \mathcal{F}(n) \doteq \sup_{|\mathcal{D}| = n} | \mathcal{F}(\mathcal{D}) |.
+\]
+One says that $\mathcal{F}$ shatters $\mathcal{D}$ if $|\mathcal{F}(\mathcal{D})| = 2^n$, \ie,
+every possible labeling is realized by some function $f \in \mathcal{F}$. The VC dimensionality of
+a function class $\mathcal{F}$ is the maximum number of data points such that a dataset of that
+size is shattered by $\mathcal{F}$, \[
+    \mathrm{VCdim}(\mathcal{F}) \doteq \max_{n\in \mathcal{N}} \sup_{|\mathcal{D}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
+\]
+Let $\hat{\ell}: \mathcal{F} \to \R$ be the empirical loss function and $\ell: \mathcal{F} \to \R$
+the expected loss function. Under uniform convergence, one can prove the VC inequality, \[
+    \mathcal{P} \lft( \sup_{f \in \mathcal{F}} |\hat{\ell}(f) - \ell(f)| > \epsilon \rgt) \leq 8 |\mathcal{F}(n)| \exp \lft( -\frac{n \epsilon^2}{32} \rgt).
+\]
+Here, $|\hat{\ell} - \ell|$ is the generalization error. Note that if the VC dimensionality of
+$\mathcal{F}$ is bounded, then in the large sample size limit, the generalization error is bounded.
+In words, using this theorem, no generalization guarantees can be given if $\mathcal{F}$ can be fit
+to any labeling.
+
+\paragraph{Randomization experiments.}
+
+\citet{zhang2021understanding} experimented with the CIFAR-10 dataset, which is a classification
+dataset that labels images as one-of-ten classes. They observed the following
+\begin{enumerate}
+    \item Deep neural networks can perfectly fit the training data and obtain a competitive test error;
+    \item When randomly replacing training labels, the models can still perfectly fit the data. This shows
+          that the training data has been memorized perfectly;
+    \item The training time does not increase much when the labels are randomized, so it is not hard to find
+          memorization solutions;
+    \item When randomly shuffling pixels, the models can also perfectly fit the data. Hence, the inductive
+          bias of convolutional networks does not provide much benefit in this regard.
+\end{enumerate}
+These findings are unexplainable by learning theory. Since perfect classification is possible on
+random labelings, the model must have infinite capacity and hence the VC dimensionality is unbounded.
+As a result, the VC inequality cannot be applied to explain the generalization of the first
+observation.
+
+\paragraph{Double descent.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{double-descent}
+    \caption{Double descent curves.}
+    \label{fig:double-descent}
+\end{marginfigure}
+
+In recent years, the double descent phenomenon has been observed in overparameterized models. At
+first, the model will overfit at some point when it memorizes the training data. However, beyond
+that point, large models will eventually start getting even better test results than before the
+model overfit---see \Cref{fig:double-descent}.
+
+\paragraph{Flat minima.}
+
+\begin{marginfigure}
+    \centering
+    \incfig{flat-minima}
+    \caption{Flat minima lead to better generalization than sharp minima.}
+    \label{fig:flat-minima}
+\end{marginfigure}
+
+The flatness of local minima are linked to their generalization ability \citep{hochreiter1997flat}.
+If a minima is flat, small perturbations in the parameters will only have a small effect on
+performance---see \Cref{fig:flat-minima}. \citet{keskar2016large} showed that small-batch
+stochastic gradient descent leads to flatter minima, because of the introduced stochasticity.
+Similarly, weight averaging also improves flatness of found optima \citep{izmailov2018averaging}.
+Furthermore, entropy stochastic gradient descent is specifically designed to find flat minima by
+introducing Langevin dynamics to favor optima with high entropy \citep{chaudhari2019entropy}.
+
+\subsection{PAC Bayesian}
+
+Consider the $\nicefrac{0}{1}$ loss of a function $f$ on a sample $\vec{x}$ with binary label $y
+    \in \{ -1,1 \}$, \[
+    \mathbb{1}\{ f(\vec{x}) \neq y \} = \frac{1-y f(\vec{x})}{2}.
+\]
+
+\begin{lemma}
+    For any $p \geq q$ and $p$-measurable $X$, \[
+        \E_q[X] \leq D_{\mathrm{KL}}(q \| p) + \log \E_p[\exp(X)].
+    \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \log \E_p[\exp(X)] & \geq \log \E_q \lft[ \exp(X) \frac{p(X)}{q(X)} \rgt] \margintag{$p \geq q$.}                     \\
+                           & \geq \E_q \lft[ \log \lft( \exp(X) \frac{p(X)}{q(X)} \rgt) \rgt] \margintag{Jensen's inequality} \\
+                           & = \E_q[X] - \E_q[\log \frac{p(X)}{q(X)}]                                                         \\
+                           & = \E_q[X] - D_{\mathrm{KL}}(q \| p).
+    \end{align*}
+\end{proof}
+
+\begin{theorem}
+    For a fixed $p$, any $q$, and $\epsilon \in (0,1)$, we have the following with probability greater than or equal to $\epsilon$, \[
+        \E_q[\ell(f)] - \E_q[\hat{\ell}(f)] \leq \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
+    \]
+\end{theorem}
+
+Here, $p$ is a prior over the parameters, $q$ is the posterior computed from $n$ datapoints, and we
+bound the expected generalization gap over stochastic classifiers. This ensures a rate of
+$\bigo{\nicefrac{1}{\sqrt{n}}}$ on the generalization error without any hidden constants. However,
+this bound only applies to stochastic classifiers, not single classifiers.
+
+\paragraph{PAC Bayesian learning.}
+
+Let the prior be a Gaussian over parameters, \[
+    p = \mathcal{N}(\vec{0}, \lambda^2 \mat{I}).
+\]
+Then, parameterize a Gaussian model distribution, \[
+    q = \mathcal{N}(\vec{\theta}, \vec{\sigma}^2).
+\]
+Since the prior and posterior are Gaussian, we can compute their KL divergence in closed form, \[
+    D_{\mathrm{KL}}(q \| p) = \sum_{i=1}^{p} \log \frac{\lambda}{\sigma_i} + \frac{\sigma_i^2 + \theta_i^2}{2 \lambda^2} - \frac{1}{2}.
+\]
+We can then optimize the PAC Bayes bound to optimize the expected risk, \[
+    \ell_{\mathrm{PAC}}(q) \doteq \E_q[\hat{\ell}] + \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
+\]
+A good choice of $q$ involves one that achieves small empirical error $\hat{\ell}$ in expectation
+and is close to the prior. So, the PAC Bayes loss function effectively adds a regularization term.
+Generally, the prior has large variance, so $q$ must balance good empirical performance and
+retaining high variance such that small parameter perturbations do not influence performance.
+
+\citet{dziugaite2017computing} proposed applying stochastic gradient descent to the posterior distribution $q$ over parameters, \[
+    \vec{\theta} = \vec{\theta} - \eta \grad{\hat{\ell}(\tilde{\vec{\theta}})}{\vec{\theta}}, \quad \vec{\sigma} = \vec{\sigma} - \eta \grad{\hat{\ell}(\tilde{\vec{\theta}})}{\vec{\sigma}}, \quad \tilde{\vec{\theta}} \sim \mathcal{N}(\vec{\theta}, \vec{\sigma}^2).
+\]
+Backpropagation can be done by making use of the reparameterization trick, \[
+    \tilde{\vec{\theta}} = \vec{\theta} + \vec{\sigma} \odot \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
+\]
+
