@@ -1,0 +1,85 @@
+\section{Adversarial attacks}
+
+In adversarial attacks, the attacker wants to make small changes to the input of the model such
+that the model gives different results. This can have negative consequences in use cases such as
+automated driving, where the traffic signs may be perturbed to give the wrong signals to the car.
+Furthermore, it could also be used in medical classification and segmentation. Such attacks hint at
+fundamental differences in human and machine vision.
+
+\paragraph{$p$-norm robustness.}
+
+Consider a multi-class classifier, \[
+    f: \R^d \to \{ 1, \ldots, m \}.
+\]
+The goal of an adversarial attack is to find a perturbation $\vec{\eta}$ such that \[
+    f(\vec{x} + \vec{\eta}) \neq f(\vec{x}), \quad \| \vec{\eta} \|_p \leq \epsilon,
+\]
+where \[
+    \| \vec{x} \|_p \doteq \lft( \sum_{i=1}^{d} x_i^p \rgt)^{\nicefrac{1}{p}}, \quad \| \vec{x} \|_\infty \doteq \max_{i=1}^d |x_i|, \quad \| \vec{x} \|_0 \doteq |\{ i \mid x_i \neq 0 \}|. \margintag{Using $\infty$-norm, we get perturbation everywhere, whereas we only change a few pixels if we use $0$-norm.}
+\]
+We will focus on $p=2$ and an affine classifier that we wish to attack, \[
+    f(\vec{x}) = \argmax_{i=1}^m f_i(\vec{x}), \quad f_i(\vec{x}) = \transpose{\vec{w}_i} \vec{x} + b_i.
+\]
+Further consider a binary classifier---$m=2$. Assume $\vec{x}$ is currently classified as the first
+class, then we want $\vec{x} + \vec{\eta}$ to be classified as the second class. We need
+$f_2(\vec{x} + \vec{\eta}) > f_1(\vec{x} + \vec{\eta})$, so we have the following convex program,
+\begin{align*}
+    \min              & \quad \frac{1}{2} \| \vec{\eta} \|^2_2                          \\
+    \text{subject to} & \quad f_1(\vec{x} + \vec{\eta}) \leq f_2(\vec{x} + \vec{\eta}).
+\end{align*}
+This can be rewritten to
+\begin{align*}
+    \min              & \quad \frac{1}{2} \| \vec{\eta} \|_2^2                                               \\
+    \text{subject to} & \quad \transpose{(\vec{w}_1 - \vec{w}_2)} (\vec{x} + \vec{\eta}) + b_1 - b_2 \leq 0.
+\end{align*}
+The Lagrangian is written as \[
+    \mathcal{L}(\vec{\eta}, \lambda) = \frac{1}{2} \| \vec{\eta} \|_2^2 + \lambda \lft( \transpose{(\vec{w}_1 - \vec{w}_2)} (\vec{x} + \vec{\eta}) + b_1 - b_2 \rgt).
+\]
+By the KKT conditions, we have \[
+    \grad{\mathcal{L}(\vec{\eta}, \lambda)}{\vec{\eta}} = \vec{\eta} + \lambda (\vec{w}_1 - \vec{w}_2) \condeq \vec{0}.
+\]
+Hence, \[
+    \vec{\eta} = \lambda (\vec{w}_2 - \vec{w}_1).
+\]
+We only need to find the minimum $\lambda > 0$ such that
+\begin{align*}
+     &      & 0       & > f_1(\vec{x} + \lambda (\vec{w}_2 - \vec{w}_1)) - f_2(\vec{x} + \lambda(\vec{w}_2 - \vec{w}_1))        \\
+     & \iff & 0       & > \transpose{(\vec{w}_1 - \vec{w}_2)} \lft( \vec{x} + \lambda (\vec{w}_2 - \vec{w}_1) \rgt) + b_1 - b_2 \\
+     & \iff & 0       & > f_1(\vec{x}) - f_2(\vec{x}) - \lambda \| \vec{w}_1 - \vec{w}_2 \|_2^2                                 \\
+     & \iff & \lambda & > \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_1 - \vec{w}_2 \|^2_2}.
+\end{align*}
+In conclusion the optimal $\vec{\eta}$ is the following, \[
+    \vec{\eta} = \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_2 - \vec{w}_1 \|^2_2} \vec{w}_2 - \vec{w}_1.
+\]
+This can be generalized to any source class $i$ and target class $j$---if the target class does not
+matter, you take the most easily confusable class. In the general case, we can linearize the model
+and iteratively find the optimal adversarial perturbation \citep{moosavi2016deepfool}. This is done
+by iteratively solving the following convex program,
+\begin{align*}
+    \min              & \quad \| \vec{\delta} \|_p                                                                                              \\
+    \text{subject to} & \quad \transpose{\vec{\delta}} \lft( \grad{f_i(\vec{x})}{} - \grad{f_j(\vec{x})}{} \rgt) < f_i(\vec{x}) - f_j(\vec{x}).
+\end{align*}
+Then, update until $f_j(\vec{x} + \vec{\eta}_t) > f_i(\vec{x} + \vec{\eta}_t)$ \[
+    \vec{\eta}_t = \vec{\eta}_{t-1} + \vec{\delta}, \quad \vec{\eta}_0 = \vec{0}.
+\]
+
+\paragraph{Robust training.}
+
+Robust training is a systemic approach to making models robust to adversarial attacks. It works by
+extending the loss function to neighborhoods of training points, \[
+    \ell(\vec{x}) \mapsto \max_{\vec{\eta} : \| \vec{\eta} \|_p \leq \epsilon} \ell(\vec{x} + \vec{\eta}).
+\]
+This yields a two-player minimax game, where the adversary picks the worst perturbation and the
+learner picks the best parameters in response, \[
+    \argmin_{\vec{\theta} \in \Theta} \max_{\vec{\eta} : \| \vec{\eta} \|_p \leq \epsilon} \ell(\vec{x} + \vec{\eta}).
+\]
+The adversarial task can be solved with projected gradient ascent, \eg when $p=2$, we get \[
+    \vec{\eta}_{t+1} = \epsilon \cdot \Pi \lft( \vec{\eta}_t + \alpha \cdot \grad{\ell(\vec{x} + \vec{\eta}_t)}{\vec{x}} \rgt), \quad \Pi(\vec{z}) \doteq \frac{\vec{z}}{\| \vec{z} \|_2}.
+\]
+And with $p=\infty$, we get \[
+    \vec{\eta}_{t+1} = \epsilon \cdot \Pi \lft( \vec{\eta}_t + \alpha \cdot \mathrm{sgn} \lft( \grad{\ell(\vec{x} + \vec{\eta}_t)}{\vec{x}} \rgt) \rgt), \quad \Pi(\vec{z}) \doteq \frac{\vec{z}}{\| \vec{z} \|_\infty}.
+\]
+The fast gradient sign method \citep{goodfellow2014explaining} performs one iteration of projected
+gradient descent with $p=\infty$, resulting in the following adversarial choice, \[
+    \vec{\eta} = \epsilon \cdot \mathrm{sgn} \lft( \grad{\ell(\vec{x})}{\vec{x}} \rgt).
+\]
