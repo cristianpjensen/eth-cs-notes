@@ -6,7 +6,7 @@ automated driving, where the traffic signs may be perturbed to give the wrong si
 Furthermore, it could also be used in medical classification and segmentation. Such attacks hint at
 fundamental differences in human and machine vision.
 
-\paragraph{$p$-norm robustness.}
+\subsection{$p$-norm robustness}
 
 Consider a multi-class classifier, \[
     f: \R^d \to \{ 1, \ldots, m \}.
@@ -63,7 +63,7 @@ Then, update until $f_j(\vec{x} + \vec{\eta}_t) > f_i(\vec{x} + \vec{\eta}_t)$ \
     \vec{\eta}_t = \vec{\eta}_{t-1} + \vec{\delta}, \quad \vec{\eta}_0 = \vec{0}.
 \]
 
-\paragraph{Robust training.}
+\subsection{Robust training}
 
 Robust training is a systemic approach to making models robust to adversarial attacks. It works by
 extending the loss function to neighborhoods of training points, \[

@@ -1,15 +1,382 @@
 \section{Uncertainty quantification}
 
-TODO
-
 \subsection{Statistical model validation}
 
-TODO
+In statistical modeling, we typically want to predict a target random variable $Y \in \mathcal{Y}$
+given a random vector $\vec{X} \in \mathcal{X}$. Formally, we want to find a function $f:
+    \mathcal{X} \to \mathcal{Y}$ that minimizes the expected risk, \[
+    \mathcal{R}(f) \doteq \E_{\vec{X}, Y} [\mathbb{1}\{ f(\vec{X}) \neq Y \}].
+\]
+However, this function is intractable, because (1) we do not have access to the joint distribution
+over $\vec{X}, Y$, (2) it is intractable to find $f$ without any assumptions on its structure, and
+(3) it is unclear how to minimize the expectation of the indicator function. To resolve (1), we
+obtain a dataset of samples from the joint distribution. Problem (2) can be resolved by restricting
+the functions to a parameterized hypothesis space $\mathcal{H}$. Lastly, the solution to (3) is to
+approximate the indicator function by a differentiable loss function $\ell: \mathcal{Y} \times
+    \mathcal{Y} \to \R$. As a result, given a dataset $\mathcal{Z} = \{ (\vec{x}_i, y_i) \}_{i=1}^n$,
+we can approximate the expected risk by the empirical risk, \[
+    \hat{\mathcal{R}}(f) \doteq \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f(\vec{x}_i)).
+\]
+We denote the minimizer of this function by $\hat{f}$.
+
+Since $\hat{f}$ is obtained by training on the dataset $\mathcal{Z}$, we need to find a way to
+measure the performance of $\hat{f}$ on unseen data points---we want to estimate
+$\mathcal{R}(\hat{f})$. Furthermore, let $\mathcal{A}: \mathcal{P}(\mathcal{X} \times \mathcal{Y})
+    \to \mathcal{H}$ be the algorithm that maps datasets to functions, then we want to estimate its
+expected risk, \[
+    \mathcal{R}(\mathcal{A}) \doteq \E_{\mathcal{Z}} [\mathcal{R}(\mathcal{A}(\mathcal{Z}))].
+\]
+
+\paragraph{Cross-validation.}
+
+Cross-validation works as follows,
+\begin{enumerate}
+    \item Partition the data $\mathcal{Z}$ in $K$ equally sized disjoint subsets, such that \[
+              \mathcal{Z} = \bigcup_{k=1}^K \mathcal{Z}_k;
+          \]
+    \item Use $\mathcal{A}$ to produce $K$ estimators $\hat{f}^{-k}$ from $\mathcal{Z} - \mathcal{Z}_k$ for
+          all $k \in [K]$;
+    \item Estimate the expected risk by \[
+              \mathcal{R}^{\mathrm{CV}}(\mathcal{A}) \doteq \frac{1}{n} \sum_{i=1}^{n} \ell\lft(y_i, \hat{f}^{-(k(i))}(\vec{x}_i)\rgt),
+          \]
+          where $k: [n] \to [K]$ maps $i$ to the partition such that $\vec{x}_i \in \mathcal{Z}_{k(i)}$.
+\end{enumerate}
+In conclusion, the loss terms in the expected risk depend on approximators that have not seen the data it is evaluating.
+
+\paragraph{Bootstrap.}
+
+The bootstrap method is used for measuring the distribution over statistical parameters. It does so
+by creating $B$ bootstrap samples by sampling with replacement from the dataset. For each bootstrap
+sample, the parameters are computed. Using these parameters, we can estimate the variability and
+uncertainty of the parameter. Note that this works for any type of parameter that can be estimated
+from the dataset---not only model parameters. Let $S: \mathcal{P}(\mathcal{X} \times \mathcal{Y})
+    \to \R^d$ be a function that processes datasets and outputs parameters, then we can compute the
+statistics of this parameter as follows,
+\begin{enumerate}
+    \item Draw $B$ samples $\mathcal{Z}^{*b}$ of size $n$ from $\mathcal{Z}$ with replacement;
+    \item Compute an estimate $S(\mathcal{Z}^{*b})$ for each bootstrap sample.
+\end{enumerate}
+Now, we can use this set of parameter estimates to compute its statistics. For example, we can compute its mean and covariance,
+\begin{align*}
+    \vec{\mu}(S)    & = \frac{1}{B} \sum_{b=1}^{B} S\lft(\mathcal{Z}^{*b}\rgt)                                                                                             \\
+    \mat{\Sigma}(S) & = \frac{1}{B-1} \sum_{b=1}^{B}  \lft( S\lft(\mathcal{Z}^{*b}\rgt) - \mu(S) \rgt) \transpose{\lft( S\lft(\mathcal{Z}^{*b}\rgt) - \vec{\mu}(S) \rgt)}.
+\end{align*}
+The algorithm $\mathcal{A}$ is a function that processes a dataset and outputs an estimator, which
+is used to compute a loss term. We can use this to estimate the empirical risk across $n$ data
+points, \[
+    \hat{\mathcal{R}}^{\mathrm{BS}}(\mathcal{A}) \doteq \frac{1}{n \cdot B} \sum_{b=1}^{B} \sum_{i=1}^{n} \ell\lft(y_i, f^{*b}\lft(\vec{x}_i\rgt)\rgt).
+\]
+However, computing this validation metric includes data that the bootstrap estimates were trained
+on---the estimate is overly optimistic. Thus, we can use the bootstrap method to estimate the
+expected risk $\mathcal{R}(\mathcal{A})$ as follows, \[
+    \mathcal{R}^{\mathrm{BS}}(\mathcal{A}) \doteq \frac{1}{n} \sum_{i=1}^{n} \frac{1}{|\mathcal{C}^{-i}|} \sum_{b \in \mathcal{C}^{-i}} \ell\lft(y_i, \hat{f}^{*b}\lft(\vec{x}_i\rgt)\rgt),
+\]
+where $\mathcal{C}^{-i}$ contains the indices of the bootstraps that do not contain observation
+$(\vec{x}_i, y_i)$.
+
+In order to correct for the optimism of $\hat{\mathcal{R}}(\mathcal{A})^{\mathrm{BS}}$, we combine
+it with $\mathcal{R}^{\mathrm{BS}}$, \[
+    \mathcal{R}^{(0.632)} \doteq 0.368 \hat{\mathcal{R}}^{\mathrm{BS}} + 0.632 \mathcal{R}^{\mathrm{BS}}.
+\]
+Here, a weight of $0.632$ is used because that is the probability that a sample $(\vec{x}_i, y_i)$
+appears at least once in a bootstrap sample of size $n$, \[
+    1 - \lft( 1 - \frac{1}{n} \rgt)^n \to 1 - \frac{1}{e} = 0.632.
+\]
+TODO: Figure out why we are weighting it, because the optimism is already removed in
+$\mathcal{R}^{\mathrm{BS}}$.
+
+\subsection{Uncertainty in linear models}
+
+Suppose we have $n$ observations in our dataset $\{ (\vec{x}_i, y_i) \}_{i=1}^n$. Let $\mat{X} \in
+    \R^{n \times d}$ and $\vec{y} \in \R^n$ be the design matrix and output vector. We further assume \[
+    \vec{y} \mid \mat{X} \sim \mathcal{N} \lft( \mat{X} \vec{\beta}^{\star}, \sigma^2 \mat{I} \rgt).
+\]
+As we have seen before, the ordinary least squares estimator is computed as follows, \[
+    \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \transpose{\mat{X}} \vec{y}.
+\]
+Thus, we have the following distribution over estimators, \[
+    \hat{\vec{\beta}} \sim \mathcal{N}\lft( \vec{\beta}^\star, \sigma^2 \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \rgt).
+\]
+An unbiased estimator of $\sigma^2$ is \[
+    \hat{\sigma}^2 = \frac{1}{n-d} \sum_{i=1}^{n} \lft( \transpose{\hat{\vec{\beta}}} \vec{x}_i - y_i \rgt)^2.
+\]
+Thus, we can approximate an $1-\alpha$ confidence interval for $\beta^\star_j$ by \[
+    \hat{\beta_j} \pm z_{\nicefrac{\alpha}{2}} \hat{\epsilon} \lft( \hat{\beta}_j \rgt),
+\]
+where $z_{\nicefrac{\alpha}{2}} = \Phi^{-1}\lft( \nicefrac{\alpha}{2} \rgt)$, $\Phi$ is the CDF of
+the standard Gaussian, and $\epsilon(\hat{\beta}_j)$ is the $j$-th diagonal element of $\sigma^2
+    \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)}$
+
+TODO: Find out how the $1-\alpha$ confidence interval of $\beta^\star_j$ is computed.
+
+\subsection{Statistical testing}
+
+Assume we have a hypothesis set $\mathcal{H} = \{ p(\cdot \mid \vec{\theta}) \mid \vec{\theta} \in
+    \Theta \}$ and let $\vec{\theta}^\star \in \Theta$ be the (unknown) true parameter. Furthermore, we
+are given a null hypothesis $H_0: \vec{\theta}^\star \in \Theta_0$ and an alternative hypothesis
+$H_1: \vec{\theta}^\star \in \Theta_1$ for predefined $\Theta_0, \Theta_1 \subseteq \Theta$.
+Lastly, we are given $n$ samples $x_1, \ldots, x_n \sim p(\cdot \mid \vec{\theta}^\star)$ and a
+test statistic $t: \mathcal{X}^n \to \R$. The goal is to find a critical value $c \in \R$ for the
+test $t$ such that \[
+    \mathbb{P}\lft( t(X_1, \ldots, X_n) \geq c \mid \vec{\theta}\rgt)
+\]
+is ``low'' when $\vec{\theta} \in \Theta_0$ and ``high'' when $\vec{\theta} \in \Theta_1$. So, we
+accept the null hypothesis when the probability of the test statistic being greater than $c$ is low
+and we reject it if it is high.
+
+We want to minimize the probability of incorrectly choosing $H_1$ as this is worse than incorrectly
+choosing $H_0$. We can quantify this notion of risk as \[
+    \alpha_c \doteq \sup_{\vec{\theta} \in \Theta_0} \mathbb{P}(t(x_1, \ldots, x_n) \geq c \mid \vec{\theta}).
+\]
+Intuitively, this is the maximum probability of incorrectly choosing $H_1$, because the test is
+passed, but the null hypothesis holds. Note that $\alpha_c \to 0$ as $c \to \infty$. So, $c^\star
+    \to \infty$ minimizes the risk. But, this comes with the problem that we would never accept $H_1$.
+
+The solution to this problem is to forget about choosing the optimal critical value a priori and
+running an experiment to obtain a realization $x_1, \ldots, x_n$. We then run the test with the
+realization $t(x_1, \ldots, x_n)$ and compute the risk of the least risky critical value that would
+incorrectly reject $H_0$, \[
+    p = \inf_{c \in \R} \{ \alpha_c \mid t(x_1, \ldots, x_n) \geq c \}.
+\]
+One can show that this is the common $p$-value, \[
+    p \doteq \sup_{\vec{\theta} \in \Theta_0} \mathbb{P}(t(X_1, \ldots, X_n) \geq t(x_1, \ldots, x_n) \mid \vec{\theta}).
+\]
+Intuitively, this is the probability that the test is higher than our current observation if we run
+the experiment again.
+
+\paragraph{Wald test.}
+
+The Wald test is an example of a statistical test. Let $\hat{\theta}$ be an estimator of $\theta$
+with standard deviation $\hat{\sigma}$ that is asymptotically normal. Let the null hypothesis $H_0$
+be $\theta = \theta_0$ and alternative hypothesis $H_1$ be $\theta \neq \theta_0$, then the Wald
+test statistic is \[
+    W = \frac{(\hat{\theta} - \theta_0)^2}{\hat{\sigma}^2}.
+\]
+
+TODO: Figure out what the point of this is in the context of machine learning. Also, figure out how
+this can be done practically, because I have no idea how one would compute $\alpha_c$ or $p$.
 
 \subsection{Bayesian neural networks}
 
-TODO
+As we have seen, BLR incorporates Bayesian uncertainty into linear regression. In a similar
+fashion, BNNs (\textit{\textbf{B}ayesian \textbf{N}eural \textbf{N}etworks}) incorporate Bayesian
+inference into neural networks.
 
-\subsection{Transductive active learning}
+\paragraph{Neural networks.}
 
-TODO
+We define a neural network as having $L$ alternating linear layers and element-wise activation
+functions,
+\begin{align*}
+    \vec{z}_0      & = \vec{x}                                       \\
+    \vec{z}_\ell   & = \phi(\vec{a}_\ell)                            \\
+    \vec{a}_{\ell} & = \mat{W}_\ell \vec{z}_{\ell-1} + \vec{b}_\ell,
+\end{align*}
+where $\phi$ is a differentiable activation function and $\vec{a}$ is its pre-activation. The output of the neural network is then \[
+    f(\vec{x} \mid \vec{\theta}) = \vec{z}_L, \quad \vec{\theta} = \{ \mat{W}_{\ell}, \vec{b}_{\ell} \}_{\ell=1}^L.
+\]
+In practice, the weights of the neural network are chosen to minimize the empirical risk, \[
+    \hat{\vec{\theta}} \in \argmin_{\vec{\theta} \in \Theta} \hat{\mathcal{R}}(f(\cdot \mid \vec{\theta})) \doteq \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f(\vec{x}_i \mid \vec{\theta})).
+\]
+In general, the weights are optimized by gradient descent, \[
+    \vec{\theta}_t = \vec{\theta}_{t-1} - \eta_t \grad{\hat{\mathcal{R}}(f(\cdot \mid \vec{\theta}_{t-1}))}{\vec{\theta}}.
+\]
+
+\margintag{TODO: Justify stochastic gradient descent with Robbins-Monro algorithm.}
+
+For large datasets, it is too expensive to compute the gradient, so we instead use SGD
+(\textit{\textbf{S}tochastic \textbf{G}radient \textbf{D}escent}), which replaces the gradient by
+an unbiased estimate, \[
+    \vec{\theta}_t = \vec{\theta}_{t-1} - \eta_t \grad{\lft( \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \ell(y_i, f(\vec{x}_i \mid \vec{\theta}_{t-1})) \rgt)}{\vec{\theta}}, \quad \mathcal{B} \subseteq [n],
+\]
+where $\mathcal{B}$ contains uniformly sampled sample indices.
+
+\paragraph{Bayesian.}
+
+The disadvantage of (stochastic) gradient descent is that it yields only a single point estimate of
+the weights. There is no quantification of uncertainty in this estimate, which leads to
+overconfidence problems that can result in poor generalization in the presence of domain shifts. We
+will use a Bayesian approach to alleviate this problem.
+
+\margintag{The Bayesian approach always has three steps---(1) define a prior, (2) define a likelihood, and (3) use Bayes rule to compute the posterior.}
+
+We must first define a prior $p(\vec{\theta})$ over the weights $\vec{\theta} \in \Theta$, \[
+    \vec{\theta} \sim \mathcal{N}(\vec{0}, \sigma^2 \mat{I}).
+\]
+Then, we can define the likelihood function $p(\mathcal{D} \mid \vec{\theta})$ that computes the
+likelihood of the dataset $\mathcal{Z}$ for a given $\vec{\theta}$, \[
+    p(\mathcal{Z} \mid \vec{\theta}) = \prod_{(\vec{x}, y) \in \mathcal{Z}} p(y \mid \vec{x}, \vec{\theta}),
+\]
+where $p(y\mid \vec{x}, \vec{\theta})$ is a probability computed by the neural network. Lastly, we
+use Bayes rule to compute the posterior over weights, \[
+    p(\vec{\theta} \mid \mathcal{Z}) = \frac{p(\vec{\theta}) p(\mathcal{Z} \mid \vec{\theta})}{p(\mathcal{Z})}.
+\]
+The problem is that $p(\mathcal{Z}) = \int p(\vec{\theta}) p(\mathcal{Z} \mid \vec{\theta})
+    \mathrm{d}\vec{\theta}$ is intractable. The solution is VI (\textit{\textbf{V}ariational
+    \textbf{I}nference})---search a distribution family $\mathcal{Q}$ for the closest distribution to
+the posterior.\sidenote{$\mathcal{Q}$ is often called the variational family.} We do this by
+minimizing the KL divergence between the two, \[
+    q^\star \in \argmin_{q \in \mathcal{Q}} D_{\mathrm{KL}}(q \| p).
+\]
+In our case, we will search the space of isotropic Gaussians. \Ie, we search for some mean vector
+$\vec{\mu} \in \R^p$ and standard deviation $\sigma > 0$ to form the following distribution, \[
+    q = \mathcal{N}(\vec{\mu}, \sigma^2 \mat{I}).
+\]
+Thus, we have the following optimization problem, \[
+    \vec{\mu}^\star, \sigma^\star \in \argmin_{\vec{\mu} \in \R^p, \sigma > 0} D_{\mathrm{KL}}\lft(\mathcal{N}\lft(\vec{\mu}, \sigma^2 \mat{I}\rgt) \| p(\vec{\theta} \mid \mathcal{Z})\rgt).
+\]
+Note that this problem does not have an analytical solution, so we must optimize it with
+(stochastic) gradient descent. The KL divergence can be rewritten to
+\begin{align*}
+    D_{\mathrm{KL}}(q \| p) & \doteq \E_{\vec{\theta} \sim q} \lft[ \log \frac{q(\vec{\theta})}{p(\vec{\theta} \mid \mathcal{Z})} \rgt]                         \\
+                            & \propto \E_{\vec{\theta} \sim q} \lft[ \log q(\vec{\theta}) - \log p(\mathcal{Z} \mid \vec{\theta}) - \log p(\vec{\theta}) \rgt].
+\end{align*}
+Let \[
+    F(\vec{\mu}, \sigma, \vec{\theta}) \doteq \log q(\vec{\theta}; \vec{\mu}, \sigma) - \log p(\mathcal{Z} \mid \vec{\theta}) - \log p(\vec{\theta}),
+\]
+then we can derive the gradients to be
+\begin{align*}
+    \grad{D_{\mathrm{KL}}(q(\vec{\mu}, \sigma) \| p(\vec{\theta} \mid \mathcal{Z}))}{\vec{\mu}} & = \E_{\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})} \lft[ \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\theta}} + \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\mu}} \rgt] \margintag{We use the reparameterization trick to obtain $\vec{\theta}$, \[ \vec{\theta} = \vec{\mu} + \sigma \vec{\epsilon}. \]} \\
+    \grad{D_{\mathrm{KL}}(q(\vec{\mu}, \sigma) \| p(\vec{\theta} \mid \mathcal{Z}))}{\sigma}    & = \E_{\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})} \lft[ \transpose{\vec{\epsilon}} \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\theta}} + \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\sigma} \rgt].
+\end{align*}
+We can then approximate the gradients by making a single sample Monte Carlo estimate and apply
+gradient descent to optimize the weights.
+
+\subsection{Information-based transductive learning}
+
+\begin{marginfigure}[8cm]
+    \centering
+    \incfig{active-learning}
+    \caption{Space of active learning.}
+    \label{fig:active-learning}
+\end{marginfigure}
+
+We are given a domain $\mathcal{X}$ that contains a safe area $\mathcal{S} \subseteq \mathcal{X}$
+and area of interest $\mathcal{A} \subseteq \mathcal{X}$. Furthermore, we have an unknown function
+$f^\star: \mathcal{X} \to \R$ that we wish to explore within $\mathcal{A}$. For any point in the
+safe area $\vec{x} \in \mathcal{S}$, we can query noisy observations, \[
+    y_{\vec{x}} = f^\star(\vec{x}) + \epsilon_{\vec{x}}, \quad \E[\epsilon_x] = 0.
+\]
+However, this is prohibitively expensive in some way, so we want to minimize the amount of queries.
+So, for every query we make, we want to maximize the amount of information that we receive.
+Formally, given $n-1$ previous samples $\mathcal{D}_{n-1} = \{ (\vec{x}_i, y_i) \}_{i=1}^{n-1}
+    \subseteq \mathcal{S} \times \R$, we want to find the next point $\vec{x}_n$ that will give the
+most information about $f$ in the area of interest $\mathcal{A}$.
+
+In ITL (\textit{\textbf{I}nformation-based \textbf{T}ransductive \textbf{L}earning})
+\citep{hubotter2024information}, the next point is selected as follows, \[
+    \vec{x}_n \in \argmax_{\vec{x} \in \mathcal{S}} \mathrm{I} \lft( \vec{f}_{\mathcal{A}}; y_{\vec{x}} \mid \mathcal{D}_{n-1} \rgt).
+\]
+Intuitively, we are looking for a point $\vec{x} \in \mathcal{S}$ that maximizes the conditional
+mutual information between $y_{\vec{x}}$ and $f$ restricted to $\mathcal{A}$. When $f \sim
+    \mathcal{GP}(\mu, k)$ with known mean function $\mu$ and kernel $k$, one can show \[
+    \mathrm{I} \lft( \vec{f}_{\mathcal{A}}; y_{\vec{x}} \mid \mathcal{D}_{n-1} \rgt) = \frac{1}{2} \log \lft( \frac{\Var[y_{\vec{x}} \mid \mathcal{D}_{n-1}]}{\Var[y_{\vec{x}} \mid \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1}]} \rgt).
+\]
+
+\begin{proof}
+    TODO: Look at exercises.
+\end{proof}
+
+Next, we will look at special cases of ITL.
+
+\paragraph{Safe Bayesian optimization.}
+
+In safe Bayesian optimization, we want to find the maximum of an unknown function $f^\star$, which
+is done by iteratively choosing points $\vec{x}$ and observing their realizations $y =
+    f^\star(\vec{x}) + \epsilon_{\vec{x}}$. Furthermore, there is an unknown function $g^\star$ that
+defines the safe area, \[
+    \mathcal{S}^\star = \{ \vec{x} \in \mathcal{X} \mid g^\star(\vec{x}) \geq 0 \}.
+\]
+We also observe the realizations of this function $z = g^\star(\vec{x})$. Now, we want to
+iteratively select points such that we find the maximum of $f^\star$ while staying within
+$\mathcal{S}^\star$.
+
+Assume we are given $n-1$ points again $\{ (\vec{x}_i, y_i, z_i) \}_{i=1}^{n-1}$. We then fit a GP
+$f$ on $\{ (\vec{x}_i, y_i) \}_{i=1}^{n-1}$, which induces a lower bound function $\ell_n^f$ and an
+upper bound function $u_n^f$, such that $\lft[\ell_n^f(\vec{x}), u_n^f(\vec{x})\rgt]$ is the $95\%$
+confidence interval of $\E[f(\vec{x})]$ for any $\vec{x} \in \mathcal{X}$. Similarly, we fit a GP
+$g$ on $\{ (\vec{x}_i, z_i) \}_{i=1}^{n-1}$, which analogously produces two functions $\ell_n^g$
+and $u_n^g$. These induce the pessimistic and optimistic estimates of the safe set, \[
+    \mathcal{S}_n \doteq \lft\{ \vec{x} \;\middle|\; \ell_n^g(\vec{x}) \geq 0 \rgt\}, \quad \hat{\mathcal{S}}_n \doteq \lft\{ \vec{x} \;\middle|\; u_n^g(\vec{x}) \geq 0 \rgt\}.
+\]
+Further, we define the area of interest, \[
+    \mathcal{A}_n \doteq \lft\{ \vec{x} \in \hat{\mathcal{S}}_n \;\middle|\; u_n^f(\vec{x}) \geq \max_{\vec{x}' \in \mathcal{S}_n} \ell_n^f(\vec{x}') \rgt\}.
+\]
+Lastly, we can apply ITL using safe set $\mathcal{S}_n$ and area of interest $\mathcal{A}_n$.
+
+\begin{marginfigure}
+    \centering
+    \incfig{safe-bayesian-optimization}
+    \caption{Safe Bayesian optimization.}
+    \label{fig:safe-bayesian-optimization}
+\end{marginfigure}
+
+\paragraph{Batch active learning.}
+
+In batch active learning, we do not select a single point at a time, but we select a batch of
+points. Formally, we are given an unknown function $f: \mathcal{X} \to \mathcal{Y}$ that we wish to
+explore, a population set $X = \{ \vec{x}_1, \ldots, \vec{x}_m \} \subseteq \mathcal{X}$, and a
+budget $b \leq m$. The goal is to find a subset $L \subseteq X$ such that $|L| = b$ for which we
+query the oracle $\{ f(\vec{x}) \mid \vec{x} \in L \}$.
+
+We define $B_{\delta}(\vec{x})$ as the set of the $\delta$-radius ball of points around $\vec{x}$, \[
+    B_{\delta}(\vec{x}) \doteq \{ \vec{x}' \in \mathcal{X} \mid \| \vec{x} - \vec{x}' \| \leq \delta \}.
+\]
+We call $B_{\delta}(\vec{x})$ ``pure'' if $f$ is constant all over $B_{\delta}(\vec{x})$, \ie,
+every point in a ball around $\vec{x}$ is classified as the same class. Further, $C(L, \delta)$ is
+the union of all balls of the chosen subset of points $L \subseteq X$, \[
+    C(L, \delta) \doteq \bigcup_{\vec{x} \in L} B_{\delta}(\vec{x}).
+\]
+Further, we define
+\begin{align*}
+    C_r(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) = f(\vec{x}) \} \margintag{$r$ stands for ``right''.}     \\
+    C_w(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) \neq f(\vec{x}) \}, \margintag{$w$ stands for ``wrong''.}
+\end{align*}
+where $\hat{f}$ is a classifier of the space $\mathcal{X}$. Note $C(L, \delta) = C_r(L, \delta) \cup C_w(L, \delta)$.
+Lastly, we define $\pi(\delta)$ to be the total probability density of points that have an impure
+$\delta$-radius ball, \[
+    \pi(\delta) \doteq \mathbb{P}\lft( \lft\{ \vec{x} \in \mathcal{X} \;\middle|\; \text{$B_{\delta}(\vec{x})$ is not pure} \rgt\} \rgt).
+\]
+Note that $\pi$ increases with $\delta$. Suppose we know $\mathcal{Z} = \{ (\vec{x}, f(\vec{x}))
+    \mid \vec{x} \in L \}$, then denote the fitted 1-nearest neighbor classifier on this dataset as
+$\hat{f}$.
+
+\begin{marginfigure}
+    \centering
+    \incfig{batch-active-learning}
+    \caption{Batch active learning. The dashed line is the fitted 1-nearest neighbor classifier on this dataset. Here, $C_w(L, \delta)$ denotes the black area and $C_r(L, \delta)$ denotes the gray area.}
+    \label{fig:batch-active-learning}
+\end{marginfigure}
+
+\begin{marginfigure}
+    \centering
+    \incfig{batch-active-learning-pi}
+    \caption{$\pi(\delta)$ is the probability density of the marked area, which is the space of impure data points under a given $\delta$.}
+    \label{fig:batch-active-learning-pi}
+\end{marginfigure}
+
+We have $C_w(L, \delta) \subseteq \{ \vec{x} \in \mathcal{X} \mid \text{$B_{\delta}(\vec{x})$ is
+        not pure} \}$. (This can easily be verified using
+\Cref{fig:batch-active-learning,fig:batch-active-learning-pi}.) So, we have \[
+    \mathbb{P}(C_w(L, \delta)) \leq \pi(\delta).
+\]
+Furthermore, looking at \Cref{fig:batch-active-learning}, we can easily see the following \[
+    \{ \vec{x} \in \mathcal{X} \mid \hat{f}(\vec{x}) \neq f(\vec{x}) \} \subseteq C_r^c \cup C_w \subseteq C^c \cup \{ \vec{x} \mid \text{$B_{\delta}(\vec{x})$ is not pure} \},
+\]
+where $A^c$ denotes the complement of a set $A$. As a result,
+\begin{align*}
+    \mathcal{R}(\hat{f}) & \doteq \E[\mathbb{1}\{ \hat{f}(\vec{x}) \neq f(\vec{x}) \}] \\
+                         & = \mathbb{P}( \hat{f}(\vec{x}) \neq f(\vec{x}))             \\
+                         & \leq 1 - \mathbb{P}\lft( C(L, \delta) \rgt) + \pi(\delta).
+\end{align*}
+We want to choose $L$ and $\delta$ that minimize $\mathcal{R}(\hat{f})$. This is
+intractable, so we minimize the upper bound instead. This is done by picking $\delta$ first and
+then choosing $L$ that maximizes $\mathbb{P}(C(L, \delta))$. \Ie, we want to solve \[
+    L^\star \in \argmax_{L \subseteq X, |L|=b} \mathbb{P}\lft( \bigcup_{\vec{x} \in L} B_{\delta}(\vec{x}) \rgt).
+\]
+This has two problems---the distribution of $\vec{x}$ is unknown and this problem is NP hard. We
+address the first problem by approximating the distribution with the empirical distribution induced
+by $X$. As a result, we get the following optimization problem, \[
+    L^\star \in \argmax_{L \subseteq X, |L| = b} \frac{1}{|X|} \lft| \lft\{ \vec{x}' \in X \;\middle|\; \| \vec{x}' - \vec{x} \| \leq \delta, \exists \vec{x} \in L \rgt\} \rgt|.
+\]
+We circumvent the second problem by greedily picking points with the most other points in its ball
+that are not within the ball of previously picked points.
