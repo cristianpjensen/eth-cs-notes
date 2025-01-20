@@ -1,7 +1,265 @@
 \section{Convex optimization}
 
-TODO
+In standard form, an optimization problem looks as follows,
+\begin{align*}
+    \text{minimize}   & \quad f(\vec{x})                                    \\
+    \text{subject to} & \quad g_i(\vec{x}) = 0, \quad \forall i \in [n]     \\
+                      & \quad h_j(\vec{x}) \leq 0, \quad \forall j \in [m],
+\end{align*}
+This is called a convex program if $f$ and all $h_j$ are convex and all $g_i$ are affine.
+We will focus on convex programming. The constraints define a convex set
+$\mathcal{C} \subseteq \mathcal{X}$, where $\mathcal{X}$ is the intersection of domains of $f$ and
+all constraints. For our purposes, let $\mathcal{X} = \R^d$. The aim is to compute \[
+    \argmin_{\vec{x} \in \mathcal{C}} f(\vec{x}).
+\]
+
+\begin{definition}[Lagrangian dual function]
+    For an optimization problem, the Lagrangian $\mathcal{L}: \mathcal{X} \times \R^n \times \R^m \to \R$ is defined as \[
+        \mathcal{L}(\vec{x}, \vec{\lambda}, \vec{\alpha}) \doteq f(\vec{x}) + \sum_{i=1}^{n} \lambda_i g_i(\vec{x}) + \sum_{j=1}^{m} \alpha_j h_j(\vec{x}).
+    \]
+    The scalars $\lambda_i$ and $\alpha_j$ are called Lagrange multipliers. The Lagrange dual function
+    $\delta: \R^n \to \R^m \to \R \cup \{ -\infty \}$ is defined as \[
+        \theta(\vec{\lambda}, \vec{\alpha}) \doteq \inf_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}, \vec{\alpha}).
+    \]
+\end{definition}
+
+\begin{lemma}[Weak duality] \label{lem:weak-duality}
+    Let $\vec{x} \in \mathcal{C}$ (so it satisfies all constraints), $\vec{\lambda} \in \R^n$, $\vec{\alpha} \in \R^m$ with $\vec{\alpha} \geq \vec{0}$, and $\theta$ be the Lagrange dual function, then \[
+        \theta(\vec{\lambda}, \vec{\alpha}) \leq f(\vec{x}).
+    \]
+    The dual Lagrange function lower bounds the primal solution.
+\end{lemma}
+
+\begin{proof}
+    Define $\vec{x}$, $\vec{\lambda}$, and $\vec{\alpha}$ as in \Cref{lem:weak-duality}, then we have
+    \begin{align*}
+        \theta(\vec{\lambda}, \vec{\alpha}) & \doteq \inf_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}, \vec{\alpha})     \\
+                                            & \leq \mathcal{L}(\vec{x}, \vec{\lambda}, \vec{\alpha})                                      \\
+                                            & = f(\vec{x}) + \sum_{i=1}^{n} \lambda_i g_i(\vec{x}) + \sum_{j=1}^{m} \alpha_j h_j(\vec{x}) \\
+                                            & \leq f(\vec{x}). \margintag{We have $g_i(\vec{x}) = 0$ and $\alpha_j h_j(\vec{x}) \leq 0$.}
+    \end{align*}
+    This concludes the proof.
+\end{proof}
+
+As shown in \Cref{lem:weak-duality}, the Lagrange dual function $\theta$ lower bounds the primal
+$f$ for all $\vec{x} \in \mathcal{C}$, $\vec{\lambda}$, and $\vec{\alpha} \geq \vec{0}$. We are
+interested in the maximum lower bound, which results in the dual program,
+\begin{align*}
+    \text{maximize}   & \quad \theta(\vec{\lambda}, \vec{\alpha})       \\
+    \text{subject to} & \quad \alpha_i \geq 0, \quad \forall i \in [n].
+\end{align*}
+This is a convex program, even if the primal is not convex.
+
+\begin{corollary}
+    \[
+        \max_{\vec{\lambda}, \vec{\alpha} \geq \vec{0}} \theta(\vec{\lambda}, \vec{\alpha}) \leq \min_{\vec{x} \in \mathcal{C}} f(\vec{x}).
+    \]
+\end{corollary}
+
+\begin{lemma}[Sufficient condition for strong duality]
+    If Slater's condition holds (there exists an $\vec{x} \in \mathcal{C}$ such that $h_j(\vec{x}) < 0$
+    for all $j \in [m]$), then we have strong duality, \[
+        \max_{\vec{\lambda},\vec{\alpha} \geq \vec{0}} \theta(\vec{\lambda}, \vec{\alpha}) = \min_{\vec{x} \in \mathcal{X}} f(\vec{x}).
+    \]
+\end{lemma}
+
+For most problems, a Slater point exists. So, most of the time, strong duality holds. If all $g_i$
+and $h_j$ are differentiable, then the Karush-Kuhn-Tucker (KKT) conditions provide necessary
+conditions for strong duality.
+
+\begin{lemma}[KKT necessary conditions for strong duality] \label{lem:kkt}
+    Let $\vec{x}^\star$ and $(\vec{\lambda}^\star, \vec{\alpha}^\star)$ be feasible solutions to the
+    primal and dual problems. Further, assume that strong duality holds. Then,
+    \begin{align*}
+        \alpha_j^\star h_j(\vec{x}^\star)                                                   & = 0, \quad \forall j \in [m] \margintag{Complementary slackness.}                                                                                                                                          \\
+        \grad{\mathcal{L}(\vec{x}^\star, \vec{\lambda}^\star, \vec{\alpha}^\star)}{\vec{x}} & = \grad{f(\vec{x}^\star)}{} + \sum_{i=1}^{n} \lambda^\star_i \grad{g_i(\vec{x}^\star)}{} + \sum_{j=1}^{m} \alpha^\star_j \grad{h_j(\vec{x}^\star)}{} = \vec{0}. \margintag{Vanishing Lagrangian gradient.}
+    \end{align*}
+    The second condition can also be written as the following if $\mathcal{L}$ is finite, \[
+        \vec{x}^\star \in \argmin_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}^\star, \vec{\alpha}^\star).
+    \]
+\end{lemma}
+
+\begin{proof}
+    Define $\vec{x}^\star$, $\vec{\lambda}^\star$, and $\vec{\alpha}^\star$ as in \Cref{lem:kkt}, then we get the Master equation,
+    \begin{align*}
+        f(\vec{x}^\star) & = \theta(\vec{\lambda}^\star, \vec{\alpha}^\star) \margintag{Strong duality.}                                                  \\
+                         & \doteq \inf_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}^\star, \vec{\alpha}^\star)                            \\
+                         & \leq \mathcal{L}(\vec{x}^\star, \vec{\lambda}^\star, \vec{\alpha}^\star)                                                       \\
+                         & \doteq f(\vec{x}^\star) + \sum_{i=1}^{n} \lambda^\star_i g_i(\vec{x}^\star) + \sum_{j=1}^{m} \alpha^\star_j h_j(\vec{x}^\star) \\
+                         & \leq f(\vec{x}^\star). \margintag{We have $g_i(\vec{x}) = 0$ and $\alpha_j h_j(\vec{x}) \leq 0$.}
+    \end{align*}
+    Thus, all inequalities become equalities. The first condition comes from the second-to-last and last line,
+    which results in $\alpha_j^\star h_j(\vec{x}^\star) = 0$ for all $j \in [m]$. The second
+    condition comes from the second and third line, where there must be vanishing gradient, because
+    $\vec{x}^\star$ is the minimizer of $\mathcal{L}(\vec{x}, \vec{\lambda}^\star, \vec{\alpha}^\star)$.
+\end{proof}
+
+\begin{lemma}[KKT sufficient conditions for strong duality]
+    Let the primal be a convex program. Further, let $\vec{x}^\star$ and $(\vec{\lambda}^\star,
+        \vec{\alpha}^\star)$ be feasible solutions to the primal and dual, respectively. Lastly, let the KKT conditions hold,
+    \begin{align*}
+        \alpha_j^\star h_j(\vec{x}^\star)                                                   & = 0, \quad \forall j \in [m] \\
+        \grad{\mathcal{L}(\vec{x}^\star, \vec{\lambda}^\star, \vec{\alpha}^\star)}{\vec{x}} & = \vec{0}.
+    \end{align*}
+    Then, strong duality holds.
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        f(\vec{x}^\star) & = f(\vec{x}^\star) + \sum_{i=1}^{n} \lambda_i g_i(\vec{x}^\star) + \sum_{j=1}^{m} \alpha_j h_j(\vec{x}^\star) \margintag{$\vec{x}^\star$ is feasible and we have complementary slackness.}                                                                                                                                                                                                                                \\
+                         & = \mathcal{L}(\vec{x}^\star, \vec{\lambda}^\star, \vec{\alpha}^\star)                                                                                                                                                                                                                                                                                                                                                     \\
+                         & = \inf_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}^\star, \vec{\alpha}^\star) \margintag{$\mathcal{L}$ is convex, because convexity is preserved under summation and positive scaling. Also, affine functions remain convex under negative scaling. Furthermore, we have vanishing gradient, so $\vec{x}^\star$ is a global minimizer of $\mathcal{L}(\cdot, \vec{\lambda}^\star, \vec{\alpha}^\star)$.} \\
+                         & \doteq \theta(\vec{\lambda}^\star, \vec{\alpha}^\star).
+    \end{align*}
+\end{proof}
 
 \subsection{Support vector machine}
 
-TODO
+\begin{marginfigure}[7cm]
+    \centering
+    \incfig{svm}
+    \caption{Support vector machines.}
+    \label{fig:svm}
+\end{marginfigure}
+
+In SVMs (\textit{\textbf{S}upport \textbf{V}ector \textbf{M}achines}), we are given a dataset with
+binary labels and we want to find the linear separator with the maximum margin. Formally, we are
+given data $\{ (\vec{x}_1, y_1), \ldots, (\vec{x}_n, y_n) \} \subseteq \R^d \times \{ -1, +1 \}$
+and we model the linear separator as \[
+    f[\vec{w}, b](\vec{x}) \doteq
+    \begin{cases}
+        +1 & \transpose{\vec{w}} \vec{x} + b > 0  \\
+        -1 & \transpose{\vec{w}} \vec{x} + b < 0.
+    \end{cases}
+\]
+We want to model this as a convex program, so we need to get rid of the strict inequality and the
+cases. We are given the dataset, so we can use information of $y$ to reverse the inequality if
+necessary. Furthermore, we introduce a small scalar $\epsilon > 0$ to get a non-strict inequality, \[
+    f[\vec{w}, b](\vec{x}, y) = y \lft( \transpose{\vec{w}} \vec{x} + b \rgt) \geq \epsilon > 0.
+\]
+Now, we have the following optimization problem,
+\begin{align*}
+    \text{maximize}   & \quad m(\vec{w}, b)                                                                             \\
+    \text{subject to} & \quad y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \geq \epsilon, \quad \forall i \in [n],
+\end{align*}
+where $m: \R^d \times \R \to \R$ is the margin function. The margin function is the minimum distance
+of any point to the linear separator. Let $\vec{x}^+$ and $\vec{x}^-$ be the positive and negative
+support vectors, where a support vector is a point that touches the margin---see \Cref{fig:svm}. Then, we have the following definition of the margin,
+\begin{align*}
+    2 \cdot m(\vec{w}, b) & \doteq \| \mathrm{proj}_{\vec{w}}(\vec{x}^+) - \mathrm{proj}_{\vec{w}}(\vec{x}^-) \|                                                          \\
+                          & = \lft\| \frac{\transpose{\vec{w}} \vec{x}^+}{\| \vec{w} \|^2} \vec{w} - \frac{\transpose{\vec{w}} \vec{x}^-}{\| \vec{w} \|^2} \vec{w} \rgt\| \\
+                          & = \frac{\lft| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- \rgt|}{\| \vec{w} \|^2} \| \vec{w} \|                             \\
+                          & = \frac{\lft| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- \rgt|}{\| \vec{w} \|}                                             \\
+                          & = \lft| \transpose{\lft( \frac{\vec{w}}{\| \vec{w} \|} \rgt)} (\vec{x}^+ - \vec{x}^-) \rgt|,
+\end{align*}
+where $\bar{\vec{w}}$ is a normalized $\vec{w}$. Note that the margin does not depend on the norm of
+$\vec{w}$ or the intercept $b$---it only depends on the direction of $\vec{w}$. As a result, there are an
+infinite number of solutions, which results in an ill-posed problem. However, only one solution
+$(\vec{w},b)$ will satisfy \[
+    \transpose{\vec{w}}\vec{x}^+ + b = 1, \quad \transpose{\vec{w}} \vec{x}^- + b = -1.
+\]
+Under this constraint, the margin can be computed as follows, \[
+    2 \cdot m(\vec{w}, b) = \frac{2}{\| \vec{w} \|},
+\]
+because $| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- | = | 1 - (-1) | = 2$.
+Thus, we get the following convex program,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 \margintag{Minimizing $\nicefrac{1}{f(\vec{x})}$ is equivalent to maximizing $f(\vec{x})$.} \\
+    \text{subject to} & \quad 1 - y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \leq 0, \quad \forall i \in [n].
+\end{align*}
+It is easy to see that this convex program has a Slater point. Let $(\vec{w}, b)$ be a solution to the convex program, so \[
+    y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \geq 1, \quad \forall i \in [n].
+\]
+Then, $(\gamma \vec{w}, \gamma b)$ for $\gamma > 1$ is a Slater point, because for all $i \in [n]$,
+we have \[
+    y_i \lft(\gamma \transpose{\vec{w}} \vec{x}_i + \gamma b \rgt) = \gamma y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) > y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \geq 1.
+\]
+Hence, strong duality holds and we can use the KKT conditions to find the minimizer
+$\vec{x}^\star$.
+
+This convex program has the following Lagrangian,
+\begin{align*}
+    \mathcal{L}(\vec{w}, b, \vec{\alpha}) & = \frac{1}{2} \| \vec{w} \|^2 + \sum_{i=1}^{n} \alpha_i \lft( 1 - y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \rgt), \quad \alpha_i \geq 0     \\
+                                          & = \frac{1}{2} \| \vec{w} \|^2 + \sum_{i=1}^{n} \alpha_i - \transpose{\vec{w}} \sum_{i=1}^{n} \alpha_i y_i \vec{x}_i - b \sum_{i=1}^{n} \alpha_i y_i.
+\end{align*}
+This function has the following gradients,
+\begin{align*}
+    \pdv{\mathcal{L}(\vec{w}, b, \vec{\alpha})}{\vec{w}} & = \vec{w} - \sum_{i=1}^{n} \alpha_i y_i \vec{x}_i \\
+    \pdv{\mathcal{L}(\vec{w}, b, \vec{\alpha})}{b}       & = - \sum_{i=1}^{n} \alpha_i y_i.
+\end{align*}
+From the vanishing Lagrangian gradient KKT condition, we know \[
+    \pdv{\mathcal{L}(\vec{w}^\star, b^\star, \vec{\alpha})}{\vec{w}} = \vec{0} \implies \vec{w}^\star = \sum_{i=1}^{n} \alpha_i y_i \vec{x}_i.
+\]
+Furthermore, we get the following constraint on $\alpha_i$, \[
+    \pdv{\mathcal{L}(\vec{w}^\star, b^\star, \vec{\alpha})}{b} = 0 \implies \sum_{i=1}^{n} \alpha_i y_i = 0.
+\]
+Thus, we have the following dual program,
+\begin{align*}
+    \text{maximize}   & \quad \theta(\vec{\alpha}) \doteq \mathcal{L}(\vec{w}^\star, b^\star, \vec{\alpha}) \\
+    \text{subject to} & \quad \alpha_i \geq 0, \quad \forall i \in [n]                                      \\
+                      & \quad \sum_{i=1}^{n} \alpha_i y_i = 0.
+\end{align*}
+We can simplify the Lagrangian by making use of the found $\vec{w}^\star$,
+\begin{align*}
+    \theta(\vec{\alpha}) & \doteq \mathcal{L}(\vec{w}^\star, b^\star, \vec{\alpha})                                                                         \\
+                         & = \frac{1}{2} \| \vec{w}^\star \|^2 + \sum_{i=1}^{n} \alpha_i - \| \vec{w}^\star \|^2                                            \\
+                         & = -\frac{1}{2} \| \vec{w}^\star \|^2 + \sum_{i=1}^{n} \alpha_i                                                                   \\
+                         & = \sum_{i=1}^{n} \alpha_i - \frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_i \alpha_j y_i y_j \transpose{\vec{x}_i} \vec{x}_j.
+\end{align*}
+Thus, the dual program is a quadratic optimization problem on a simplex, which is easy to optimize.
+Once we have solved the dual program for $\vec{\alpha}^\star$, we can use this to compute $\vec{w}^\star$, \[
+    \vec{w}^\star = \sum_{i=1}^{n} \alpha_i^\star y_i \vec{x}_i.
+\]
+Due to complementary slackness, the following holds, \[
+    \alpha_i^\star \lft( 1 - y_i \lft( \transpose{\vec{w}_\star} \vec{x}_i + b^\star \rgt) \rgt) = 0.
+\]
+So, $\alpha_i^\star = 0$ often, which makes $\vec{\alpha}^\star$ sparse. In fact, $1 - y_i \lft(
+    \transpose{\vec{w}_\star} \vec{x}_i + b^\star \rgt) = 0$ only if $\vec{x}_i$ is a support vector.
+Thus, the solution $\vec{w}^\star$ is a sparse linear combination of support vectors.
+
+We can compute intercept by finding support vectors, \[
+    \vec{x}^+ \in \argmin_{\vec{x}_i : y_i = +1} \transpose{\vec{w}} \vec{x}_i, \quad \vec{x}^- \in \argmax_{\vec{x}_i : y_i = -1} \transpose{\vec{w}} \vec{x}_i.
+\]
+Further, remember the constraints $\transpose{\vec{w}_\star} \vec{x}^+ + b = 1$ and
+$\transpose{\vec{w}_\star} \vec{x}^- + b = -1$, from which we can derive the optimal intercept, \[
+    b^\star = -\frac{1}{2} \lft( \transpose{\vec{w}_\star} \vec{x}^+ + \transpose{\vec{w}_\star} \vec{x}^- \rgt).
+\]
+
+\subsection{Soft-margin SVM}
+
+The SVM only works if the data is linearly separable, but this does not hold in general. We can
+work around this by introducing a slackness parameter to each data point, which gives the following
+convex program,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 + C \sum_{i=1}^{n} \xi_i                              \\
+    \text{subject to} & \quad y_i \lft( \transpose{\vec{w}} \vec{x}_i + b \rgt) \geq 1 - \xi_i, \quad i \in [n] \\
+                      & \quad \xi_i \geq 0, \quad i \in [n].
+\end{align*}
+Here, we introduced slackness parameters that we wish to be as small as possible with some weight $C$.
+This allows for incorrect classifications if it is justified. For example, the slack of an outlier
+might be very high. The hyperparameter $C$ has an important role in balancing the size of the margin
+with the number of neglected samples. As $C$ increases, the margin will get more narrow, but fewer points
+will be neglected.
+
+The optimal slackness parameters can be computed as follows, \[
+    \xi_i^\star = \max \lft\{ 0, 1 - y_i \lft( \transpose{\vec{w}_\star} \vec{x}_i + b^\star \rgt) \rgt\}.
+\]
+And, $\alpha_i$ is further constrained to be less than $C$.
+
+\subsection{Kernelization}
+
+The data points might be separated by a non-linear separator. In this case, we can use a different
+feature space by employing a feature function $\phi$. This results in the following solution
+$\vec{w}^\star$, \[
+    \vec{w}^\star = \sum_{i=1}^{n} \alpha_i^\star y_i \phi(\vec{x}_i).
+\]
+And, we get the following Lagrangian,
+\begin{align*}
+    \mathcal{L}(\vec{w}^\star, \vec{\alpha}) & = \sum_{i=1}^{n} \alpha_i - \frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_i \alpha_j y_i y_j \transpose{\phi(\vec{x}_i)} \phi(\vec{x}_j) \\
+                                             & = \sum_{i=1}^{n} \alpha_i - \frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_i \alpha_j y_i y_j k(\vec{x}_i, \vec{x}_j).
+\end{align*}
+So, we do not even need the feature function to compute the Lagrangian---we only need a kernel.
+Furthermore, we can use the kernel for classification (without loss of generalization, assume
+$b^\star = 0$), \[
+    \transpose{\vec{w}_\star} \phi(\vec{x}) = \sum_{i=1}^{n} \alpha_i^\star y_i k(\vec{x}_i, \vec{x}).
+\]
