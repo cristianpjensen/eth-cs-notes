@@ -263,3 +263,85 @@ Furthermore, we can use the kernel for classification (without loss of generaliz
 $b^\star = 0$), \[
     \transpose{\vec{w}_\star} \phi(\vec{x}) = \sum_{i=1}^{n} \alpha_i^\star y_i k(\vec{x}_i, \vec{x}).
 \]
+
+\subsection{Multi-class SVM}
+
+We can generalize the notion of a margin to multi-class problems by introducing weights $\vec{w}_z$
+for each class $z \in [k]$. Then, we define the margin as the maximum $m \in \R$ such that \[
+    m \leq \lft( \transpose{\vec{w}}_{z_i} \vec{y}_i + b_{z_i} \rgt) - \max_{z \neq z_i} \lft\{ \transpose{\vec{w}_z} \vec{y}_i + b_z \rgt\}, \quad \forall i \in [n].
+\]
+Intuitively, it is the closest distance of any point to a decision boundary. We then define the
+following optimization problem, which we can solve
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 = \frac{1}{2} \sum_{z=1}^{^k} \| \vec{w}_z \|^2                                                                                        \\
+    \text{subject to} & \quad \lft( \transpose{\vec{w}_{z_i}} \vec{y}_i + b_{z_i} \rgt) - \max_{z \neq z_i} \lft\{ \transpose{\vec{w}_z} \vec{y}_i + b_z \rgt\} \geq 1, \quad \forall i \in [n].
+\end{align*}
+For data that is not linearly separable, we can again introduce slack,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 + C \sum_{i=1}^{n} \xi_i                                                                                                                      \\
+    \text{subject to} & \quad \lft( \transpose{\vec{w}_{z_i}} \vec{y}_i + b_{z_i} \rgt) - \max_{z \neq z_i} \lft\{ \transpose{\vec{w}_z} \vec{y}_i + b_z \rgt\} \geq 1 - \xi_i, \quad \forall i \in [n] \\
+                      & \quad \xi_i \geq 0, \quad \forall i \in [n].
+\end{align*}
+
+\subsection{Structural SVM}
+
+SVMs can also be used to predict complex objects by making use of its structure. A naive way of
+achieving this is to to give each unique structure its own class and doing multi-class SVM.
+However, this would result in exponentially (or infinitely) many classes, which is intractable.
+Thus, the structural SVM needs the following things,
+\begin{enumerate}
+    \item Compact representation of the output space;
+    \item Algorithm that allows for efficient prediction---we cannot enumerate every possible structure;
+    \item Notion of a prediction error---some structures are more similar than others;
+    \item Efficient training algorithm that has a runtime complexity that is sublinear in the number of
+          structures.
+\end{enumerate}
+
+The first can be solved by defining a joint feature map $\psi: \mathcal{X} \times \mathcal{Y} \to
+    \R^d$ that combines properties of inputs and outputs.\sidenote{Notice that the dimensionality of
+    this feature map is independent of the number of structures $|\mathcal{Y}|$.} Then, we can define
+the following scoring function, \[
+    f_{\vec{w}}(\vec{x}, \vec{y}) = \transpose{\vec{w}} \psi(\vec{x}, \vec{y}).
+\]
+We use this function to perform classification, \[
+    c(\vec{x}) = \argmax_{\vec{y} \in \mathcal{Y}} f_{\vec{w}}(\vec{x}, \vec{y}).
+\]
+We would need to construct an algorithm to efficiently compute this argmax. In general, we cannot
+enumerate over all structures, so we would need to make use of the structure of the data to somehow
+compute this. For example, the output space might be decomposable into independent parts, such that
+$\mathcal{Y} = \mathcal{Y}_1 \times \cdots \times \mathcal{Y}_m$.
+
+Moreover, we define the margin as the maximum $m$ that satisfies \[
+    \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}_i) - \max_{\vec{y} \neq \vec{y}_i} \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) \geq m, \quad \forall i \in [n].
+\]
+Thus, we have the following optimization problem,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2                                                                                                                                  \\
+    \text{subject to} & \quad \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}_i) - \max_{\vec{y} \neq \vec{y}_i} \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) \geq 1, \quad \forall i \in [n].
+\end{align*}
+Here, again the maximum would need a specialized algorithm.
+
+To quantify errors, we introduce a loss function $\Delta: \mathcal{Y} \times \mathcal{Y} \to \R$,
+where $\Delta(\vec{y}, \vec{y}')$ is the loss of predicting $\vec{y}'$ when the correct output is
+$\vec{y}$. Reformulating the optimization problem with slack results in the following,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 + C \sum_{i=1}^{n} \xi_i                                                                                                                                  \\
+    \text{subject to} & \quad \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}_i) - \max_{\vec{y} \neq \vec{y}_i} \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) \geq \Delta(\vec{y}, \vec{y}_i) - \xi_i, \quad \forall i \in [n], \vec{y} \neq \vec{y}_i.
+\end{align*}
+Or, equivalently with (significantly) less constraints,
+\begin{align*}
+    \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 + C \sum_{i=1}^{n} \xi_i                                                                                                                                  \\
+    \text{subject to} & \quad \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}_i) - \max_{\vec{y} \neq \vec{y}_i} \lft\{ \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) + \Delta(\vec{y}, \vec{y}_i) \rgt\} \geq - \xi_i, \quad \forall i \in [n].
+\end{align*}
+
+In conclusion, we need to design the following four elements,
+\begin{enumerate}
+    \item Joint feature map $\psi: \mathcal{X} \times \mathcal{Y} \to \R^d$;
+    \item Loss function $\Delta: \mathcal{Y} \times \mathcal{Y} \to \R$;
+    \item Algorithm during training to compute \[
+            \tilde{\vec{y}} \in \argmax_{\vec{y} \neq \vec{y}_i} \lft\{ \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) + \Delta(\vec{y}, \vec{y}_i) \rgt\};
+        \]
+    \item Inference algorithm to compute \[
+            \hat{\vec{y}} \in \argmax_{\vec{y} \in \mathcal{Y}} \transpose{\vec{w}} \psi(\vec{x}, \vec{y}).
+    \]
+\end{enumerate}
