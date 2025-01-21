@@ -15,14 +15,14 @@ Then, we define the anomaly score of $\vec{x}$ as a low probability $p(\vec{x} \
 Anomaly detection in a high-dimensional space is hard, because the normal class can be very
 complex. The idea is to project $\mathcal{X}$ down to a lower dimensionality and perform anomaly
 detection there---hopefully the projected version of the normal class $\Pi(\mathcal{N})$ is less
-complex. In order to find the optimal linear projection, we will use principal component analysis
-(PCA).
+complex. In order to find the optimal linear projection, we will use PCA
+(\textit{\textbf{P}rincipal \textbf{C}omponent \textbf{A}nalysis}).
 
 Furthermore, it has been observed that linear projections of high-dimensional distributions onto
 low-dimensional spaces resemble Gaussian distributions. Hence, after performing PCA, we will fit a
-Gaussian mixture model (GMM) to the projected data.
+GMM (\textit{\textbf{G}aussian \textbf{M}ixture \textbf{M}odel}).
 
-\paragraph{Principal component analysis.}
+\subsection{Principal component analysis}
 
 The goal of PCA is to linearly project $\R^d$ to $\R^{d^-}$ such that the maximum amount of
 variance of the data is preserved.\sidenote{Components with larger variance are more informative.}
@@ -65,7 +65,7 @@ example, to get the second principal component, we first factor out the first pr
 \]
 Then, we do the same as above.
 
-\paragraph{Gaussian mixture model.}
+\subsection{Gaussian mixture model}
 
 The probability density function (PDF) of a Gaussian mixture model with $k$ components is
 formalized as a convex combination of Gaussians, \[
@@ -136,7 +136,11 @@ around $\vec{\theta}$.
     Thus, $\{ \log p(\vec{x}; \vec{\theta}_t) \}_{t=0}^T$ is non-decreasing.
 \end{proof}
 
-\paragraph{Summary.}
+\subsection{Gaussian mixture models}
+
+TODO: Lecture 12
+
+\subsection{Summary}
 
 In conclusion, given a set of data points $\mathcal{X}$ with normal points $\mathcal{N} \subseteq
     \mathcal{X}$, we train an anomaly detector as follows,

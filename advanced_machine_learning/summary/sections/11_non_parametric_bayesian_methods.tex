@@ -1,0 +1,153 @@
+\section{Non-parametric Bayesian methods}
+
+The common beta distribution is defined as follows, \[
+    \mathrm{Beta}(x \mid \alpha, \beta) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1}, \quad x \in [0,1], \alpha,\beta > 0. \margintag{$B(\alpha,\beta) \doteq \nicefrac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha+\beta)}$, where $\Gamma(\alpha) = \int_0^\infty \exp(-x) x^{\alpha-1} \mathrm{d}x$.}
+\]
+Intuitively, the Beta distribution is the probability of a Bernoulli process with $p=x$ after
+observing $\alpha-1$ successes and $\beta-1$ failures. The Dirichlet distribution is the
+multivariate generalization of the beta distribution, \[
+    \mathrm{Dir}(\vec{x} \mid \vec{\alpha}) = \frac{1}{B(\vec{\alpha})} \prod_{k=1}^n x_k^{\alpha_k-1}, \quad \vec{x} \in [0,1]^n, \vec{\alpha} \in \R_{> 0}^n. \margintag{$B(\vec{\alpha}) \doteq \nicefrac{\prod_{k=1}^n \Gamma(\alpha_k)}{\Gamma \lft( \sum_{k=1}^{n} \alpha_k \rgt)}$.}
+\]
+
+We can model the Gaussian mixture model generative process with a Dirichlet distribution by
+sampling the cluster means from a fixed distribution, \[
+    \mu_1, \ldots, \mu_K \overset{\mathrm{iid}}{\sim} \mathcal{N}(\mu_0, \sigma_0).
+\]
+Then, we sample the cluster probabilities from the Dirichlet distribution, \[
+    (\rho_1, \ldots, \rho_K) \sim \mathrm{Dir}(\alpha_1, \ldots, \alpha_K).
+\]
+We assign the points to their clusters by \[
+    z_i \sim \mathrm{Categorical}(\rho_1, \ldots, \rho_K).
+\]
+Lastly, the coordinates of the data points are sampled from their cluster's distribution, \[
+    x_i \sim \mathcal{N}(\mu_{z_i}, \sigma).
+\]
+
+The problem with models like the GMM is that we need to specify the number of classes $K$
+beforehand. However, generally, there is no way of knowing the number of classes. Non-parametric
+Bayesian methods solve this by setting $K=\infty$, meaning that we have infinitely many parameters
+and we can keep drawing new parameters. However, we cannot draw infinite points from a Dirichlet
+distribution.
+
+\subsection{Dirichlet process}
+
+A Dirichlet process $DP(\alpha, H)$ is a distribution over probability distributions on a space
+$\Theta$, where $\alpha > 0$ is the concentration parameter and $H$ is the base measure on
+$\Theta$. Specifically, a sample $G \sim DP(\alpha, H)$ is a function $G: \Theta \to \R_{\geq 0}$
+such that $\int_{\Theta} G(\theta)\mathrm{d}\theta = 1$. $DP(\alpha, H)$ is characterized by the
+following property: for every partition $(T_1, \ldots, T_k)$ of $\Theta$ and $G \sim DP(\alpha,
+    H)$, we have \[
+    (G(T_1), \ldots, G(T_k)) \sim \mathrm{Dir}(\alpha H(T_1), \ldots, \alpha H(T_k)).
+\]
+
+One important observation of the Dirichlet distribution $\mathrm{Dir}(\alpha_1, \ldots, \alpha_K)$
+is that we can equivalently define its sampling recursively,
+\begin{align*}
+    \beta_i                      & \sim \mathrm{Beta} \lft( \alpha_i, \prod_{k=i+1}^K \alpha_k \rgt) \\
+    \rho_i                       & = \beta_i \prod_{j=1}^{i-1} (1-\beta_j)                           \\
+    (\rho_{i+1}, \ldots, \rho_K) & \sim \mathrm{Dir}(\alpha_{i+1}, \ldots, \alpha_K),
+\end{align*}
+where we have the following base case, \[
+    \rho_K = 1 - \sum_{k=1}^{K} \rho_i.
+\]
+This is called stick-breaking. However, we are still limited to finite $K$. The GEM distribution
+fixed this by fixing $\alpha$ such that $\beta_i \sim \mathrm{Beta}(1, \alpha)$ for all $i$. So, we
+get the following recursion,
+\begin{align*}
+    \beta_i & \sim \mathrm{Beta}(1, \alpha)              \\
+    \rho_i  & = \beta_i \prod_{j=1}^{i-1} (1 - \beta_j),
+\end{align*}
+where the base case is \[
+    \rho_K = \beta_k \lft( 1 - \sum_{i=1}^{K-1} \rho_i \rgt).
+\]
+Here, we can keep sampling until we are satisfied with $K$.
+
+If $(\rho_1, \rho_2, \ldots) \sim \mathrm{GEM}(\alpha)$ and $\theta_k \sim H$ for $k=1,2,\ldots$,
+then the following is a sample from $DP(\alpha, H)$, \[
+    G(\theta) = \sum_{k=1}^{\infty} \rho_k \delta_{\vec{\theta}_k}(\theta).
+\]
+In particular, samples from a DP are almost surely discrete measures on $\Theta$, supported on a
+countable set $\{ \theta_k \}_{k=1}^{\infty} \subset \Theta$.
+
+\subsection{Chinese restaurant process}
+
+In order to present a technique for drawing samples from a Dirichlet process, we use a Chinese
+restaurant metaphor. Here, customers are observations and tables are clusters. When a new customer
+arrives, he can either join an existing table with a probability proportional to the number of
+people sitting there or start a new table with probability proportional to $\alpha > 0$. For
+example, we might have the following partition, \[
+    \mathcal{P} = \{ \{ 1,2,4,7 \}, \{ 3,6,8 \}, \{ 5,9 \}, \{ 10 \} \}.
+\]
+Here, a table is represented by a set of its customers. Using this notation, we can define the
+probability distribution of a customer joining a table given the current partition as \[
+    P(\text{customer $n+1$ joins table $\theta$} \mid \mathcal{P}) = \begin{cases}
+        \frac{|\theta|}{\alpha+n} & \theta \in \mathcal{P} \\
+        \frac{\alpha}{\alpha+n}   & \text{otherwise}.
+    \end{cases}
+\]
+The above example partition has the following probability, where the number of the customers
+indicate the order in which they entered the restaurant, \[
+    P(\mathcal{P}) = \lft( \frac{\alpha}{\alpha} \rgt) \lft( \frac{1}{\alpha+1} \rgt) \lft( \frac{\alpha}{\alpha+2} \rgt) \lft( \frac{2}{\alpha+3} \rgt) \lft( \frac{\alpha}{\alpha+4} \rgt) \cdots \margintag{An $\alpha$ in the numerator means that a new table was created.}
+\]
+This can be written in a closed form, \[
+    P(\mathcal{P}) = \alpha^{|\mathcal{P}|} \frac{\alpha!}{(N+\alpha)!} \prod_{\tau \in \mathcal{P}} \lft( |\tau| - 1 \rgt)!.
+\]
+This means that this process is exchangeable, meaning that it is order and labeling independent.
+The expected number of tables is on the order of $\bigo{\alpha\log N}$, which means that the
+expected cluster count is a prior property of a Dirichlet process.
+
+\subsection{Dirichlet process mixture model}
+
+Let $\Theta$ be a set that parametrizes a set of probability distributions and fix a base measure
+$H$ on $\Theta$. For example, we might have $\Theta = \R$ with $\mu \in \Theta$ corresponding to
+$\mathcal{N}(\mu, \sigma)$ for some fixed $\sigma > 0$ and $H = \mathcal{N}(\mu_0, \sigma_0)$ for
+some fixed $\mu_0 \in \R, \sigma_0 > 0$. Using that we can define the generative process of a DP
+mixture model, where the probabilities of the clusters are sampled from a GEM distribution, \[
+    (\rho_1, \rho_2, \ldots) \sim \mathrm{GEM}(\alpha).
+\]
+The centers of the clusters are sampled from the base measure, \[
+    \mu_1, \mu_2, \ldots \overset{\mathrm{iid}}{\sim} H = \mathcal{N}(\mu_0, \sigma_0).
+\]
+We assign data points to the cluster based on the probabilities, \[
+    z_i \sim \mathrm{Categorical}(\rho_1, \rho_2, \ldots), \quad i \in [n].
+\]
+And, we sample the coordinates of the data points from the cluster distributions, \[
+    x_i \sim \mathcal{N}(\mu_{z_i}, \sigma), \quad i \in [n].
+\]
+By exchangeability, we can consider any point to be the ``last arrived''.
+
+To fit a DPMM, we use Gibbs sampling, where the idea is that we sample each variable in turn,
+conditioned on the values of all the other variables in the distribution. Collapsed Gibbs sampling
+formulation:
+\begin{align*}
+     & p(z_i=k \mid \vec{z}^{-i}, \vec{x}, \alpha, \vec{\mu})                                                                                                                                                                                                       \\
+     & \quad \propto p(z_i=k \mid \vec{z}^{-i}, \alpha, \vec{\mu}) p(\vec{x} \mid z_i=k, \vec{z}^{-i}, \alpha, \vec{\mu}) \margintag{Bayes rule.}                                                                                                                   \\
+     & \quad = p(z_i=k \mid \vec{z}^{-i}, \alpha) p(\vec{x} \mid z_i=k, \vec{z}^{-i}, \vec{\mu}) \margintag{$z_i$ is independent of $\vec{\mu}$ and $\vec{x}$ is independent of $\alpha$.}                                                                          \\
+     & \quad = p(z_i=k \mid \vec{z}^{-i}, \alpha) p(x_i \mid \vec{x}^{-i}, z_i=k, \vec{z}^{-i}, \vec{\mu}) p(\vec{x}^{-i} \mid \vec{z}^{-i}, \vec{\mu}) \margintag{Product rule.}                                                                                   \\
+     & \quad \propto \underbrace{p(z_i=k \mid \vec{z}^{-i}, \alpha)}_{\mathrm{Prior}} \underbrace{p(x_i \mid \vec{x}^{-i}, z_i=k, \vec{z}^{-i}, \vec{\mu})}_{\mathrm{Likelihood}}. \margintag{$p(\vec{x}^{-i} \mid \vec{x}^{-i}, \vec{\mu})$ is a constant factor.}
+\end{align*}
+The prior is simple to compute, because we can view $i$ as the last point to enter the dataset---akin
+how we can view any customer as the last to enter the Chinese restaurant due to exchangeability. So, we get \[
+    p(z_i=k \mid \vec{z}^{-i}, \alpha) = \begin{cases}
+        \frac{N^{-i}_{k}}{\alpha + N-1} & \text{for existing $k$} \\
+        \frac{\alpha}{\alpha + N-1}     & \text{otherwise},
+    \end{cases}
+\]
+where $N^{-i}_{k}$ is the number of elements in cluster $k$, excluding $i$.
+
+The likelihood is conditioned on the cluster $k$, so we only have to consider points within that
+cluster. Let $\vec{x}^{-i}_{k}$ be the set of points assigned to cluster $k$, excluding $i$. Then, \[
+    p(x_i \mid \vec{x}^{-i}, z_i = l, \vec{z}^{-i}, \vec{\mu}) = \begin{cases}
+        p(x_i \mid \vec{x}^{-i}_k, \vec{\mu}) = \frac{p(x_i, \vec{x}^{-i}_{k} \mid \vec{\mu})}{p(\vec{x}^{-i}_k \mid \vec{\mu})} & \text{for existing $k$} \\
+        p(x_i \mid \vec{\mu})                                                                                                    & \text{otherwise}.
+    \end{cases}
+\]
+So, the final Gibbs sampler iterates over the points $i \in [N]$ in a random order and samples a
+new cluster allocation from the following distribution, \[
+    p(z_i = k \mid \vec{z}^{-i}, \vec{x}, \alpha, \vec{\mu}) = \begin{cases}
+        \frac{N^{-i}_k}{\alpha + N - 1} p(x_i \mid \vec{x}^{-i}_k, \vec{\mu}) & \text{for existing $k$} \\
+        \frac{\alpha}{\alpha + N - 1} p(x_i \mid \vec{\mu})                   & \text{otherwise}.
+    \end{cases}
+\]
+As a result, we add new clusters with a small probability at each iteration, dependent on $\alpha$.
+Furthermore, points are more likely to be added to clusters with many points.
