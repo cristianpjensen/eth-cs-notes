@@ -1,0 +1,294 @@
+\section{Statistical learning theory}
+
+\subsection{PAC learning}
+
+PAC (\textit{\textbf{P}robably \textbf{A}pproximately \textbf{C}orrect}) learning is a subfield of
+machine learning that concerns itself with the definition of ``learnable'' and if something is
+``learnable'', whether it can be learned by empirically minimizing a loss function. We will be
+using the following fundamental definitions and notations,
+\begin{itemize}
+    \item $\mathcal{X}$: Data space over which there is some distribution $p$;
+    \item $\mathcal{C}$: Concept class, whose elements decide the labels of $\mathcal{X}$. We can
+          think of it as a set of functions $c: \mathcal{X} \to \mathcal{Y}$;
+    \item $\mathcal{H}$: Hypothesis class, which is a space of solutions that the model can consider,
+          \eg, the weight space of a linear model. Generally, $|\mathcal{H}| \ll |\mathcal{C}|$.
+\end{itemize}
+No additional prior knowledge on $p$ is available, which makes this setting differ from Bayesian
+approaches, which require a prior on $\mathcal{X}$.
+
+The setting is that nature decides the distribution over $\mathcal{X}$ and its concept class
+$\mathcal{C}$. We draw samples from $\mathcal{X}$ according to $p$ and observe its labels from
+$\mathcal{C}$---this forms the dataset $\mathcal{Z}$. The learning algorithm receives $\mathcal{Z}$
+and $\mathcal{H}$ as input and selects a hypothesis $\hat{c} \in \mathcal{H}$. Lastly, the
+$\hat{c}$ is evaluated on its generalization error, \[
+    \mathcal{R}(\hat{c}) \doteq \mathbb{P}(\hat{c}(X) \neq c(X)).
+\]
+In practice, the expected risk is approximated using held-out validation data.
+
+\begin{definition}[Learning algorithm]
+    Let $\mathcal{H}$ and $c \in \mathcal{C}$ be a hypothesis class and a concept. A learning algorithm $\mathcal{A}$
+    is an algorithm that receives as input a labeled dataset $\mathcal{Z} = \{ (\vec{x}_1, y_1),
+        \ldots, (\vec{x}_n,y_n) \}$ with $y_i = c(\vec{x}_i)$ for all $i \in [n]$ and outputs a
+    hypothesis $\hat{c} \in \mathcal{H}$.
+\end{definition}
+
+The objective of the learning algorithm is to minimize the generalization error. However, this is
+intractable, because we do not have access to $p$, only its samples. Hence, we approximate it by
+the empirical error, \[
+    \hat{c} \in \argmin_{c \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^{n} \mathbb{1}\{ \hat{c}(\vec{x}_i) \neq c(\vec{x}_i) \}.
+\]
+
+\begin{definition}[Learnable] \label{def:learnable}
+    A learning algorithm $\mathcal{A}$ can learn a concept $c \in \mathcal{C}$ if there exists a
+    polynomial function $\mathrm{poly}(\cdot, \cdot, \cdot)$ such that for any distribution $p$ on
+    $\mathcal{X}$ and $\epsilon, \delta \in (0, \nicefrac{1}{2})$, if $\mathcal{A}$ receives as input
+    a sample $\mathcal{Z}$ of size $n \geq \mathrm{poly}(\nicefrac{1}{\epsilon}, \nicefrac{1}{\delta},
+        \mathrm{size}(c))$, then $\mathcal{A}$ outputs $\hat{c}$ such that \[
+        \mathbb{P}(\mathcal{R}(\hat{c}) \leq \epsilon) \geq 1-\delta.
+    \]
+    Note that this probability is taken over the randomness of $\mathcal{Z}$ and the potential
+    randomness of $\mathcal{A}$. The value $\mathrm{size}(c)$ indicates the size of the representation
+    of concept $c$.
+\end{definition}
+
+Here, $\epsilon$ is an error parameter and $\delta$ denotes a confidence value.
+
+\begin{definition}[PAC learnable]
+    A concept class $\mathcal{C}$ is PAC learnable from a hypothesis class $\mathcal{H}$ if there is
+    an algorithm that can learn any concept in $\mathcal{C}$.
+\end{definition}
+
+\begin{definition}[Efficient PAC learning]
+    If $\mathcal{A}$ runs in time polynomial in only $\nicefrac{1}{\epsilon}$ and
+    $\nicefrac{1}{\delta}$, $\mathcal{C}$ is efficiently PAC learnable.
+\end{definition}
+
+\subsection{Axis-aligned rectangles}
+
+\begin{marginfigure}[-10cm]
+    \centering
+    \incfig{axis-aligned-rectangles}
+    \caption{The dots, along with their color, represent the dataset $\mathcal{Z} \sim p$. The concept class $\mathcal{C}$ and
+        hypothesis class $\mathcal{H}$ is the set of all rectangles in $\R^2$.}
+    \label{fig:axis-aligned-rectangles}
+\end{marginfigure}
+
+We will now consider the problem of learning an axis-aligned rectangle---see
+\Cref{fig:axis-aligned-rectangles}---and we will prove that this problem is PAC learnable. For
+this, we need to show that there exists a $\mathrm{poly}(\cdot, \cdot, \cdot)$ such that for any $R
+    \in \mathcal{C}$, $p$ on $\R^2$, and $\epsilon, \delta > 0$, the condition in \Cref{def:learnable}
+holds. In this problem, $\mathrm{size}(R) = 4$. The algorithm we use is taking the tightest
+rectangle around the points.
+
+\begin{marginfigure}[-1cm]
+    \centering
+    \incfig{rig}
+    \caption{The event $\hat{R}IG$ is the event that $\hat{R}$ intersects all four strips.}
+    \label{fig:rig}
+\end{marginfigure}
+
+Let $\epsilon, \delta > 0$ and $R \in \mathcal{C}$. We now define an event $\hat{R}IG$
+(\textit{$\bm{\hat{R}}$ \textbf{I}s \textbf{G}ood Enough}). Let $T^{\epsilon}_{\uparrow}$ be the
+upper strip of $R$ such that $\mathbb{P}(T^{\epsilon}_{\uparrow}) = \nicefrac{\epsilon}{4}$---see
+\Cref{fig:rig}.\sidenote{$\mathbb{P}(A)$, where $A$ is a set, is the probability of a data point
+    $\vec{x} \sim p$ being in the set $\vec{x} \in A$.} Analogously define $T^\epsilon_\downarrow$,
+$T^\epsilon_\leftarrow$, $T^\epsilon_\rightarrow$.
+
+The $\hat{R}IG$ event occurs when a hypothesis $\hat{R}$ intersects all four $T^\epsilon_*$. This
+only occurs if there is a sample from $p$ within every $T_*^\epsilon$. We have constructed these
+spaces, such that the probability of a single sample being within one is $\nicefrac{\epsilon}{4}$.
+Hence, the probability that a single sample from $p$ misses is $1-\nicefrac{\epsilon}{4}$, so the
+probability that $n$ samples miss is $\lft( 1 - \nicefrac{\epsilon}{4} \rgt)^n$. The probability of
+the $\hat{R}IG$ event is thus \[
+    \mathbb{P}(\hat{R}IG) \geq 1 - 4 \cdot \lft( 1 - \frac{\epsilon}{4} \rgt)^n \geq 1 - 4 \exp \lft( -\frac{n \epsilon}{4} \rgt). \margintag{$1-x \leq \exp(-x)$.}
+\]
+
+The risk is the density of the difference between the sets $R$ and $\hat{R}$, \[
+    \mathcal{R}(\hat{R}) = \mathbb{P}(\hat{R}(X) \neq R(X)) = \mathbb{P}((R \backslash \hat{R}) \cup (\hat{R} \backslash R)) = \mathbb{P}(R \backslash \hat{R}).
+\]
+Since $\mathbb{P}(R \backslash \hat{R}) \leq \epsilon$ is guaranteed in---but not limited to---the
+event of $\hat{R}IG$, we have the following bound on the generalization error, \[
+    \mathbb{P}(\mathcal{R}(\hat{R}) \leq \epsilon) = \mathbb{P}(\mathbb{P}(R \backslash \hat{R}) \leq \epsilon) \geq \mathbb{P}(\hat{R}IG).
+\]
+As a result, \[
+    \mathbb{P}\lft( \mathcal{R}(\hat{R}) \leq \epsilon \rgt) \geq 1 - 4 \exp \lft( -\frac{n \epsilon}{4} \rgt).
+\]
+For $n \geq \frac{4}{\epsilon} \log \lft( \frac{4}{\delta} \rgt)$, we then have \[
+    \mathbb{P}\lft( \mathcal{R}(\hat{R}) \leq \epsilon \rgt) \geq 1-\delta.
+\]
+This concludes the proof.
+
+\subsection{Stochastic setting}
+
+In general, the label of an instance $\vec{x} \in \mathcal{X}$ is not deterministically determined
+by the underlying concept---it is modeled by a distribution on $\mathcal{X} \times \mathcal{Y}$.
+This reflects that two instances with identical features may have different labels. Thus, the
+definition of a dataset is altered, where it is now $\mathcal{Z} = \{ (\vec{x}_1, y_1), \ldots,
+    (\vec{x}_n), y_n \}$, where $(\vec{x}_i, y_i) \sim p$ for all $i \in [n]$. In this setting, the
+goal is to find a hypothesis $\hat{c} \in \mathcal{H}$ with small generalization error, \[
+    \mathcal{R}(\hat{c}) = \mathbb{P}_{\vec{x},y \sim p} (\hat{c}(\vec{x}) \neq y) = \E_{\vec{x},y\sim p} \lft[ \mathbb{1}\{ \hat{c}(\vec{x}) \neq y \} \rgt].
+\]
+If the Bayes-optimal classifier is not an element of the concept class $\mathcal{C}$, then it is
+impossible to construct an algorithm that finds a $\hat{c} \in \mathcal{H}$ such that
+$\mathcal{R}(\hat{c}) \leq \epsilon$ for all $\epsilon \in (0,\nicefrac{1}{2})$ for a polynomial
+number of data points. Thus, instead we aim to minimize the generalization error to the best
+concept, \[
+    \mathcal{R}(\hat{c}) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) \leq \epsilon.
+\]
+
+\begin{definition}[Learnable in the stochastic setting]
+    A learning algorithm $\mathcal{A}$ can learn a concept $c \in \mathcal{C}$ from $\mathcal{H}$ if
+    there is a $\mathrm{poly}(\cdot, \cdot, \cdot)$ such that for any distribution $p$ on
+    $\mathcal{X} \times \mathcal{Y}$ and for any $\epsilon,\delta\in (0,\nicefrac{1}{2})$, if
+    $\mathcal{A}$ receives as input a sample $\mathcal{Z}$ of size $n \geq
+        \mathrm{poly}(\nicefrac{1}{\epsilon},\nicefrac{1}{\delta},\mathrm{size}(c))$, then $\mathcal{A}$ outputs $\hat{c} \in \mathcal{H}$ such that \[
+        \mathbb{P}_{\mathcal{Z} \sim p} \lft( \mathcal{R}(\hat{c}) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) \leq \epsilon \rgt) \geq 1-\delta.
+    \]
+\end{definition}
+
+\subsection{Vapnik-Chervonenkis}
+
+The VC (\textit{\textbf{V}apnik \textbf{C}hervonenkis}) dimension is defined as the cardinality of
+the largest set of points that a concept class $\mathcal{C}$ can shatter, which means that there
+exists a concept in $\mathcal{C}$ for every labeling of the points. Intuitively, this is a measure
+of the complexity of the concept class.
+
+% Let $\epsilon > 0$, $\mathcal{Z} = \{ (\vec{x}_1, y_1), \ldots, (\vec{x}_n, y_n) \}$, and
+% $\hat{c}^\star_n$ be the hypothesis obtained by empirical risk minimization with
+% $\mathcal{H}=\mathcal{C}$, \[
+%     \hat{c}^\star_n \in \argmin_{c \in \mathcal{C}} \frac{1}{2} \lft| \{ (\vec{x}_i, y_i) \mid c(\vec{x}_i \neq y_i) \} \rgt|.
+% \]
+% If $\mathcal{C}$ is finite, then \[
+%     \mathbb{P}\lft( \mathcal{R}(\hat{c}^\star_n) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) > \epsilon \rgt) \leq 2 |\mathcal{C}| \exp \lft( -2n \epsilon^2 \rgt).
+% \]
+% For an uncountably large hypothesis class, we need the VC-dimension $\mathcal{VC}_{\mathcal{C}}$.
+% The VC-dimension is a complexity measure of $\mathcal{C}$. If $\mathcal{VC}_{\mathcal{C}} > 2$,
+% then \[
+%     \mathbb{P}\lft( \mathcal{R}(\hat{c}^\star_n) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) > \epsilon \rgt) \leq 9n^{\mathcal{VC}_{\mathcal{C}}} \exp \lft( -\frac{n \epsilon^2}{32} \rgt).
+% \]
+
+\begin{theorem}[\citep{vapnik1974theory}] \label{thm:vapnik1974}
+    Assume a finite concept class such that $|\mathcal{C}| < \infty$ and $\mathcal{R}(c^\star) = 0$
+    for the optimal $c^\star \in \mathcal{C}$. Further, define the empirical risk minimizer
+    $c_n^\star$ as  \[
+        c^\star_n \in \{ c \in \mathcal{C} \mid \hat{\mathcal{R}}_n(c) = 0 \}.
+    \]
+    Then, for every $n \in \N$ and $\epsilon > 0$, \[
+        \mathbb{P}(\mathcal{R}(\hat{c}^\star_n) > \epsilon) \leq |\mathcal{C}| \exp(-n \epsilon).
+    \]
+    And, \[
+        \E[\mathcal{R}(\hat{c}^\star_n)] \leq \frac{1 + \log |\mathcal{C}|}{n}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    We will only show the first statement,
+    \begin{align*}
+        \mathbb{P}(\mathcal{R}(c^\star_n) > \epsilon) & \leq \mathbb{P} \lft( \max_{c \in \mathcal{C} : \hat{\mathcal{R}}_n(c) = 0} \mathcal{R}(c) > \epsilon \rgt)                              \\
+                                                      & = \mathbb{P} \lft( \lft( \max_{c \in \mathcal{C}} \mathbb{1}\{ \hat{\mathcal{R}}_n(c) = 0 \} \cdot \mathcal{R}(c) \rgt) > \epsilon \rgt) \\
+                                                      & = \E \lft[ \max_{c \in \mathcal{C}} \mathbb{1}\{ \hat{\mathcal{R}}_n(c) = 0 \} \cdot \mathbb{1}\{ \mathcal{R}(c) > \epsilon \} \rgt]     \\
+                                                      & \leq \sum_{c \in \mathcal{C} : \mathcal{R}(c) > \epsilon}  \E \lft[ \mathbb{1} \{ \hat{\mathcal{R}}_n(c) = 0 \} \rgt]                    \\
+                                                      & = \sum_{c \in \mathcal{C} : \mathcal{R}(c) > \epsilon}  \mathbb{P}(\hat{\mathcal{R}}_n(c) = 0)                                           \\
+                                                      & \leq |\mathcal{C}| (1-\epsilon)^n                                                                                                        \\
+                                                      & \leq |\mathcal{C}| \exp(-n \epsilon).
+    \end{align*}
+    This concludes the proof.
+\end{proof}
+
+\begin{theorem}[VC inequality]
+    \[
+        \mathbb{P} \lft( \mathcal{R}(\hat{c}^\star_n) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) > \epsilon \rgt) \leq \mathbb{P} \lft( \sup_{c \in \mathcal{C}} |\hat{\mathcal{R}}_n(c) - \mathcal{R}(c)| > \frac{\epsilon}{2} \rgt).
+    \]
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+        \mathcal{R}(\hat{c}^\star_n) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) & = \mathcal{R}(\hat{c}^\star_n) - \hat{\mathcal{R}}_n(\hat{c}^\star_n) + \hat{\mathcal{R}}_n(\hat{c}^\star_n) - \inf_{c \in \mathcal{C}} \mathcal{R}(c)                                                                                               \\
+                                                                               & \leq \mathcal{R}(\hat{c}^\star_n) - \hat{\mathcal{R}}_n(\hat{c}^\star_n) + \hat{\mathcal{R}}_n(c^\star) - \mathcal{R}(c^\star) \margintag{$\hat{\mathcal{R}}_n(c_n^\star) \leq \hat{\mathcal{R}}_n(\tilde{c})$ for all $\tilde{c} \in \mathcal{C}$.} \\
+                                                                               & \leq \sup_{c \in \mathcal{C}} | \hat{\mathcal{R}}_n(c) - \mathcal{R}(c) | + \sup_{c \in \mathcal{C}} | \hat{\mathcal{R}}_n(c) - \mathcal{R}(c) |                                                                                                     \\
+                                                                               & \leq 2 \sup_{c \in \mathcal{C}} | \hat{\mathcal{R}}_n(c) - \mathcal{R}(c) |.
+    \end{align*}
+    The result follows.
+\end{proof}
+
+Note that this bound requires uniform convergence, since we minimize $\hat{c}_n^\star$ \wrt
+empirical risk. So, the classifier is selected conditional on the data, in which case the weak law
+of large numbers does not apply.
+
+% \begin{lemma}[Markov inequality]
+%     Let $X$ be a non-negative random variable, then \[
+%         \mathbb{P}(X \geq \epsilon) \leq \frac{\E[X]}{\epsilon}.
+%     \]
+% \end{lemma}
+%
+% \begin{lemma}[Hoeffding's inequality]
+%     Let $X$ be a random variable with $\E[X] = 0$ and $X \in [a,b]$, then for $s > 0$, \[
+%         \E[\exp(sX)] \leq \exp \lft( \frac{s^2 (b-a)^2}{8} \rgt).
+%     \]
+% \end{lemma}
+
+% This is not a very informative result, because the bound does not depend on the distribution, only
+% its support. However, it is good enough if we know nothing of the distribution---we can find
+% tighter bounds if we have information of it.
+
+\begin{theorem}[\citep{hoeffding1994probability}] \label{thm:hoeffding}
+    Let $X_1, \ldots, X_n$ be independent random variables such that $X_i \in [a_i, b_i]$ and $S_n = \sum_{i=1}^{n} X_i$, then for any $t > 0$,
+    \begin{align*}
+        \mathbb{P}(S_n - \E[S_n] \geq t)  & \leq \exp \lft( -\frac{2t^2}{\sum_{i=1}^{n} (b_i - a_i)^2} \rgt)  \\
+        \mathbb{P}(S_n - \E[S_n] \leq -t) & \leq \exp \lft( -\frac{2t^2}{\sum_{i=1}^{n} (b_i - a_i)^2} \rgt).
+    \end{align*}
+\end{theorem}
+
+In the case of normalized sums $\tilde{S}_n = \nicefrac{S_n}{n}$ and $t=n\epsilon$, we have
+\begin{align*}
+    \mathbb{P}\lft( \tilde{S}_n - \E \lft[ \tilde{S}_n \rgt] \geq \epsilon \rgt) & \leq \exp \lft( -\frac{2n^2 \epsilon^2}{\sum_{i=1}^{n} (b_i - a_i)^2} \rgt)          \\
+                                                                                 & = \exp \lft( -\frac{2n \epsilon^2}{\sum_{i=1}^{n} \nicefrac{(b_i - a_i)^2}{n}} \rgt) \\
+                                                                                 & \xrightarrow{n\to \infty} 0.
+\end{align*}
+We can also bound the absolute deviation,
+\begin{align*}
+    \mathbb{P}\lft( \lft| \tilde{S}_n - \E \lft[ \tilde{S}_n \rgt] \rgt| \geq \epsilon \rgt) & = \mathbb{P}(\tilde{S}_n - \E[\tilde{S}_n] \geq \epsilon) + \mathbb{P}(\tilde{S}_n - \E[\tilde{S}_n] \leq -\epsilon) \margintag{The two cases are disjoint.} \\
+                                                                                             & \leq 2 \exp \lft( -\frac{2n \epsilon^2}{\sum_{i=1}^{n} \nicefrac{(b_i - a_i)^2}{n}} \rgt).
+\end{align*}
+
+\begin{theorem}
+    Assume $|\mathcal{C}| \leq N$, then for all $\epsilon > 0$, \[
+        \mathbb{P}\lft( \sup_{c \in \mathcal{C}} | \hat{\mathcal{R}}_n(c) - \mathcal{R}(c) | > \epsilon \rgt) \leq 2 N \exp \lft( -2n \epsilon^2 \rgt).
+    \]
+\end{theorem}
+
+\begin{proof}
+    This is a trivial application of the union bound and \Cref{thm:hoeffding},
+    \begin{align*}
+        \mathbb{P}\lft( \sup_{c \in \mathcal{C}} | \hat{\mathcal{R}}_n(c) - \mathcal{R}(c) | > \epsilon \rgt) & = \mathbb{P}\lft( \bigvee_{c \in \mathcal{C}} |\hat{\mathcal{R}}_n(c) - \mathcal{R}(c)| > \epsilon \rgt)                                           \\
+                                                                                                              & \leq \sum_{c\in \mathcal{C}} \mathbb{P}\lft( |\hat{\mathcal{R}}_n(c) - \mathcal{R}(c)| > \epsilon \rgt)                                            \\
+                                                                                                              & \leq \sum_{c\in \mathcal{C}} 2 \exp \lft( - 2n \epsilon^2 \rgt) \margintag{\Cref{thm:hoeffding} and $\hat{\mathcal{R}}_n: \mathcal{C} \to [0,1]$.} \\
+                                                                                                              & \leq 2N \exp \lft( -2n \epsilon^2 \rgt).
+    \end{align*}
+    This concludes the proof.
+\end{proof}
+
+If we define the confidence $\delta \doteq 2N \exp \lft( -2n \epsilon^2 \rgt)$, then the precision
+is \[
+    \epsilon = \sqrt{\frac{\log N - \log \lft( \nicefrac{\delta}{2} \rgt)}{2n}}.
+\]
+Thus, we have a $\bigo{\log |\mathcal{C}|}$ dependence for the precision, which is not bad, unless
+$|\mathcal{C}| \to \infty$. In conclusion, we have $\mathcal{R}(c) - \hat{\mathcal{R}}_n(c) \leq
+    \epsilon$ with high probability uniformly for all concepts $c \in \mathcal{C}$, \[
+    \mathcal{R}(c) \leq \hat{\mathcal{R}}_n(c) + \sqrt{\frac{\log N - \log \lft( \nicefrac{\delta}{2} \rgt)}{2n}}.
+\]
+This is the key difference between \Cref{thm:vapnik1974} and
+\Cref{thm:hoeffding}---\Cref{thm:vapnik1974} only applies to the empirical risk minimizer.
+
+However, the cardinality of $\mathcal{C}$ might be infinite. We can deal with this in two ways,
+\begin{enumerate}
+    \item Represent hypotheses by the classifications that they yield;
+    \item Measure the $\mathcal{VC}$ dimension of $\mathcal{C}$ and select a hypothesis class with finite
+          $\mathcal{VC}$-dimensionality.
+\end{enumerate}
+
+For example, we can apply the first solution to a linear classification problem. There are an
+infinite number of hyperplane separators, but there are a finite number of ways that the datapoints
+can be labeled. Instead of treating each hyperplane independently, we bundle all hyperplanes that
+lead to the same classifications together.
+
