@@ -54,8 +54,7 @@
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{version-space.pdf}}%
-    \put(0.5421966,0.49639021){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{V}(\mathcal{S})$\end{tabular}}}}%
-    \put(0.03498818,0.51593357){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$w$\end{tabular}}}}%
-    \put(0.53868893,0.0283119){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$b$\end{tabular}}}}%
+    \put(0.52680556,0.46514063){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\mathcal{V}(\mathcal{S})$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{version-space.pdf}}%
   \end{picture}%
 \endgroup%

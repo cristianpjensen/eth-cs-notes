@@ -2,14 +2,13 @@
 
 \subsection{Regression models}
 
-In least squares, we attempt to fit a linear model, \[
-    f[\vec{w}](\vec{x}) = \transpose{\vec{w}}\vec{x},
+In least squares, we attempt to fit a linear model, $f[\vec{w}](\vec{x}) =
+    \transpose{\vec{w}}\vec{x}$, to data points with an MSE (\textit{\textbf{M}ean \textbf{S}quared
+    \textbf{E}rror}) loss, \[
+    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{n} \lft( \transpose{\vec{w}} \vec{x}_i - y_i \rgt)^2.
 \]
-to data points with a MSE (\textit{\textbf{M}ean \textbf{S}quared \textbf{E}rror}) loss, \[
-    \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{s} \lft( \transpose{\vec{w}} \vec{x}_i - y_i \rgt)^2.
-\]
-Summarizing the patterns into a design matrix $\mat{X} \in \R^{d \times s}$ and output vector
-$\vec{y} \in \R^s$, we get the following loss, \[
+Summarizing the patterns into a design matrix $\mat{X} \in \R^{d \times n}$ and output vector
+$\vec{y} \in \R^n$, we get the following loss, \[
     \ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \| \transpose{\mat{X}} \vec{w} - \vec{y} \|^2.
 \]
 This loss function is convex, so we can find the minimizer by setting the gradient to zero, \[
@@ -24,16 +23,14 @@ In logistic regression, the outputs are binary. Hence, we make use of the sigmoi
     \R \to (0,1)$, \[
     \sigma(z) \doteq \frac{1}{1 + \exp(-z)}.
 \]
-Hence, the model has the following form, \[
-    f[\vec{w}](\vec{x}) = \sigma \lft( \transpose{\vec{w}}\vec{x} \rgt).
-\]
-This outputs the probability of the label of $\vec{x}$ being $1$. We train this model to optimize
-the cross-entropy loss, \[
-    \ell[\vec{w}](\mathcal{S}) = \frac{1}{s} \sum_{i=1}^{s} -\log \sigma \lft( (2y_i - 1) \transpose{\vec{w}} \vec{x}_i \rgt).
+And the model is linear with this activation function, $f[\vec{w}](\vec{x}) = \sigma \lft(
+    \transpose{\vec{w}}\vec{x} \rgt)$. This outputs the probability of the label of $\vec{x}$ being
+$1$. We train this model to optimize the cross-entropy loss, \[
+    \ell[\vec{w}](\mathcal{S}) = -\frac{1}{n} \sum_{i=1}^{n} y_i \log \sigma(\transpose{\vec{w}} \vec{x}_i) + (1-y_i) \log (1-\sigma(\transpose{\vec{w}} \vec{x}_i)).
 \]
 This problem does not have a closed-form solution, but we can optimize the weights by SGD
 (\textit{\textbf{S}tochastic \textbf{G}radient \textbf{D}ecent}) with the following gradient, \[
-    \grad{\ell[\vec{w}](\langle \vec{x}_i, y_i \rangle)}{\vec{w}} = \lft( \sigma \lft( \transpose{\vec{w}} \vec{x}_i \rgt) - y_i \rgt) \vec{x}_i.
+    \grad{\ell[\vec{w}](\vec{x}_i, y_i)}{\vec{w}} = \lft( \sigma \lft( \transpose{\vec{w}} \vec{x}_i \rgt) - y_i \rgt) \vec{x}_i.
 \]
 
 \subsection{Layers and units}
@@ -45,23 +42,21 @@ mapping, \[
 where $\phi$ is a pointwise activation function and $m$ is the width of the layer.
 
 Deep neural networks compose maps in sequence, \[
-    G = F^L\lft[ \vec{\theta}^L \rgt] \circ \cdots \circ F^1 \lft[ \vec{\theta}^1 \rgt],
+    G = F_L\lft[ \vec{\theta}_L \rgt] \circ \cdots \circ F_1 \lft[ \vec{\theta}_1 \rgt],
 \]
-where $\vec{\theta}^{\ell}$ are the (adjustable) weights of layer $\ell$. Intuitively, models with
+where $\vec{\theta}_{\ell}$ are the (adjustable) weights of layer $\ell$. Intuitively, models with
 higher depth are able to extract features with increasing complexity. Such networks induce
 intermediate results (or layer activations), \[
-    \vec{x}^{\ell} \doteq \lft( F^{\ell} \circ \cdots \circ F^{1} \rgt)(\vec{x}) = F^{\ell}\lft( \vec{x}^{\ell-1} \rgt).
+    \vec{x}^{\ell} \doteq \lft( F_{\ell} \circ \cdots \circ F_{1} \rgt)(\vec{x}) = F_{\ell}\lft( \vec{x}^{\ell-1} \rgt), \quad \vec{x}^0 = \vec{x}.
 \]
 The intermediate layers are permutation symmetric, meaning that the units within a hidden layer are
 interchangeable if we change the order of the weights accordingly, \[
     F[\mat{W}, \vec{b}](\vec{x}) = \inv{\mat{P}} \phi(\mat{P}\mat{W}\vec{x} + \mat{P}\vec{b}) = \inv{\mat{P}} F[\mat{P}\mat{W},\mat{P}\vec{b}](\vec{x}),
 \]
-where $\mat{P}$ is a permutation matrix.\sidenote{A permutation matrix $\mat{P} \in \R^{n \times
-            n}$ satisfies the following condition, \[
-        \sum_{i=1}^{n} p_{ij} = \sum_{j=1}^{n} p_{ij} = 1, \quad \forall i, j \in [n].
-    \]} Hence, the parameters are not unique in feedforward networks.
+where $\mat{P}$ is a permutation matrix. Hence, the parameters are not unique in feedforward
+networks.
 
-The layers---as presented---differ only in their choice of activation function,
+The presented layers differ only in their choice of activation function,
 \begin{itemize}
     \item Linear activation, \[
               \phi = \mathrm{Id};
@@ -70,7 +65,7 @@ The layers---as presented---differ only in their choice of activation function,
               \phi = \sigma;
           \]
     \item ReLU (\textit{\textbf{Re}ctifier \textbf{L}inear \textbf{U}nit}) activation, \[
-              \phi = (z)_+ = \max \{ 0, z \}.
+              \phi = (z)_+ \doteq \max \{ 0, z \}.
           \]
 \end{itemize}
 
@@ -82,32 +77,39 @@ For a multi-class classification problem, the final layer must be the softmax, w
 categorical probability distribution over classes, \[
     \mathrm{softmax}_i(\vec{z}) = \frac{\exp(z_i)}{\sum_{j=1}^{n} \exp(z_j)}.
 \]
-Usually, this type of model optimizes the cross-entropy loss.
+Usually, this type of model optimizes the cross-entropy loss, \[
+    \ell[\vec{\theta}](\vec{x}, y) = -\log \frac{\exp(z_y)}{\sum_{\upsilon \in \mathcal{Y}} \exp(z_\upsilon)} = -z_y + \log \sum_{\upsilon \in \mathcal{Y}} \exp(z_\upsilon),
+\]
+where $\vec{z}$ is the pre-activation of the softmax function and $\mathcal{Y}$ is the set of
+classes of the problem.
 
 In a perfect world, we would want to minimize the expected risk, \[
     \E[\ell(y, f[\vec{\theta}](\vec{x}))].
 \]
 However, since we do not have access to the underlying probability distribution of the data, this
 is intractable. Hence, we minimize the empirical risk, \[
-    \frac{1}{s} \sum_{i=1}^{s} \ell(y_i, f[\vec{\theta}](\vec{x}_i)).
+    \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f[\vec{\theta}](\vec{x}_i)).
 \]
 In practice, we partition the dataset into training and validation sets. Then, we directly minimize
 the empirical risk of the training set, and approximate the expected risk with the validation set.
 
-\subsection{Linear and residual networks}
+\subsection{Linear networks}
 
 Linear layers are closed under composition, meaning that we do not gain any representational power
-by increasing the depth. However, linear analysis are nice to work with for theoretical analysis.
+by increasing the depth. However, linear layers are nice to work with for theoretical analysis.
+
+\subsection{Residual networks}
 
 Residual layers are formalized as follows, \[
-    F[\mat{W}, \vec{b}](\vec{x}) = \vec{x} + (\phi(\mat{W} \vec{x} + \vec{b}) - \phi(\vec{0})).
+    F[\mat{W}, \vec{b}](\vec{x}) = \vec{x} + \phi(\mat{W} \vec{x} + \vec{b}) - \phi(\vec{0}).
 \]
 They have the following property, \[
     F[\mat{0}, \vec{0}] = \mathrm{Id}.
 \]
 In most architectures, learning the identity map is non-trivial. However, it is desirable to
 incrementally learn a better representation, rather than having to learn it at every layer.
-Intuitively, the residual layer learns how to change its input representation.
+Intuitively, the residual layer learns how to change its input representation, instead of learning
+how to construct a new one.
 
 A problem with the above formalization is that the input and output must have the same
 dimensionality. This is solved by a projection, \[
@@ -116,7 +118,7 @@ dimensionality. This is solved by a projection, \[
 
 \citet{he2016deep} showed that increasing model depth with residual layers leads to better
 performance than when using normal layers. This small change allows model depths of up to 100–-200
-layers. DenseNet \citet{zhu2017densenet} makes use of a similar idea of shortcutting information by
+layers. DenseNet \citep{zhu2017densenet} makes use of a similar idea of shortcutting information by
 feeding the output of all upstream layer activations to every layer, \[
     \vec{x}^{\ell+1} = F^{\ell+1}\lft( \vec{x}^\ell, \ldots, \vec{x}^1, \vec{x} \rgt).
 \]
@@ -226,12 +228,13 @@ the trivial upper bound $|\{ \mathbb{1}\{ \mat{W} \vec{x} + \vec{b} > 0 \} \mid 
     \}| \leq 2^m$. However, we would like to obtain a stricter bound. We can represent each hidden unit
 as a hyperplane $\transpose{\vec{w}_i}\vec{x} + b_i$. On one side the unit would be active and
 inactive on the other. Geometrically, we can thus think of it as a space, where each hidden unit
-represents a hyperplane. The connected regions of these hyperplanes are the activation patterns.
+represents a hyperplane---see \Cref{fig:connected-regions}. The connected regions of these
+hyperplanes are the activation patterns.
 
 \begin{marginfigure}
     \centering
     \incfig{connected-regions}
-    \caption{Connected regions, partitioned according to activation pattern. Each hyperplane represents a hidden unit. This shows an MLP with 2-dimensional input and 3-dimensional hidden layer.}
+    \caption{Connected regions, partitioned according to activation pattern. Each hyperplane represents a hidden unit. This shows an MLP with 2-dimensional input and 3-dimensional hidden layer. So, we are in 2 dimensions and have 3 hyperplanes.}
     \label{fig:connected-regions}
 \end{marginfigure}
 
@@ -255,7 +258,7 @@ possible activation patterns represent complexity, this is a good argument for w
 tend to perform well.
 
 \begin{theorem}[\citep{shekhtman1982piecewise}]
-    Piecewise linear functions are dense in $\mathcal{C}([0,1])$.
+    Piecewise linear functions are universal approximators of $\mathcal{C}(\R)$.
 \end{theorem}
 
 \begin{theorem}[Lebesgue]

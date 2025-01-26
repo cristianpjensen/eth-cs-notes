@@ -7,7 +7,7 @@ networks that satisfy invariances by design. Assume we have a set of feature vec
 standard multi-layer perceptron, \[
     \{ \vec{x}_1, \ldots, \vec{x}_M \} \mapsto [\vec{x}_1, \ldots, \vec{x}_M].
 \]
-However, this has two problems---(1) $M$ is not fixed, so the inputs have variable length and (2)
+However, this has two problems: (1) $M$ is not fixed, so the inputs have variable length and (2)
 the order in which we concatenate the feature vectors is arbitrary. We need to model an
 architecture that can take a variable-length input and does not depend on the ordering of the
 feature vectors.
@@ -17,7 +17,7 @@ feature vectors.
 In order to formally design such functions, we need the following two definitions.
 
 \begin{definition}[Order-invariance]
-    $f: \mathcal{P}(R) \to \mathcal{Y}$ is order-invariant if and only if \[
+    A function $f$ that takes an arbitrary number of inputs is order-invariant if and only if \[
         f(\vec{x}_1, \ldots, \vec{x}_M) = f(\vec{x}_{\pi_1}, \ldots, \vec{x}_{\pi_M}), \quad \forall \vec{\pi} \in \Pi(M),
     \]
     where $\vec{\pi}$ is a permutation. Or, in matrix notation, \[
@@ -28,7 +28,7 @@ In order to formally design such functions, we need the following two definition
 \end{definition}
 
 \begin{definition}[Equivariance]
-    $f: R^M \to \mathcal{Y}^M$ is equivariant if and only if
+    A function $f$ that takes an arbitrary number of inputs and has outputs of the same length is equivariant if and only if
     \begin{align*}
         f(\vec{x}_1, \ldots, \vec{x}_M)                      & = (y_1, \ldots, y_M)                                                  \\
         \implies f(\vec{x}_{\pi_1}, \ldots, \vec{x}_{\pi_M}) & = (y_{\pi_1}, \ldots, y_{\pi_M}), \quad \forall \vec{\pi} \in \Pi(M).
@@ -51,15 +51,17 @@ equivariant.
     \label{fig:deep-sets}
 \end{figure}
 
-Let $\phi: R \to \R^d$ be a pointwise feature extractor neural network, the Deep Sets architecture
-\citep{zaheer2017deep} obtains an order-invariant representation of the input set by summing them
-up, because the sum operation enforces order-invariant, \[
+Let $\phi: R \to \R^d$ be a pointwise feature extractor neural network. The Deep Sets architecture
+\citep{zaheer2017deep} obtains an order-invariant representation of the input set by summing their
+features up, because the sum operation enforces order-invariance, \[
     \sum_{m=1}^{M} \phi(\vec{x}_m).
 \]
 We can then use this representation with any type of neural network $\rho: \R^d \to \mathcal{Y}$ to
 get an order-invariant model, \[
     f(\vec{x}_1, \ldots, \vec{x}_M) = \rho \lft( \sum_{m=1}^{M} \phi(\vec{x}_m) \rgt).
 \]
+Similarly, we can use other aggregation functions, such as the maximum or minimum.
+
 Once we have an order-invariant feature extractor, we can easily turn it into an equivariant map by
 additionally providing $\vec{x}_m$ to $\rho: R \times \R^d \to \mathcal{Y}$ and applying $\rho$
 pointwise, \[
@@ -112,13 +114,13 @@ vertex feature vectors and $\mat{A} \in \R^{M \times M}$ be the adjacency matrix
 
 \begin{definition}
     A function $f$ on a graph with adjacency matrix $\mat{A}$ is order-invariant if and only if \[
-        f(\mat{X}, \mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}), \quad \mat{P} \in \Pi(M).
+        f(\mat{X}, \mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}), \quad \forall \mat{P} \in \Pi(M).
     \]
 \end{definition}
 
 \begin{definition}
     A function $f$ on a graph with adjacency matrix $\mat{A}$ is equivariant if and only if \[
-        f(\mat{X}, \mat{A}) = \mat{P} f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}), \quad \mat{P} \in \Pi(M).
+        f(\mat{X}, \mat{A}) = \mat{P} f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}), \quad \forall \mat{P} \in \Pi(M).
     \]
 \end{definition}
 
@@ -127,7 +129,8 @@ by parametrizing a local function that only depends on the neighbors of each ver
     \doteq \{\!\{ \vec{x}_n \mid \{ v_n, v_m \} \in E \}\!\}$, which denotes the multiset of feature
 vectors of the neighbors of $v_m$. We then parametrize a feature function $\phi$ that takes
 $\vec{x}_m$ and $\mat{X}_m$ as input. (As a consequence, any pair of isomorphic graphs result in
-the same feature representations.) This function must also be order-invariant to the neighbors, so
+the same feature representations.)\sidenote{Two graphs are isomorphic if the edges are preserved
+    under a bijection of the vertices.} This function must also be order-invariant to the neighbors, so
 we need to additionally aggregate the neighbor feature vectors, which are processed by a separate
 network $\psi$, \[
     \phi(\vec{x}_m, \mat{X}_m) = \phi \lft( \vec{x}_m, \bigoplus_{\vec{x}\in \mat{X}_m} \psi(\vec{x}) \rgt),
@@ -136,14 +139,20 @@ where $\bigoplus$ is an invariant aggregation function. This is sometimes called
 scheme in the sense that a vertex receives messages from its neighbors via a messaging function
 $\psi$ and uses an update function $\phi$ to update its representation.
 
+Effectively, we are constructing an equivariant function that makes additional use of provided
+information in the form of a graph. We may want to use this to do equivariant node classification
+or invariant graph classification.
+
 \paragraph{Coupling matrix.}
 
 In GCNs (\textit{\textbf{G}raph \textbf{C}onvolutional \textbf{N}etworks}), the aggregation over
 local neighborhoods is performed with a fixed set of weights, known as the coupling matrix, \[
-    \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}, \quad \mat{D} = \mathrm{diag}(\vec{d}), d_m = 1 + \sum_{n=1}^{M} a_{nm}.
+    \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}, \quad \mat{D} = \mathrm{diag}(\vec{d}), \quad d_m = 1 + \sum_{n=1}^{M} a_{nm}. \margintag{We multiply by $\mat{D}^{-\nicefrac{1}{2}}$ on both sides, and not $\mat{D}^{-1}$ on one side, because we want both the rows and columns to be normalized.}
 \]
 Here, $\mat{D}$ is the degree matrix and $\bar{\mat{A}}$ is a normalized version of $\mat{A}$ with
-self-loops as a result.
+self-loops as a result. As such, if we compute $\mat{Y} = \bar{\mat{A}} \mat{X}$, where $\mat{X}
+    \in \R^{M \times d}$ contains the features, then $\vec{y}_i$ is an average of the features of the
+neighbors and node $i$ itself.
 
 Furthermore, we introduce learnable parameters $\mat{W}$ that linearly transforms the vertex
 feature vectors. Let $\sigma$ be an activation function, then the following is one step of
@@ -162,7 +171,7 @@ A limitation of GCNs is that it requires a depth equal to the diameter of the gr
 information between all nodes. However, the problem with very deep GCNs is that feature vectors
 between nodes become indistinguishable due to the smoothing that $\bar{\mat{A}}$ introduces
 \citep{chen2020measuring}. Further, there is a bottleneck effect of how much information can be
-stored in fixed-size representations \citep{alon2020bottleneck}. There are no general solutions to
+stored in fixed-size representations \citep{alon2020bottleneck}. There is no canonical solution to
 these problems.
 
 \paragraph{Attention.}
@@ -171,7 +180,7 @@ As we have already seen in transformers, the attention mechanism is permutation 
 the sequence order.\sidenote{This is due to the softmax operator being equivariant.} GATs
 (\textit{\textbf{G}raph \textbf{A}ttention \textbf{N}etworks}) \citep{velivckovic2017graph} define
 the coupling matrix $\mat{Q}$ using attention, \[
-    q_{ij} = \mathrm{softmax}_j \lft( \rho \lft( \transpose{\vec{u}} [\mat{V} \vec{x}_i, \mat{V} \vec{x}_j, \vec{x}_{ij}] \rgt) \rgt),
+    q_{ij} = \mathrm{softmax}_j \lft( \rho \lft( \transpose{\vec{u}} [\mat{V} \vec{x}_i, \mat{V} \vec{x}_j, \vec{x}_{ij}] \rgt) \rgt), \quad \sum_{j=1}^{M} a_{ij}q_{ij} = 1, \forall i \in [M].
 \]
 where $\mat{V}$ projects the node features and $\vec{x}_{ij}$ is a feature vector representing the
 edge between $v_i$ and $v_j$. These are concatenated and projected to a learnable direction
@@ -198,12 +207,13 @@ neighborhoods.
 
 \begin{definition}[Graph Laplacian]
     The graph Laplacian is defined as \[
-        \mat{L} = \mat{D} - \mat{A},
+        \mat{L} \doteq \mat{D} - \mat{A},
     \]
-    where $\mat{D}$ is the degree matrix and $\mat{A}$ is the adjacency matrix. Alternatively, the
-    symmetric degree-normalized Laplacian can be used, \[
-        \tilde{\mat{L}} = \mat{I} - \mat{D}^{-\nicefrac{1}{2}} \mat{A} \mat{D}^{-\nicefrac{1}{2}} = \mat{D}^{-\nicefrac{1}{2}} (\mat{D} - \mat{A}) \mat{D}^{-\nicefrac{1}{2}}.
+    where $\mat{D} \in \R^{M \times M}$ is the (diagonal) degree matrix and $\mat{A} \in \R^{M \times
+            M}$ is the adjacency matrix. Alternatively, the symmetric degree-normalized Laplacian can be used, \[
+        \tilde{\mat{L}} \doteq \mat{I} - \mat{D}^{-\nicefrac{1}{2}} \mat{A} \mat{D}^{-\nicefrac{1}{2}} = \mat{D}^{-\nicefrac{1}{2}} (\mat{D} - \mat{A}) \mat{D}^{-\nicefrac{1}{2}}.
     \]
+    They are both positive semidefinite.
 \end{definition}
 
 One can generalize the Fourier transform to graphs by making use of the diagonalization of the
@@ -211,25 +221,25 @@ Laplacian, \[
     \mat{L} = \mat{U} \mat{\Lambda} \transpose{\mat{U}}.
 \]
 The columns of the orthogonal matrix $\mat{U}$ can be seen as the graph Fourier basis and the
-eigenvalues as frequencies. The convolution can then be defined as pointwise multiplication in the
-Fourier domain, \[
-    \vec{x} * \vec{y} = \mat{U} (\transpose{\mat{U}} \vec{x} \odot \transpose{\mat{U} \vec{y}}).
+eigenvalues as frequencies. By making use of \Cref{lem:conv-as-fourier}, a graph convolution can be
+defined as pointwise multiplication in the Fourier domain, \[
+    \mat{X} * \mat{Y} = \mat{U} \lft(\lft( \transpose{\mat{U}} \mat{X} \rgt) \odot \lft( \transpose{\mat{U}} \mat{Y} \rgt)\rgt).
 \]
 The learned convolution operation from one-dimensional signals is generalized as follows, \[
-    G_{\vec{\theta}}(\mat{L})\vec{x} = \mat{U}G_{\vec{\theta}}(\mat{\Lambda}) \transpose{\mat{U}}\vec{x}.
+    G_{\vec{\theta}}(\mat{L})\vec{x} = \mat{U}G_{\vec{\theta}}(\mat{\Lambda}) \transpose{\mat{U}}\mat{X}.
 \]
 The problem with this approach is that computing the eigendecomposition of $\mat{L}$ is done in
 $\bigo{M^3}$. A trick to circumvent this problem is to use polynomial kernels, \[
-    \mat{U} \lft( \sum_{k=0}^{K} \alpha_k \mat{\Lambda}^k \rgt) \transpose{\mat{U}} = \sum_{k=0}^{K} \alpha_k \mat{L}^k.
+    \mat{U} \lft( \sum_{k=0}^{K} \alpha_k \mat{\Lambda}^k \rgt) \transpose{\mat{U}} \mat{X} = \sum_{k=0}^{K} \alpha_k \mat{L}^k \mat{X}.
 \]
 Here, the polynomial order $K$ defines the size of the neighborhood, \ie, the kernel size. The
-parameters of this model are $\alpha_k$, so the number of parameters---and hence the
+parameters of this model are $\vec{\alpha} \in \R^K$, so the number of parameters---and hence the
 expressivity---of this layer is much smaller than in traditional one-, two-, or three-dimensional
 convolutions.
 
 Motivated by spectral graph theory, we can define a graph-convolutional layer as \[
     \vec{\xi}_m = \sum_{n=1}^{M} p_{mn}(\mat{L}) \vec{x}_n + b_n, \quad p_{mn}(\mat{L}) \doteq \sum_{k=0}^{K} \alpha_{mnk} \mat{L}^k.
 \]
-As before, $K$ defines the ``kernel size'' and $\vec{\alpha}$ are the parameters, which is used to
-compute the coefficients of the neighbors. As in traditional convolutions, this can be expressed as
-an affine transformation.
+As before, $K$ defines the ``kernel size'' and $\vec{\alpha} \in \R^{M \times M \times K}$ are the
+parameters, which is used to compute the coefficients of the neighbors. As in traditional
+convolutions, this can be expressed as an affine transformation.

@@ -1,70 +1,76 @@
 \section{Bayesian learning}
 
-Starting from a prior $p(\vec{\theta})$, we want to compute or approximate the posterior
-$p(\vec{\theta} \mid \mathcal{D})$. The ultimate goal is the Bayesian predictive distribution, \[
-    f(\vec{x}) = \int p(\vec{\theta}\mid \mathcal{D}) f[\vec{\theta}](\vec{x}) \mathrm{d}\vec{\theta},
+Typically in deep learning, we start from initial parameters and evolve them through gradient
+descent to obtain near-optimal parameters. In Bayesian learning, we take a more general point of
+view. Starting from a prior $p(\vec{\theta})$, we want to compute or approximate the posterior
+$p(\vec{\theta} \mid \mathcal{S})$. The ultimate goal is the Bayesian predictive distribution, \[
+    f(\vec{x}) = \int p(\vec{\theta}\mid \mathcal{S}) f[\vec{\theta}](\vec{x}) \mathrm{d}\vec{\theta}, \margintag{We weight predictions by the posterior probability of its parameters.}
 \]
 where the posterior can be defined via Bayes' rule, \[
-    p(\vec{\theta} \mid \mathcal{D}) = \frac{p(\mathcal{D}\mid \vec{\theta}) p(\vec{\theta})}{p(\mathcal{D})}, \quad p(\mathcal{D}) = \int p(\vec{\theta}) p(\mathcal{D}\mid \vec{\theta}) \mathrm{d}\vec{\theta}.
+    p(\vec{\theta} \mid \mathcal{S}) = \frac{p(\mathcal{S}\mid \vec{\theta}) p(\vec{\theta})}{p(\mathcal{S})}, \quad p(\mathcal{S}) = \int p(\vec{\theta}) p(\mathcal{S}\mid \vec{\theta}) \mathrm{d}\vec{\theta}.
 \]
-The evidence $p(\mathcal{D})$ is often intractable, but we often do not need it when unnormalized
+The evidence $p(\mathcal{S})$ is often intractable, but we often do not need it when unnormalized
 probabilities are sufficient.
 
 The isotropic Gaussian is a common prior, \[
-    p(\vec{\theta}) = \mathcal{N}(\vec{\theta}, \sigma^2 \mat{I}).
+    p(\vec{\theta}) = \mathcal{N}(\vec{0}, \sigma^2 \mat{I}).
 \]
 Optimizing this prior leads to a weight decay term as we have seen before,
 \begin{align*}
-    \vec{\theta}^\star & = \argmax_{\vec{\theta} \in \Theta} p(\vec{\theta} \mid \mathcal{D})                                                                                                                                                                 \\
-                       & = \argmax_{\vec{\theta} \in \Theta} p(\mathcal{D}\mid \vec{\theta}) p(\vec{\theta}) \margintag{$p(\mathcal{D})$ is a constant \wrt $\vec{\theta}$.}                                                                                  \\
-                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) - \log p(\vec{\theta}) \margintag{The logarithm is increasing.}                                                                                             \\
-                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) - \log p(\vec{\theta})                                                                                                                                      \\
-                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{D}\mid\vec{\theta}) + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2 \margintag{Plug in the definition of the Gaussian and remove all terms which are constant \wrt $\vec{\theta}$.} \\
+    \vec{\theta}^\star & = \argmax_{\vec{\theta} \in \Theta} p(\vec{\theta} \mid \mathcal{S})                                                                                                                                                                 \\
+                       & = \argmax_{\vec{\theta} \in \Theta} p(\mathcal{S}\mid \vec{\theta}) p(\vec{\theta}) \margintag{$p(\mathcal{S})$ is a constant \wrt $\vec{\theta}$.}                                                                                  \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{S}\mid\vec{\theta}) - \log p(\vec{\theta}) \margintag{The logarithm is increasing.}                                                                                             \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{S}\mid\vec{\theta}) - \log p(\vec{\theta})                                                                                                                                      \\
+                       & = \argmin_{\vec{\theta} \in \Theta} -\log p(\mathcal{S}\mid\vec{\theta}) + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2 \margintag{Plug in the definition of the Gaussian and remove all terms which are constant \wrt $\vec{\theta}$.} \\
                        & = \circledast
 \end{align*}
+Thus, a priori, the model favors small parameters.
 
 Further assume that we have data that is described by a function $f^\star: \mathcal{X} \to
     \mathcal{Y}$ with normal noise, \[
     y_i = f^\star(\vec{x}_i) + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \gamma^2).
 \]
-We get the following negative log likelihood,
+We get the following negative log-likelihood,
 \begin{align*}
-    -\log p(\mathcal{D}\mid\vec{\theta}) & = -\sum_{i=1}^{n} \log p(y_i \mid \vec{x}_i, \vec{\theta})                                                                                                                                                      \\
-                                         & \propto -\sum_{i=1}^{n} \frac{1}{2 \gamma^2} (y_i - f[\vec{\theta}](\vec{x}_i))^2 \margintag{We modeled $y_i \sim \mathcal{N}(f^\star(\vec{x}_i), \gamma^2)$ and $f[\vec{\theta}]$ must approximate $f^\star$.} \\
-                                         & = -\frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2.
+    -\log p(\mathcal{S}\mid\vec{\theta}) & = -\sum_{i=1}^{n} \log p(y_i \mid \vec{x}_i, \vec{\theta}) \margintag{We assume that the data is sampled i.i.d.}                                                                                               \\
+                                         & \propto \sum_{i=1}^{n} \frac{1}{2 \gamma^2} (y_i - f[\vec{\theta}](\vec{x}_i))^2 \margintag{We modeled $y_i \sim \mathcal{N}(f^\star(\vec{x}_i), \gamma^2)$ and $f[\vec{\theta}]$ must approximate $f^\star$.} \\
+                                         & = \frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2.
 \end{align*}
 So, the final optimization problem becomes \[
-    \circledast = \argmin_{\vec{\theta} \in \Theta} -\frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2 + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2.
+    \circledast = \argmin_{\vec{\theta} \in \Theta} \frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2 + \frac{1}{2 \sigma^2} \| \vec{\theta} \|^2.
 \]
 
-Finally, the question becomes how we sample parameters from the posterior $p(\vec{\theta} \mid
-    \mathcal{D})$ to approximate the predictive distribution, \[
-    f(\vec{x}) \approx \sum_{i=1}^{m} \frac{p\lft( \vec{\theta}^{(i)} \;\middle|\; \mathcal{D} \rgt)}{\sum_{j=1}^{m} p \lft( \vec{\theta}^{(j)} \;\middle|\; \mathcal{D} \rgt)} f\lft[ \vec{\theta}^{(i)} \rgt](\vec{x})
+This only gives us the best parameters, however, we want the posterior distribution of parameters,
+such that we can compute the Bayesian predictive distribution. Thus, the question becomes how we
+sample parameters from the posterior $p(\vec{\theta} \mid \mathcal{S})$ to approximate the
+predictive distribution, \[
+    f(\vec{x}) \approx \sum_{i=1}^{m} \frac{p( \vec{\theta}^{(i)} \mid \mathcal{S} )}{\sum_{j=1}^{m} p( \vec{\theta}^{(j)} \mid \mathcal{S})} f[\vec{\theta}^{(i)}](\vec{x})
 \]
+The next sections will consider common methods to sample the unknown posterior distribution.
 
 \subsection{Markov chain Monte Carlo}
 
 MCMC (\textit{\textbf{M}arkov \textbf{C}hain \textbf{M}onte \textbf{C}arlo}) is the standard method
-of sampling from a high-dimensional posterior distribution. It does so by defining a Markov chain
-in the parameter space, where the stationary distribution is equal to the posterior---when sampling
-a random sequence of parameters, we converge that we are at any parameter pair with the probability
-of its posterior. If we can construct such a Markov chain, we can sample the posterior by running
-the Markov chain for long enough---this period is known as the burn-in period. Further note that
-close parameters in the Markov chain are highly correlated, so we cannot take nearby samples as
-independent draws from the posterior.
-
-\subsection{Metropolis-Hastings}
+of sampling from a high-dimensional posterior distribution. It does so by constructing a Markov
+chain in the parameter space, where the stationary distribution is equal to the posterior---when
+sampling a random sequence of parameters, we converge to the posterior distribution. If we can
+construct such a Markov chain, we can sample the posterior by running the Markov chain for long
+enough---this period is known as the burn-in period. Further note that close parameters in the
+Markov chain are highly correlated, so we cannot take nearby samples as independent draws from the
+posterior.
 
 \begin{lemma} \label{lem:dbe}
     If a Markov chain, described by its kernel $\Pi: \Theta \to \Delta(\Theta)$, satisfies the DBE (\textit{\textbf{D}etailed \textbf{B}alance \textbf{E}quation}), \[
         q(\vec{\theta}) \Pi(\vec{\theta}' \mid \vec{\theta}) = q(\vec{\theta}') \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}' \in \Theta,
     \]
-    then the Markov chain is time reversible and has the posterior distribution $q$.
+    then the Markov chain is time reversible and has the unique stationary distribution $q$.
 \end{lemma}
 
-Using \Cref{lem:dbe}, we can thus guarantee that the stationary distribution of the Markov chain is
-the posterior if we have \[
-    p(\vec{\theta} \mid \mathcal{D}) \Pi(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{D}) \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}' \in \Theta.
+\paragraph{Metropolis-Hastings.}
+
+Using \Cref{lem:dbe}, we can guarantee that the stationary distribution of the Markov chain is the
+posterior if we have \[
+    p(\vec{\theta} \mid \mathcal{S}) \Pi(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{S}) \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}' \in \Theta.
 \]
 
 MH (\textit{\textbf{M}etropolis-\textbf{H}astings}) starts with sampling from an arbitrary Markov
@@ -75,22 +81,23 @@ acceptance function, and construct $\Pi$ as \[
 \]
 Intuitively, $\tilde{\Pi}$ makes a suggestion and $\alpha$ accepts or rejects it,
 probabilistically. Then, we need to construct $\alpha$ such that it satisfies the DBE, \[
-    p(\vec{\theta}\mid \mathcal{D}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta}) \alpha(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}') \alpha(\vec{\theta} \mid \vec{\theta}')
+    p(\vec{\theta}\mid \mathcal{S}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta}) \alpha(\vec{\theta}' \mid \vec{\theta}) = p(\vec{\theta}' \mid \mathcal{S}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}') \alpha(\vec{\theta} \mid \vec{\theta}')
 \]
-The acceptance function must satisfy a one-sided structure, \[
-    \alpha(\vec{\theta}' \mid \vec{\theta}) = 1 \lor \alpha(\vec{\theta} \mid \vec{\theta}') = 1.
+If we enforce the acceptance function to satisfy a one-sided structure, \[
+    \alpha(\vec{\theta}' \mid \vec{\theta}) = 1 \lor \alpha(\vec{\theta} \mid \vec{\theta}') = 1,
 \]
-Thus, the following is the only choice of $\alpha$, \[
-    \alpha(\vec{\theta} \mid \vec{\theta}') = \min \lft\{ 1, \frac{p(\vec{\theta} \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta})}{p(\vec{\theta}' \mid \mathcal{D}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}')} \rgt\}.
+the following is the only choice of $\alpha$, \[
+    \alpha(\vec{\theta} \mid \vec{\theta}') = \min \lft\{ 1, \frac{p(\vec{\theta} \mid \mathcal{S}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta})}{p(\vec{\theta}' \mid \mathcal{S}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}')} \rgt\}.
 \]
 If $\tilde{\Pi}$ is symmetric, then the acceptance probability is simply the ratio of posteriors.
+Note that we do not need to compute the normalizer $p(\mathcal{S})$ for this method.
 
 A potential problem with this approach is that while the Markov chain is guaranteed to converge to
 the posterior as its stationary distribution, this might take arbitrarily long---the burn-in period
 can be impractically costly. This is due to poor initial kernels $\tilde{\Pi}$ leading to very high
 rejection probabilities.
 
-\subsection{Hamiltonian Monte Carlo}
+\paragraph{Hamiltonian Monte Carlo.}
 
 HMC (\textit{\textbf{H}amiltonian \textbf{M}onte \textbf{C}arlo}) is an MCMC method for obtaining
 posterior averages. Consider an energy function---or loss function---equal to the negative log
@@ -118,9 +125,9 @@ momentum-based gradient descent dynamics.\sidenote{As a result, optimization wit
     single sample approximation of the predictive distribution.} However, this approach requires the full
 gradient, which is often intractable in practice.
 
-\subsection{Langevin dynamics}
+\paragraph{Langevin dynamics.}
 
-\marginnote{See the following video for a visualization of the sampling process with Langevin dynamics---\url{https://www.youtube.com/watch?v=cVn0kru3hL8}.}
+\marginnote{See the following video for a visualization of the sampling process with Langevin dynamics: \url{https://www.youtube.com/watch?v=cVn0kru3hL8}.}
 
 Langevin dynamics extends HMC by introducing friction,
 \begin{align*}
@@ -178,14 +185,15 @@ Hence, this is a Gaussian process with the following kernel, \[
 We can do this for multiple units, because the preactivations of units in the same layer are
 independent, conditioned on the input.
 
-If we increase the depth of this network, we do not get the same effect in general. However, a deep
+If we increase the depth of this network, we do not get the same effect in general, because there
+is randomness not only in the weights, but also in the preactivations. However, a deep
 preactivation process is ``near normal'' for high-dimensional inputs. This can be made rigorous
 with a multivariate version of the central limit theorem.
 
 \paragraph{Non-linear networks.}
 
 By introducing non-linear activation functions into the network, the activations are no longer
-Gaussian. However, due to the central limit theorem, they get are effectively turned back into
+Gaussian. However, due to the central limit theorem, they are effectively shaped back into
 Gaussians when they propagate to the next layer. The mean function can be computed by \[
     \mu \lft( \vec{x}^{\ell+1} \rgt) = \E \lft[ \phi \lft( \mat{W}^{\ell} \vec{x}^\ell \rgt) \rgt].
 \]
@@ -195,8 +203,9 @@ This might need to be computed using numerical integration. The kernel can be de
 We can now use kernel regression, \[
     f^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \mat{K}^{-1} \vec{y}, \quad \mat{K} = \mat{K}^{L}.
 \]
-In conclusion, deep neural networks can be thought of as GPs in the infinite-width limit. The
-advantage is that we can use wide random layers without the need for training, we can quantify
+In conclusion, deep neural networks can be thought of as GPs in the infinite-width
+limit.\sidenote{In the infinite-width limit, all preactivations can be viewed as incoming Gaussians.}
+The advantage is that we can use wide random layers without the need for training, we can quantify
 uncertainty, and we can leverage techniques from kernel machines. However, in general, it is not
 feasible to compute $f^\star$ and store $\mat{K}^{\ell}$. Furthermore, the expectations need to be
 computed, which is much less efficient than optimizing weights with gradient descent.

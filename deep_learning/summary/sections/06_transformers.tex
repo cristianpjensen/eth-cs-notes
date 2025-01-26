@@ -18,10 +18,11 @@ The attention mechanism is computed as follows, \[
     \mat{A} = \mathrm{softmax}\lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt), \quad \mat{\Xi} = \mat{A} \mat{V}. \margintag{Softmax is performed row-wise. The division by $\sqrt{d_k}$ is necessary because $\Var[\vec{x} \cdot \vec{y}] = d$, where $\vec{x}, \vec{y} \sim \mathcal{N}(\vec{0}, \mat{I}_d)$. We want to recover unit variance.} \\
 \]
 Here, $\mat{A} \in \R^{T\times T}$ is the attention matrix---$\vec{a}_i$ is a convex combination
-that tells us how much attention the $i$-th timestep pays to each other timestep.
+that tells us how much attention the $i$-th timestep pays to each other timestep. The rank of this
+matrix is bounded by $d_k$.
 
 The contextualized outputs are convex combinations of values, \[
-    \vec{\xi}_i = \sum_{t=1}^{T} \mathrm{softmax}_t(\vec{\omega}_i) \vec{v}_i, \quad \omega_{it} \propto \transpose{\vec{q}_i} \vec{k}_t.
+    \vec{\xi}_i = \sum_{t=1}^{T} \mathrm{softmax}_t(\vec{a}_i) \vec{v}_i, \quad a_{it} \propto \transpose{\vec{q}_i} \vec{k}_t.
 \]
 This makes intuitive sense, because the weight of the $t$-th timestep for timestep $i$ depends on
 the alignment between $\vec{q}_i$ and $\vec{k}_t$. Furthermore, $\vec{\xi}_i$ depends only on its
@@ -61,13 +62,13 @@ an effective way of giving additional sequence data $\mat{B}$ to a sequence $\ma
 The attention mechanism is permutation equivariant, which means that the order of input tokens does
 not influence the output. So, we need a way of reintroducing the sequence structure to this
 mechanism. We do this by defining a positional encoding matrix $\mat{P} \in \R^{T \times d}$ and
-adding it to the input sequence, $\mat{X} + \mat{P}$. One way of defining this matrix is as
+adding it to the input sequence, $\mat{X} + \mat{P}$. A common way of defining this matrix is as
 follows, \[
     p_{tk} =
     \begin{cases}
         \sin(t \omega_k) & k \mod 2 = 0  \\
-        \cos(t \omega_k) & k \mod 2 = 1.
-    \end{cases},
+        \cos(t \omega_k) & k \mod 2 = 1,
+    \end{cases}
     \quad
     \omega_k \doteq C^{\nicefrac{k}{d}}. \margintag{$C=10^4$.}
 \]
@@ -123,19 +124,20 @@ contextualize its input tokens. When the weights of these encoders are pretraine
 additional layers on top of the encoders that operate on BERT's contextualized tokens. We then
 finetune the weights of the full model on the specific task we are interested in.
 
-BERT's pre-training consists of two stages:
+BERT's pre-training consists of two stages,
 \begin{enumerate}
-    \item Predicting masked out tokens using its left and right context as input.\sidenote{This is also known
+    \item \textit{Predicting masked out tokens using its left and right context as input.}\sidenote{This is also known
               as the Cloze test \citep{taylor1953cloze}. Cloze tests require the ability to understand the
               context and vocabulary in order to identify the correct language or part of speech that belongs in
               the deleted passages.}\sidenote{BERT masks 15\% of tokens, of which 80\% is replaced by
-              \texttt{[MASK]}, 10\% is replaced by a random token, and 10\% is left unchanged.} The task is
-          performed by passing the representation of the masked token to a model that predicts which token
-          was originally there. This was previously not easy to do with RNNs, because they can only process
-          sequences left-to-right or right-to-left;
-    \item Binary next sentence classification, where the model must classify two sentences as being
-          consecutive or not, where the two sentences are separated by a \texttt{[SEP]}-token as input to the
-          encoders. In order to make classification possible, the \texttt{[CLS]}-token is appended to the
+              \texttt{[MASK]}, 10\% is replaced by a random token, and 10\% is left unchanged.} The
+          task is performed by passing a masked out text to BERT to retrieve its representations.
+          Then, the representation embedding of the masked tokens are passed to a model that predicts which token
+          was originally there. This was previously not easy to do with RNNs, because they can
+          only process sequences left-to-right or right-to-left;
+    \item \textit{Binary next sentence classification, where the model must classify two sentences as being
+              consecutive or not.} Here, the two sentences are separated by a \texttt{[SEP]}-token as input to BERT.
+          In order to make classification possible, the \texttt{[CLS]}-token is appended to the
           input tokens and its representation is used for the final prediction network.
 \end{enumerate}
 The first stage trains BERT's understanding of language, whereas the second stage enables BERT to infer relationships
@@ -144,26 +146,26 @@ between sentences, which is important for tasks like question-answering.
 Lastly, we can finetune the parameters of BERT with a small ground truth dataset to a large variety
 of tasks. \Eg,
 \begin{itemize}
-    \item Question answering, where a question and a context passage is provided with a \texttt{[SEP]}-token
+    \item \textit{Question answering}, where a question and a context passage is provided with a \texttt{[SEP]}-token
           separating them. Each token is passed to start and end token classifiers, which predict how likely
           each token is to be the start and end of the answer. Using these classifiers, we can extract the
           answer from the passage;
-    \item Part-of-speech tagging, where each token embedding is passed to a classification model, which
+    \item \textit{Part-of-speech tagging}, where each token embedding is passed to a classification model, which
           outputs a distribution over part-of-speech tags;
-    \item Sentiment classification, where the representation of the \texttt{[CLS]}-token is passed to a
+    \item \textit{Sentiment classification}, where the representation of the \texttt{[CLS]}-token is passed to a
           binary classification model that predicts whether the sentence is positive or negative.
 \end{itemize}
 
 \subsection{Vision transformer}
 
 ViT (\textit{\textbf{Vi}sion \textbf{T}ransformer}) \citep{dosovitskiy2020image} adapts the
-transformer architecture to images by treating patches of an input image as its tokens.
-\citet{dosovitskiy2020image} showed the effectiveness of this approach by adapting the transformer
-architecture to an image classification task. ViT computes the input tokens by vectorizing $16
-    \times 16$ patches of the input image and linearly projecting them to a token space. Further, a
-\texttt{[CLS]}-token is prepended to the sequence of tokens. Then, ViT employs the encoder
-architecture of the transformer to contextualize its input representations. Finally, the
-contextualized embedding of the \texttt{[CLS]}-token is passed to a classification network that
+transformer architecture to images by treating patches of an input image as its tokens---see
+\Cref{fig:vit}. \citet{dosovitskiy2020image} showed the effectiveness of this approach by adapting
+the transformer architecture to an image classification task. ViT computes the input tokens by
+vectorizing $16 \times 16$ patches of the input image and linearly projecting them to a token
+space. Further, a \texttt{[CLS]}-token is prepended to the sequence of tokens. Then, ViT employs
+the encoder architecture of the transformer to contextualize its input representations. Finally,
+the contextualized embedding of the \texttt{[CLS]}-token is passed to a classification network that
 predicts the class of the input image.
 
 \begin{figure}[t]

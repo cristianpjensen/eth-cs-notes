@@ -49,19 +49,22 @@ We only need to find the minimum $\lambda > 0$ such that
      & \iff & \lambda & > \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_1 - \vec{w}_2 \|^2_2}.
 \end{align*}
 In conclusion the optimal $\vec{\eta}$ is the following, \[
-    \vec{\eta} = \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_2 - \vec{w}_1 \|^2_2} \vec{w}_2 - \vec{w}_1.
+    \vec{\eta} = \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_2 - \vec{w}_1 \|^2_2} (\vec{w}_2 - \vec{w}_1).
 \]
 This can be generalized to any source class $i$ and target class $j$---if the target class does not
-matter, you take the most easily confusable class. In the general case, we can linearize the model
+matter, you take the most easily confusable class. In the general case, we can linearize the model, \[
+    f_i(\vec{x}) \approx f_i(\tilde{\vec{x}}) + \lft\langle \grad{f_i(\tilde{\vec{x}})}{}, \vec{x} - \tilde{\vec{x}} \rgt\rangle. \margintag{We choose $\tilde{\vec{x}}$ to be the current iterate, since that results in the best approximation. Now, $\grad{f_i(\tilde{\vec{x}})}{}$ acts as $\vec{w}_i$ and $f_i(\tilde{\vec{x}})$ as $b_i$ in the previous example.}
+\]
 and iteratively find the optimal adversarial perturbation \citep{moosavi2016deepfool}. This is done
 by iteratively solving the following convex program,
 \begin{align*}
-    \min              & \quad \| \vec{\delta} \|_p                                                                                              \\
-    \text{subject to} & \quad \transpose{\vec{\delta}} \lft( \grad{f_i(\vec{x})}{} - \grad{f_j(\vec{x})}{} \rgt) < f_i(\vec{x}) - f_j(\vec{x}).
+    \min              & \quad \| \vec{\delta} \|_p                                                                                                                        \\
+    \text{subject to} & \quad \lft\langle \grad{f_i(\vec{x})}{} - \grad{f_j(\vec{x})}{}, (\vec{x}+\vec{\delta})-\vec{x} \rgt\rangle + f_i(\vec{x}) - f_j(\vec{x}) \leq 0.
 \end{align*}
-Then, update until $f_j(\vec{x} + \vec{\eta}_t) > f_i(\vec{x} + \vec{\eta}_t)$ \[
-    \vec{\eta}_t = \vec{\eta}_{t-1} + \vec{\delta}, \quad \vec{\eta}_0 = \vec{0}.
+Then, update the noise, \[
+    \vec{\eta}_t = \vec{\eta}_{t-1} + \vec{\delta}, \quad \vec{\eta}_0 = \vec{0},
 \]
+until $f_j(\vec{x} + \vec{\eta}_t) > f_i(\vec{x} + \vec{\eta}_t)$.
 
 \subsection{Robust training}
 

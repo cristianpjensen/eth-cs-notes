@@ -2,97 +2,149 @@
 
 \subsection{Convolutions}
 
+An operator $T$ maps a function $f: \R \to \R^m$ to another function $Tf: \R \to \R^m$.
+
 \begin{definition}[Integral operator]
-    \[
+    The integral operator $T$ uses a kernel $G: \R^2 \to \R$ and maps a function $f: \R \to \R$ to
+    another as follows, \[
         (Tf)(u) \doteq \int_{t_1}^{t_2} H(u,t) f(t) \mathrm{d}t, \quad -\infty \leq t_1 < t_2 \leq \infty.
     \]
 \end{definition}
 
-\begin{definition}[Fourier transform]
-    \[
-        (\mathcal{F} f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi i t u} f(t) \mathrm{d}t. \margintag{Special case of integral operator with $H(u,t) = e^{-2 \pi itu}, t_1 = -\infty, t_2=\infty$.}
+\begin{definition}[Fourier transform] \label{def:fourier}
+    The Fourier transform is an example of an integral operator with $H(u,t) = \exp(-2\pi itu)$, $t_1
+        = -\infty$, and $t_2 = +\infty$, \[
+        (\mathcal{F} f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi i t u} f(t) \mathrm{d}t.
     \]
 \end{definition}
 
 \begin{definition}[Convolution]
-    \[
-        (f * h)(u) \doteq \int_{-\infty}^\infty h(u-t)f(t) \mathrm{d}t. \margintag{Special case of integral operator with $H(u,t) = h(u-t), t_1=-\infty, t_2=\infty$.}
+    The convolutional operator is a special case of the integral operator with $H(u, t) = h(u-t)$
+    with $h: \R \to \R$, $t_1 = -\infty$, and $t_2 = +\infty$, \[
+        (f * h)(u) \doteq \int_{-\infty}^\infty h(u-t)f(t) \mathrm{d}t.
     \]
 \end{definition}
 
 \begin{lemma}[Convolution is commutative]
     \[
-        f * h = h * f, \quad \forall f, h.
+        f * h = h * f, \quad \forall f,h: \R \to \R.
     \]
 \end{lemma}
 
 \begin{proof}
     Let $u \in \R$, then
     \begin{align*}
-        (h * f)(u) & \doteq \int_{-\infty}^\infty h(u-t) f(t) \mathrm{d}t                             \\
-                   & = \int_{\infty}^{-\infty} h(v) f(u-v) (-\mathrm{d}v) \margintag{$v \doteq u-t$.} \\
-                   & = \int_{-\infty}^\infty h(v) f(u-v) \mathrm{d}v.
+        (h * f)(u) & \doteq \int_{-\infty}^\infty h(u-t) f(t) \mathrm{d}t                        \\
+                   & = \int_{\infty}^{-\infty} h(v) f(u-v) (-\mathrm{d}v) \margintag{$v = u-t$.} \\
+                   & = \int_{-\infty}^\infty h(v) f(u-v) \mathrm{d}v                             \\
+                   & = (f * h)(u).
     \end{align*}
 \end{proof}
 
 \begin{lemma}[Convolution is shift-equivariant]
-    Let $f_{\delta}$ denote a shifted function, \[
-        f_{\delta}(t) \doteq f(t+\delta).
+    Let $f_{\Delta}$ denote a shifted function, \[
+        f_{\Delta}(t) \doteq f(t+\Delta).
     \]
     The convolution is shift-equivariant, \[
-        f_{\delta} * h = (f * h)_{\delta}.
+        f_{\Delta} * h = (f * h)_{\Delta}.
+    \]
+    So, it does not matter if we first shift and then apply convolution or the other way around.
+\end{lemma}
+
+\begin{proof}
+    Let $u,\Delta \in \R$, then
+    \begin{align*}
+        (f_{\Delta} * h)(u) & = \int_{-\infty}^\infty h(u-t) f(t-\Delta) \mathrm{d}t                               \\
+                            & = \int_{-\infty}^\infty h(u+\Delta-v) f(v) \mathrm{d}v \margintag{$v = t - \Delta$.} \\
+                            & = (f * h)(u + \Delta)                                                                \\
+                            & = (f * h)_{\Delta}(u).
+    \end{align*}
+\end{proof}
+
+\begin{lemma}[Convolution with Fourier transform] \label{lem:conv-as-fourier}
+    The convolutional operator can be computed via the Fourier transform, \[
+        \mathcal{F}(f * h) = \mathcal{F} f \cdot \mathcal{F} h.
+    \]
+    Then, the convolution can be obtained by \[
+        f * h = \mathcal{F}^{-1}(\mathcal{F}f \cdot \mathcal{F}h).
     \]
 \end{lemma}
 
 \begin{proof}
-    Let $u,\delta \in \R$, then
+    Note the definition of the Fourier transform in \Cref{def:fourier},
     \begin{align*}
-        (f_{\delta} * h)(u) & = \int_{-\infty}^\infty h(u-t) f(t-\delta) \mathrm{d}t                               \\
-                            & = \int_{-\infty}^\infty h(u+\delta-v) f(v) \mathrm{d}v \margintag{$v = t - \delta$.} \\
-                            & = (f * h)(u + \delta)                                                                \\
-                            & = (f * h)_{\delta}(u).
+        \mathcal{F}(f * h)(u) & = \int_{-\infty}^\infty e^{-2\pi iut} (f * h)(t) \mathrm{d}t                                                                \\
+                              & = \int_{-\infty}^\infty \int_{-\infty}^\infty e^{-2\pi iut} h(t-s) f(s) \mathrm{d}s\mathrm{d}t                              \\
+                              & = \int_{-\infty}^\infty \int_{\infty}^{-\infty} e^{-2\pi iu (v+s)} h(v) f(s) \mathrm{d}s(-\mathrm{d}v) \margintag{$v=t-s$.} \\
+                              & = \int_{-\infty}^\infty \int_{-\infty}^\infty e^{-2\pi iu (v+s)} h(v) f(s) \mathrm{d}s\mathrm{d}v                           \\
+                              & = \int_{-\infty}^\infty e^{-2\pi iuv} h(v) \cdot \int_{-\infty}^\infty e^{-2\pi ius} f(s) \mathrm{d}s\mathrm{d}v            \\
+                              & = \mathcal{F}f \cdot \mathcal{F} h.
     \end{align*}
 \end{proof}
 
-The convolutional operator can be computed via the Fourier transform, \[
-    \mathcal{F}(f * h) = \mathcal{F} f \cdot \mathcal{F} h.
-\]
-In the discrete case, this allows computing the convolution with the Fast Fourier Transform
-algorithm---however, this is not very useful for machine learning.
+In the discrete case, this allows computing the convolution in $\bigo{n \log n}$ with the Fast
+Fourier Transform algorithm and its inverse---however, this is not very useful for machine
+learning.
 
 \begin{theorem}
-    Any linear shift-equivariant transformation can be written as a convolution with a suitable kernel.
+    Let $T$ be a linear shift-equivariant operator, then there exists a kernel $h: \R \to \R$ such
+    that $T$ can be written as a convolution, \[
+        Tf = f * h.
+    \]
 \end{theorem}
 
 \begin{proof}
-    TODO
+    A linear shift-equivariant operator $T$ is characterized by its linearity, \[
+        T(\alpha f + \beta g) = \alpha Tf + \beta Tg, \quad \forall f,g: \R \to \R, \alpha,\beta\in \R,
+    \]
+    and its shift-equivariance, \[
+        Tf_{\Delta} = (Tf)_{\Delta}.
+    \]
+    Let $\delta$ be the Dirac delta function, \[
+        \delta(u) \doteq \begin{cases}
+            \infty & u = 0     \\
+            0      & u \neq 0,
+        \end{cases}
+        \quad \int_{-\infty}^\infty \delta(u)\mathrm{d}u = 1.
+    \]
+    We can write the function as an integral over delta functions, \[
+        f(u) = \int_{-\infty}^\infty f(t) \delta(t-u) \mathrm{d}t.
+    \]
+    Applying $T$ yields
+    \begin{align*}
+        Tf(u) & = T \lft( \int_{-\infty}^\infty f(t) \delta(t-u) \mathrm{d}t \rgt)                                                                                   \\
+              & = \int_{-\infty}^\infty T(f(t) \delta(t-u)) \mathrm{d}t \margintag{$T$ is linear.}                                                                   \\
+              & = \int_{-\infty}^\infty f(t) T \delta(t-u) \mathrm{d}t \margintag{$T$ acts \wrt $u$, so $f(t)$ is a constant that we can pull out due to linearity.} \\
+              & = \int_{-\infty}^\infty f(t) h(u-t) \mathrm{d}t \margintag{$h(u) = T\delta(-u)$. This holds because of shift-equivariance.}                          \\
+              & = (f * h)(u).
+    \end{align*}
 \end{proof}
 
 \begin{definition}[Discrete convolution]
     Let $f,h: \Z \to \R$, then \[
-        (f * h)[u] \doteq \sum_{t=-\infty}^{\infty} h[t] f[u-t].
+        (f * h)[u] \doteq \sum_{t=-\infty}^{\infty} f[t] h[u-t].
     \]
 \end{definition}
 
 Typically, the kernel $h$ has support over a finite window, such that $h[t] = 0, \forall t \not\in
     [t_{\min}, t_{\max}]$. Then, the sum can be truncated, \[
-    (f * h)[u] \doteq \sum_{t=t_{\min}}^{t_{\max}} h[t] f[u-t].
+    (f * h)[u] \doteq \sum_{t=t_{\min}}^{t_{\max}} f[t] h[u-t].
 \]
 
 \begin{definition}[Cross-correlation]
     Let $f,h: \Z \to \R$, then \[
-        (h \star f)[u] \doteq \sum_{t=-\infty}^{\infty} h[t] f[u+t].
+        (f \star h)[u] \doteq \sum_{t=-\infty}^{\infty} f[t] h[u+t].
     \]
 \end{definition}
 
 \begin{remark}
     This is equivalent to convolution with a flipped kernel, \[
-        (h \star f) = (\bar{h} * f), \quad \bar{h}[t] \doteq h[-t].
+        (f \star h) = (f * \bar{h}), \quad \bar{h}[t] \doteq h[-t].
     \]
 \end{remark}
 
-Toeplitz matrix $\mat{H}_n^h \in \R^{(n + m - 1) \times n}$ is a matrix, where $h_i$ is on the
-$i$-th diagonal, \[
+Let $f: [n] \to \R$ and $h: [n] \to \R$, then the Toeplitz matrix $\mat{H}_n^h \in \R^{(n + m - 1)
+        \times n}$ is a matrix, where $h_i$ is on the $i$-th diagonal, \[
     \mat{H}_n^h \doteq \begin{bmatrix}
         h_1    & 0      & 0      & 0      & \cdots & 0      & 0       \\
         h_2    & h_1    & 0      & 0      & \cdots & 0      & 0       \\
@@ -105,9 +157,10 @@ $i$-th diagonal, \[
 Convolution is equivalent to applying this matrix to a vectorized $\vec{f} \in \R^n$, \[
     f * h = \mat{H}_n^h \begin{bmatrix} f_1 \\ \vdots \\ f_n \end{bmatrix}.
 \]
-This is effectively a proof that the convolutional operator is linear.
+This highlights the fact that a convolutional operator is a linear layer with shared parameters
+within the matrix---it has increased statistical efficiency over a linear layer.
 
-\subsection{Convolutional layers}
+\subsection{Convolutional networks}
 
 The goal of convolutional layers is to exploit translational equivariance of data, such as images.
 Furthermore, convolutional layers have higher statistical efficiency than fully connected layers,
@@ -120,6 +173,31 @@ In general, the data has channels. So, in practice, we learn multiple convolutio
 for every pair of input-output channel. The output channel is then computed as the sum over its
 corresponding kernels with all input channels.
 
+Let $\mat{X}^{\ell}$ be the $\ell$-th layer of a convolutional network. Further, let
+$\mat{\Delta}^{\ell} \doteq \pdv{h}{\mat{X}^{\ell}}$, where $h = \ell \circ f$ then we have
+\begin{align*}
+    \delta^{\ell-1}_{ij} & = \pdv{h}{x^{\ell-1}_{ij}}                                                                                          \\
+                         & = \sum_{m} \sum_{n} \pdv{h}{x^{\ell}_{mn}} \pdv{x^{\ell}_{mn}}{x^{\ell-1}_{ij}}                                     \\
+                         & = \sum_{m} \sum_{n} \delta^{\ell}_{mn} \pdv*{\sum_{k} \sum_{l} x^{\ell-1}_{m-k,n-l} w^{\ell}_{kl}}{x^{\ell-1}_{ij}} \\
+                         & = \sum_{m} \sum_{n} \delta^{\ell}_{mn} w^{\ell}_{m-i,n-l}.
+\end{align*}
+Thus, we can compute $\mat{\Delta}^{\ell-1}$ by a cross-correlation, \[
+    \mat{\Delta}^{\ell-1} = \mat{\Delta}^{\ell} \star \mat{W}^{\ell}.
+\]
+Furthermore, we can compute the gradient \wrt the weights,
+\begin{align*}
+    \pdv{h}{w^\ell_{mn}} & = \sum_i \sum_j \pdv{h}{x^{\ell}_{ij}} \pdv{x^\ell_{ij}}{w^\ell_{mn}}                                       \\
+                         & = \sum_i \sum_j \delta^{\ell}_{ij} \pdv*{\sum_{k} \sum_{l} x^{\ell-1}_{i-k,j-l} w^{\ell}_{kl}}{w^\ell_{mn}} \\
+                         & = \sum_i \sum_j \delta^{\ell}_{ij} x^{\ell-1}_{i-m,j-n}.
+\end{align*}
+We can compute this with a convolution, \[
+    \pdv{h}{\mat{W}^{\ell}} = \mat{\Delta}^{\ell} * \mat{X}^{\ell-1}.
+\]
+In conclusion, we can compute both the forward and backward pass using only convolutional
+operations.
+
+\paragraph{Non-linearities and pooling.}
+
 We interleave convolutional layers with non-linearities and pooling layers, which downsample the
 input, \[
     \mat{I}'[i,j] = \max \{ \mat{I}[i+k,j+\ell] \mid k, \ell \in [0, r) \},
@@ -127,8 +205,21 @@ input, \[
 where $r$ is the window size. In general, convolutional networks have a pyramid structure, where
 the data gets iteratively downsampled.
 
-TODO: Gradients.
+Let the $\ell$-th layer be a max-pooling layer and $(i^\star,j^\star)$ the indices of the maximum
+values in the forward pass, then we can compute the gradient by \[
+    \pdv{x^{\ell}_{ij}}{x^{\ell-1}_{mn}} = \mathbb{1}\{ (m,n) = (i^\star, j^\star) \}.
+\]
+Note that max pooling has no parameters, so the backward pass only propagates the gradient to
+further layers.
 
-% \subsection{Computer vision}
-%
-% \subsection{Natural language processing}
+\paragraph{Channels.}
+
+We can extend the convolutional layer to multiple channels as follows, \[
+    (\tens{X} * \tens{W})[c, i, j] \doteq \sum_{r=1}^{C_\mathrm{in}} \sum_{k=-\infty}^{\infty} \sum_{\ell=-\infty}^{\infty} w[c,r,k,\ell] x[r, i-k, j-\ell].
+\]
+Here, $\tens{W} \in \R^{C_{\mathrm{in}} \times C_{\mathrm{out}} \times K \times K}$ is a tensor of
+parameters, where $K$ is the kernel size. In general, such layers are used to sequentially increase
+the channel dimension, while the max pool layers are used to decrease the spatial dimension. In the
+end, a classification or regression network produces a $C \times 1 \times 1$ image for some
+dimensionality $C$, which is cast to be a $C$-dimensional feature vector. This is then given to a
+fully connected network to make the final prediction.

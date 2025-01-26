@@ -6,20 +6,22 @@ Autoencoders map datapoints to latents with an encoder $\bm{\mathcal{E}}$ and la
 respective datapoint with a decoder $\bm{\mathcal{D}}$, \[
     \bm{\mathcal{E}}: \mathcal{X} \to \mathcal{Z}, \quad \bm{\mathcal{D}}: \mathcal{Z} \to \mathcal{X}.
 \]
-Generally, the latent space is smaller than the data space. As a result, new data points can be
-sampled by sampling the latent space and using the decoder.
+We want these to satisfy $\bm{\mathcal{D}}(\bm{\mathcal{E}}(\vec{x})) = \vec{x}$. Generally, the
+latent space is smaller than the data space. As a result, new data points can be sampled by sampling
+the latent space and using the decoder.
 
 \paragraph{Linear autoencoder.}
 
 The simplest autoencoder is linear, \[
     \bm{\mathcal{E}}(\vec{x}) = \mat{E} \vec{x}, \quad \bm{\mathcal{D}}(\vec{z}) = \mat{D} \vec{z}, \quad \mat{E} \in \R^{m \times d}, \mat{D} \in \R^{d \times m},
 \]
-where generally $m \ll d$. Reconstruction loss, \[
+where generally $m \ll d$. The reconstruction loss is \[
     \ell[\mat{E}, \mat{D}](\vec{x}) = \frac{1}{2} \| \vec{x} - \hat{\vec{x}} \|^2 = \frac{1}{2} \| (\mat{I} - \mat{D} \mat{E}) \vec{x} \|^2.
 \]
-The solution to this loss is performing PCA (\textit{\textbf{P}rincipal \textbf{C}omponent 
+It can be shown that the solution to this loss is performing PCA (\textit{\textbf{P}rincipal \textbf{C}omponent 
 \textbf{A}nalysis}) on the covariance matrix $\frac{1}{n} \transpose{\mat{X}} \mat{X} \in \R^{d \times d}$
-and taking the $m$ principal eigenvectors.
+and taking the $m$ principal eigenvectors. The intuition behind this is that we want to retain as
+much variance in the data as possible.
 
 \paragraph{Variational autoencoder.}
 
@@ -31,7 +33,7 @@ However, the question is how to optimize the decoder. In generative modeling, we
 the likelihood of the data. However, this is not possible for the VAE, so we must bound it using
 the ELBO (\textit{\textbf{E}vidence \textbf{L}ower \textbf{Bo}und}),
 \begin{align*}
-    \log p[\vec{\theta}](\vec{x}) & = \log \int p[\vec{\theta}](\vec{x}, \vec{z}) \mathrm{d}\vec{z} \margintag{Sum rule.}                                                                                                                                                                                                                                                                                                \\
+    \log p[\vec{\theta}](\vec{x}) & = \log \int p[\vec{\theta}](\vec{x}, \vec{z}) \mathrm{d}\vec{z} \margintag{Sum rule, where $\vec{z}$ could be anything.}                                                                                                                                                                                                                                                                                                \\
                                   & = \log \int p[\vec{\theta}](\vec{x} \mid \vec{z}) p(\vec{z}) \mathrm{d}\vec{z} \margintag{Product rule. The conditional distribution is induced by the decoder with parameters $\vec{\theta}$.}                                                                                                                                                                                      \\
                                   & = \log \int q(\vec{z}) \lft( p[\vec{\theta}](\vec{x} \mid \vec{z}) \frac{p(\vec{z})}{q(\vec{z})} \rgt) \mathrm{d}\vec{z} \margintag{$q$ can be any distribution over $\vec{z}$, which we will make use of later.}                                                                                                                                                                    \\
                                   & = \log \E_q \lft[ p[\vec{\theta}](\vec{x}\mid \vec{z}) \frac{p(\vec{z})}{q(\vec{z})} \rgt]                                                                                                                                                                                                                                                                                           \\
@@ -48,7 +50,7 @@ than a single point. Then, the decoder will see a greater variety of latents dur
 making it perform well on all latents around the prior. As a result, when we want to sample from the
 autoencoder, we can sample $\vec{z}$ from the prior and get a good reconstruction
 $\vec{x} = \bm{\mathcal{D}}(\vec{z})$. If every training data point instead only had to cover a
-single point in the latent space, the latent $\vec{z}$ would likely not have been seen before by the
+single point in the latent space, a sampled latent $\vec{z} \sim p$ would likely not have been seen before by the
 decoder and thus give a bad sample.
 
 In general, the posterior $p[\vec{\vartheta}](\vec{z}\mid \vec{x})$ is intractable, so we restrict
@@ -97,8 +99,8 @@ discriminator,
                        & = \E_p \lft[ \log \frac{p(\vec{x})}{p(\vec{x}) + p[\vec{\theta}](\vec{x})} \rgt] + \E_{p[\vec{\theta}]} \lft[ \log \frac{p[\vec{\theta}](\vec{x})}{p(\vec{x}) + p[\vec{\theta}](\vec{x})} \rgt]                                                                                                             \\
                        & = \E_p \lft[ \log p(\vec{x}) \rgt] - \E_p \lft[ \log \lft( p(\vec{x}) + p[\vec{\theta}](\vec{x}) \rgt) \rgt]                                                                                                                                                                                                \\
                        & \quad + \E_{p[\vec{\theta}]} \lft[ \log p[\vec{\theta}](\vec{x}) \rgt] - \E_{p[\vec{\theta}]} \lft[ \log \lft( p(\vec{x}) + p[\vec{\theta}](\vec{x}) \rgt) \rgt]                                                                                                                                            \\
-                       & = -\frac{1}{2} H(p) -\frac{1}{2} H(p[\vec{\theta}]) + H\lft(\frac{1}{2} (p + p[\vec{\theta}])\rgt) - \log 4 \margintag{Combine the two negative terms into an expectation \wrt $\tilde{p}$. Then, get the argument of the logarithm to be $\tilde{p}$ to get the entropy term of $\tilde{p} = \frac{1}{2} (p + p[\vec{\theta}])$.} \\
-                       & = 2D_{\mathrm{JS}}(p \| p[\vec{\theta}]) - \log 4.
+                       & = -\frac{1}{2} H(p) -\frac{1}{2} H(p[\vec{\theta}]) + H\lft(\frac{1}{2} (p + p[\vec{\theta}])\rgt) - \log 2 \margintag{Combine the two negative terms into an expectation \wrt $\tilde{p}$. Then, get the argument of the logarithm to be $\tilde{p}$ to get the entropy term of $\tilde{p} = \frac{1}{2} (p + p[\vec{\theta}])$.} \\
+                       & = D_{\mathrm{JS}}(p \| p[\vec{\theta}]) - \log 2.
 \end{align*}
 In conclusion, minimizing the logistic log-likelihood of the optimal classifier leads to a loss
 function that is the discrepancy between the nature distribution and the model distribution.
@@ -128,7 +130,7 @@ This can also be interpreted as a two-player zero-sum game---we need the extragr
     \vec{\theta}_{t+1} & = \vec{\theta}_t - \eta \grad{\ell(\vec{\theta}_{t+\nicefrac{1}{2}}, \vec{\varphi}_t)}{\vec{\theta}}, \quad \vec{\theta}_{t+\nicefrac{1}{2}} \doteq \vec{\theta}_t - \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_t)}{\vec{\theta}} \\
     \vec{\varphi}_{t+1} & = \vec{\varphi}_t + \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_{t+\nicefrac{1}{2}})}{\vec{\varphi}}, \quad \vec{\varphi}_{t+\nicefrac{1}{2}} \doteq \vec{\varphi}_t + \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_t)}{\vec{\varphi}}.
 \end{align*}
-This is necessary, because alternating gradient descent/ascent is not guaranteed to converge to a local minimum.
+This is necessary, because alternating gradient descent/ascent is not guaranteed to converge to local optima.
 
 In practice, it is also necessary to set the loss function of the generator to be the following, \[
     \ell(\vec{\theta} \mid \vec{\varphi}) = \E_{p[\vec{\theta}]} \lft[ -\log q[\vec{\varphi}](\vec{x}) \rgt]. \margintag{Initially, it was $\E_{p[\vec{\theta}]} \lft[ \log(1-q_{\vec{\varphi}}(\vec{x})) \rgt]$.}
@@ -151,10 +153,10 @@ One can view the diffusion process in a continuous time by an SDE (\textit{\text
 \textbf{D}ifferential \textbf{E}quation}) \citep{song2019generative,song2020score}, \[
     \mathrm{d}\vec{x}_t = -\frac{1}{2} \beta_t \vec{x}_t \mathrm{d}t + \sqrt{\beta_t} \mathrm{d}\mathbb{W}_t,
 \]
-where $\mathbb{W}_t$ is a Wiener process. The time-reversed SDE can be computed by the following, \[
+where $\mathrm{d}\mathbb{W}_t$ is a Wiener process.\sidenote{The Wiener process $\mathrm{d}\mathbb{W}_t$ is a Gaussian distribution with variance $\mathrm{d}t$.} The time-reversed SDE can be computed by the following, \[
     \mathrm{d}\vec{x}_t = \lft( -\frac{1}{2} \beta_t \vec{x}_t - \beta_t \grad{\log q_t(\vec{x}_t)}{\vec{x}_t} \rgt) \mathrm{d}t + \sqrt{\beta_t} \mathrm{d} \tilde{\mathbb{W}}_t,
 \]
-where $\tilde{\mathbb{W}}_t$ is the reversed Wiener process. Intuitively, denoising amounts to
+where $\mathrm{d}\tilde{\mathbb{W}}_t$ is the reversed Wiener process. Intuitively, denoising amounts to
 approximating a vector field over the gradient of the probability distribution---moving towards areas
 with high probability density. Effectively, we are performing gradient ascent on the log-probability
 perturbed by a Wiener noise process. Hence, we can think of diffusion models as approximating the
@@ -172,6 +174,12 @@ score function $\grad{\log p(\vec{x})}{}$.
 One can also present diffusion models in a less involved way by deriving an ELBO. Let the following be the forward process, \[
     \vec{x}_t = \sqrt{1-\beta_t} \vec{x}_{t-1} + \sqrt{\beta}_t \vec{\epsilon}_t, \quad \vec{\epsilon}_t \sim \mathcal{N}(\vec{0}, \mat{I}).
 \]
+Note that the energy of the stochastic process evolves as follows, \[
+    \E \lft[ \| \vec{x}_t \|^2 \;\middle|\; \vec{x}_{t-1} \rgt] = (1-\beta_t) \| \vec{x}_{t-1} \|^2 + \beta_t \tr{\mat{I}}.
+\]
+Fixing the scale of the data such that $\E \lft[ \| \vec{x}_0 \|^2 \rgt] = \tr{\mat{I}} =
+\mathrm{dim}(\vec{x}_0)$ results in energy conservation.
+
 Let $q$ be the kernel of the forward diffusion Markov chain and $p[\vec{\theta}]$ the learned kernel
 for the time-reversed one. Furthermore, let $p$ be the actual distribution over data points. Then,
 the log-likelihood of a sample $\vec{x}_0 \sim p$ can be lower bounded as follows,
@@ -181,12 +189,15 @@ the log-likelihood of a sample $\vec{x}_0 \sim p$ can be lower bounded as follow
                                     & \geq \E_{q(\vec{x}_{1:T} \mid \vec{x}_0)} \lft[ \log \frac{p[\vec{\theta}](\vec{x}_{0:T})}{q(\vec{x}_{1:T} \mid \vec{x}_0)} \rgt] \margintag{Jensen's inequality.} \\
                                     & = \E_{q(\vec{x}_{1:T} \mid \vec{x}_0)} \lft[ \sum_{t=0}^{T} \log p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1:T}) - \sum_{t=1}^{T} \log q(\vec{x}_t \mid  \vec{x}_0, \vec{x}_{1:t-1}) \rgt] \margintag{Product rule.} \\
                                     & = \E_{q(\vec{x}_{1:T} \mid \vec{x}_0)} \lft[ \sum_{t=0}^{T} \log p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1}) - \sum_{t=1}^{T} \log q(\vec{x}_t \mid \vec{x}_0, \vec{x}_{t-1}) \rgt] \margintag{Markov property.} \\
-                                    & = \E_{q(\vec{x}_{1:T} \mid \vec{x}_0)} \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) + \log \frac{p(\vec{x}_T)}{q(\vec{x}_T \mid \vec{x}_0)} + \sum_{t=1}^{T-1} \log \frac{p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})}{q(\vec{x}_t \mid \vec{x}_0, \vec{x}_{t-1})} \rgt] \\
-                                    & = \E_q \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) \rgt] + \sum_{t=1}^{T-1} \E_q \lft[ \log \frac{p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})}{q(\vec{x}_t \mid \vec{x}_0, \vec{x}_{t-1})} \rgt] + \E_q \lft[ \log \log \frac{p(\vec{x}_T)}{q(\vec{x}_T \mid \vec{x}_0)} \rgt] \\
-                                    & = \E_q \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) \rgt] - \sum_{t=1}^{T-1} D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \| p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) - D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \mid \pi).
+                                    & = \E_{q(\vec{x}_{1:T} \mid \vec{x}_0)} \Biggl[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) + \log \frac{p(\vec{x}_T)}{q(\vec{x}_T \mid \vec{x}_0)} \\
+                                    & \quad \quad + \sum_{t=1}^{T-1} \log \frac{p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})}{q(\vec{x}_t \mid \vec{x}_0, \vec{x}_{t-1})} \Biggr] \\
+                                    & = \E_q \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) \rgt] + \sum_{t=1}^{T-1} \E_q \lft[ \log \frac{p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})}{q(\vec{x}_t \mid \vec{x}_0, \vec{x}_{t-1})} \rgt] \\
+                                    & \quad \quad + \E_q \lft[ \log \frac{p(\vec{x}_T)}{q(\vec{x}_T \mid \vec{x}_0)} \rgt] \\
+                                    & = \E_q \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) \rgt] - \sum_{t=1}^{T-1} D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \| p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) \\
+                                    & \quad \quad - D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \mid \pi).
 \end{align*}
-We can divide this up into loss terms per timestep, \[
-    \mathcal{L}_t = \begin{cases}
+We can divide this up into loss terms (that we want to maximize) per timestep, \[
+    \ell_t = \begin{cases}
         \E_q \lft[ \log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1) \rgt] & t = 0 \\
         -D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \| p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) & 0 < t < T \\
         -D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \mid \pi) & t = T.
@@ -197,6 +208,7 @@ $\beta_t$ are small enough, the reverse distributions $p[\vec{\theta}]$ can be a
 Gaussians---this is generally how they are parameterized, \[
     \vec{x}_{t-1} \mid \vec{x}_t \sim \mathcal{N}(\vec{\mu}[\vec{\theta}](\vec{x}_t, t), \mat{\Sigma}[\vec{\theta}](\vec{x}_t, t)).
 \]
+Often, the covariance matrix is fixed and only the mean is predicted.
 
 \paragraph{Entropy bounds.}
 
@@ -217,13 +229,13 @@ Using these, we can compute the forward process in closed form at any timestep, 
     \vec{x}_t \sim \mathcal{N}(\sqrt{\bar{\alpha}_t} \vec{x}_0, \bar{\beta}_t \mat{I}).
 \]
 Furthermore, the $q$ targets in the ELBO can be derived to be the following, \[
-    \vec{x}_{t-1} \mid \vec{x}_t \sim \mathcal{N}(\vec{\mu}(\vec{x}_t, \vec{x}_0, t), \tilde{\beta}_t \mat{I}).
+    \vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0 \sim \mathcal{N}(\vec{\mu}(\vec{x}_t, \vec{x}_0, t), \tilde{\beta}_t \mat{I}).
 \]
 where \[
     \vec{\mu}(\vec{x}_t, \vec{x}_0, t) \doteq \frac{\sqrt{\bar{\alpha}_{t-1}} \beta_t}{1- \bar{\alpha}_t} \vec{x}_0 + \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \sqrt{1-\beta_t} \vec{x}_t, \quad \tilde{\beta}_t \doteq \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \beta_t.
 \]
 Now, the divergences for $0 < t < T$ in the ELBO simplify to \[
-    \mathcal{L}_t = \frac{1}{2 \sigma_t^2} \| \vec{\mu}(\vec{x}_t, \vec{x}_0, t) - \vec{\mu}[\vec{\theta}](\vec{x}_t, t) \|^2,
+    \ell_t = -\frac{1}{2 \sigma_t^2} \| \vec{\mu}(\vec{x}_t, \vec{x}_0, t) - \vec{\mu}[\vec{\theta}](\vec{x}_t, t) \|^2,
 \]
 where $\sigma_t^2 \in [\beta_t, \tilde{\beta}_t]$ is the chosen fixed variance of the backward process.
 

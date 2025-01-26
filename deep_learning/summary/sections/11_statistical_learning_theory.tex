@@ -4,18 +4,18 @@
 
 Let $\mathcal{F}$ be a function class and consider its functions $f \in \mathcal{F}$ to be binary
 classifiers. Then, the following denotes the set of possible classification outcomes over a dataset
-$\mathcal{D} \subseteq \mathcal{X} \times \mathcal{Y}$ with $n$ datapoints, \[
-    \mathcal{F}(\mathcal{D}) \doteq \{ [f(\vec{x}_1), \ldots, f(\vec{x}_n)] \mid f \in \mathcal{F} \}, \quad f: \mathcal{X} \to \{ 0,1 \}.
+$\mathcal{S} \subseteq \mathcal{X} \times \mathcal{Y}$ with $n$ datapoints, \[
+    \mathcal{F}(\mathcal{S}) \doteq \{ [f(\vec{x}_1), \ldots, f(\vec{x}_n)] \in \{ 0,1 \}^n \mid f \in \mathcal{F} \}, \quad f: \mathcal{X} \to \{ 0,1 \}.
 \]
 Furthermore, the following denotes the maximal number of different classifications of a dataset of
 size $n$ that can be realized by functions in $\mathcal{F}$, \[
-    \mathcal{F}(n) \doteq \sup_{|\mathcal{D}| = n} | \mathcal{F}(\mathcal{D}) |.
+    \mathcal{F}(n) \doteq \sup_{|\mathcal{S}| = n} | \mathcal{F}(\mathcal{S}) |.
 \]
-One says that $\mathcal{F}$ shatters $\mathcal{D}$ if $|\mathcal{F}(\mathcal{D})| = 2^n$, \ie,
+One says that $\mathcal{F}$ shatters $\mathcal{S}$ if $|\mathcal{F}(\mathcal{S})| = 2^n$, \ie,
 every possible labeling is realized by some function $f \in \mathcal{F}$. The VC dimensionality of
 a function class $\mathcal{F}$ is the maximum number of data points such that a dataset of that
 size is shattered by $\mathcal{F}$, \[
-    \mathrm{VCdim}(\mathcal{F}) \doteq \max_{n\in \mathcal{N}} \sup_{|\mathcal{D}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
+    \mathrm{VC}(\mathcal{F}) \doteq \max_{n\in \N} \sup_{|\mathcal{S}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
 \]
 Let $\hat{\ell}: \mathcal{F} \to \R$ be the empirical loss function and $\ell: \mathcal{F} \to \R$
 the expected loss function. Under uniform convergence, one can prove the VC inequality, \[
@@ -83,7 +83,7 @@ Consider the $\nicefrac{0}{1}$ loss of a function $f$ on a sample $\vec{x}$ with
 \]
 
 \begin{lemma}
-    For any $p \geq q$ and $p$-measurable $X$, \[
+    For any $p \gg q$ and $p$-measurable $X$, \[
         \E_q[X] \leq D_{\mathrm{KL}}(q \| p) + \log \E_p[\exp(X)].
     \]
 \end{lemma}
@@ -92,7 +92,7 @@ Consider the $\nicefrac{0}{1}$ loss of a function $f$ on a sample $\vec{x}$ with
     \begin{align*}
         \log \E_p[\exp(X)] & \geq \log \E_q \lft[ \exp(X) \frac{p(X)}{q(X)} \rgt] \margintag{$p \geq q$.}                     \\
                            & \geq \E_q \lft[ \log \lft( \exp(X) \frac{p(X)}{q(X)} \rgt) \rgt] \margintag{Jensen's inequality} \\
-                           & = \E_q[X] - \E_q[\log \frac{p(X)}{q(X)}]                                                         \\
+                           & = \E_q[X] - \E_q\lft[\log \frac{p(X)}{q(X)}\rgt]                                                 \\
                            & = \E_q[X] - D_{\mathrm{KL}}(q \| p).
     \end{align*}
 \end{proof}
@@ -133,4 +133,3 @@ retaining high variance such that small parameter perturbations do not influence
 Backpropagation can be done by making use of the reparameterization trick, \[
     \tilde{\vec{\theta}} = \vec{\theta} + \vec{\sigma} \odot \vec{\epsilon}, \quad \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I}).
 \]
-

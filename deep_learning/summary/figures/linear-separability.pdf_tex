@@ -53,37 +53,7 @@
   \begin{picture}(1,1)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
+    \put(0.20371502,0.93348301){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\transpose{\vec{w}} \vec{x} + b \overset{!}{=} 0$\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{linear-separability.pdf}}%
-    \put(0.03498818,0.51593357){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$x_2$\end{tabular}}}}%
-    \put(0.53868893,0.0283119){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$x_1$\end{tabular}}}}%
-    \put(0.59175721,0.51896259){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.83288168,0.44397701){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.55866601,0.61301279){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.51621502,0.74622043){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.67503263,0.36322204){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.66621502,0.76327974){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.87430622,0.68420286){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.82419343,0.57889418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.84121502,0.3479167){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.74121502,0.28958338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.70812382,0.46835739){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.69930622,0.64713141){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.78291006,0.81536867){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.83288168,0.23164269){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$+$\end{tabular}}}}%
-    \put(0.29399217,0.2968687){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.22871501,0.39375004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.24538167,0.49375004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.20371501,0.58958338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.39538167,0.36875004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.20788167,0.21458338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.41621501,0.1604167){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.57871501,0.1354167){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.49538167,0.27708338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.45371501,0.49375004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.32454833,0.45208338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.34121501,0.63958338){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0.19121501,0.78125004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$-$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=2]{linear-separability.pdf}}%
-    \put(0.3743062,0.88494156){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\transpose{\vec{w}} \vec{x} + b \overset{!}{=} 0$\end{tabular}}}}%
   \end{picture}%
 \endgroup%
