@@ -123,6 +123,7 @@ jobs:
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
         file advanced_machine_learning/summary/main.pdf | grep -q ' PDF '
         file deep_learning/summary/main.pdf | grep -q ' PDF '
+        file deep_learning/cheatsheet/main.pdf | grep -q ' PDF '
 
     - name: Upload to GitHub pages
       run: |
@@ -151,6 +152,7 @@ jobs:
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab/summary.pdf"
         cp -f advanced_machine_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning/summary.pdf"
         cp -f deep_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning/summary.pdf"
+        cp -f deep_learning/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning/cheatsheet.pdf"
 
         cd "$GITHUB_WORKSPACE/deploy"
 
