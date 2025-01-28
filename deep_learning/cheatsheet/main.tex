@@ -1,0 +1,1119 @@
+\documentclass[10pt]{article}
+
+\usepackage[a4paper, margin=0.25cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
+\usepackage{derivative}
+\usepackage[skip=.5\baselineskip-0.5pt]{parskip}
+\usepackage[extreme, mathspacing=normal, leadingfraction=0.85]{savetrees}
+\usepackage[document]{ragged2e}
+\usepackage{enumitem}
+
+\usepackage[osf,sc]{mathpazo}
+
+\usepackage{color,soul}
+\usepackage{xcolor}
+
+\input{../../commands}
+
+\setlength{\columnseprule}{0.4pt}
+
+\title{Deep Learning Cheatsheet}
+
+\newenvironment{topic}[1]
+{\textbf{\sffamily \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}}}
+{}
+
+\newenvironment{subtopic}[1]
+{\begin{center}\textbf{\sffamily #1}\end{center}}
+{}
+
+\begin{document}
+
+\setlength{\columnsep}{0.25cm}
+
+\begin{multicols*}{3}
+
+    \scriptsize
+
+    \begin{itemize}
+        \item Closed form of KL for Gaussians:
+            \begin{align*}
+                D_{KL} & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
+                    & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
+            \end{align*}
+        \item Cosine theorem: \[
+                \| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle.
+            \]
+        \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with $|\Xi| \leq \delta$ is linearly independent.
+    \end{itemize}
+
+    \begin{topic}{Connectionism}
+
+        \begin{subtopic}{McCulloch-Pitts neuron}
+            \[
+                f[\vec{\sigma},\theta](\vec{x}) \doteq \mathbb{1}\{ \transpose{\vec{\sigma}}\vec{x} \geq \theta \}, \quad \vec{\sigma} \in \{ -1,1 \}^n, \vec{x} \in \{ 0,1 \}^n, \theta \in \R.
+            \]
+        \end{subtopic}
+
+        \begin{subtopic}{Perceptron}
+            \begin{align*}
+                f[\vec{w},b](\vec{x})          & \doteq \mathrm{sgn}(\transpose{\vec{w}}\vec{x} + b)                    \\
+                \gamma[\vec{w},b](\vec{x},y)   & \doteq \frac{y (\transpose{\vec{w}}\vec{x} + b)}{\| \vec{w} \|}        \\
+                \gamma[\vec{w},b](\mathcal{S}) & \doteq \min_{(\vec{x},y) \in \mathcal{S}} \gamma[\vec{w},b](\vec{x},y) \\
+                \mathcal{V}(\mathcal{S})       & \doteq \{ (\vec{w},b) \mid \gamma[\vec{w},b](\mathcal{S}) > 0 \}.
+            \end{align*}
+            Decision boundary hyperplane: $\nicefrac{\transpose{\vec{w}} \vec{x}}{\| \vec{w} \|} + \nicefrac{b}{\| \vec{w} \|}
+                \overset{!}{=} 0$. If $\gamma[\vec{w},b](\mathcal{S}) > 0$, then $\mathcal{S}$ is
+            linearly separated. $\mathcal{V}(\mathcal{S}) \neq \emptyset$ iff $\mathcal{S}$ is
+            linearly separable. Adding points to $\mathcal{S}$ makes $\mathcal{V}(\mathcal{S})$ smaller.
+
+            The perceptron algorithm tries to find any $(\vec{w},b) \in \mathcal{V}(\mathcal{S})$. It does not
+            aim to find solution with smaller error if $\mathcal{V}(\mathcal{S}) = \emptyset$. Iterative
+            mistake-driven algorithm: \[
+                f[\vec{w},b](\vec{x}) \neq y \implies \vec{w} \gets \vec{w} + y \vec{x}, \quad b \gets b + y.
+            \]
+            For all iterates $\vec{w}_t \in \mathrm{span}(\vec{x}_1, \ldots, \vec{x}_n)$.
+
+            Convergence can be proven by using $\transpose{\vec{w}} \vec{w}_t \geq t \gamma$ and $\| \vec{w}_t
+                \| \leq R \sqrt{t}$, where $\| \vec{w} \| = 1$, $\gamma[\vec{w}](\mathcal{S}) > 0$, and $R =
+                \max_{\vec{x} \in \mathcal{S}} \| \vec{x} \|$. Then, bound $1 \geq \cos\angle{(\vec{w},\vec{w}_t)}
+                = \nicefrac{\transpose{\vec{w}} \vec{w}_t}{\| \vec{w} \| \| \vec{w}_t \|}$. We convergence within
+            $\lfloor \nicefrac{R^2}{\gamma^2} \rfloor$ iterations.
+
+            Number of unique classifications: \[
+                \mathcal{C}(\mathcal{S},d) = \lft| \lft\{ \vec{y} \in \{ -1,+1 \}^n \;\middle|\; \exists \vec{w} : \forall i : y_i (\transpose{\vec{w}}\vec{x}_i) > 0 \rgt\} \rgt|
+            \]
+            Assume that points are in general position. Cover's theorem: \[
+                \mathcal{C}(n+1,d) = 2 \sum_{i=0}^{d-1} \begin{pmatrix} n \\ i \end{pmatrix}.
+            \]
+            Proof: Base cases are both 2 and adding a point has two cases $\to$ Recurrence: \[
+                \mathcal{C}(n+1,d) = \mathcal{C}(n,d) + \mathcal{C}(n,d-1).
+            \]
+            For $n \leq d$, we have $\mathcal{C}(n,d) = 2^n$. After $n=2d$, there is a steep decrease in number of linear classification, quickly moving toward $0$.
+        \end{subtopic}
+
+        \begin{subtopic}{Parallel distributed processing}
+            (1) A set of processing units with states of activation; (2) Output functions for each
+            unit; (3) A pattern of connectivity between units; (4) Propagation rules for propagating
+            patterns of activity; (5) Activation functions for units; (6) A learning rule to modify
+            connectivity based on experience; (7) An environment within which the system must operate.
+        \end{subtopic}
+
+        \begin{subtopic}{Hopfield networks}
+            Models an associative memory, which aims to reconstruct a memory from an input that has been subjected to noise. Energy function via second-order interactions between $n$ binary neurons: \[
+                H(\vec{x}) \doteq \frac{1}{2} \sum_{i=1}^{d} \sum_{j=1}^{d} w_{ij}x_ix_j + \sum_{i=1}^{n} b_ix_i, \quad \vec{x} \in \{ -1, 1 \}^d.
+            \]
+            We have $w_{ii} = 0$ and $w_{ij} = w_{ji}$. Simple dynamics: \[
+                x_i \gets \begin{cases}
+                    +1 & H([., x_{i-1}, +1, x_{i+1}, .]) \leq H([., x_{i-1}, -1, x_{i+1}, .]) \\
+                    -1 & \mathrm{otherwise}.
+                \end{cases}
+            \]
+            Or: $x_i \gets \mathrm{sgn}(H_i)$, where $H_i \doteq \sum_{j=1}^{d} w_{ij} x_j - b_i$.
+
+            Hebbian learning (neurons frequently in the same state reinforce): \[
+                \mat{W} = \frac{1}{d} \sum_{t=1}^{n} \vec{x}_t \transpose{\vec{x}_t}.
+            \]
+            Pattern $\vec{x}_t$ is memorized if meta-stable: update rule makes no updates to it: \[
+                x_{ti} = \mathrm{sgn}(x_{ti} + C_{ti}), \quad C_{ti} \doteq \frac{1}{d} \sum_{j=1}^{d} \sum_{r\neq t}^{n} x_{ri}x_{rj}x_{tj}.
+            \]
+            If cross-talk $|C_{ti}| < 1$ for all $i$, then $\vec{x}_t$ is meta-stable.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Feedforward networks}
+
+        \begin{subtopic}{Regression models}
+            Mean-squared error \[
+                \ell[\vec{\theta}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{n} \lft( f[\vec{\theta}](\vec{x}_i) - y_i \rgt)^2.
+            \]
+            Linear model: $\ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \| \transpose{\mat{X}} \vec{w} - \vec{y}
+                \|^2$ $\to$ Closed form solution: $\vec{w}^\star = \inv{\lft( \transpose{\mat{X}}\mat{X}
+                    \rgt)}\transpose{\mat{X}} \vec{y}$.
+
+            Logistic regression (binary outputs) use sigmoid: $\sigma(z) \doteq \nicefrac{1}{1 + \exp(-z)}$.
+            Binary cross-entropy loss: \[
+                \ell[\vec{\theta}](\mathcal{S}) = -\frac{1}{n} \sum_{i=1}^{n} y_i \log \sigma(f[\vec{\theta}](\vec{x}_i)) + (1-y_i)\log(1-f[\vec{\theta}](\vec{x}_i)).
+            \] (Multi-class) Cross-entropy loss: \[
+                \ell[\vec{\theta}](\vec{x},y) = -\log \mathrm{softmax}(f[\vec{\theta}](\vec{x}))_y.
+            \]
+        \end{subtopic}
+
+        \begin{subtopic}{Layers and units}
+            Mapping: $f[\mat{W},\vec{b}](\vec{x}) = \phi(\mat{W}\vec{x}+\vec{b})$, where $\phi$ is a pointwise activation function. DNNs compose: $G = F_L[\vec{\theta}_L] \circ \cdots \circ F_1[\vec{\theta}_1]$.
+
+            Intermediate layers are permutation symmetric: $\mat{F}[\mat{W},\vec{b}](\vec{x}) = \inv{\mat{P}}
+                \phi(\mat{P}\mat{W}\vec{x} + \mat{P}\vec{b}) = \inv{\mat{P}} F[\mat{P} \mat{W},
+                        \mat{P}\vec{b}](\vec{x})$ $\to$ Parameters are not unique.
+        \end{subtopic}
+
+        \begin{subtopic}{Linear networks}
+            Linear layers are closed under composition $\to$ We do not gain representational power from composing them.
+        \end{subtopic}
+
+        \begin{subtopic}{Residual networks}
+            Residual layers: \[
+                F[\mat{W},\vec{b}](\vec{x}) = \vec{x} + \phi(\mat{W}\vec{x} + \vec{b}) - \phi(\vec{0}).
+            \]
+            Then, $F[\vec{0}, \vec{0}] = \mathrm{Id}$. This makes it such that the model learns how to
+            incrementally learn a better representation, rather than having to learn it at every layer. If
+            input and output have different dimensionality, linearly project $\vec{x}$. Using this
+            architecture, the depth can be increased significantly, because gradients propagate better.
+        \end{subtopic}
+
+        \begin{subtopic}{Sigmoid networks}
+            MLP with sigmoid activation: \[
+                g[\vec{v}, \mat{W}, \vec{b}](\vec{x}) \doteq \transpose{\vec{v}} \sigma(\mat{W}\vec{x}+\vec{b}), \quad \vec{v},\vec{b}\in\R^m, \mat{W}\in\R^{m\times n}.
+            \]
+            Function class: $\mathcal{G}_n \doteq \bigcup_{m=1}^{\infty} \mathcal{G}_{n,m}$, where \[
+                \mathcal{G}_{n,m} \doteq \{ g[\vec{v},\mat{W},\vec{b}] \mid \vec{b}\in\R^m, \mat{W}\in\R^{m\times n} \}.
+            \]
+            Or, as a linear span of units, \[
+                \mathcal{G}_{n} = \mathrm{span} \{ \sigma(\transpose{\vec{w}}\vec{x} + b) \mid \vec{w} \in \R^n, b \in \R \}.
+            \]
+            This set universally approximates $\mathcal{C}(\R^n)$. But, it does not provide insight into how
+            depth affects performance $\to$ Barron: Let $f: \R^n \to \R$ with finite $\mathcal{C}_f$ and any $r
+                > 0$, there is a sequence of one hidden layer MLPs $(g_m)_{m \in \N}$ such that \[
+                \int_{r \mathbb{B}} (f(\vec{x}) - g_m(\vec{x}))^2 \mu(\mathrm{d}\vec{x}) \leq \bigo{\nicefrac{1}{m}},
+            \]
+            where $r\mathbb{B}$ is a $r$-radius ball and $\mu$ is any probability measure. Relaxing the notion
+            of approximation to squared error over ball with radius $r$ gives a decay of $\nicefrac{1}{m}$ on
+            the approximation error.
+        \end{subtopic}
+
+        \begin{subtopic}{ReLU networks}
+            ReLU: $(z)_+ \doteq \max_{0,z}$. Consider a layer of $m$ ReLU units, then each unit is
+            active or inactive: $\mathbb{1}\{ \mat{W}\vec{x} + \vec{b} > 0 \} \in \{ 0,1 \}^m$. As
+            such, we can partition the input space into cells that have the same activation pattern: \[
+                \mathcal{X}_{\vec{\kappa}} \doteq \{ \vec{x} \mid \mathbb{1}\{ \mat{W}\vec{x} + \vec{b} > 0 \} = \vec{\kappa} \}.
+            \]
+            The number of cells is a proxy for the complexity of a network. Consider a ReLU network with $L$
+            layers of $m > n$ width. The number of linear regions is lower bounded by \[
+                R(m,L) \geq R(m) \lfloor \nicefrac{m}{n} \rfloor^{n(L-1)}.
+            \]
+            Thus, complexity is related to depth.
+
+            Piecewise linear functions are approximators of $\mathcal{C}(\R)$ and a piecewise linear function
+            $g$ with $m$ pieces can be written as \[
+                g(x) = ax + b + \sum_{i=1}^{m-1} c_i(x - x_i)_+.
+            \]
+            Using the lifting lemma, ReLU networks are universal approximators of $\mathcal{C}(\R)$.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Gradient-based learning}
+
+        \begin{subtopic}{Backpropagation}
+            Backpropagation computes gradient in linear time if we know the gradient of all basic
+            blocks in the function. Assume we have the following function, \[
+                F[\vec{\theta}](\vec{x}) \doteq (F_L \circ \cdots \circ F_1)(\vec{x}), \quad \vec{h}_{\ell} \doteq F_{\ell}[\vec{\theta}_{\ell}](\vec{h}_{\ell-1}), \quad \vec{h}_0 = \vec{x}.
+            \]
+            We need the following, \[
+                \vec{\delta}_{\ell} = \pdv{h(\vec{\theta})}{\vec{h}_{\ell}}.
+            \]
+            We have a recurrence, \[
+                \vec{\delta}_{\ell} = \transpose{\lft[ \pdv{\vec{h}_{\ell+1}}{\vec{h}_{\ell}} \rgt]} \vec{\delta}_{\ell+1}, \quad \vec{\delta}_L = \pdv{h(\vec{\theta})}{\vec{h}_L}.
+            \]
+            Then, to compute parameter gradients, \[
+                \pdv{h(\vec{\theta})}{\vec{\theta}_{\ell}} = \vec{\delta}_{\ell} \pdv{\vec{h}_{\ell}}{\vec{\theta}_{\ell}}.
+            \]
+        \end{subtopic}
+
+        \begin{subtopic}{Gradient descent}
+            Update rule: \[
+                \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{\vec{\theta}}, \quad \eta > 0, \quad h(\vec{\theta}) \doteq \ell \circ F[\vec{\theta}].
+            \]
+            Discretization of ODE: \[
+                \mathrm{d}\vec{\theta} = -\grad{h(\vec{\theta})}{} \mathrm{d}t.
+            \]
+            Trajectory outcome (point where $\grad{h(\vec{\theta})}{} = \vec{0}$) depends on initial
+            conditions.
+
+            Gradient descent can only be successful if gradients change slowly $\to$ Smoothness: $h$ is
+            $L$-smooth if \[
+                \| \grad{h(\vec{\theta})}{} - \grad{h(\vec{\theta})'}{} \| \leq L \| \vec{\theta} - \vec{\theta}' \|, \quad \forall \vec{\theta},\vec{\theta}'.
+            \]
+            Or: $\| \hess{h(\vec{\theta})}{} \|_2 \leq L$ for all $\vec{\theta}$. If $\eta = \nicefrac{1}{L}$,
+            then we have sufficient decrease, \[
+                h(\vec{\theta}') \leq h(\vec{\theta}) - \frac{1}{2L} \| \grad{h(\vec{\theta})}{} \|^2, \quad \forall \vec{\theta},\vec{\theta}'.
+            \]
+            Let $h$ be $L$-smooth and $\eta=\nicefrac{1}{L}$, then an $\epsilon$-critical point will be found
+            in at most \[
+                T = \frac{2L}{\epsilon^2} (h(\vec{\theta}^0) - h(\vec{\theta}^\star)).
+            \]
+            Proof: Sufficient decrease $\to$ Telescoping sum and $\min \leq \sum$.
+
+            $h$ satisfies PL-inequality with $\mu > 0$ if \[
+                \frac{1}{2} \| \grad{h(\vec{\theta})}{} \|^2 \geq \mu (h(\vec{\theta}) - h(\vec{\theta}^\star)), \quad \forall \vec{\theta}.
+            \]
+            Intuition: If $\vec{\theta}$ has small gradient, then it is near-optimal. Let $h$ be $L$-smooth and
+            $\mu$-PL and $\eta = \nicefrac{1}{L}$, then \[
+                h(\vec{\theta}_T) - h(\vec{\theta}^\star) \leq \lft( 1 - \frac{\mu}{L} \rgt)^T (h(\vec{\theta}_0) - h(\vec{\theta}^\star)).
+            \]
+            Proof: Sufficient decrease $\to$ PL $\to$ Subtract $h(\vec{\theta}^\star)$ both sides.
+        \end{subtopic}
+
+        \begin{subtopic}{Acceleration, adaptivity, and momentum}
+            Nesterov acceleration achieves better theoretical guarantees than GD: \[
+                \vec{\chi}^{t+1} = \vec{\theta}^t + \gamma(\vec{\theta}^t - \vec{\theta}^{t-1}), \quad \vec{\theta}^{t+1} = \vec{\chi}^{t+1} - \eta \grad{h(\vec{\chi}^{t+1})}{}.
+            \]
+
+            Momentum intuition: If gradient is stable, we can make bolder steps. Heavy Ball: \[
+                \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{} + \beta (\vec{\theta}^t - \vec{\theta}^{t-1}), \quad \beta \in [0,1].
+            \]
+            Assuming constant gradient $\vec{\delta}$, we have \[
+                \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \lft( \sum_{\tau=1}^{t-1} \beta^{\tau} \rgt) \vec{\delta}.
+            \]
+            Thus, learning rate increases in case of a stable gradient.
+
+            Adaptivity intuition: Different parameters behave differently $\to$ Parameter-specific learning
+            rates:
+            \begin{align*}
+                \theta_i^{t+1} & = \theta_i^t - \eta_i^t \partial_i h(\vec{\theta}^t) \\
+                \eta_i^t & \doteq \frac{\eta}{\sqrt{\gamma_i^t} + \delta}, \quad \gamma_i^t \doteq \gamma_i^{t-1} + [\partial_i h(\vec{\theta}^t)]^2.
+            \end{align*}
+            Parameters with small gradient magnitude will have a larger step size.
+
+            Adam combines adaptivity and momentum:
+            \begin{align*}
+                \vec{g}_t          & = \beta \vec{g}_{t-1} + (1-\beta) \grad{h(\vec{\theta}_t)}{}, \quad \beta \in [0,1]                               \\
+                \vec{\gamma}_t     & = \alpha\vec{\gamma}_{t-1} + (1-\alpha) \grad{h(\vec{\theta}_t)}{}^{\odot 2}, \quad \alpha \in [0,1]              \\
+                \vec{\theta}_{t+1} & = \vec{\theta}_t - \vec{\eta}_t \odot \vec{g}_t, \quad \vec{\eta}_t = 1 \oslash (\sqrt{\vec{\gamma}_t} + \delta).
+            \end{align*}
+            $\vec{g}_t$ is a smooth gradient estimator and $\vec{\gamma}_t$ measures the stability of the optimization landscape.
+        \end{subtopic}
+
+        \begin{subtopic}{Stochastic gradient descent}
+            When the dataset is too large, computing the full gradient is infeasible $\to$ Estimate
+            gradient with a mini-batch (SGD). SGD outperforms GD in practice, because it has a lower
+            chance of getting stuck in a local optimum due to variance in the gradient estimator.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Convolutional networks}
+
+        \begin{subtopic}{Convolution}
+            Integral operator: \[
+                (Tf)(u) \doteq \int_{t_1}^{t_2} H(u,t) f(t) \mathrm{d}t.
+            \]
+            Fourier transform: \[
+                (\mathcal{F}f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi itu} f(t) \mathrm{d}t.
+            \]
+            Convolution: \[
+                (f * h)(u) \doteq \int_{-\infty}^{\infty} h(u-t) f(t) \mathrm{d}t.
+            \]
+            Commutative: $f * h = h * f$, Shift-equivariant: $f_{\Delta} * h = (f * h)_{\Delta}$, Convolution
+            as Fourier: $f * h = \mathcal{F}^{-1}(\mathcal{F}f \cdot \mathcal{F}h)$. All proofs are done by
+            defining new variables dependent on existing ones. Linear shift-equivariant operator $\iff$
+            Convolution.
+
+            Discrete convolution: \[
+                (f * h)[u] = \sum_{t=-\infty}^{\infty} f[t]h[u-t].
+            \]
+            Cross-correlation: \[
+                (f \star h)[u] = \sum_{t=-\infty}^{\infty} f[t] h[u+t].
+            \]
+            Toeplitz matrix $\mat{H}_n^h \in \R^{(n+m-1)\times n}$ \[
+                \mat{H}_n^h \doteq
+                \begin{bmatrix}
+                    h_1    & 0      & \cdots & 0      & 0       \\
+                    h_2    & h_1    & \cdots & 0      & 0       \\
+                    \vdots & \vdots & \ddots & \vdots & \vdots  \\
+                    0      & 0      & \cdots & h_m    & h_{m-1} \\
+                    0      & 0      & \cdots & 0      & h_m
+                \end{bmatrix}.
+            \]
+            This can then be applied to a vectorized $\vec{f} \in \R^n$. Effectively a proof that convolution
+            is linear with increased statistical efficiency.
+        \end{subtopic}
+
+        \begin{subtopic}{Convolutional networks}
+            Images are 2D, so use 2D definition of convolution: \[
+                (\mat{X} * \mat{W})[i,j] = \sum_{k=-\infty}^{\infty} \sum_{l=-\infty}^{\infty} x_{i-k,j-l} w_{k,l}.
+            \]
+            Let $\mat{X}^{\ell}$ be output of the $\ell$-th convolutional layer and $\mat{\Delta}^{\ell} \doteq
+                \pdv{h}{\mat{X}^{\ell}}$, then \[
+                \mat{\Delta}^{\ell-1} = \mat{\Delta}^{\ell} \star \mat{W}^{\ell}, \quad \pdv{h}{\mat{W}^{\ell}} = \mat{\Delta}^{\ell} * \mat{X}^{\ell-1}.
+            \]
+            Max-pooling layer:
+            \begin{align*}
+                x^{\ell}_{ij} & = \max \{ x^{\ell-1}_{i+k,j+l} \mid k, l \in [0,r) \} \\
+                \pdv{x_{ij}^{\ell}}{x^{\ell-1}_{mn}} & = \mathbb{1}\{ (m,n) = (i^\star,j^\star) \},
+            \end{align*}
+            where $(i^\star, j^\star)$ are the indices of maximum value in the forward pass.
+
+            Data generally has multiple channels: \[
+                (\tens{X} * \tens{W})[c,i,j] = \sum_{r=1}^{C_{in}} \sum_{k=-K}^{K} \sum_{l=-K}^{K} w_{c,r,k,l} x_{r,i-k,j-l}.
+            \]
+            Fully connected in channels and local in spatial dimensions.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Recurrent neural networks}
+        Activations are computed recursively to handle variable-length data, \[
+            \vec{z}_t = F[\vec{\theta}](\vec{z}_{t-1},\vec{x}_t).
+        \]
+        Dependent on application, compute output variables: \[
+            \vec{y}_t = G[\vec{\varphi}](\vec{z}_t).
+        \]
+        Elman RNN: \[
+            F[\mat{U},\mat{V}](\vec{z},\vec{x}) = \phi(\mat{U}\vec{z} + \mat{V}\vec{x}), \quad G[\mat{W}](\vec{z}) = \psi(\mat{W}\vec{z}).
+        \]
+        Bidirectional RNNs do both ways and concatenate. Stacked RNNS connect layers horizontally: \[
+            \vec{z}_{t,l} = \phi(\mat{U}_l \vec{z}_{t-1,l} + \mat{V}_l \vec{z}_{t,l-1}), \quad \vec{z}_{t,0} = \vec{x}_t.
+        \]
+        Let $L = \sum_{t=1}^{T} \ell(\hat{\vec{y}}_t, \vec{y}_t)$, then we have gradients: \[
+            \pdv{L}{\mat{U}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{U}}, \quad \pdv{L}{\mat{V}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{V}},
+        \]
+        where \[
+            \pdv{L}{\vec{z}_t} = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \prod_{j=t+1}^i \dot{\mat{\Phi}}_j \mat{U},
+        \]
+        where $\dot{\Phi}_j = \mathrm{diag}(\phi'(\mat{U}\vec{z}_{j-1} + \mat{V}\vec{x}_j))$. This is only
+        stable if $\| \dot{\mat{\Phi}}_j \mat{U} \|_2 = 1$, which is almost never the case $\to$
+        exploding/vanishing gradient.
+
+        \begin{subtopic}{Gated memory}
+            Solve vanishing gradient by gating.
+
+            LSTM ($\vec{z}_t$: cell state, $\vec{\zeta}_t$: hidden state):
+            \begin{align*}
+                \vec{z}_t     & = \sigma(\mat{F}\tilde{\vec{x}}_t) \odot \vec{z}_{t-1} + \sigma(\mat{G}\tilde{\vec{x}}_t) \odot \tanh(\mat{V}\tilde{\vec{x}}_t) \\
+                \tilde{\vec{x}}_t & = [\vec{\zeta}_{t-1}, \vec{x}_t] \\
+                \vec{\zeta}_t & = \sigma(\mat{H}\tilde{\vec{x}}_t) \odot \tanh(\mat{U}\vec{z}_t).
+            \end{align*}
+
+            GRU simplifies the LSTM to only 3 weight matrices:
+            \begin{align*}
+                \vec{z}_t         & = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{\vec{z}}_t, \quad \vec{\sigma} = \sigma(\mat{G}\tilde{\vec{x}}_t) \\
+                \tilde{\vec{x}}_t & = [\vec{z}_{t-1}, \vec{x}_t] \\
+                \tilde{\vec{z}}_t & = \tanh(\mat{V}[\vec{\zeta}_t \odot \vec{z}_{t-1}, \vec{x}_t]), \quad \vec{\zeta}_t = \sigma(\mat{H}[\vec{z}_{t-1} \vec{x}_t]).
+            \end{align*}
+        \end{subtopic}
+
+        \begin{subtopic}{Linear recurrent model}
+            Simplify GRU to be linear such that it can exploit prefix scan parallelism which has $\bigo{\log T}$ runtime: \[
+                \vec{z}_t = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{\vec{z}}_t, \quad \vec{\sigma} = \sigma(\mat{G}\vec{x}_t), \quad \tilde{\vec{z}}_t = \mat{V}\vec{x}_t.
+            \]
+
+            We can ensure that the gradients do not explode by parametrizing the GRU smartly. The LRU has hidden state evolution in a discrete time linear system: \[
+                \vec{z}_{t+1} = \mat{A} \vec{z}_t + \mat{B} \vec{x}_t.
+            \]
+            Diagonalize $\mat{A} = \mat{P}\mat{\Lambda}\inv{\mat{P}}$, where $\mat{\Lambda} =
+            \mathrm{diag}(\lambda_1, \ldots, \lambda_m), \lambda_i \in \mathbb{C}$. This linear
+            system is stable if the modulus of the eigenvalues is bounded by $1$. Thus, we
+            parameterize them such that the moduli can only be in $(0,1)$ in the following way, \[
+                \lambda_i = \exp(-\exp(\nu_i))(\cos(\phi_i) + \sin(\phi_i)i).
+            \]
+            This uses $\exp(\theta i) = \cos(\theta) + \sin(\theta)i$ and that we can represent complex numbers in polar coordinate form via modulus $r$ and phase $\phi$: \[
+                z = r(\cos(\phi) \sin(\phi) i), \quad r = |z|.
+            \]
+            Thus, $r_i = \exp(-\exp(\nu_i)) \in (0,1)$. Thus, at initialization we sample \[
+                \phi_i \sim \mathrm{Unif}([0,2\pi]), \quad r_i \sim \mathrm{Unif}(I), \quad I \subseteq [0,1].
+            \]
+            And compute $\nu_i = \log(-\log r_i)$. The modulus always remains upper bounded by $1$.
+
+            We do not lose any representational power, because we can put all representational power into the output map: \[
+                \vec{y}_t = \mathrm{MLP}(\mathrm{Re}(\mat{G}\vec{\zeta}_t)), \quad \mat{G} \in \mathbb{C}^{k \times m}.
+            \]
+        \end{subtopic}
+
+        \begin{subtopic}{Sequence learning}
+            Generate sequence step-by-step, given another sequence: \[
+                p(\vec{y}_{1:n} \mid \vec{x}_{1:m}) = \prod_{i=1}^n p(y_i \mid \vec{y}_{1:i-1}, \vec{x}_{1:m}).
+            \]
+            This is done by mapping input sequence to latent representation (encoder RNN): \[
+                x_1, \ldots, x_m \mapsto \vec{\zeta}.
+            \]
+            Decoder RNN uses this along with history to predict next token: \[
+                \vec{\zeta}, y_1, \ldots, y_{t-1} \mapsto \vec{z}_{t-1}.
+            \]
+            This is mapped to a distribution over next tokens, \[
+                \vec{z}_{t-1} \mapsto \vec{\mu}_t, \quad y_t \sim p(\vec{\mu}_t).
+            \]
+            Problem: Lossy compression of input sequence. Solution: Use attention such that decoder can look at
+            full input sequence at every step: \[
+                a_{ij} = \mathrm{softmax}_j(\mathrm{MLP}([\vec{z}_{i-1}, \vec{\zeta}_j])), \quad \vec{c}_t = \sum_{i=1}^{m} a_{ti} \vec{\zeta}_i.
+            \]
+            This allows for alignment between input and output sequence.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Transformers}
+
+        \begin{subtopic}{Self-attention}
+            Let $\mat{X} \in \R^{T \times d}$ denote a sequence of input embeddings. Problem: They are non-contextual. Self-attention: \[
+                \mat{Q} = \mat{X} \mat{W}_Q, \quad \mat{K} = \mat{X} \mat{W}_K, \quad \mat{V} = \mat{X}\mat{W}_V,
+            \]
+            where $\mat{W}_Q, \mat{W}_K \in \R^{d\times d_k}$ and $\mat{W}_V \in \R^{d \times d_v}$. Attention: \[
+                \mat{\Xi} = \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt) \mat{V}.
+            \]
+            Multi-headed self-attention performs attention $h$ times in parallel.
+        \end{subtopic}
+
+        \begin{subtopic}{Cross-attention}
+            Two sequences $\mat{A} \in \R^{T_a \times d_a}$, $\mat{B} \in \R^{T_b \times d_b}$ and we want to give information of $\mat{B}$ to $\mat{A}$: \[
+                \mat{Q} = \mat{A}\mat{W}_Q, \quad \mat{K} = \mat{B} \mat{W}_K, \quad \mat{V} = \mat{B}\mat{W}_V,
+            \]
+            where $\mat{W}_Q \in \R^{d_a \times d_k}$, $\mat{W}_K \in \R^{d_b\times d_k}$, and $\mat{W}_V \in
+                \R^{d_b \times d_v}$.
+
+        \end{subtopic}
+
+        \begin{subtopic}{Positional encoding}
+            Attention is permutation equivariant $\to$ Add positional encoding matrix $\mat{P} \in \R^{T \times d}$ with \[
+                p_{tk} = \begin{cases}
+                    \sin(t \omega_k) & k \mod 2 = 0  \\
+                    \cos(t \omega_k) & k \mod 1 = 0,
+                \end{cases}
+                \quad \omega_k \doteq C^{\nicefrac{k}{d}}.
+            \]
+        \end{subtopic}
+
+        \begin{subtopic}{Machine translation}
+            Encoder-decoder architecture where the encoder applies MHSA to input sequence and decoder
+            applies masked MHSA to history and then cross-attention with contextualized input
+            sequence. Furthermore, MLP, Layer normalization, and residual layers are used.
+        \end{subtopic}
+
+        \begin{subtopic}{BERT}
+            BERT is a transformer-based pretrained language model that is used for finetuning on
+            downstream NLP tasks. BERT tokenizes uses WordPiece tokenization and prepends a
+            \texttt{[CLS]} token. When the weights of the encoders are pretrained, we can place
+            additional layers on top that operate on the contextualized BERT tokens.
+
+            Two pre-training stages:
+            \begin{enumerate}
+                \item Predicting masked out tokens using its left and right context as input (Cloze test; trains BERT's
+                      understanding of language);
+                \item Binary next sentence classification, where the model must classify two sentences as being
+                      consecutive or not (trains BERT to infer relationships between sentences).
+            \end{enumerate}
+        \end{subtopic}
+
+        \begin{subtopic}{Vision transformer}
+            ViT adapts the transformer to images by treating projected $16 \times 16$ image patches
+            as tokens. A possible reason for this model's effectiveness is that this architecture
+            carries less inductive bias than CNN-based models. In general, this seems to be beneficial
+            for very large datasets.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Geometric deep learning}
+        GDL models neural networks that satisfy invariances by design.
+
+        \begin{subtopic}{Invariance and equivariance}
+            $f$ (arbitrary number of inputs) is order-invariant iff \[
+                f(\mat{X}) = f(\mat{P}\mat{X}), \quad \mat{X} \in \R^{M \times d},
+            \]
+            where $\mat{P}$ is a permutation matrix.
+
+            $f$ (arbitrary number of inputs and same number of outputs) is equivariant iff \[
+                f(\mat{X}) = \mat{P} f(\mat{P} \mat{X}).
+            \]
+
+            We want models that have these properties by design.
+        \end{subtopic}
+
+        \begin{subtopic}{Deep sets}
+            Let $\phi: R \to \R^d$ be a pointwise feature extractor network. Deep Sets obtains an
+            order-invariant representation of the input set by summing their features up. This
+            representation can be given to any network $\rho: \R^d \to \mathcal{Y}$: \[
+                f(\vec{x}_1, \ldots, \vec{x}_M) = \rho \lft( \sum_{m=1}^{M} \phi(\vec{x}_m) \rgt).
+            \]
+            We can easily turn this into an equivariant map by providing $\vec{x}_m$ to $\rho: R \times \R^d
+                \to \mathcal{Y}$: \[
+                f(\vec{x}_1, \ldots, \vec{x}_M)_i = \rho \lft( \vec{x}_i, \sum_{m=1}^{M} \phi(\vec{x}_m) \rgt).
+            \]
+            This architecture is universal for a fixed $d$, but it requires mapping that are highly
+            discontinuous for $M \to \infty$.
+        \end{subtopic}
+
+        \begin{subtopic}{PointNet}
+            PointNet is a Deep Sets architecture on three-dimensional point clouds. The model employs
+            T-net blocks, which apply rigid transformations to the point cloud, which is permutation
+            invariant. These are applied twice alternatingly with MLPs to form $\phi$. This gives a
+            64-dim intermediate feature vector and 1024-dim final feature vector. The features are
+            aggregated by a max-pool operator.
+
+            Object classification: $\rho$ is an MLP with a softmax head that takes the global feature vector as
+            input.
+
+            Object segmentation: $\rho$ concatenates intermediate local feature and final global feature, which
+            is given to MLP with softmax head.
+        \end{subtopic}
+
+        \begin{subtopic}{Graph neural networks}
+            Let $\mat{A}$ be the adjacency matrix of an undirected graph. $f$ is order-invariant on a graph if \[
+                f(\mat{X},\mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}).
+            \]
+            And equivariant if \[
+                f(\mat{X}, \mat{A}) = \mat{P} f(\mat{P}\mat{X},\mat{P}\mat{A}\transpose{\mat{P}}).
+            \]
+            Let $\mat{X}_m = \{ \{ \vec{x}_n \mid a_{nm} = 1 \} \}$ (multiset of neighbors' features). $\phi$
+            takes $\vec{x}_m$ and $\mat{X}_m$ as input (any pair of isomorphic graphs result in same feature
+            representations): \[
+                \phi(\vec{x}_m, \mat{X}_m) = \phi \lft( \vec{x}_m \bigoplus_{\vec{x} \in \mat{X}_m} \psi(\vec{x}) \rgt).
+            \]
+            This is a message-passing scheme.
+
+            Graph convolutional networks (GCNs) aggregates local neighborhoods with a fixed set of weights
+            (coupling matrix), \[
+                \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}, \quad \mat{D} = \mathrm{diag}(\vec{d}), \quad d_m = 1 + \sum_{n=1}^{M} a_{nm}.
+            \]
+            Now, $\bar{\mat{A}}\mat{X}$ computes the average feature over neighbors and the node itself. GCNs
+            introduce learnable parameters $\mat{W}$: \[
+                f[\mat{W}](\mat{X}, \mat{A}) = \sigma(\bar{\mat{A}} \mat{X} \mat{W}).
+            \]
+            This is an equivariant function, which can be stacked. Then, we can use the final representations
+            to do graph classification or node classification.
+
+            Limitations: Requires a depth equal to diameter of graph to exchange information between all nodes;
+            In very deep GCNs, node features become indistinguishable due to smoothing of $\bar{\mat{A}}$;
+            Bottleneck effect of how much information can be stored in fixed-size representations. There are no
+            canonical solutions to these problems.
+
+            GATs introduce attention (which is equivariant) in the neighborhood function and replaces
+            $\bar{\mat{A}}$. It does so by parametrizing the coupling matrix $\mat{Q}$,
+            \begin{align*}
+                q_{mn}                       & = \mathrm{softmax}_n ( \rho(\transpose{\vec{u}} [\mat{V}\vec{x}_m, \mat{V}\vec{x}_n, \vec{x}_{mn}]) ) \\
+                \sum_{n=1}^{M} a_{mn} q_{mn} & = 1, \quad \forall m \in [M].
+            \end{align*}
+            Here, $\vec{x}_{ij}$ is an edge feature.
+
+            Despite better adaptivity, GATs are still message-passing algorithms. Such algorithms have inherent
+            limitations in the type of graphs they can distinguish. The Weisfeiler-Lehman graph isomorphism
+            test computes whether there exists an isomorphism between two graphs. It can be shown that GCNs and
+            GATs cannot distinguish graphs beyond the WL-test.
+        \end{subtopic}
+
+        \begin{subtopic}{Spectral graph theory}
+            Laplacian operator measures local deviation from the mean in vanishingly small neighborhoods: \[
+                \Delta f = \sum_{i=1}^{d} \pdv[order=2]{f}{x_i}.
+            \]
+            Graph Laplacian: $\mat{L} = \mat{D} - \mat{A}$. Degree-normalized Laplacian: $\tilde{\mat{L}} =
+                \mat{D}^{-\nicefrac{1}{2}} (\mat{D} - \mat{A}) \mat{D}^{-\nicefrac{1}{2}}$. We can generalize
+            Fourier transform to graphs: Diagonalize $\mat{L} = \mat{U} \mat{\Lambda} \transpose{\mat{U}}$ and
+            $\mat{U}$ can be seen as graph Fourier basis and $\mat{\Lambda}$ as frequencies. Graph convolution
+            can be computed as pointwise multiplication in Fourier domain: \[
+                \mat{X} * \mat{Y} = \mat{U}((\transpose{\mat{U}}\mat{X}) \odot (\transpose{\mat{U}} \mat{Y})).
+            \]
+            This can be learned by \[
+                G[\vec{\theta}](\mat{L}) \mat{X} = \mat{U} G[\vec{\theta}](\mat{\Lambda}) \transpose{\mat{U}} \mat{X}.
+            \]
+            Problem: Eigendecomposition of $\mat{L}$ takes $\bigo{M^3}$. Solution: Use polynomial kernels: \[
+                \mat{U} \lft( \sum_{k=0}^{K} \alpha_k \mat{\Lambda} \rgt) \transpose{\mat{U}} \mat{X} = \sum_{k=1}^{K} \alpha_k \mat{L}^k \mat{X}.
+            \]
+            Here, the polynomial order $K$ defines the kernel size (or neighborhood size). $\vec{\alpha} \in
+                \R^K$ are parameters.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Tricks of the trade}
+
+        \begin{subtopic}{Initialization}
+            Parameters are typically chosen with a fixed variance by sampling from \[
+                \vec{\theta} \sim \mathcal{N}(0, \sigma^2), \quad \vec{\theta} \sim \mathrm{Unif}([-\sqrt{3}\sigma,\sqrt{3}\sigma]).
+            \]
+            LeCun init, $\sigma = \nicefrac{1}{\sqrt{n}}$, preserves input variance. Glorot init, $\sigma =
+                \sqrt{\nicefrac{2}{n+m}}$, normalizes magnitude of gradient (intuition: backpropagation combines
+            $n$-dim input and $m$-dim output). Kaiming init, $\sigma = \sqrt{\nicefrac{2}{n}}$, is designed to
+            be used with ReLU by observing that only half of the units are active in expectation. Orthogonal
+            init considers the weights holistically by initializing as orthogonal matrix (benefit: eigenvalues
+            are $\pm 1$).
+        \end{subtopic}
+
+        \begin{subtopic}{Weight decay}
+            \[
+                \vec{\theta}_{t+1} = \vec{\theta}_t - \eta (\grad{h(\vec{\theta}_t)}{} - \mu \vec{\theta}_t) = (1-\eta \mu) \vec{\theta}_t - \grad{h(\vec{\theta}_t)}{}.
+            \]
+            Equivalent to (1) gradient descent with $\ell_2$ regularization, (2) Bayesian prior that weights
+            are sampled from normal distribution, (3) Lagrangian with constraint $\| \vec{\theta} \| \leq \mu$.
+
+            Under the basis of the Hessian's eigenvectors, the optimum of $\ell_2$-regularized $\ell_{\mu}$ is \[
+                \vec{\theta}_\mu^\star = \mathrm{diag}\lft( \frac{\lambda_i}{\lambda_i + \mu} \rgt) \vec{\theta}^\star.
+            \]
+            Each axis is scaled based on sensitivity. If $\lambda_i \gg \mu$, then
+            $\nicefrac{\lambda_i}{\lambda_i + \mu} \approx 1$, so the solution does not change much.
+        \end{subtopic}
+
+        \begin{subtopic}{Early stopping}
+            Stop if validation performance does not improve for past $p$ epochs. Crudely
+            equivalent to weight decay with $\mu$ if stopped at $T \approx \nicefrac{1}{\eta \mu}$.
+        \end{subtopic}
+
+        \begin{subtopic}{Dropout}
+            Randomly disable subset of parameters during training $\to$ Units become less dependent
+            on one another $\to$ Instead of units being specialized, they become generally useful.
+
+            Two view: (1) regularization and (2) ensemble of networks: \[
+                p[\vec{\theta}](\vec{y} \mid \vec{x}) = \sum_{\vec{b} \in \{ 0,1 \}^P} p(\vec{b}) p[\vec{\theta} \odot \vec{b}](\vec{y} \mid \vec{x}).
+            \]
+            This can be approximated by scaling weights by their probability of being active.
+        \end{subtopic}
+
+        \begin{subtopic}{Normalization}
+            Goal: Make all units more similar. A unit $f: \R^d \to \R$ can be normalized by \[
+                \bar{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
+            \]
+            This removes 2 DOF (bias and variance) $\to$ Explicitly parameterize: \[
+                \overline{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x}).
+            \]
+            BatchNorm approximates $\E[f]$ and $\Var[f]$ over a mini-batch.
+
+            Normalization is very effective and sometimes essential. We used to believe that it was because it
+            helped combat covariance shift. However, a modern motivation shows that normalization is the same
+            as weight normalization and scaling by $\nicefrac{\| \vec{w} \|_{\mat{I}}}{\| \vec{w}
+                \|_{\mat{\Sigma}}}$, where $\mat{\Sigma} = \E[\vec{x}\transpose{\vec{x}}]$.
+
+            Layer normalization estimates mean and variance over the feature dimension instead of batch
+            dimension.
+        \end{subtopic}
+
+        \begin{subtopic}{Weight normalization}
+            Normalize weights before applying them: \[
+                f[\vec{v},\gamma](\vec{x}) = \phi(\transpose{\vec{w}}\vec{x}), \quad \vec{w} = \frac{\gamma}{\| \vec{v} \|_2} \vec{v}.
+            \]
+            Gradients: \[
+                \pdv{h}{\gamma} = \pdv{h}{\vec{w}} \pdv{\vec{w}}{\gamma}, \quad \pdv{h}{\vec{v}} = \frac{\gamma}{\| \vec{v} \|} \pdv{h}{\vec{w}} \lft( \mat{I} - \frac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|^2} \rgt).
+            \]
+            Here $\mat{I} - \nicefrac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|^2}$ is the projection matrix
+            onto the complement of $\vec{w}$ $\to$ The direction of $\vec{w}$ is projected out.
+        \end{subtopic}
+
+        \begin{subtopic}{Data augmentation}
+            Transform input data to train invariances.
+
+            Label smoothing: Replace labels by noisy probability distributions, because classifiers are not
+            good at dealing with mislabeled data.
+        \end{subtopic}
+
+        \begin{subtopic}{Distillation}
+            Let $F$ be the teacher and $G$ its student and we want the student to match its teacher's
+            logits. Then, we have tempered cross-entropy loss:
+            \begin{align*}
+                \ell(\vec{x}) & = \sum_{y \in \mathcal{Y}} \frac{\exp(\nicefrac{F_y(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{F_{y'}(\vec{x})}{T})} \cdot \\
+                              & \quad \quad \quad \quad \lft( \frac{1}{T} G_y(\vec{x}) - \log \sum_{y' \in \mathcal{Y}} \exp(\nicefrac{G_{y'}(\vec{x})}{T}) \rgt).
+            \end{align*}
+            Gradient: \[
+                \pdv{h}{G_y} = \frac{1}{T} \lft( \frac{\exp(\nicefrac{F_y(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{F_{y'}(\vec{x})}{T})} - \frac{\exp(\nicefrac{G_y(\vec{x})}{T})}{\sum_{y' \in \mathcal{Y}} \exp(\nicefrac{G_{y'}(\vec{x})}{T})} \rgt).
+            \]
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Neural tangent kernel}
+
+        \begin{subtopic}{Linearized model}
+            \[
+                f[\vec{\theta}] \approx f[\vec{\theta}_0] + \langle \grad{f[\vec{\theta}_0]}{}, \vec{\theta} - \vec{\theta}_0 \rangle.
+            \]
+            $f$ is non-linear w.r.t.\ $\vec{x}$, but linear w.r.t.\ $\vec{\theta}$ $\rightarrow$ Define linear model with gradient feature map: \[
+                h[\vec{\beta}](\vec{x}) = f[\vec{\theta}_0](\vec{x}) + \transpose{\vec{\beta}} \grad{f[\vec{\theta}_0](\vec{x})}{}.
+            \]
+            Kernel method with $k(\vec{x}, \vec{x}') = \langle \grad{f[\vec{\theta}_0](\vec{x})}{},
+                \grad{f[\vec{\theta}_0](\vec{x}')}{} \rangle$ and MSE loss, \[
+                \vec{\beta}^\star = \transpose{\mat{\Phi}} \inv{\mat{K}} (\vec{y}-\vec{f}), \quad \mat{K} = \mat{\Phi} \transpose{\mat{\Phi}}, \quad \vec{\phi}_i = \grad{f[\vec{\theta}_0](\vec{x}_i)}{}.
+            \]
+            Predictions: \[
+                h^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \inv{\mat{K}} (\vec{y} - \vec{f}).
+            \]
+            Linearized models are non-competitive with full networks. Also they may be intractable due to
+            number of samples and parameters. Benefit: We can look at DNNs through the lens of kernel methods
+            if the parameters do not evolve far away from $\vec{\theta}_0$.
+        \end{subtopic}
+
+        \begin{subtopic}{Training dynamics}
+            Gradient flow ODE with MSE loss: \[
+                \dot{\vec{\theta}}_t = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) \grad{f[\vec{\theta}_t](\vec{x})}{}.
+            \]
+            Functional gradient flow: \[
+                \dot{f}_j[\vec{\theta}_t] = \transpose{\dot{\vec{\theta}_t}} \grad{f[\vec{\theta}_t](\vec{x}_j)}{} = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) k[\vec{\theta}_t](\vec{x}_i, \vec{x}_j).
+            \]
+            In matrix form: \[
+                \dot{\vec{f}}[\vec{\theta}_t] = \mat{K}[\vec{\theta}_t](\vec{y} - \vec{f}[\vec{\theta}_t]), \quad \dot{\vec{f}}[\vec{\theta}_t] = -\mat{K}[\vec{\theta}_t] \grad{\ell(\vec{\theta}_t)}{\vec{f}[\vec{\theta}]}.
+            \]
+            NTK $\mat{K}[\vec{\theta}_t]$ governs the evolution of the joint sample predictions. Problem: NTK
+            has a dependence on the parameters.
+        \end{subtopic}
+
+        \begin{subtopic}{Infinite width}
+            In practice it has been found that as the width $m$ of a model is scaled, the parameters stay
+            more closely to their initialization during gradient descent. It can be shown (under
+            basic assumptions) that the NTK converges in probability to a deterministic limit as the
+            model is scaled to infinite width: \[
+                k[\vec{\theta}] \xrightarrow{m \to \infty} k_{\infty}.
+            \]
+            The deterministic limit depends only on the law of initialization. Under these training dynamics,
+            minimizing MSE equates to solving a kernel regression problem with $k_{\infty}$. This provides
+            insight into why overparameterization works so well in practice, despite having the ability to
+            overfit.
+        \end{subtopic}
+
+        \begin{subtopic}{NTK constancy}
+            The NTK remains constant under gradient flow: $\pdv{\mat{K}[\vec{\theta}_t]}{t} = \vec{0}$.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Bayesian learning}
+        Goal is to compute the Bayesian predictive posterior: \[
+            f(\vec{x}) = \int p(\vec{\theta} \mid \mathcal{S}) f[\vec{\theta}](\vec{x}) \mathrm{d}\vec{\theta},
+        \]
+        where \[
+            p(\vec{\theta} \mid \mathcal{S}) = \frac{p(\mathcal{S} \mid \vec{\theta})}{p(\mathcal{S})}, \quad p(\mathcal{S}) = \int p(\vec{\theta}) p(\mathcal{S} \mid \vec{\theta}) \mathrm{d}\vec{\theta}.
+        \]
+        $p(\mathcal{S})$ is intractable but often not necessary. An isotropic Gaussian prior leads to MAP optimizing $\ell_2$ regularization.
+
+        \begin{subtopic}{Markov chain Monte Carlo}
+            However, we do not want MAP only, we want the full distribution. MCMC methods sample from
+            the posterior by constructing a Markov chain, where the stationary distribution is the
+            posterior.
+
+            Detailed Balance Equation: \[
+                q(\vec{\theta}) \Pi(\vec{\theta}' \mid \vec{\theta}) = q(\vec{\theta}') \Pi(\vec{\theta} \mid \vec{\theta}'), \quad \forall \vec{\theta}, \vec{\theta}'.
+            \]
+            Then, the Markov chain is time reversible and has the unique stationary distribution $q$.
+
+            \textit{Metropolis-Hastings} samples from an arbitrary Markov chain with kernel $\tilde{\Pi}$ and adjusts it
+            such that DBE is satisfied for the posterior. It does so by constructing a new kernel:
+            \begin{align*}
+                \Pi(\vec{\theta}' \mid \vec{\theta})    & = \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta}) \alpha(\vec{\theta}' \mid \vec{\theta})                                                                                                        \\
+                \alpha(\vec{\theta}' \mid \vec{\theta}) & = \min \lft\{ 1, \frac{p(\vec{\theta} \mid \mathcal{S}) \tilde{\Pi}(\vec{\theta}' \mid \vec{\theta})}{p(\vec{\theta}' \mid \mathcal{S}) \tilde{\Pi}(\vec{\theta} \mid \vec{\theta}')} \rgt\}.
+            \end{align*}
+            This is the unique choice of acceptance function $\alpha$ that has a one-sided structure. If $\tilde{\Pi}$ is
+            symmetric, we only need the ratio of posteriors, not $p(\mathcal{S})$. Problems: Burn-in
+            period can be arbitrarily long due to poor $\tilde{\Pi}$ leading to high rejection
+            probabilities.
+
+            \textit{Hamiltonian Monte Carlo} obtains posterior averages. Energy function: \[
+                E(\vec{\theta}) = - \sum_{\vec{x},y} \log p[\vec{\theta}](y \mid \vec{x}) - \log p(\vec{\theta}).
+            \]
+            The Hamiltonian augments with momentum vector: \[
+                H(\vec{\theta}, \vec{v}) = E(\vec{\theta}) + \frac{1}{2} \transpose{\vec{v}} \inv{\mat{M}} \vec{v}.
+            \]
+            Hamiltonian dynamics: \[
+                \dot{\vec{v}} = -\grad{E(\vec{\theta})}{}, \quad \dot{\vec{\theta}} = \vec{v}.
+            \]
+            HMC discretizes with stepsize $\eta$: \[
+                \vec{\theta}_{t+1} = \vec{\theta}_t + \eta \vec{v}_t, \quad \vec{v}_{t+1} = \vec{v}_t - \eta \grad{E(\vec{\theta}_t)}{}.
+            \]
+            We sample the posterior by following momentum-based gradient descent dynamics. (We can also view
+            this as momentum-based gradient descent leading to a single sample approximation of the predictive
+            distribution.) Problem: We need to compute the full gradient.
+
+            \textit{Langevin dynamics} extends HMC by friction: \[
+                \dot{\vec{\theta}} = \vec{v}, \quad \mathrm{d}\vec{v} = -\grad{E(\vec{\theta})}{} \mathrm{d}t - \mat{B} \vec{v}\mathrm{d}t + \mathcal{N}(\vec{0}, 2 \mat{B} \mathrm{d}t).
+            \]
+            Friction reduces momentum and dissipates kinetic energy, while the Wiener noise injects
+            stochasticity. Discretize:
+            \begin{align*}
+                \vec{\theta}_{t+1} & = \vec{\theta}_t + \eta \vec{v}_t \\
+                \vec{v}_{t+1} & = (1-\eta \gamma) \vec{v}_t - \eta s \grad{\tilde{E}(\vec{\theta})}{} + \sqrt{2 \gamma \eta} \mathcal{N}(\vec{0}, \mat{I}).
+            \end{align*}
+            Here, $\tilde{E}$ is a stochastic potential function which is the empirical loss over a random
+            mini-batch of data.
+        \end{subtopic}
+
+        \begin{subtopic}{Gaussian process}
+            GPs is a fully tractable Bayesian method. $f$ is a GP if for every finite subset $\{ \vec{x}_1, \ldots, \vec{x}_n \} \subseteq \mathcal{X}$, the resulting finite marginal is jointly normally distributed, \[
+                [f(\vec{x}_1), \ldots, f(\vec{x}_n)] \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma}).
+            \]
+            In GPs, the mean can be computed by deterministic regression and the covariance matrix is evaluated
+            by a kernel function: \[
+                \sigma_{ij} = k(\vec{x}_i, \vec{x}_j).
+            \]
+            The kernel function can be seen as a prior over function space that describes how related the
+            output values corresponding to the two input value should be. RBF kernel encodes that close input
+            value should have close output values: \[
+                k(\vec{x}, \vec{x}') = \exp \lft( -\gamma \| \vec{x} - \vec{x}' \|^2 \rgt).
+            \]
+            Linear networks assume a random Gaussian weight vector: \[
+                \vec{w} \sim \mathcal{N}\lft(\vec{0}, \frac{\sigma^2}{d} \mat{I}_d\rgt).
+            \]
+            Outputs are computed by $y_i = \transpose{\vec{w}}\vec{x}_i$. Vectorized: \[
+                \vec{y} = \mat{X} \vec{w}.
+            \]
+            This is a Gaussian vector: \[
+                \vec{y} \sim \mathcal{N}\lft(\vec{0}, \frac{\sigma^2}{d} \transpose{\mat{X}} \mat{X} \rgt).
+            \]
+            In other words, it is a GP with the following kernel: \[
+                k(\vec{x}, \vec{x}') = \frac{\sigma^2}{d} \transpose{\vec{x}}\vec{x}'.
+            \]
+            We can do this for multiple units because the preactivations of units in the same layer are
+            independent, conditioned on the input. In general, we do not get the same effect if we increase the
+            depth, because there is randomness not only in the weights but also the preactivations. However, a
+            deep preactivation process is ``near normal'' for high-dimensional inputs.
+
+            We can extend this to non-linear networks. But, the activations are no longer Gaussian due to the
+            non-linearity. However, due to CLT, they are effectively shaped back into Gaussians when they
+            propagate to the next layer. The mean function and kernels are computed by \[
+                \mu(\vec{x}^{\ell}) = \E[\phi(\mat{W}^{\ell-1} \vec{x}^{\ell-1})], \quad k^{\ell}(\vec{x}_i, \vec{x}_j) = \E[\phi(\vec{x}^{\ell-1}_i) \phi(\vec{x}^{\ell-1}_j)].
+            \]
+            We can now use kernel regression: \[
+                f^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \mat{K}^{-1}\vec{y}, \quad k = k^L.
+            \]
+            In conclusion, DNNs in the infinite-width limit can be thought of as GPs (because then all
+            preactivations can be viewed as Gaussians). Benefit: Uncertainty quantification, No training,
+            Leverage tricks form kernel machines. Problems: Computing $f^\star$ and storing $\mat{K}^{\ell}$
+            are not feasible, It is much less efficient than optimizing weights with gradient descent.
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Statistical learning theory}
+
+        \begin{subtopic}{VC theory}
+            Let $\mathcal{F}$ be a class of binary classifiers. Then the following is the set of possible classification outcomes over a dataset $\mathcal{S}$: \[
+                \mathcal{F}(\mathcal{S}) = \{ [f(\vec{x}_1), \ldots, f(\vec{x}_n)] \in \{ 0,1 \}^n \mid f \in \mathcal{F} \}.
+            \]
+            Further define maximum number: \[
+                \mathcal{F}(n) = \sup_{|\mathcal{S}| = n} |\mathcal{F}(\mathcal{S})|.
+            \]
+            $\mathcal{F}$ shatters $\mathcal{S}$ if $|\mathcal{F}(\mathcal{S})| = 2^n$ (every
+            possible labeling is realized by some function $f \in \mathcal{F}$). VC dimensionality is defined as \[
+                \mathrm{VC}(\mathcal{F}) = \max_{n \in \mathbb{N}} \sup_{|\mathcal{S}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
+            \]
+            Under uniform convergence, VC inequality holds: \[
+                \mathbb{P}\lft( \sup_{f \in \mathcal{F}} |\hat{\ell}(f) - \ell(f)| > \epsilon \rgt) \leq 8 |\mathcal{F}(n)| \exp \lft( -\frac{n \epsilon^2}{32} \rgt),
+            \]
+            where $\ell$ is the expected loss and $\hat{\ell}$ is the empirical loss. Intuition: No
+            generalization guarantees can be given if $\mathcal{F}$ can be fit to any labeling.
+
+            Randomization experiments with CIFAR-10 observations:
+            \begin{enumerate}
+                \item DNNs can perfectly fit the training data;
+                \item When randomly replacing training labels, the models can still perfectly fit the data
+                      (memorization);
+                \item The training time does not increase much when labels are randomized;
+                \item When randomly shuffling pixels, the models can also perfectly fit the data $\to$ Inductive bias of
+                      CNNs does not provide much benefit in this regard.
+            \end{enumerate}
+            These findings are unexplainable by the above theory.
+
+            Overparameterization can lead to double descent phenomenon, where large models will eventually
+            start generalizing better after overfitting.
+
+            The flatness of local minima are linked to their generalization ability, because at flat minima,
+            small perturbations in the parameters will only have a small effect on performance. These can be
+            found by small-batch SGD, weight averaging, or entropy SGD.
+        \end{subtopic}
+
+        \begin{subtopic}{PAC-Bayesian}
+            For any $p \gg q$ and $p$-measurable $X$, \[
+                \E_q[X] \leq D_{\mathrm{KL}}(q \| p) + \log \E_p[\exp(X)].
+            \]
+
+            For a fixed $p$, any $q$, and $\epsilon \in (0,1)$, we have the following with probability greater
+            than or equal to $\epsilon$, \[
+                \E_q[\ell(f)] - \E_q[\hat{\ell}(f)] \leq \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
+            \]
+            Here, $p$ is a prior over parameters, $q$ the posterior, and we bound the expected generalization
+            gap over stochastic classifiers $\to$ $\bigo{\nicefrac{1}{\sqrt{n}}}$ bound on generalization
+            error. However, it only applies to stochastic classifiers, not single classifiers.
+
+            This motivated the PAC Bayes loss function \[
+                \ell_{\mathrm{PAC}}(q) \doteq \E_q[\hat{\ell}] + \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2\sqrt{n}}{\epsilon} \rgt)}.
+            \]
+            Effectively just a regularization term. The KL term can be computed in closed form if prior and
+            posterior are Gaussian.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Generative models}
+
+        \begin{subtopic}{Autoencoders}
+            Encoder $\bm{\mathcal{E}}$ maps data to latents and decoder $\bm{\mathcal{D}}$ maps
+            latents to data. We want $\bm{\mathcal{D}}(\bm{\mathcal{E}}(\vec{x})) = \vec{x}$. Linear
+            autoencoder with MSE loss is PCA of covariance matrix $\frac{1}{n} \transpose{\mat{X}}
+                \mat{X}$ and taking $m$ principal eigenvectors. Intuition: Retain as much variance as possible.
+
+            VAE optimizes log-likelihood of data $\to$ Intractable $\to$ ELBO:
+            \begin{align*}
+                \log p[\vec{\theta}](\vec{x}) & \geq \E_{p[\vec{\vartheta}](\vec{z} \mid \vec{x})} [\log p[\vec{\theta}](\vec{x} \mid \vec{z})] \\
+                & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \| p(\vec{z})).
+            \end{align*}
+            $p[\vec{\vartheta}]$ is the encoder distribution and $p[\vec{\theta}]$ is the decoder
+            distribution. This is effectively a reconstruction loss with a regularization term, where
+            the regularization term ensures a well-behaved latent space.
+
+            In general, the posterior $p[\vec{\vartheta}](\vec{z} \mid \vec{x})$ is intractable, so we restrict
+            it to Gaussians, \[
+                \vec{z} \mid \vec{x}, \vec{\vartheta} \sim \mathcal{N}(\vec{\mu}[\vec{\vartheta}](\vec{x}), \mat{\Sigma}[\vec{\vartheta}](\vec{x})).
+            \]
+            And the prior is $\mathcal{N}(\vec{0}, \mat{I})$. Then, the KL divergence can be computed in a
+            closed form: \[
+                \frac{1}{2} \lft( \| \vec{\mu}[\vec{\vartheta}](\vec{x}) \|^2 + \tr{\mat{\Sigma}[\vec{\vartheta}](\vec{x})} - \log \det{\mat{\Sigma}[\vec{\vartheta}](\vec{x})} - m \rgt).
+            \]
+            This can be optimized using the reparameterization tick.
+        \end{subtopic}
+
+        \begin{subtopic}{Generative adversarial networks}
+            Log-likelihood is not the only way to optimize a model. GANs provide a training signal by
+            introducing a binary classifier that distinguishes between samples from ``nature'' (1) and the
+            generator (0): discriminator.
+
+            Augmented distribution over samples: \[
+                \tilde{p}(\vec{x},y) = \frac{1}{2} (yp(\vec{x}) + (1-y)p[\vec{\theta}](\vec{x})).
+            \]
+            Bayes-optimal classifier: \[
+                \mathbb{P}(y=1 \mid \vec{x}) = \frac{p(\vec{x})}{p(\vec{x}) + p[\vec{\theta}](\vec{x})}.
+            \]
+            Minimizing the logistic log-likelihood w.r.t.\ this discriminator gives the following loss for the
+            generator, \[
+                \ell^\star(\vec{\theta}) = D_{\mathrm{JS}}(p \| p[\vec{\theta}]) - \log 2,
+            \]
+            where $D_{\mathrm{JS}}(p \| q) = H(\nicefrac{p + p[\vec{\theta}]}{2}) - \nicefrac{H(p) +
+                    H(p[\vec{\theta}])}{2}$. But, the optimal classifier is intractable, so we train a parametrized one
+            $q[\vec{\varphi}]$, \[
+                \vec{\theta}^\star, \vec{\varphi}^\star \in \argmin_{\vec{\theta}} \argmax_{\vec{\varphi}} \ell(\vec{\theta}, \vec{\varphi}),
+            \]
+            where \[
+                \ell(\vec{\theta}, \vec{\varphi}) = \E_{\tilde{p}[\vec{\theta}]}[y \log q[\vec{\varphi}](\vec{x}) + (1-y) \log (1-q[\vec{\varphi}](\vec{x}))].
+            \]
+            We have the following bound: \[
+                \ell^\star(\vec{\theta}) \geq \sup_{\vec{\varphi}} \ell(\vec{\theta}, \vec{\varphi}).
+            \]
+            Problem: Gradient descent-ascent is not guaranteed to converge. Solution: Extragradient
+            optimization algorithm:
+            \begin{align*}
+                \vec{\theta}_{t+1}  & = \vec{\theta}_t - \eta \grad{\ell(\vec{\theta}_{t+\nicefrac{1}{2}}, \vec{\varphi}_t)}{\vec{\theta}}, \quad \vec{\theta}_{t+\nicefrac{1}{2}} = \vec{\theta}_t - \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_t)}{\vec{\theta}}       \\
+                \vec{\varphi}_{t+1} & = \vec{\varphi}_t + \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_{t+\nicefrac{1}{2}})}{\vec{\varphi}}, \quad \vec{\varphi}_{t+\nicefrac{1}{2}} = \vec{\varphi}_t + \eta \grad{\ell(\vec{\theta}_t, \vec{\varphi}_t)}{\vec{\varphi}}.
+            \end{align*}
+            In practice, we also need to use a different loss function for the generator: \[
+                \ell(\vec{\theta} \mid \vec{\varphi}) = \E_{p[\vec{\theta}]}[-\log q[\vec{\varphi}](\vec{x})],
+            \]
+            because otherwise the gradient goes to infinity when $q[\vec{\varphi}](\vec{x}) = 1$, which makes
+            the generator saturate.
+        \end{subtopic}
+
+        \begin{subtopic}{Diffusion models}
+            Map a simple distribution to a complex one in many steps: \[
+                \pi = \pi_T \mapsto \pi_{T-1} \mapsto \cdots \mapsto \pi_0 \approx p.
+            \]
+            \textit{SDE view}: \[
+                \mathrm{d}\vec{x}_t = -\frac{1}{2} \beta_t \vec{x}_t \mathrm{d}t \sqrt{\beta_t} \mathrm{d}\omega_t.
+            \]
+            Time-reversed: \[
+                \mathrm{d}\vec{x}_t = \lft( -\frac{1}{2} \beta_t \vec{x}_t - \beta_t \grad{\log q_t(\vec{x}_t)}{\vec{x}_t} \rgt) \mathrm{d}t + \sqrt{\beta_t} \mathrm{d}\tilde{\omega}_t.
+            \]
+            Denoising amounts to approximating a vector field over the gradient of the probability distribution
+            moving towards areas with high probability density. Score models approximate $\grad{\log
+                    q_t(\vec{x}_t)}{\vec{x}_t}$.
+
+            \textit{ELBO view}: Forward process: \[
+                \vec{x}_t = \sqrt{1-\beta_t} \vec{x}_{t-1} + \sqrt{\beta_t} \vec{\epsilon}_t, \quad \vec{\epsilon}_t \sim \mathcal{N}(\vec{0}, \mat{I}).
+            \]
+            Energy of the stochastic process evolves as $\E[\| \vec{x}_t \|^2 \mid \vec{x}_{t-1}] =
+                (1-\beta_t)\| \vec{x}_{t-1} \|^2 + \beta_t \mathrm{tr}(\mat{I})$. If $\E[\| \vec{x}_0 \|^2] =
+                \mathrm{tr}(\mat{I}) = \dim(\vec{x}_0)$, then energy is conserved throughout the process.
+
+            Closed form ($\bar{\alpha}_t = \prod_{\tau=1}^t (1-\beta_{\tau})$): \[
+                \vec{x}_t \sim \mathcal{N}(\sqrt{\bar{\alpha}_t}, (1-\bar{\alpha}_t) \mat{I}).
+            \]
+            Backward process: \[
+                \vec{x}_{t-1} \sim \mathcal{N}(\vec{\mu}[\vec{\theta}](\vec{x}_t, t), \mat{\Sigma}[\vec{\theta}](\vec{x}_t, t)).
+            \]
+            ELBO: \[
+                \log p[\vec{\theta}](\vec{x}_0) \geq \sum_{t=0}^{T} \ell_t,
+            \]
+            where \[
+                \ell_t = \begin{cases}
+                    \E_q[\log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1)]                                                          & t = 0     \\
+                    -D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \| p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) & 0 < t < T \\
+                    -D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \| \pi)                                                          & t = T.
+                \end{cases}
+            \]
+            The KL divergences can be analytically computed because all $q_t$ are Gaussians an we parameterized
+            the network as a Gaussian. The $q$ targets are derived as \[
+                q(\vec{x}_{t-1} \mid \vec{x}_t, \vec{x}_0) = \mathcal{N}(\vec{\mu}(\vec{x}_t, \vec{x}_0, t), \tilde{\beta}_t),
+            \]
+            where
+            \begin{align*}
+                \vec{\mu}(\vec{x}_t, \vec{x}_0, t) & = \frac{\sqrt{\bar{\alpha}_{t-1}} \beta_t}{1-\bar{\alpha}_t} \vec{x}_0 + \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \sqrt{1-\beta_t} \vec{x}_t \\
+                \tilde{\beta}_t                    & = \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \beta_t.
+            \end{align*}
+            Thus $\ell_t$ simplify to \[
+                \ell_t = -\frac{1}{2 \sigma_t^2} \| \vec{\mu}(\vec{x}_t, \vec{x}_0, t) - \vec{\mu}[\vec{\theta}](\vec{x}_t,t) \|^2,
+            \]
+            where $\sigma_t^2 \in [\beta_t, \tilde{\beta}_t]$.
+
+            By noting the closed form forward process, we have \[
+                \vec{x}_0 = \frac{1}{\sqrt{\bar{\alpha}_t}} \vec{x}_t - \frac{\sqrt{1-\bar{\alpha}_t}}{\bar{\alpha}_t} \vec{\epsilon}.
+            \]
+            We can thus rewrite \[
+                \vec{\mu}(\vec{x}_t, \vec{x}_0, t) = \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \vec{\epsilon} \rgt).
+            \]
+            Note that $\vec{\epsilon}$ fully determines $\vec{x}_t$ and $\vec{x}_0$ is constant. So, we only
+            need to predict $\vec{\epsilon}$. Simplified loss:
+            \begin{align*}
+                \E_q[\ell_t \mid \vec{x}_0] & = \E_{\vec{\epsilon}}[\lambda(t) \| \vec{\epsilon} - \vec{\epsilon}[\vec{\theta}](\vec{x}_t, t) \|^2] \\
+                \lambda(t) & = \frac{\beta_t^2}{2 \sigma_t^2 \alpha_t (1-\bar{\alpha}_t)}.
+            \end{align*}
+            In practice, the loss is approximated by \[
+                \ell(\vec{\theta} \mid \vec{x}_0) = \frac{1}{T} \sum_{t=1}^{T} \lft[ \| \vec{\epsilon} - \vec{\epsilon}[\vec{\theta}](\vec{x}_t, t) \|^2 \;\middle|\; \vec{x}_0 \rgt].
+            \]
+
+            Entropy bound: \[
+                H(\vec{x}_{t-1} \mid \vec{x}_t) \leq H(\vec{x}_t \mid \vec{x}_{t-1}).
+            \]
+            The entropy of the reverse process is bounded by the entropy of the forward process.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Adversarial attacks}
+
+        The attacker wants to make small changes to the input such that the model gives a different result.
+
+        \begin{subtopic}{$p$-norm robustness}
+            Consider a multi-class classifier $f: \R^d \to [m]$. The goal of an adversarial attack is to find a perturbation $\vec{\eta}$ such that \[
+                f(\vec{x} + \vec{\eta}) \neq f(\vec{x}), \quad \| \vec{\eta} \|_p \leq \epsilon.
+            \]
+
+            Consider a binary affine classifier and $p=2$, \[
+                f(\vec{x}) = \argmax \{ \transpose{\vec{w}_1} \vec{x} + b_1, \transpose{\vec{w}_2}\vec{x} + b_2 \}.
+            \]
+            Assume $\vec{x}$ is classified as $1$ and we want to find $\vec{\eta}$ such that $\vec{x} +
+                \vec{\eta}$ is classified as $2$ such that $\| \vec{\eta} \|_2$ is minimized $\to$ Convex program:
+            \begin{align*}
+                \text{minimize}   & \quad \frac{1}{2} \| \vec{\eta} \|_2^2                                               \\
+                \text{subject to} & \quad \transpose{(\vec{w}_1 - \vec{w}_2)} (\vec{x} + \vec{\eta}) + b_1 - b_2 \leq 0.
+            \end{align*}
+            Set gradient of Lagrangian to zero $\to$ $\vec{\eta}^\star = \lambda (\vec{w}_2 -
+                \vec{w}_1)$. Then, find $\lambda$ that satisfies constraint $\to$ $\lambda \geq
+                \nicefrac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_1 - \vec{w}_2 \|_2^2}$. Thus: \[
+                \vec{\eta}^\star = \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_2 - \vec{w}_1 \|_2^2} (\vec{w}_2 - \vec{w}_1).
+            \]
+            This can be generalized to any source $i$ and target $j$. In the general case, we can linearize the
+            model and iteratively solve the above convex program.
+        \end{subtopic}
+
+        \begin{subtopic}{Robust training}
+            Robust training systematically makes models robust to adversarial attacks by extending the loss function to neighborhoods of training points: \[
+                \ell(\vec{x}) \mapsto \max_{\vec{\eta} : \| \vec{\eta} \|_p \leq \epsilon} \ell(\vec{x} + \vec{\eta}).
+            \]
+            This can be solved with projected gradient ascent. For $p=2$, we have \[
+                \vec{\eta}_{t+1} = \epsilon \Pi(\vec{\eta}_t + \alpha \grad{\ell(\vec{x} + \vec{\eta}_t)}{\vec{x}}), \quad \Pi(\vec{z}) \doteq \frac{\vec{z}}{\| \vec{z} \|_2}.
+            \]
+            Fast gradient sign method performs one iteration with $p=\infty$ resulting in $\vec{\eta} =
+                \epsilon\cdot\mathrm{sgn}(\grad{\ell(\vec{x})}{\vec{x}})$
+
+        \end{subtopic}
+
+    \end{topic}
+
+\end{multicols*}
+
+\end{document}

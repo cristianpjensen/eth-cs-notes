@@ -104,7 +104,7 @@ advantage of this over LSTM is that it only has 3 weight matrices, instead of 5.
 The LRU (\textit{\textbf{L}inear \textbf{R}ecurrent \textbf{M}odel}) \citep{feng2024were} further
 simplifies the GRU recurrence function to be linear, such that it can exploit fast parallel
 sequence processing for training, \[
-    \vec{z}_t = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{z}_t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \vec{x}_t \rgt), \quad \tilde{z}_t = \mat{V} \vec{x}_t.
+    \vec{z}_t = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{\vec{z}}_t, \quad \vec{\sigma} = \sigma \lft( \mat{G} \vec{x}_t \rgt), \quad \tilde{z}_t = \mat{V} \vec{x}_t.
 \]
 Now we can use prefix scan parallelism, which allows for an $\bigo{\log T}$ runtime during
 training, instead of $\bigo{T}$. This might bridge the gap to the performance of
