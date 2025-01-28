@@ -6,13 +6,13 @@
 
 _WIP_
 
-**Documents**: [Summary](https://cristianpjensen.github.io/eth-cs-notes/deep_learning/summary.pdf) (WIP).
+**Documents**: [Summary](https://cristianpjensen.github.io/eth-cs-notes/deep_learning/summary.pdf), [Cheatsheet](https://cristianpjensen.github.io/eth-cs-notes/deep_learning/cheatsheet.pdf).
 
 ## Advanced Machine Learning, F24
 
 _WIP_
 
-**Documents**: [Summary](https://cristianpjensen.github.io/eth-cs-notes/advanced_machine_learning/summary.pdf) (WIP).
+**Documents**: [Summary](https://cristianpjensen.github.io/eth-cs-notes/advanced_machine_learning/summary.pdf).
 
 
 ## Optimization for Data Science, S24
