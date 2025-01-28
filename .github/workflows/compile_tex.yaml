@@ -100,6 +100,13 @@ jobs:
         latexmk_shell_escape: true
         working_directory: deep_learning/summary
 
+    - name: Deep Learning (cheatsheet)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        working_directory: deep_learning/cheatsheet
+
+
       # (*) To add a file, add the PDF filename to the following
     - name: Check PDF files
       run: |
