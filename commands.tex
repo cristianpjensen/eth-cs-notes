@@ -40,7 +40,7 @@
 
 % Distributions
 \newcommand{\sample}{\sim}
-\newcommand{\sampleiid}{\overset{\mathrm{iid}}{\sim}}
+\newcommand{\sampleiid}{\overset{\text{\iid}}{\sim}}
 \NewDocumentCommand{\Gauss}{O{0}O{1}o}{\mathcal{N}\lft(#1,#2 \IfValueT{#3}{\mid #3}\rgt)}
 \newcommand{\MultiGauss}{\Gauss[\vec{0}][\mat{I}]}
 \NewDocumentCommand{\Unif}{m}{\mathrm{Unif}\parentheses*{#1}}
@@ -67,6 +67,7 @@
 \def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
 \def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
 \def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\iid{\emph{i.i.d}\onedot} \def\Iid{\emph{I.i.d}\onedot}
 \makeatother
 
 % Argument optima

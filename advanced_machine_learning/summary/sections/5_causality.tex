@@ -10,31 +10,31 @@ The following are examples of causal fallacies, where one might conclude that $X
 \begin{itemize}
     \item Reverse causality, where $Y$ actually predicts $X$ and not the other way around;
     \item Third-cause fallacy, where there is a confounding factor $Z$ that influences both $X$ and $Y$;
-    \item Bidirectional causation, where $X$ influence each other;
+    \item Bidirectional causation, where $X$ and $Y$ influence each other.
 \end{itemize}
 
-A domain shift happens when the test samples are drawn from a different distribution than the
-training samples. \Eg, COVID-19 detection models trained on a western population might not perform
-well on an eastern population.
+Further, a domain shift happens when the test samples are drawn from a different distribution than
+the training samples. \Eg, COVID-19 detection models trained on a western population might not
+perform well on an eastern population.
 
-Shortcut learning happens when there is a spurious correlation between causal and non-causal
-features in the training dataset. The resulting estimator abuses the non-causal features to
-generalize in the testing dataset. The solution to this is to encode the features such that they do
-not depend on the environment.
+Moreover, shortcut learning happens when there is a spurious correlation between causal and
+non-causal features in the training dataset. The resulting estimator abuses the non-causal features
+to generalize in the testing dataset. The solution to this is to encode the features such that they
+do not depend on the environment.
 
 \subsection{Counterfactual invariance}
 
 \begin{marginfigure}
     \centering
     \incfig{causal-graph}
-    \caption{Causal graph.}
+    \caption{Causal graph of $\vec{W}$, $\vec{X}$, and $Y$. $\vec{X}$ is decomposed into several components. Dotted arrows are non-causal relationships.}
     \label{fig:causal-graph}
 \end{marginfigure}
 
 \begin{marginfigure}
     \centering
     \incfig{anti-causal-graph}
-    \caption{Anti-causal graph.}
+    \caption{Anti-causal graph of $\vec{W}$, $\vec{X}$, and $Y$. $\vec{X}$ is decomposed into several components. Dotted arrows are non-causal relationships.}
     \label{fig:anti-causal-graph}
 \end{marginfigure}
 
@@ -65,5 +65,12 @@ invariant if and only if $f$ only depends on $\vec{X}_{\vec{W}^\perp}$.
 \end{theorem}
 
 \begin{proof}
-    This can be proven by using d-separation.
+    This can be easily be seen by using d-separation---see \Cref{fig:causal-graph,fig:anti-causal-graph,fig:d-separation}.
+
+    \begin{marginfigure}
+        \centering
+        \incfig{d-separation}
+        \caption{d-separation. Here, we condition (or observe) on nodes that are gray. In all of these examples A is separated from C, meaning that $\text{A} \perp \text{C} | Z$, where $Z$ are the conditioned variables.}
+        \label{fig:d-separation}
+    \end{marginfigure}
 \end{proof}

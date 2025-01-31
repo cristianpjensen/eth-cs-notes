@@ -562,7 +562,7 @@ the time complexity.
 However, the key question is how to choose $\mat{Q}$ appropriately. The following is a scheme for
 finding a suitable $\mat{Q}$,
 \begin{enumerate}
-    \item Generate a random matrix with i.i.d. Gaussian entries, $\mat{R} \in \R^{m \times 2k}$;
+    \item Generate a random matrix with \iid Gaussian entries, $\mat{R} \in \R^{m \times 2k}$;
     \item Compute $\mat{Y} = \lft( \mat{A}\transpose{\mat{A}} \rgt)^q \mat{A} \mat{R}$, where $\mat{Y} \in
               \R^{n \times 2k}$, by repeated matrix multiplications;
     \item Construct an orthonormal basis $\mat{Q}$ for the image of $\mat{Y}$ (\eg, via Gram-Schmidt).

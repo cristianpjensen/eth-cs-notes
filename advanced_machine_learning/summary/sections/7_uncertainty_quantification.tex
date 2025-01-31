@@ -74,16 +74,15 @@ expected risk $\mathcal{R}(\mathcal{A})$ as follows, \[
 where $\mathcal{C}^{-i}$ contains the indices of the bootstraps that do not contain observation
 $(\vec{x}_i, y_i)$.
 
-In order to correct for the optimism of $\hat{\mathcal{R}}(\mathcal{A})^{\mathrm{BS}}$, we combine
+In order to correct for the optimism of $\hat{\mathcal{R}}^{\mathrm{BS}}(\mathcal{A})$, we combine
 it with $\mathcal{R}^{\mathrm{BS}}$, \[
     \mathcal{R}^{(0.632)} \doteq 0.368 \hat{\mathcal{R}}^{\mathrm{BS}} + 0.632 \mathcal{R}^{\mathrm{BS}}.
 \]
 Here, a weight of $0.632$ is used because that is the probability that a sample $(\vec{x}_i, y_i)$
 appears at least once in a bootstrap sample of size $n$, \[
-    1 - \lft( 1 - \frac{1}{n} \rgt)^n \to 1 - \frac{1}{e} = 0.632.
+    1 - \lft( 1 - \frac{1}{n} \rgt)^n \to 1 - \frac{1}{e} \approx 0.632.
 \]
-TODO: Figure out why we are weighting it, because the optimism is already removed in
-$\mathcal{R}^{\mathrm{BS}}$.
+This results in a more robust estimator than $\mathcal{R}^{\mathrm{BS}}$.
 
 \subsection{Uncertainty in linear models}
 
@@ -91,23 +90,21 @@ Suppose we have $n$ observations in our dataset $\{ (\vec{x}_i, y_i) \}_{i=1}^n$
     \R^{n \times d}$ and $\vec{y} \in \R^n$ be the design matrix and output vector. We further assume \[
     \vec{y} \mid \mat{X} \sim \mathcal{N} \lft( \mat{X} \vec{\beta}^{\star}, \sigma^2 \mat{I} \rgt).
 \]
-As we have seen before, the ordinary least squares estimator is computed as follows, \[
+As we have seen before, the OLSE is computed as follows, \[
     \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \transpose{\mat{X}} \vec{y}.
 \]
 Thus, we have the following distribution over estimators, \[
     \hat{\vec{\beta}} \sim \mathcal{N}\lft( \vec{\beta}^\star, \sigma^2 \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \rgt).
 \]
 An unbiased estimator of $\sigma^2$ is \[
-    \hat{\sigma}^2 = \frac{1}{n-d} \sum_{i=1}^{n} \lft( \transpose{\hat{\vec{\beta}}} \vec{x}_i - y_i \rgt)^2.
+    \hat{\sigma}^2 = \frac{1}{n-d} \sum_{i=1}^{n} \lft( \transpose{\hat{\vec{\beta}}} \vec{x}_i - y_i \rgt)^2. \margintag{This is the variance computed with the unbiased estimator of $\vec{\beta}^\star$.}
 \]
 Thus, we can approximate an $1-\alpha$ confidence interval for $\beta^\star_j$ by \[
     \hat{\beta_j} \pm z_{\nicefrac{\alpha}{2}} \hat{\epsilon} \lft( \hat{\beta}_j \rgt),
 \]
 where $z_{\nicefrac{\alpha}{2}} = \Phi^{-1}\lft( \nicefrac{\alpha}{2} \rgt)$, $\Phi$ is the CDF of
-the standard Gaussian, and $\epsilon(\hat{\beta}_j)$ is the $j$-th diagonal element of $\sigma^2
-    \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)}$
-
-TODO: Find out how the $1-\alpha$ confidence interval of $\beta^\star_j$ is computed.
+the standard Gaussian, and $\epsilon(\hat{\beta}_j)$ is the $j$-th diagonal element of
+$\hat{\sigma}^2 \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)}$.
 
 \subsection{Statistical testing}
 
@@ -128,9 +125,9 @@ We want to minimize the probability of incorrectly choosing $H_1$ as this is wor
 choosing $H_0$. We can quantify this notion of risk as \[
     \alpha_c \doteq \sup_{\vec{\theta} \in \Theta_0} \mathbb{P}(t(x_1, \ldots, x_n) \geq c \mid \vec{\theta}).
 \]
-Intuitively, this is the maximum probability of incorrectly choosing $H_1$, because the test is
-passed, but the null hypothesis holds. Note that $\alpha_c \to 0$ as $c \to \infty$. So, $c^\star
-    \to \infty$ minimizes the risk. But, this comes with the problem that we would never accept $H_1$.
+Intuitively, this is the maximum probability of choosing $H_1$ when $H_0$ holds. Note that
+$\alpha_c \to 0$ as $c \to \infty$. So, $c^\star \to \infty$ minimizes the risk. But, this comes
+with the problem that we would never accept $H_1$.
 
 The solution to this problem is to forget about choosing the optimal critical value a priori and
 running an experiment to obtain a realization $x_1, \ldots, x_n$. We then run the test with the
@@ -142,7 +139,31 @@ One can show that this is the common $p$-value, \[
     p \doteq \sup_{\vec{\theta} \in \Theta_0} \mathbb{P}(t(X_1, \ldots, X_n) \geq t(x_1, \ldots, x_n) \mid \vec{\theta}).
 \]
 Intuitively, this is the probability that the test is higher than our current observation if we run
-the experiment again.
+the experiment again. A very small $p$-value means that such an extreme observed outcome would be
+very unlikely under the null hypothesis.
+
+\begin{marginfigure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                colormap name=sequential,
+                width=\textwidth,
+                grid=major,
+                domain=-2:2,
+                y domain=0.05:0.5,
+                view={135}{45},
+                zmin=0,
+                zmax=1000,
+                samples=25,
+                xlabel=$\hat{\theta}$,
+                ylabel=$\hat{\sigma}$,
+            ]
+            \addplot3 [surf] {(x/y)^2};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Wald test statistic with $\theta_0 = 0$ for different estimators.}
+    \label{fig:wald}
+\end{marginfigure}
 
 \paragraph{Wald test.}
 
@@ -153,8 +174,8 @@ test statistic is \[
     W = \frac{(\hat{\theta} - \theta_0)^2}{\hat{\sigma}^2}.
 \]
 
-TODO: Figure out what the point of this is in the context of machine learning. Also, figure out how
-this can be done practically, because I have no idea how one would compute $\alpha_c$ or $p$.
+As can be seen in \Cref{fig:wald}, the Wald test is very high when the estimator is confident (low
+$\hat{\sigma}$) and very different from $\theta_0$.
 
 \subsection{Bayesian neural networks}
 
@@ -181,8 +202,6 @@ In general, the weights are optimized by gradient descent, \[
     \vec{\theta}_t = \vec{\theta}_{t-1} - \eta_t \grad{\hat{\mathcal{R}}(f(\cdot \mid \vec{\theta}_{t-1}))}{\vec{\theta}}.
 \]
 
-\margintag{TODO: Justify stochastic gradient descent with Robbins-Monro algorithm.}
-
 For large datasets, it is too expensive to compute the gradient, so we instead use SGD
 (\textit{\textbf{S}tochastic \textbf{G}radient \textbf{D}escent}), which replaces the gradient by
 an unbiased estimate, \[
@@ -192,17 +211,17 @@ where $\mathcal{B}$ contains uniformly sampled sample indices.
 
 \paragraph{Bayesian.}
 
-The disadvantage of (stochastic) gradient descent is that it yields only a single point estimate of
-the weights. There is no quantification of uncertainty in this estimate, which leads to
-overconfidence problems that can result in poor generalization in the presence of domain shifts. We
-will use a Bayesian approach to alleviate this problem.
+The disadvantage of (S)GD is that it yields only a single point estimate of the weights. There is
+no quantification of uncertainty in this estimate, which leads to overconfidence problems that can
+result in poor generalization in the presence of domain shifts. We will use a Bayesian approach to
+alleviate this problem.
 
-\margintag{The Bayesian approach always has three steps---(1) define a prior, (2) define a likelihood, and (3) use Bayes rule to compute the posterior.}
+\margintag{The Bayesian approach always has three steps: (1) define a prior, (2) define a likelihood, and (3) use Bayes rule to compute the posterior.}
 
 We must first define a prior $p(\vec{\theta})$ over the weights $\vec{\theta} \in \Theta$, \[
     \vec{\theta} \sim \mathcal{N}(\vec{0}, \sigma^2 \mat{I}).
 \]
-Then, we can define the likelihood function $p(\mathcal{D} \mid \vec{\theta})$ that computes the
+Then, we can define the likelihood function $p(\mathcal{Z} \mid \vec{\theta})$ that computes the
 likelihood of the dataset $\mathcal{Z}$ for a given $\vec{\theta}$, \[
     p(\mathcal{Z} \mid \vec{\theta}) = \prod_{(\vec{x}, y) \in \mathcal{Z}} p(y \mid \vec{x}, \vec{\theta}),
 \]
@@ -239,7 +258,7 @@ then we can derive the gradients to be
     \grad{D_{\mathrm{KL}}(q(\vec{\mu}, \sigma) \| p(\vec{\theta} \mid \mathcal{Z}))}{\sigma}    & = \E_{\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})} \lft[ \transpose{\vec{\epsilon}} \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\theta}} + \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\sigma} \rgt].
 \end{align*}
 We can then approximate the gradients by making a single sample Monte Carlo estimate and apply
-gradient descent to optimize the weights.
+(S)GD to optimize the weights.
 
 \subsection{Information-based transductive learning}
 
@@ -273,7 +292,21 @@ mutual information between $y_{\vec{x}}$ and $f$ restricted to $\mathcal{A}$. Wh
 \]
 
 \begin{proof}
-    TODO: Look at exercises.
+    Let $X|Y \sim \mathcal{N}(\mu, \sigma^2)$ be conditionally Gaussian, then
+    \begin{align*}
+        H[X \mid Y] & = \E \lft[ -\log \lft( \frac{1}{\sqrt{2\pi\sigma^2}} \exp \lft( \frac{(x-\mu)^2}{2\sigma^2} \rgt) \rgt) \rgt] \\
+                    & = \E \lft[ \log \sqrt{2\pi\sigma^2} - \frac{(x-\mu)^2}{2\sigma^2} \rgt]                                       \\
+                    & = \frac{1}{2} \log(2\pi) + \frac{1}{2} \log (\sigma^2) - \frac{1}{2\sigma^2} \E[(x-\mu)^2]                    \\
+                    & = \frac{1}{2} \log(2\pi) + \frac{1}{2} \log (\sigma^2) - \frac{1}{2} \margintag{$\sigma^2 = \E[(x-\mu)^2]$.}  \\
+                    & = \frac{1}{2} \lft( \log(2\pi) + \log \Var[X\mid Y] - 1 \rgt).
+    \end{align*}
+    Decomposing mutual information into conditional entropy terms and using that $y_{\vec{x}} \mid
+        \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1}$ and $y_{\vec{x}} \mid \mathcal{D}_{n-1}$ are Gaussian yields
+    \begin{align*}
+        \mathrm{I}(\vec{f}_{\mathcal{A}}, y_{\vec{x}} \mid \mathcal{D}_{n-1}) & = H(y_{\vec{x}} \mid \mathcal{D}_{n-1}) - H(y_{\vec{x}} \mid \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1})                                           \\
+                                                                              & = \frac{1}{2} \lft( \log \Var[y_{\vec{x}} \mid \mathcal{D}_{n-1}] - \log \Var[y_{\vec{x}} \mid \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1}] \rgt)   \\
+                                                                              & = \frac{1}{2} \log \lft( \frac{\Var[y_{\vec{x}} \mid \mathcal{D}_{n-1}]}{\Var[y_{\vec{x}} \mid \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1}]} \rgt).
+    \end{align*}
 \end{proof}
 
 Next, we will look at special cases of ITL.
@@ -328,8 +361,8 @@ the union of all balls of the chosen subset of points $L \subseteq X$, \[
 \]
 Further, we define
 \begin{align*}
-    C_r(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) = f(\vec{x}) \} \margintag{$r$ stands for ``right''.}     \\
-    C_w(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) \neq f(\vec{x}) \}, \margintag{$w$ stands for ``wrong''.}
+    C_r(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) = f(\vec{x}) \} \margintag{This is the gray area in \Cref{fig:batch-active-learning}.}      \\
+    C_w(L, \delta) & \doteq \{ \vec{x} \in C(L, \delta) \mid \hat{f}(\vec{x}) \neq f(\vec{x}) \}, \margintag{This is the black area in \Cref{fig:batch-active-learning}.}
 \end{align*}
 where $\hat{f}$ is a classifier of the space $\mathcal{X}$. Note $C(L, \delta) = C_r(L, \delta) \cup C_w(L, \delta)$.
 Lastly, we define $\pi(\delta)$ to be the total probability density of points that have an impure
@@ -338,9 +371,9 @@ $\delta$-radius ball, \[
 \]
 Note that $\pi$ increases with $\delta$. Suppose we know $\mathcal{Z} = \{ (\vec{x}, f(\vec{x}))
     \mid \vec{x} \in L \}$, then denote the fitted 1-nearest neighbor classifier on this dataset as
-$\hat{f}$.
+$\hat{f}$---the dashed line in \Cref{fig:batch-active-learning} is its decision boundary.
 
-\begin{marginfigure}
+\begin{marginfigure}[2cm]
     \centering
     \incfig{batch-active-learning}
     \caption{Batch active learning. The dashed line is the fitted 1-nearest neighbor classifier on this dataset. Here, $C_w(L, \delta)$ denotes the black area and $C_r(L, \delta)$ denotes the gray area.}
@@ -355,8 +388,8 @@ $\hat{f}$.
 \end{marginfigure}
 
 We have $C_w(L, \delta) \subseteq \{ \vec{x} \in \mathcal{X} \mid \text{$B_{\delta}(\vec{x})$ is
-        not pure} \}$. (This can easily be verified using
-\Cref{fig:batch-active-learning,fig:batch-active-learning-pi}.) So, we have \[
+        not pure} \}$ (easily verifiable using
+\Cref{fig:batch-active-learning,fig:batch-active-learning-pi}). So, we have \[
     \mathbb{P}(C_w(L, \delta)) \leq \pi(\delta).
 \]
 Furthermore, looking at \Cref{fig:batch-active-learning}, we can easily see the following \[
@@ -368,9 +401,10 @@ where $A^c$ denotes the complement of a set $A$. As a result,
                          & = \mathbb{P}( \hat{f}(\vec{x}) \neq f(\vec{x}))             \\
                          & \leq 1 - \mathbb{P}\lft( C(L, \delta) \rgt) + \pi(\delta).
 \end{align*}
-We want to choose $L$ and $\delta$ that minimize $\mathcal{R}(\hat{f})$. This is
-intractable, so we minimize the upper bound instead. This is done by picking $\delta$ first and
-then choosing $L$ that maximizes $\mathbb{P}(C(L, \delta))$. \Ie, we want to solve \[
+
+We want to choose $L$ and $\delta$ that minimize $\mathcal{R}(\hat{f})$. This is intractable, so we
+minimize the upper bound instead. This is done by picking $\delta$ first and then choosing $L$ that
+maximizes $\mathbb{P}(C(L, \delta))$. \Ie, we want to solve \[
     L^\star \in \argmax_{L \subseteq X, |L|=b} \mathbb{P}\lft( \bigcup_{\vec{x} \in L} B_{\delta}(\vec{x}) \rgt).
 \]
 This has two problems---the distribution of $\vec{x}$ is unknown and this problem is NP hard. We

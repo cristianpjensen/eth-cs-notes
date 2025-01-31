@@ -1,6 +1,6 @@
 %% Creator: Inkscape 1.3.2 (091e20e, 2023-11-25), www.inkscape.org
 %% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
-%% Accompanies image file 'causal-graph.pdf' (pdf, eps, ps)
+%% Accompanies image file '----d-separation.pdf' (pdf, eps, ps)
 %%
 %% To include the image in your LaTeX document, write
 %%   \input{<filename>.pdf_tex}
@@ -50,19 +50,9 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.77777778)%
+  \begin{picture}(1,1)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
-    \put(0,0){\includegraphics[width=\unitlength,page=1]{causal-graph.pdf}}%
-    \put(0.16046638,0.51896713){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{W}$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=2]{causal-graph.pdf}}%
-    \put(0.780977,0.29732077){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$Y$\end{tabular}}}}%
-    \put(0.43092441,0.19313151){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{X}_{\vec{W}^\perp}$\end{tabular}}}}%
-    \put(0.41815976,0.40371015){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{X}_{\vec{W}\cap Y}$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=3]{causal-graph.pdf}}%
-    \put(0.43925773,0.62242685){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{X}_{Y^\perp}$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=4]{causal-graph.pdf}}%
-    \put(0.45942273,0.04623483){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{0}\smash{\begin{tabular}[t]{l}$\vec{X}$\end{tabular}}}}%
-    \put(0,0){\includegraphics[width=\unitlength,page=5]{causal-graph.pdf}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{----d-separation.pdf}}%
   \end{picture}%
 \endgroup%

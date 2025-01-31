@@ -3,7 +3,7 @@
 In regression, we try to estimate a function $f: \R^d \to \R$ that best fits a given dataset $\{
     (\vec{x}_i, y_i) \}_{i=1}^n \subseteq \R^d \times \R$. \Ie, we try to minimize the following loss
 function, \[
-    \ell(\vec{\beta}) = \frac{1}{n} \sum_{i=1}^{n} \lft\| f(\vec{x}_i) - y_i \rgt\|^2.
+    \ell(f) = \frac{1}{n} \sum_{i=1}^{n} (f(\vec{x}_i) - y_i)^2.
 \]
 
 \subsection{Linear regression}
@@ -14,18 +14,16 @@ In linear regression, we assume the underlying data to be linear with a fixed no
 for some ground truth $\vec{\beta}_\star$. We parametrize $f$ as a linear function, \[
     f(\vec{x}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{x}.
 \]
-Under these assumptions, the minimizer of the loss function is analytically tractable---the
-ordinary least squares estimator (OLSE), \[
+Under these assumptions, the minimizer of the loss function is analytically tractable---the OLSE
+(\textit{\textbf{O}rdinary \textbf{L}east \textbf{S}quares \textbf{E}stimator}), \[
     \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{X}} \mat{X} \rgt)} \transpose{\mat{X}} \vec{y},
 \]
-where $\mat{X} \in \R^{d \times n}$ is the design matrix with respective outputs $\vec{y} \in
+where $\mat{X} \in \R^{n \times d}$ is the design matrix with respective outputs $\vec{y} \in
     \R^n$.
 
 In practice, it is important to remove outliers, because linear models can be heavily influenced by
 them. Also, the data should be standardized, such that all features are on the same scale, because
 differences in scale can make matrix inversion unstable.
-
-TODO: Curse of dimensionality \citep{sur2019modern}, \Cref{fig:overestimation,fig:overconfidence}.
 
 \begin{marginfigure}
     \begin{tikzpicture}
@@ -48,6 +46,14 @@ TODO: Curse of dimensionality \citep{sur2019modern}, \Cref{fig:overestimation,fi
     \label{fig:overconfidence}
 \end{marginfigure}
 
+Moreover, it has been found that in high-dimensional problems, logistic regression produces
+overconfident outputs \citep{sur2019modern}. For example, see the 20-dimensional
+$\vec{\beta}^\star$ in \Cref{fig:overestimation}. If we sample many datapoints with some noise and
+train a logistic regression model on them, the colored $\hat{\vec{\beta}}$ in
+\Cref{fig:overestimation} is produced. As can be seen, the weights of the first 10 dimensions are
+overestimated. Because of this, the model becomes overconfident as shown in
+\Cref{fig:overconfidence}. This is called ``the curse of dimensionality''.
+
 Further, if features are collinear, then the model might only learn the correlation with the target
 variable of one of them and discard the other. In addition, some singular values will equal zero.
 This makes matrix inversion unstable. This can easily be shown by considering the singular value
@@ -63,20 +69,48 @@ decomposition $\mat{X} = \mat{U} \mat{D} \transpose{\mat{V}}$, then
 The inversion of $\mat{D}$ is unstable if the singular values are small. The solution to this is to
 remove collinear features and/or to add regularization.
 
-Consider the mean-squared error loss. The risk (expected loss) can be decomposed as follows into
-bias, variance, and noise terms, \[
-    \E \lft[ \lft( f(\vec{x}) - y \rgt)^2 \rgt] = \underbrace{\lft( \E[f(\vec{x})] - \E[y] \rgt)^2}_{\text{squared bias}} + \underbrace{\Var[f(\vec{x})]}_{\text{variance}} + \underbrace{\E \lft[ \lft( \E[y] - y \rgt)^2 \rgt]}_{\text{noise}}.
-\]
-The OLSE is the minimum variance unbiased estimator.\sidenote{This is proven by the Gauss-Markov
-    theorem.} However, this does not mean it is the best, because introducing some bias may
-considerably decrease the variance. Bayesianism adds bias by introducing a prior---priors often
-induce a regularizing term.\sidenote{\Eg, a Gaussian prior induces an $\ell_2$-norm regularizing
-    term.}
+\begin{lemma}[Risk decomposition]
+    Consider the mean-squared error loss. The risk (expected loss) can be decomposed as follows into
+    bias, variance, and noise terms, \[
+        \E \lft[ \lft( \hat{f}(\vec{x}) - y \rgt)^2 \rgt] = \underbrace{\lft( \E\lft[\hat{f}(\vec{x})\rgt] - \E[y] \rgt)^2}_{\text{squared bias}} + \underbrace{\Var\lft[\hat{f}(\vec{x})\rgt] \vphantom{\lft( \E\lft[\hat{f}(\vec{x})\rgt] - \E[y] \rgt)^2}}_{\text{variance}} + \underbrace{\Var[y] \vphantom{\lft( \E\lft[\hat{f}(\vec{x})\rgt] - \E[y] \rgt)^2}}_{\text{noise}}.
+    \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \E \lft[ \lft( \hat{f}(\vec{x}) - y \rgt)^2 \rgt] & = \E \lft[ \lft( \hat{f}(\vec{x}) - f(\vec{x}) + \epsilon \rgt)^2 \rgt] \margintag{$y = f(\vec{x}) + \epsilon$, where $\E[\epsilon] = 0$.}                                                                                                            \\
+                                                          & = \E \lft[ \lft( \hat{f}(\vec{x}) - f(\vec{x}) \rgt)^2 \rgt] + \E\lft[ \epsilon^2 \rgt] + 2\E[\epsilon]\E\lft[ \hat{f}(\vec{x}) - f(\vec{x}) \rgt]                                                                                                    \\
+                                                          & = \E \lft[ \lft( \hat{f}(\vec{x}) - f(\vec{x}) \rgt)^2 \rgt] + \Var[y] \margintag{$\E\lft[ \epsilon^2 \rgt] = \E\lft[( y - f(\vec{x}) )^2\rgt] = \E\lft[(y - \E[y])^2 \rgt] = \Var[y]$.}                                                              \\
+                                                          & = \E \lft[ \lft( \hat{f}(\vec{x}) - \E \lft[ \hat{f}(\vec{x}) \rgt] + \E \lft[ \hat{f}(\vec{x}) \rgt] - f(\vec{x}) \rgt)^2 \rgt] + \Var[y]                                                                                                            \\
+                                                          & = \E \lft[ \lft( \hat{f}(\vec{x}) - \E \lft[ \hat{f}(\vec{x}) \rgt] \rgt)^2 \rgt] + \E \lft[ \E \lft[ \hat{f}(\vec{x}) \rgt] - \lft( f(\vec{x}) \rgt)^2 \rgt]                                                                                         \\
+                                                          & \quad \quad + 2 \E \lft[ \lft( \hat{f}(\vec{x}) - \E \lft[ \hat{f}(\vec{x}) \rgt] \rgt) \lft( f(\vec{x}) - \E \lft[ \hat{f}(\vec{x}) \rgt] \rgt) \rgt] + \Var[y]                                                                                      \\
+                                                          & = \lft( \E \lft[ \hat{f}(\vec{x}) - \E[y] \rgt] \rgt)^2 + \Var \lft[ \hat{f}(\vec{x}) \rgt] + \Var[y]. \margintag{$f(\vec{x}) - \E[\hat{f}(\vec{x})]$ is deterministic so we can pull it out, then the term becomes $0$. Also, $f(\vec{x}) = \E[y]$.}
+    \end{align*}
+\end{proof}
+
+\begin{theorem}[Gauss-Markov]
+    The ordinary least-squares estimator is the (unique) minimum-variance unbiased linear estimator.
+\end{theorem}
+
+Just because the OLSE is the minimum variance unbiased estimator, it does not mean it is the best,
+because introducing some bias may considerably decrease the variance. Bayesianism adds bias by
+introducing a prior, which often induces a regularizing term that decreases variance.
+
+\subsection{Regularization}
+
+By introducing a Gaussian prior, $\vec{\beta} \sim \mathcal{N}(\vec{0}, \lambda \mat{I})$, the MAP
+estimator is the Ridge regression estimator. It essentially just adds an $\ell_2$-norm
+regularization with weight $\lambda$. Furthermore, we could also use a Laplacian prior,
+$\vec{\beta} \sim \mathrm{Lap}(\vec{0}, \lambda \mat{I})$, which results in the LASSO estimator
+that adds an $\ell_1$-norm regularization with weight $\lambda$. The $\ell_1$-norm results in
+sparse features which can be interpreted better. For example, it has the feature that as $\lambda$
+increases, weights do not go from positive to negative or vice versa. This is not the case for the
+$\ell_2$-norm.
 
 \subsection{Polynomial regression}
 
 In polynomial regression, we construct a feature function of all possible polynomials, \eg, \[
-    \phi([x_1, x_2]) = [1, x_1, x_2, x_1^2, x_1 x_2, x_2^2, x_1^3, x_1^2 x_2, \ldots].
+    \phi([x_1, x_2]) = \lft[1, x_1, x_2, x_1^2, x_1 x_2, x_2^2, x_1^3, x_1^2 x_2, \ldots\rgt].
 \]
 We then perform linear regression in this space, \[
     \psi(\vec{x}; \vec{\beta}) = \langle \vec{\beta}, \phi(\vec{x}) \rangle.
@@ -88,11 +122,17 @@ this by transforming the vector such that inner products cannot diverge by intro
 data-dependent scalar, \[
     \phi(\vec{x}) = \alpha(\vec{x}) \cdot \tilde{\phi}(\vec{x}), \quad \alpha(\vec{x}) > 0. \margintag{$\tilde{\phi}$ contains all polynomials in this equation.}
 \]
-An inner product \wrt this feature function is a valid inner product. Such transformations can have
-a closed form for the inner product, called kernelization. Commonly, the radial basis function
-(RBF) kernel is used, \[
-    \langle \phi(\vec{x}), \phi(\vec{x}') \rangle = \exp \lft( -\frac{\| \vec{x} - \vec{x}' \|^2}{2 \sigma^2} \rgt), \quad \sigma \in \R.
+Specifically, \[
+    \phi(\vec{x}) = \exp \lft( -\frac{1}{2} \| \vec{x} \|^2 \rgt) \lft[ \frac{\prod_{i=1}^d x_i^{\alpha_i}}{\sqrt{\prod_{i=1}^d \alpha_i!}} \rgt]_{\vec{\alpha} \in \mathbb{N}^d}.
 \]
+An inner product \wrt this feature function is a valid inner product. It results in the RBF
+(\textit{\textbf{R}adial \textbf{B}asis \textbf{F}unction}) kernel,
+\begin{align*}
+    \langle \phi(\vec{x}), \phi(\vec{x}') \rangle & = \exp \lft( -\frac{1}{2} \| \vec{x} \|^2 \rgt) \exp \lft( -\frac{1}{2} \| \vec{x}' \|^2 \rgt) \sum_{\vec{\alpha} \in \N^d} \frac{\prod_{i=1}^d x_i^{\alpha_i} (x_i')^{\alpha_i}}{\prod_{i=1}^d \alpha_i!} \\
+                                                  & = \exp \lft( -\frac{1}{2} \| \vec{x} \|^2 \rgt) \exp \lft( -\frac{1}{2} \| \vec{x}' \|^2 \rgt) \exp\lft( \transpose{\vec{x}} \vec{x}' \rgt) \margintag{Using the multinomial series expansion.}            \\
+                                                  & = \exp \lft( -\frac{1}{2} \lft( \| \vec{x} \|^2 + \| \vec{x}' \|^2 - 2 \langle \vec{x},\vec{x}' \rangle \rgt) \rgt)                                                                                        \\
+                                                  & = \exp \lft( -\frac{1}{2} \| \vec{x} - \vec{x}' \|^2 \rgt). \margintag{Cosine theorem.}
+\end{align*}
 Let $\mat{\Phi} \in \R^{n \times \infty}$ contain all feature vectors, then the OLSE for polynomial
 regression can be computed by \[
     \hat{\vec{\beta}} = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \vec{y}, \quad \mat{\Phi \in \R^{n\times \infty}}.
@@ -106,21 +146,17 @@ However, $\transpose{\mat{\Phi}} \mat{\Phi}$ cannot be computed, because it is $
                       & = \inv{\lft( \transpose{\mat{\Phi}} \mat{\Phi} \rgt)} \transpose{\mat{\Phi}} \mat{\Phi} \transpose{\mat{\Phi}} \inv{\lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt)} \vec{y}             \\
                       & = \transpose{\mat{\Phi}} \inv{\lft( \mat{\Phi} \transpose{\mat{\Phi}} \rgt)} \vec{y}.
 \end{align*}
-Let $\mat{K} = \mat{\Phi} \transpose{\mat{\Phi}}$, then it only contains kernel evaluations---$k_{ij} = \langle \phi(\vec{x}_i), \phi(\vec{x}_j) \rangle$. The next problem is that $\transpose{\mat{\Phi}}$ is still infinitely dimensional. However, this is not a problem, since when we want to make a prediction, we do the following,
-\begin{align*}
-    \psi(\hat{\vec{x}}) & = \langle \phi(\hat{\vec{x}}), \hat{\vec{\beta}} \rangle                        \\
-                        & = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}} \inv{\mat{K}} \vec{y}.
-\end{align*}
-Let $\vec{k}(\hat{\vec{x}}) = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}}$, then it only contains kernel evaluations with the new point---$k_i(\hat{\vec{x}}) = \langle \phi(\hat{\vec{x}}), \phi(\vec{x}_i) \rangle$. In conclusion, we can make predictions by \[
-    \psi(\hat{\vec{x}}) = \vec{k}(\hat{\vec{x}}) \inv{\mat{K}} \vec{y}, \quad \vec{k}(\hat{\vec{x}}) \in \R^{1 \times n}, \mat{K} \in \R^{n \times n}, \vec{y} \in \R^n.
+Let $\mat{K} = \mat{\Phi} \transpose{\mat{\Phi}}$, then it only contains kernel
+evaluations---$k_{ij} = \langle \phi(\vec{x}_i), \phi(\vec{x}_j) \rangle$. The next problem is that
+$\transpose{\mat{\Phi}}$ is still infinitely dimensional. However, this is not a problem, since when we
+want to make a prediction, we do the following, \[
+    \psi(\hat{\vec{x}}) = \langle \phi(\hat{\vec{x}}), \hat{\vec{\beta}} \rangle = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}} \inv{\mat{K}} \vec{y}.
 \]
-However, the problem with this approach is that it takes $O(n^3)$ to make a prediction---it scales
-in the amount of data points.
-
-\subsection{Regularization}
-
-TODO: Ridge regression---$\ell_2$-norm.
-
-TODO: LASSO---$\ell_1$-norm induces sparsity. Better interpretability properties.
-
-TODO: Figure showing coefficient weights under different regularization factors.
+Let $\vec{k}(\hat{\vec{x}}) = \transpose{\phi(\hat{\vec{x}})} \transpose{\mat{\Phi}}$, then it only
+contains kernel evaluations with the new point---$k_i(\hat{\vec{x}}) = \langle \phi(\hat{\vec{x}}),
+    \phi(\vec{x}_i) \rangle$. In conclusion, we can make predictions by \[
+    \psi(\hat{\vec{x}}) = \transpose{\vec{k}(\hat{\vec{x}})} \inv{\mat{K}} \vec{y}, \quad \vec{k}(\hat{\vec{x}}) \in \R^n, \mat{K} \in \R^{n \times n}, \vec{y} \in \R^n.
+\]
+However, the problem with this approach is that it takes $O(n^3)$ to make a prediction, because it
+scales in the number of data points. Furthermore, we need to store all data points---we cannot
+compress them into model parameters.

@@ -40,14 +40,73 @@
 
     \begin{itemize}
         \item Closed form of KL for Gaussians:
-            \begin{align*}
-                D_{KL} & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
-                    & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
-            \end{align*}
+              \begin{align*}
+                  D_{KL} & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
+                         & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
+              \end{align*}
         \item Cosine theorem: \[
-                \| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle.
-            \]
-        \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with $|\Xi| \leq \delta$ is linearly independent.
+                  \| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle.
+              \]
+        \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with
+              $|\Xi| \leq \delta$ is linearly independent.
+        \item Gaussian arithmetic:
+              \begin{align*}
+                   & \vec{x} \sim \mathcal{N}(\vec{\mu}_{\vec{x}}, \mat{\Sigma}_{\vec{x}}), \vec{y} \sim \mathcal{N}(\vec{\mu}_{\vec{y}}, \mat{\Sigma}_{\vec{y}}) \\
+                   & \implies \vec{x} + \vec{y} \sim \mathcal{N}(\vec{\mu}_{\vec{x}} + \vec{\mu}_{\vec{y}}, \mat{\Sigma}_{\vec{x}} + \mat{\Sigma}_{\vec{y}})      \\
+                   & \vec{x} \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma}), \mat{M} \in \R^{m \times d}                                                               \\
+                   & \implies \vec{y} = \mat{M} \vec{x} \sim \mathcal{N}(\mat{M} \vec{\mu}, \mat{M}\mat{\Sigma}\transpose{\mat{M}}).
+              \end{align*}
+        \item Sign function $\mathrm{sgn}(z) = \mathbb{1}\{ z \geq 0 \}$.
+        \item Cosine angle $\cos \angle{(\vec{x},\vec{y})} = \frac{\transpose{\vec{x}} \vec{y}}{\| \vec{x} \| \|
+                      \vec{y} \|}$.
+        \item Gradients:
+              \begin{align*}
+                   & \vec{z} = \mat{W} \vec{x}                                        \\
+                   & \implies \pdv{L}{\mat{W}} = \pdv{L}{\vec{z}} \transpose{\vec{x}} \\
+                   & \vec{h} = f(\vec{z}) \text{ element-wise}                        \\
+                   & \implies \pdv{L}{\vec{z}} = \pdv{L}{\vec{h}} \odot f'(\vec{z})   \\
+                   & \pdv{L}{x_i} = \sum_{j=1}^{m} \pdv{L}{y_j} \pdv{y_j}{x_i} \\
+                   & \pdv{\transpose{\vec{x}\mat{A}\vec{x}}}{\vec{x}} = (\mat{A}+\transpose{\mat{A}})\vec{x}.
+              \end{align*}
+
+        \item Information theory:
+            \begin{align*}
+                H(p) & \doteq \E_{X \sim p}[-\log p(X)] \\
+                D_{\mathrm{KL}}(p\|q) & \doteq \E_{X \sim p}\lft[ -\log \lft( \frac{q(X)}{p(X)} \rgt) \rgt] \\
+                H(p, q) & \doteq \E_{X \sim p}[-\log q(X)] \\
+                H(p, q) & = H(p) + D_{\mathrm{KL}}(p\|q) \\
+                \mathrm{I}(p; q) & = H(p) - H(p \mid q) \\
+            \end{align*}
+
+        \item Probability review:
+            \begin{align*}
+                p(X \mid Y) & = \frac{p(Y \mid Y) p(X)}{p(Y)} \\
+                p(X_{1:n}) & = p(X_1) \prod_{i=2}^n p(X_i \mid X_{1:i-1}) \\
+                p(X_{1:i-1},X_{i+1:n}) & = \sum_{x_i} p(X_{1:i-1}, X_i=x_i, X_{i+1:n}).
+            \end{align*}
+
+        \item $\mat{M}$ is positive (semi-)definite if $\transpose{\vec{x}} \mat{M} \vec{x} \geq 0$ (PSD) or $\transpose{\vec{x}} \mat{M} \vec{x} > 0$ (PD) for all $\vec{x}$.
+        \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
+        \item $\tanh(z) = 2 \sigma(2z) - 1$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$.
+        \item Integration by part: $\int u\mathrm{d}v = uv - \int v\mathrm{d}u$.
+
+        \item Convexity:
+              \begin{align*}
+                   & f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) \\
+                   & f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle       \\
+                   & \langle \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle \geq 0       \\
+                   & \text{$\hess{f(\vec{x})}{}$ is positive semi-definite.}
+              \end{align*}
+
+        \item $L$-smoothness:
+              \begin{align*}
+                   & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq \| \vec{x} - \vec{y} \|                                                 \\
+                   & f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
+              \end{align*}
+
+        \item Geometric series: $\sum_{k=0}^{\infty} ar^k = \frac{a}{1-r}$ if $|r| < 1$.
+        \item $\log(1+x) \approx x$ for small $x$.
+
     \end{itemize}
 
     \begin{topic}{Connectionism}
@@ -92,7 +151,8 @@
             Proof: Base cases are both 2 and adding a point has two cases $\to$ Recurrence: \[
                 \mathcal{C}(n+1,d) = \mathcal{C}(n,d) + \mathcal{C}(n,d-1).
             \]
-            For $n \leq d$, we have $\mathcal{C}(n,d) = 2^n$. After $n=2d$, there is a steep decrease in number of linear classification, quickly moving toward $0$.
+            For $n \leq d$, we have $\mathcal{C}(n,d) = 2^n$. After $n=2d$, there is a steep decrease in number
+            of linear classification, quickly moving toward $0$.
         \end{subtopic}
 
         \begin{subtopic}{Parallel distributed processing}
@@ -274,8 +334,8 @@
             Adaptivity intuition: Different parameters behave differently $\to$ Parameter-specific learning
             rates:
             \begin{align*}
-                \theta_i^{t+1} & = \theta_i^t - \eta_i^t \partial_i h(\vec{\theta}^t) \\
-                \eta_i^t & \doteq \frac{\eta}{\sqrt{\gamma_i^t} + \delta}, \quad \gamma_i^t \doteq \gamma_i^{t-1} + [\partial_i h(\vec{\theta}^t)]^2.
+                \theta_i^{t+1} & = \theta_i^t - \eta_i^t \partial_i h(\vec{\theta}^t)                                                                       \\
+                \eta_i^t       & \doteq \frac{\eta}{\sqrt{\gamma_i^t} + \delta}, \quad \gamma_i^t \doteq \gamma_i^{t-1} + [\partial_i h(\vec{\theta}^t)]^2.
             \end{align*}
             Parameters with small gradient magnitude will have a larger step size.
 
@@ -343,7 +403,7 @@
             \]
             Max-pooling layer:
             \begin{align*}
-                x^{\ell}_{ij} & = \max \{ x^{\ell-1}_{i+k,j+l} \mid k, l \in [0,r) \} \\
+                x^{\ell}_{ij}                        & = \max \{ x^{\ell-1}_{i+k,j+l} \mid k, l \in [0,r) \} \\
                 \pdv{x_{ij}^{\ell}}{x^{\ell-1}_{mn}} & = \mathbb{1}\{ (m,n) = (i^\star,j^\star) \},
             \end{align*}
             where $(i^\star, j^\star)$ are the indices of maximum value in the forward pass.
@@ -384,15 +444,15 @@
 
             LSTM ($\vec{z}_t$: cell state, $\vec{\zeta}_t$: hidden state):
             \begin{align*}
-                \vec{z}_t     & = \sigma(\mat{F}\tilde{\vec{x}}_t) \odot \vec{z}_{t-1} + \sigma(\mat{G}\tilde{\vec{x}}_t) \odot \tanh(\mat{V}\tilde{\vec{x}}_t) \\
-                \tilde{\vec{x}}_t & = [\vec{\zeta}_{t-1}, \vec{x}_t] \\
-                \vec{\zeta}_t & = \sigma(\mat{H}\tilde{\vec{x}}_t) \odot \tanh(\mat{U}\vec{z}_t).
+                \vec{z}_t         & = \sigma(\mat{F}\tilde{\vec{x}}_t) \odot \vec{z}_{t-1} + \sigma(\mat{G}\tilde{\vec{x}}_t) \odot \tanh(\mat{V}\tilde{\vec{x}}_t) \\
+                \tilde{\vec{x}}_t & = [\vec{\zeta}_{t-1}, \vec{x}_t]                                                                                                \\
+                \vec{\zeta}_t     & = \sigma(\mat{H}\tilde{\vec{x}}_t) \odot \tanh(\mat{U}\vec{z}_t).
             \end{align*}
 
             GRU simplifies the LSTM to only 3 weight matrices:
             \begin{align*}
                 \vec{z}_t         & = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{\vec{z}}_t, \quad \vec{\sigma} = \sigma(\mat{G}\tilde{\vec{x}}_t) \\
-                \tilde{\vec{x}}_t & = [\vec{z}_{t-1}, \vec{x}_t] \\
+                \tilde{\vec{x}}_t & = [\vec{z}_{t-1}, \vec{x}_t]                                                                                                         \\
                 \tilde{\vec{z}}_t & = \tanh(\mat{V}[\vec{\zeta}_t \odot \vec{z}_{t-1}, \vec{x}_t]), \quad \vec{\zeta}_t = \sigma(\mat{H}[\vec{z}_{t-1} \vec{x}_t]).
             \end{align*}
         \end{subtopic}
@@ -402,24 +462,28 @@
                 \vec{z}_t = \vec{\sigma} \odot \vec{z}_{t-1} + (1-\vec{\sigma}) \odot \tilde{\vec{z}}_t, \quad \vec{\sigma} = \sigma(\mat{G}\vec{x}_t), \quad \tilde{\vec{z}}_t = \mat{V}\vec{x}_t.
             \]
 
-            We can ensure that the gradients do not explode by parametrizing the GRU smartly. The LRU has hidden state evolution in a discrete time linear system: \[
+            We can ensure that the gradients do not explode by parametrizing the GRU smartly. The LRU has
+            hidden state evolution in a discrete time linear system: \[
                 \vec{z}_{t+1} = \mat{A} \vec{z}_t + \mat{B} \vec{x}_t.
             \]
             Diagonalize $\mat{A} = \mat{P}\mat{\Lambda}\inv{\mat{P}}$, where $\mat{\Lambda} =
-            \mathrm{diag}(\lambda_1, \ldots, \lambda_m), \lambda_i \in \mathbb{C}$. This linear
-            system is stable if the modulus of the eigenvalues is bounded by $1$. Thus, we
-            parameterize them such that the moduli can only be in $(0,1)$ in the following way, \[
+                \mathrm{diag}(\lambda_1, \ldots, \lambda_m), \lambda_i \in \mathbb{C}$. This linear system is
+            stable if the modulus of the eigenvalues is bounded by $1$. Thus, we parameterize them such that
+            the moduli can only be in $(0,1)$ in the following way, \[
                 \lambda_i = \exp(-\exp(\nu_i))(\cos(\phi_i) + \sin(\phi_i)i).
             \]
-            This uses $\exp(\theta i) = \cos(\theta) + \sin(\theta)i$ and that we can represent complex numbers in polar coordinate form via modulus $r$ and phase $\phi$: \[
+            This uses $\exp(\theta i) = \cos(\theta) + \sin(\theta)i$ and that we can represent complex numbers
+            in polar coordinate form via modulus $r$ and phase $\phi$: \[
                 z = r(\cos(\phi) \sin(\phi) i), \quad r = |z|.
             \]
             Thus, $r_i = \exp(-\exp(\nu_i)) \in (0,1)$. Thus, at initialization we sample \[
                 \phi_i \sim \mathrm{Unif}([0,2\pi]), \quad r_i \sim \mathrm{Unif}(I), \quad I \subseteq [0,1].
             \]
-            And compute $\nu_i = \log(-\log r_i)$. The modulus always remains upper bounded by $1$.
+            And compute $\nu_i = \log(-\log r_i)$. The modulus always remains upper bounded by $1$. This is
+            equivalent to Glorot initialization.
 
-            We do not lose any representational power, because we can put all representational power into the output map: \[
+            We do not lose any representational power, because we can put all representational power into the
+            output map: \[
                 \vec{y}_t = \mathrm{MLP}(\mathrm{Re}(\mat{G}\vec{\zeta}_t)), \quad \mat{G} \in \mathbb{C}^{k \times m}.
             \]
         \end{subtopic}
@@ -556,7 +620,7 @@
                 f(\mat{X},\mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}).
             \]
             And equivariant if \[
-                f(\mat{X}, \mat{A}) = \mat{P} f(\mat{P}\mat{X},\mat{P}\mat{A}\transpose{\mat{P}}).
+                f(\mat{X}, \mat{A}) = \transpose{\mat{P}} f(\mat{P}\mat{X},\mat{P}\mat{A}\transpose{\mat{P}}).
             \]
             Let $\mat{X}_m = \{ \{ \vec{x}_n \mid a_{nm} = 1 \} \}$ (multiset of neighbors' features). $\phi$
             takes $\vec{x}_m$ and $\mat{X}_m$ as input (any pair of isomorphic graphs result in same feature
@@ -599,11 +663,14 @@
             Laplacian operator measures local deviation from the mean in vanishingly small neighborhoods: \[
                 \Delta f = \sum_{i=1}^{d} \pdv[order=2]{f}{x_i}.
             \]
+            The Fourier basis can be defined as the eigenfunction of the Laplacian.
+
             Graph Laplacian: $\mat{L} = \mat{D} - \mat{A}$. Degree-normalized Laplacian: $\tilde{\mat{L}} =
                 \mat{D}^{-\nicefrac{1}{2}} (\mat{D} - \mat{A}) \mat{D}^{-\nicefrac{1}{2}}$. We can generalize
-            Fourier transform to graphs: Diagonalize $\mat{L} = \mat{U} \mat{\Lambda} \transpose{\mat{U}}$ and
-            $\mat{U}$ can be seen as graph Fourier basis and $\mat{\Lambda}$ as frequencies. Graph convolution
-            can be computed as pointwise multiplication in Fourier domain: \[
+            Fourier transform to graphs: Diagonalize $\mat{L} = \mat{U} \mat{\Lambda} \transpose{\mat{U}}$
+            (exists because symmetric and PSD) and $\mat{U}$ can be seen as graph Fourier basis and
+            $\mat{\Lambda}$ as frequencies. Graph convolution can be computed as pointwise multiplication in
+            Fourier domain: \[
                 \mat{X} * \mat{Y} = \mat{U}((\transpose{\mat{U}}\mat{X}) \odot (\transpose{\mat{U}} \mat{Y})).
             \]
             This can be learned by \[
@@ -817,8 +884,8 @@
             Friction reduces momentum and dissipates kinetic energy, while the Wiener noise injects
             stochasticity. Discretize:
             \begin{align*}
-                \vec{\theta}_{t+1} & = \vec{\theta}_t + \eta \vec{v}_t \\
-                \vec{v}_{t+1} & = (1-\eta \gamma) \vec{v}_t - \eta s \grad{\tilde{E}(\vec{\theta})}{} + \sqrt{2 \gamma \eta} \mathcal{N}(\vec{0}, \mat{I}).
+                \vec{\theta}_{t+1} & = \vec{\theta}_t + \eta \vec{v}_t                                                                                           \\
+                \vec{v}_{t+1}      & = (1-\eta \gamma) \vec{v}_t - \eta s \grad{\tilde{E}(\vec{\theta})}{} + \sqrt{2 \gamma \eta} \mathcal{N}(\vec{0}, \mat{I}).
             \end{align*}
             Here, $\tilde{E}$ is a stochastic potential function which is the empirical loss over a random
             mini-batch of data.
@@ -942,7 +1009,7 @@
             VAE optimizes log-likelihood of data $\to$ Intractable $\to$ ELBO:
             \begin{align*}
                 \log p[\vec{\theta}](\vec{x}) & \geq \E_{p[\vec{\vartheta}](\vec{z} \mid \vec{x})} [\log p[\vec{\theta}](\vec{x} \mid \vec{z})] \\
-                & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \| p(\vec{z})).
+                                              & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \| p(\vec{z})).
             \end{align*}
             $p[\vec{\vartheta}]$ is the encoder distribution and $p[\vec{\theta}]$ is the decoder
             distribution. This is effectively a reconstruction loss with a regularization term, where
@@ -1059,7 +1126,7 @@
             need to predict $\vec{\epsilon}$. Simplified loss:
             \begin{align*}
                 \E_q[\ell_t \mid \vec{x}_0] & = \E_{\vec{\epsilon}}[\lambda(t) \| \vec{\epsilon} - \vec{\epsilon}[\vec{\theta}](\vec{x}_t, t) \|^2] \\
-                \lambda(t) & = \frac{\beta_t^2}{2 \sigma_t^2 \alpha_t (1-\bar{\alpha}_t)}.
+                \lambda(t)                  & = \frac{\beta_t^2}{2 \sigma_t^2 \alpha_t (1-\bar{\alpha}_t)}.
             \end{align*}
             In practice, the loss is approximated by \[
                 \ell(\vec{\theta} \mid \vec{x}_0) = \frac{1}{T} \sum_{t=1}^{T} \lft[ \| \vec{\epsilon} - \vec{\epsilon}[\vec{\theta}](\vec{x}_t, t) \|^2 \;\middle|\; \vec{x}_0 \rgt].

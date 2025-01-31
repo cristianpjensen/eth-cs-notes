@@ -32,7 +32,7 @@ Further assume that we have data that is described by a function $f^\star: \math
 \]
 We get the following negative log-likelihood,
 \begin{align*}
-    -\log p(\mathcal{S}\mid\vec{\theta}) & = -\sum_{i=1}^{n} \log p(y_i \mid \vec{x}_i, \vec{\theta}) \margintag{We assume that the data is sampled i.i.d.}                                                                                               \\
+    -\log p(\mathcal{S}\mid\vec{\theta}) & = -\sum_{i=1}^{n} \log p(y_i \mid \vec{x}_i, \vec{\theta}) \margintag{We assume that the data is sampled \iid.}                                                                                                \\
                                          & \propto \sum_{i=1}^{n} \frac{1}{2 \gamma^2} (y_i - f[\vec{\theta}](\vec{x}_i))^2 \margintag{We modeled $y_i \sim \mathcal{N}(f^\star(\vec{x}_i), \gamma^2)$ and $f[\vec{\theta}]$ must approximate $f^\star$.} \\
                                          & = \frac{1}{2 \gamma^2} \| \vec{y} - \vec{f}[\vec{\theta}] \|^2.
 \end{align*}
@@ -204,8 +204,8 @@ We can now use kernel regression, \[
     f^\star(\vec{x}) = \transpose{\vec{k}(\vec{x})} \mat{K}^{-1} \vec{y}, \quad \mat{K} = \mat{K}^{L}.
 \]
 In conclusion, deep neural networks can be thought of as GPs in the infinite-width
-limit.\sidenote{In the infinite-width limit, all preactivations can be viewed as incoming Gaussians.}
-The advantage is that we can use wide random layers without the need for training, we can quantify
-uncertainty, and we can leverage techniques from kernel machines. However, in general, it is not
-feasible to compute $f^\star$ and store $\mat{K}^{\ell}$. Furthermore, the expectations need to be
-computed, which is much less efficient than optimizing weights with gradient descent.
+limit.\sidenote{In the infinite-width limit, all preactivations can be viewed as incoming
+    Gaussians.} The advantage is that we can use wide random layers without the need for training, we
+can quantify uncertainty, and we can leverage techniques from kernel machines. However, in general,
+it is not feasible to compute $f^\star$ and store $\mat{K}^{\ell}$. Furthermore, the expectations
+need to be computed, which is much less efficient than optimizing weights with gradient descent.

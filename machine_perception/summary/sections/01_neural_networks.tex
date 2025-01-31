@@ -53,7 +53,7 @@ We need an objective to optimize for. We typically call this objective function 
 which we minimize. In classification, we typically optimize the \textit{maximum likelihood
     estimate} (MLE),
 \begin{align*}
-    \argmax_{\vec{\theta}} p(\mathcal{D}\mid \vec{\theta}) & \overset{\mathrm{iid}}{=} \argmax_{\vec{\theta}} \prod_{i=1}^n p(y_i \mid \vec{\theta})              \\
+    \argmax_{\vec{\theta}} p(\mathcal{D}\mid \vec{\theta}) & \overset{\text{\iid}}{=} \argmax_{\vec{\theta}} \prod_{i=1}^n p(y_i \mid \vec{\theta})               \\
                                                            & = \argmin_{\vec{\theta}} -\log \prod_{i=1}^n p(y_i\mid\vec{\theta}) \margintag{$\log$ is monotonic.} \\
                                                            & = \argmin_{\vec{\theta}} -\sum_{i=1}^n \log p(y_i\mid\vec{\theta}).
 \end{align*}
@@ -101,10 +101,10 @@ Furthermore, the Laplacian distribution yields minimizing the $\ell_1$ norm, \[
 If we have prior information about the weights $p(\vec{\theta})$, we could also optimize for the
 \textit{maximum a posteriori} (MAP),
 \begin{align*}
-    \argmax_{\vec{\theta}} p(\vec{\theta}\mid \mathcal{D}) & = \argmax_{\vec{\theta}} p(\vec{\theta}) p(\mathcal{D}\mid\vec{\theta})                                               \\
-                                                           & \overset{\mathrm{iid}}{=} \argmax_{\vec{\theta}} p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) p(\vec{\theta}) \\
-                                                           & = \argmin_{\vec{\theta}} -\log \lft( p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) \rgt)                       \\
-                                                           & = \argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i\mid \vec{\theta})                         \\
+    \argmax_{\vec{\theta}} p(\vec{\theta}\mid \mathcal{D}) & = \argmax_{\vec{\theta}} p(\vec{\theta}) p(\mathcal{D}\mid\vec{\theta})                                              \\
+                                                           & \overset{\text{\iid}}{=} \argmax_{\vec{\theta}} p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) p(\vec{\theta}) \\
+                                                           & = \argmin_{\vec{\theta}} -\log \lft( p(\vec{\theta}) \prod_{i=1}^n p(y_i\mid\vec{\theta}) \rgt)                      \\
+                                                           & = \argmin_{\vec{\theta}} - \log p(\vec{\theta}) - \sum_{i=1}^{n} \log p(y_i\mid \vec{\theta})                        \\
 \end{align*}
 Note that MAP and MLE are equivalent if $p(\vec{\theta})$ is uniform over the domain of weights.
 Assuming a Gaussian prior distribution over $\vec{\theta}$, MAP yields Ridge regression, \[

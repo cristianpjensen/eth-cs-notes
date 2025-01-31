@@ -28,9 +28,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="6.1161871"
-     inkscape:cx="137.99447"
-     inkscape:cy="137.74922"
+     inkscape:zoom="3.3250861"
+     inkscape:cx="105.86192"
+     inkscape:cy="88.26839"
      inkscape:window-width="1792"
      inkscape:window-height="1067"
      inkscape:window-x="0"
@@ -391,6 +391,40 @@
            id="path1-13" />
       </g>
     </marker>
+    <marker
+       id="tikz-arrow-0.53080004-48"
+       orient="auto-start-reverse"
+       refX="0.45"
+       refY="0"
+       markerWidth="0.911"
+       markerHeight="1.69">
+      <g
+         transform="scale(2.1535292)"
+         id="g1-3">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+           d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722"
+           inkscape:connector-curvature="0"
+           id="path1-9" />
+      </g>
+    </marker>
+    <marker
+       id="tikz-arrow-0.53080004-7"
+       orient="auto-start-reverse"
+       refX="0.45"
+       refY="0"
+       markerWidth="0.911"
+       markerHeight="1.69">
+      <g
+         transform="scale(2.1535292)"
+         id="g1-90">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+           d="M -1.55415,2.0722 C -1.42464,1.29512 0,0.1295 0.38852,0 0,-0.1295 -1.42464,-1.29512 -1.55415,-2.0722"
+           inkscape:connector-curvature="0"
+           id="path1-23" />
+      </g>
+    </marker>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -582,6 +616,14 @@
        inkscape:connector-curvature="0"
        inkscape:connection-start="#path1-1"
        inkscape:connection-end="#path1-6" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:black;stroke-width:0.14044084;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;strike-linecap:butt;fill-opacity:1;stroke-dasharray:0.14044084,0.70220417;marker-start:url(#tikz-arrow-0.53080004);marker-end:url(#tikz-arrow-0.53080004)"
+       d="M 19.430911,19.723703 V 25.29484"
+       id="path4"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#path1"
+       inkscape:connection-end="#path1-7" />
   </g>
   <metadata
      id="metadata1">

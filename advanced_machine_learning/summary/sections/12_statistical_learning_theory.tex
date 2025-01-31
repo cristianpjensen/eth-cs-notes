@@ -18,12 +18,14 @@ approaches, which require a prior on $\mathcal{X}$.
 
 The setting is that nature decides the distribution over $\mathcal{X}$ and its concept class
 $\mathcal{C}$. We draw samples from $\mathcal{X}$ according to $p$ and observe its labels from
-$\mathcal{C}$---this forms the dataset $\mathcal{Z}$. The learning algorithm receives $\mathcal{Z}$
-and $\mathcal{H}$ as input and selects a hypothesis $\hat{c} \in \mathcal{H}$. Lastly, the
-$\hat{c}$ is evaluated on its generalization error, \[
-    \mathcal{R}(\hat{c}) \doteq \mathbb{P}(\hat{c}(X) \neq c(X)).
+$\mathcal{C}$---this forms the dataset $\mathcal{Z} \subseteq \mathcal{X} \times \mathcal{Y}$. The
+learning algorithm receives $\mathcal{Z}$ and $\mathcal{H}$ as input and selects a hypothesis
+$\hat{c} \in \mathcal{H}$. Lastly, the hypothesis $\hat{c}$ is evaluated on its generalization
+error, \[
+    \mathcal{R}(\hat{c}) \doteq \mathbb{P}(\hat{c}(X) \neq c(X)) = \E[\mathbb{1}\{ \hat{c}(X)\neq c(X) \}].
 \]
-In practice, the expected risk is approximated using held-out validation data.
+In practice, the expected risk is approximated using held-out validation data, since we do not have
+access to the distribution $p$ over $X$.
 
 \begin{definition}[Learning algorithm]
     Let $\mathcal{H}$ and $c \in \mathcal{C}$ be a hypothesis class and a concept. A learning algorithm $\mathcal{A}$
@@ -124,7 +126,7 @@ In general, the label of an instance $\vec{x} \in \mathcal{X}$ is not determinis
 by the underlying concept---it is modeled by a distribution on $\mathcal{X} \times \mathcal{Y}$.
 This reflects that two instances with identical features may have different labels. Thus, the
 definition of a dataset is altered, where it is now $\mathcal{Z} = \{ (\vec{x}_1, y_1), \ldots,
-    (\vec{x}_n), y_n \}$, where $(\vec{x}_i, y_i) \sim p$ for all $i \in [n]$. In this setting, the
+    (\vec{x}_n, y_n) \}$, where $(\vec{x}_i, y_i) \sim p$ for all $i \in [n]$. In this setting, the
 goal is to find a hypothesis $\hat{c} \in \mathcal{H}$ with small generalization error, \[
     \mathcal{R}(\hat{c}) = \mathbb{P}_{\vec{x},y \sim p} (\hat{c}(\vec{x}) \neq y) = \E_{\vec{x},y\sim p} \lft[ \mathbb{1}\{ \hat{c}(\vec{x}) \neq y \} \rgt].
 \]

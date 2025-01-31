@@ -1,17 +1,17 @@
 \section{Non-parametric Bayesian methods}
 
 The common beta distribution is defined as follows, \[
-    \mathrm{Beta}(x \mid \alpha, \beta) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1}, \quad x \in [0,1], \alpha,\beta > 0. \margintag{$B(\alpha,\beta) \doteq \nicefrac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha+\beta)}$, where $\Gamma(\alpha) = \int_0^\infty \exp(-x) x^{\alpha-1} \mathrm{d}x$.}
+    \mathrm{Beta}(x; \alpha, \beta) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1}, \quad x \in [0,1], \alpha,\beta > 0. \margintag{$B(\alpha,\beta) \doteq \nicefrac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha+\beta)}$, where $\Gamma(\alpha) = \int_0^\infty \exp(-x) x^{\alpha-1} \mathrm{d}x$.}
 \]
 Intuitively, the Beta distribution is the probability of a Bernoulli process with $p=x$ after
 observing $\alpha-1$ successes and $\beta-1$ failures. The Dirichlet distribution is the
 multivariate generalization of the beta distribution, \[
-    \mathrm{Dir}(\vec{x} \mid \vec{\alpha}) = \frac{1}{B(\vec{\alpha})} \prod_{k=1}^n x_k^{\alpha_k-1}, \quad \vec{x} \in [0,1]^n, \vec{\alpha} \in \R_{> 0}^n. \margintag{$B(\vec{\alpha}) \doteq \nicefrac{\prod_{k=1}^n \Gamma(\alpha_k)}{\Gamma \lft( \sum_{k=1}^{n} \alpha_k \rgt)}$.}
+    \mathrm{Dir}(\vec{x}; \vec{\alpha}) = \frac{1}{B(\vec{\alpha})} \prod_{k=1}^n x_k^{\alpha_k-1}, \quad \vec{x} \in [0,1]^n, \vec{\alpha} \in \R_{> 0}^n. \margintag{$B(\vec{\alpha}) \doteq \nicefrac{\prod_{k=1}^n \Gamma(\alpha_k)}{\Gamma \lft( \sum_{k=1}^{n} \alpha_k \rgt)}$.}
 \]
 
-We can model the Gaussian mixture model generative process with a Dirichlet distribution by
-sampling the cluster means from a fixed distribution, \[
-    \mu_1, \ldots, \mu_K \overset{\mathrm{iid}}{\sim} \mathcal{N}(\mu_0, \sigma_0).
+We can model the model generative process with a Dirichlet distribution by sampling the cluster
+means from a fixed distribution, \[
+    \mu_1, \ldots, \mu_K \overset{\text{\iid}}{\sim} \mathcal{N}(\mu_0, \sigma_0).
 \]
 Then, we sample the cluster probabilities from the Dirichlet distribution, \[
     (\rho_1, \ldots, \rho_K) \sim \mathrm{Dir}(\alpha_1, \ldots, \alpha_K).
@@ -101,12 +101,12 @@ expected cluster count is a prior property of a Dirichlet process.
 Let $\Theta$ be a set that parametrizes a set of probability distributions and fix a base measure
 $H$ on $\Theta$. For example, we might have $\Theta = \R$ with $\mu \in \Theta$ corresponding to
 $\mathcal{N}(\mu, \sigma)$ for some fixed $\sigma > 0$ and $H = \mathcal{N}(\mu_0, \sigma_0)$ for
-some fixed $\mu_0 \in \R, \sigma_0 > 0$. Using that we can define the generative process of a DP
+some fixed $\mu_0 \in \R, \sigma_0 > 0$. Using that, we can define the generative process of a DP
 mixture model, where the probabilities of the clusters are sampled from a GEM distribution, \[
     (\rho_1, \rho_2, \ldots) \sim \mathrm{GEM}(\alpha).
 \]
 The centers of the clusters are sampled from the base measure, \[
-    \mu_1, \mu_2, \ldots \overset{\mathrm{iid}}{\sim} H = \mathcal{N}(\mu_0, \sigma_0).
+    \mu_1, \mu_2, \ldots \overset{\text{\iid}}{\sim} H = \mathcal{N}(\mu_0, \sigma_0).
 \]
 We assign data points to the cluster based on the probabilities, \[
     z_i \sim \mathrm{Categorical}(\rho_1, \rho_2, \ldots), \quad i \in [n].
@@ -126,7 +126,7 @@ formulation:
      & \quad = p(z_i=k \mid \vec{z}^{-i}, \alpha) p(x_i \mid \vec{x}^{-i}, z_i=k, \vec{z}^{-i}, \vec{\mu}) p(\vec{x}^{-i} \mid \vec{z}^{-i}, \vec{\mu}) \margintag{Product rule.}                                                                                   \\
      & \quad \propto \underbrace{p(z_i=k \mid \vec{z}^{-i}, \alpha)}_{\mathrm{Prior}} \underbrace{p(x_i \mid \vec{x}^{-i}, z_i=k, \vec{z}^{-i}, \vec{\mu})}_{\mathrm{Likelihood}}. \margintag{$p(\vec{x}^{-i} \mid \vec{x}^{-i}, \vec{\mu})$ is a constant factor.}
 \end{align*}
-The prior is simple to compute, because we can view $i$ as the last point to enter the dataset---akin
+The prior is simple to compute, because we can view $i$ as the last point to enter the dataset---akin to
 how we can view any customer as the last to enter the Chinese restaurant due to exchangeability. So, we get \[
     p(z_i=k \mid \vec{z}^{-i}, \alpha) = \begin{cases}
         \frac{N^{-i}_{k}}{\alpha + N-1} & \text{for existing $k$} \\
@@ -137,7 +137,7 @@ where $N^{-i}_{k}$ is the number of elements in cluster $k$, excluding $i$.
 
 The likelihood is conditioned on the cluster $k$, so we only have to consider points within that
 cluster. Let $\vec{x}^{-i}_{k}$ be the set of points assigned to cluster $k$, excluding $i$. Then, \[
-    p(x_i \mid \vec{x}^{-i}, z_i = l, \vec{z}^{-i}, \vec{\mu}) = \begin{cases}
+    p(x_i \mid \vec{x}^{-i}, z_i = k, \vec{z}^{-i}, \vec{\mu}) = \begin{cases}
         p(x_i \mid \vec{x}^{-i}_k, \vec{\mu}) = \frac{p(x_i, \vec{x}^{-i}_{k} \mid \vec{\mu})}{p(\vec{x}^{-i}_k \mid \vec{\mu})} & \text{for existing $k$} \\
         p(x_i \mid \vec{\mu})                                                                                                    & \text{otherwise}.
     \end{cases}
@@ -150,4 +150,5 @@ new cluster allocation from the following distribution, \[
     \end{cases}
 \]
 As a result, we add new clusters with a small probability at each iteration, dependent on $\alpha$.
-Furthermore, points are more likely to be added to clusters with many points.
+Furthermore, points are more likely to be added to clusters with many points. Also, the probability
+of joining a cluster is dependent on the cluster means.

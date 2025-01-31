@@ -64,8 +64,8 @@ This is a convex program, even if the primal is not convex.
 \end{lemma}
 
 For most problems, a Slater point exists. So, most of the time, strong duality holds. If all $g_i$
-and $h_j$ are differentiable, then the Karush-Kuhn-Tucker (KKT) conditions provide necessary
-conditions for strong duality.
+and $h_j$ are differentiable, then the KKT (\textit{\textbf{K}arush-\textbf{K}uhn-\textbf{T}ucker})
+conditions provide necessary conditions for strong duality.
 
 \begin{lemma}[KKT necessary conditions for strong duality] \label{lem:kkt}
     Let $\vec{x}^\star$ and $(\vec{\lambda}^\star, \vec{\alpha}^\star)$ be feasible solutions to the
@@ -146,11 +146,11 @@ where $m: \R^d \times \R \to \R$ is the margin function. The margin function is 
 of any point to the linear separator. Let $\vec{x}^+$ and $\vec{x}^-$ be the positive and negative
 support vectors, where a support vector is a point that touches the margin---see \Cref{fig:svm}. Then, we have the following definition of the margin,
 \begin{align*}
-    2 \cdot m(\vec{w}, b) & \doteq \| \mathrm{proj}_{\vec{w}}(\vec{x}^+) - \mathrm{proj}_{\vec{w}}(\vec{x}^-) \|                                                          \\
-                          & = \lft\| \frac{\transpose{\vec{w}} \vec{x}^+}{\| \vec{w} \|^2} \vec{w} - \frac{\transpose{\vec{w}} \vec{x}^-}{\| \vec{w} \|^2} \vec{w} \rgt\| \\
+    2 \cdot m(\vec{w}, b) & \doteq \| \mathrm{proj}_{\vec{w}}(\vec{x}^+) - \mathrm{proj}_{\vec{w}}(\vec{x}^-) \| \margintag{See \Cref{fig:svm}.}                                                          \\
+                          & = \lft\| \frac{\transpose{\vec{w}} \vec{x}^+}{\| \vec{w} \|^2} \vec{w} - \frac{\transpose{\vec{w}} \vec{x}^-}{\| \vec{w} \|^2} \vec{w} \rgt\| \margintag{$\mathrm{proj}_{\vec{b}}(\vec{a}) = \frac{\transpose{\vec{a}} \vec{b}}{\| \vec{b} \|^2} \vec{a}$.} \\
                           & = \frac{\lft| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- \rgt|}{\| \vec{w} \|^2} \| \vec{w} \|                             \\
                           & = \frac{\lft| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- \rgt|}{\| \vec{w} \|}                                             \\
-                          & = \lft| \transpose{\lft( \frac{\vec{w}}{\| \vec{w} \|} \rgt)} (\vec{x}^+ - \vec{x}^-) \rgt|,
+                          & = \lft| \transpose{\bar{\vec{w}}} (\vec{x}^+ - \vec{x}^-) \rgt|,
 \end{align*}
 where $\bar{\vec{w}}$ is a normalized $\vec{w}$. Note that the margin does not depend on the norm of
 $\vec{w}$ or the intercept $b$---it only depends on the direction of $\vec{w}$. As a result, there are an
@@ -161,7 +161,7 @@ $(\vec{w},b)$ will satisfy \[
 Under this constraint, the margin can be computed as follows, \[
     2 \cdot m(\vec{w}, b) = \frac{2}{\| \vec{w} \|},
 \]
-because $| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- | = | 1 - (-1) | = 2$.
+because $| \transpose{\vec{w}} \vec{x}^+ - \transpose{\vec{w}} \vec{x}^- | = | (1 - b) - (-1 - b) | = 2$.
 Thus, we get the following convex program,
 \begin{align*}
     \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 \margintag{Minimizing $\nicefrac{1}{f(\vec{x})}$ is equivalent to maximizing $f(\vec{x})$.} \\
@@ -203,7 +203,7 @@ We can simplify the Lagrangian by making use of the found $\vec{w}^\star$,
 \begin{align*}
     \theta(\vec{\alpha}) & \doteq \mathcal{L}(\vec{w}^\star, b^\star, \vec{\alpha})                                                                         \\
                          & = \frac{1}{2} \| \vec{w}^\star \|^2 + \sum_{i=1}^{n} \alpha_i - \| \vec{w}^\star \|^2                                            \\
-                         & = -\frac{1}{2} \| \vec{w}^\star \|^2 + \sum_{i=1}^{n} \alpha_i                                                                   \\
+                         & = \sum_{i=1}^{n} \alpha_i - \frac{1}{2} \| \vec{w}^\star \|^2                                                                    \\
                          & = \sum_{i=1}^{n} \alpha_i - \frac{1}{2} \sum_{i=1}^{n} \sum_{j=1}^{n} \alpha_i \alpha_j y_i y_j \transpose{\vec{x}_i} \vec{x}_j.
 \end{align*}
 Thus, the dual program is a quadratic optimization problem on a simplex, which is easy to optimize.
@@ -217,7 +217,7 @@ So, $\alpha_i^\star = 0$ often, which makes $\vec{\alpha}^\star$ sparse. In fact
     \transpose{\vec{w}_\star} \vec{x}_i + b^\star \rgt) = 0$ only if $\vec{x}_i$ is a support vector.
 Thus, the solution $\vec{w}^\star$ is a sparse linear combination of support vectors.
 
-We can compute intercept by finding support vectors, \[
+We can compute the intercept by finding support vectors, \[
     \vec{x}^+ \in \argmin_{\vec{x}_i : y_i = +1} \transpose{\vec{w}} \vec{x}_i, \quad \vec{x}^- \in \argmax_{\vec{x}_i : y_i = -1} \transpose{\vec{w}} \vec{x}_i.
 \]
 Further, remember the constraints $\transpose{\vec{w}_\star} \vec{x}^+ + b = 1$ and

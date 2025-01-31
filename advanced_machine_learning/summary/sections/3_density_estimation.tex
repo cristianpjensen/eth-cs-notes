@@ -1,30 +1,30 @@
 \section{Density estimation}
 
 In this section, we will consider parametric models, \[
-    \{ p(\vec{x}; \vec{\theta}) \mid \vec{\theta} \in \Theta \}.
+    \{ p(\cdot; \vec{\theta}) \mid \vec{\theta} \in \Theta \}.
 \]
 The problem we concern ourselves with is finding the best parameter $\vec{\theta}$. The most common
-method of finding the best parameters is maximum likelihood estimation (MLE),
+method of finding the best parameters is MLE,
 \begin{align*}
     \hat{\vec{\theta}}_{\mathrm{MLE}} & \in \argmax_{\vec{\theta} \in \Theta} \prod_{i=1}^n p(\vec{x}_i; \vec{\theta})      \\
                                       & = \argmin_{\vec{\theta} \in \Theta} - \sum_{i=1}^n \log p(\vec{x}_i; \vec{\theta}).
 \end{align*}
 The following properties makes the MLE estimator attractive,
 \begin{enumerate}
-    \item Consistency---in the limit of $n$, $\hat{\vec{\theta}}_{\mathrm{MLE}}$ converges to the true
+    \item \textit{Consistency}: In the limit of $n$, $\hat{\vec{\theta}}_{\mathrm{MLE}}$ converges to the true
           parameter $\vec{\theta}^\star$;
-    \item Equivariance---if $\hat{\vec{\theta}}$ is the MLE of $\vec{\theta}$, then
+    \item \textit{Equivariance}: If $\hat{\vec{\theta}}$ is the MLE of $\vec{\theta}$, then
           $g\lft(\hat{\vec{\theta}}\rgt)$ is the MLE of $g(\vec{\theta})$ for any function $g$;
-    \item Asymptotically normal---in the limit of $n$, $\nicefrac{\hat{\vec{\theta}}_{\mathrm{MLE}} -
+    \item \textit{Asymptotically normal}: In the limit of $n$, $\nicefrac{\hat{\vec{\theta}}_{\mathrm{MLE}} -
                   \vec{\theta}}{\sqrt{n}}$ converges to a random variable with distribution $\mathcal{N}(0,
               \inv{\mathcal{I}(\vec{\theta})})$, where $\mathcal{I}$ is the Fisher information matrix;
-    \item Asymptotically efficient---in the limit of $n$, the MLE estimator has the smallest variance of all
+    \item \textit{Asymptotically efficient}: In the limit of $n$, the MLE estimator has the smallest variance of all
           unbiased estimators.
 \end{enumerate}
 
-We can understand the asymptotic efficiency (property 4) of estimators better by the Rao--Cram\'er
-bound, which provides a bound on the variance of the estimator. We will only consider the general
-scalar case, but it generalizes to the multivariate case.
+We can understand the asymptotic efficiency of estimators better by the Rao--Cram\'er bound, which
+provides a bound on the variance of the estimator. We will only consider the general scalar case,
+but it generalizes to the multivariate case.
 
 \begin{theorem}[Rao--Cram\'er bound (scalar case)]
     For any (scalar) unbiased estimator $\hat{\theta}: \mathcal{Y}^n \to \R$, given $n$ data points,
@@ -32,7 +32,7 @@ scalar case, but it generalizes to the multivariate case.
         \Var\lft[\hat{\theta}(\vec{y})\rgt] \geq \frac{\lft( \pdv*{b_{\hat{\theta}}}{\theta} + 1 \rgt)^2}{\mathcal{I}_n(\theta)} + b_{\hat{\theta}}^2,
     \]
     where $\mathcal{I}_n(\theta)$ is the Fisher information, \[
-        \mathcal{I}_n(\theta) \doteq \E_{\vec{y} \mid \theta} \lft[ \lft( \pdv*{\log p(\vec{y} \mid \theta)}{\theta} \rgt)^2 \rgt] \overset{\mathrm{iid}}{=} n \cdot \mathcal{I}(\theta),
+        \mathcal{I}_n(\theta) \doteq \E_{\vec{y} \mid \theta} \lft[ \lft( \pdv*{\log p(\vec{y} \mid \theta)}{\theta} \rgt)^2 \rgt] \overset{\text{\iid}}{=} n \cdot \mathcal{I}(\theta),
     \]
     and $b_{\hat{\theta}}$ is the bias of $\hat{\theta}$, \[
         b_{\hat{\theta}} \doteq \E_{\vec{y} \mid \theta} \lft[ \hat{\theta}(\vec{y}) \rgt] - \theta.
@@ -52,7 +52,7 @@ scalar case, but it generalizes to the multivariate case.
                                                                     & = 0.
     \end{align*}
     (Hence, the Fisher information is equivalent to the variance of the score.)
-    Furthermore, the cross-correlation between $\Lambda(\vec{y},\theta)$ and $\hat{\theta}(\vec{y})$
+    Furthermore, the cross-correlation between the score $\Lambda(\vec{y},\theta)$ and the estimator $\hat{\theta}(\vec{y})$
     can be computed as
     \begin{align*}
         \mathrm{Cov}_{\vec{y}\mid \theta}\lft(\Lambda(\vec{y},\theta), \hat{\theta}(\vec{y}) \rgt) & = \E_{\vec{y} \mid \theta} \lft[ (\Lambda(\vec{y},\theta) - \E[\Lambda(\vec{y},\theta)])\lft( \hat{\theta}(\vec{y}) - \E\lft[\hat{\theta}(\vec{y})\rgt] \rgt) \rgt]                               \\
@@ -66,15 +66,17 @@ scalar case, but it generalizes to the multivariate case.
     \end{align*}
     Using the Cauchy-Schwarz inequality, we have the following bound,
     \begin{align*}
-        \mathrm{Cov}_{\vec{y}\mid \theta} \lft( \Lambda(\vec{y}, \theta), \hat{\theta}(\vec{y}) \rgt)^2 & = \lft( \E_{\vec{y}\mid \theta} \lft[ \Lambda(\vec{y},\theta) \lft( \hat{\theta}(\vec{y}) - \E \lft[ \hat{\theta}(\vec{y}) \rgt] \rgt) \rgt] \rgt)^2                                           \\
-        \lft( \pdv*{b_{\hat{\theta}}}{\theta} + 1 \rgt)^2                                               & \leq \E_{\vec{y}\mid \theta}\lft[ \Lambda(\vec{y},\theta)^2 \rgt] \cdot \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \E \lft[ \hat{\theta}(\vec{y}) \rgt] \rgt)^2 \rgt]        \\
-                                                                                                        & = \mathcal{I}_n(\theta) \cdot \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta - \E \lft[ \hat{\theta}(\vec{y}) - \theta \rgt] \rgt)^2 \rgt]                                \\
-                                                                                                        & = \mathcal{I}_n(\theta) \cdot \Big( \E_{\vec{y} \mid \theta}\lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] + \lft( \E_{\vec{y} \mid \theta}\lft[ \hat{\theta} \rgt] - \theta \rgt)^2 \\
-                                                                                                        & \quad \quad - 2 \E_{\vec{y}\mid \theta} \lft[ \hat{\theta}(\vec{y}) - \theta \rgt]^2 \Big)                                                                                                     \\
-                                                                                                        & \leq \mathcal{I}_n(\theta) \cdot \lft( \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] - b_{\hat{\theta}}^2 \rgt).
+        \lft( \pdv*{b_{\hat{\theta}}}{\theta} + 1 \rgt)^2 & = \mathrm{Cov}_{\vec{y}\mid \theta} \lft( \Lambda(\vec{y}, \theta), \hat{\theta}(\vec{y}) \rgt)^2                                                                                                                              \\
+                                                          & = \lft( \E_{\vec{y}\mid \theta} \lft[ \Lambda(\vec{y},\theta) \lft( \hat{\theta}(\vec{y}) - \E \lft[ \hat{\theta}(\vec{y}) \rgt] \rgt) \rgt] \rgt)^2                                                                           \\
+                                                          & \leq \E_{\vec{y}\mid \theta}\lft[ \Lambda(\vec{y},\theta)^2 \rgt] \cdot \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \E \lft[ \hat{\theta}(\vec{y}) \rgt] \rgt)^2 \rgt] \margintag{Cauchy-Schwarz inequality.} \\
+                                                          & = \mathcal{I}_n(\theta) \cdot \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta - \E \lft[ \hat{\theta}(\vec{y}) - \theta \rgt] \rgt)^2 \rgt]                                                                \\
+                                                          & = \mathcal{I}_n(\theta) \cdot \Big( \E_{\vec{y} \mid \theta}\lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] + \lft( \E_{\vec{y} \mid \theta}\lft[ \hat{\theta}(\vec{y}) \rgt] - \theta \rgt)^2                        \\
+                                                          & \quad \quad - 2 \E_{\vec{y}\mid \theta} \lft[ \hat{\theta}(\vec{y}) - \theta \rgt]^2 \Big)                                                                                                                                     \\
+                                                          & = \mathcal{I}_n(\theta) \cdot \lft( \E_{\vec{y} \mid \theta}\lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] - \lft( \E_{\vec{y} \mid \theta}\lft[ \hat{\theta}(\vec{y}) \rgt] - \theta \rgt)^2 \rgt)                  \\
+                                                          & = \mathcal{I}_n(\theta) \cdot \lft( \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] - b_{\hat{\theta}}^2 \rgt).
     \end{align*}
     Re-arranging yields \[
-        \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] \geq \frac{\lft( \pdv*{b_{\hat{\theta}}}{\theta} + 1 \rgt)^2}{\mathcal{I}_n(\theta)} + b_{\hat{\theta}}^2.
+        \Var_{\vec{y} \mid \theta}[\hat{\theta}(\vec{y})] \doteq \E_{\vec{y} \mid \theta} \lft[ \lft( \hat{\theta}(\vec{y}) - \theta \rgt)^2 \rgt] \geq \frac{\lft( \pdv*{b_{\hat{\theta}}}{\theta} + 1 \rgt)^2}{\mathcal{I}_n(\theta)} + b_{\hat{\theta}}^2.
     \]
 \end{proof}
 
