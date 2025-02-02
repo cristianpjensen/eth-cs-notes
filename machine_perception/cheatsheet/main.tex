@@ -611,7 +611,7 @@
         \textbf{DQN}: Large state spaces $\Rightarrow$ Function approximation with loss: \[
             \ell(\vec{\theta}) = (Q_{\vec{\theta}}(s,a) - (r + \gamma Q_{\bar{\vec{\theta}}}(s', a')))^2, \quad a' \in \argmax\nolimits_{a \in \mathcal{A}} Q_{\bar{\vec{\theta}}}(s', a).
         \]
-        We train as in supervised learning. Data is not \iid $\Rightarrow$ Replay buffer.
+        We train as in supervised learning. Data is not i.i.d. $\Rightarrow$ Replay buffer.
 
         \textbf{Sample inefficiency of deep RL}: As the policy improves, we can collect better data.
         So, we have to keep training on new better data.

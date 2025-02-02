@@ -59,14 +59,16 @@
                     \transpose{\vec{x}} \mat{M} \vec{x} - 2 \transpose{\vec{b}} \vec{x} & = \transpose{(\vec{x} - \inv{\mat{M}} \vec{b})} \mat{M} (\vec{x} - \inv{\mat{M}} \vec{b}) \\
                                                                                         & \quad \quad - \transpose{\vec{b}} \inv{\mat{M}} \vec{b}.
                 \end{align*}
-            \item Woodbury's identity: $\inv{(\mat{A} + \mat{U} \mat{C} \mat{V})} = \inv{\mat{A}} - \inv{\mat{A}} \mat{U} \inv{(\inv{\mat{C}} + \mat{V} \inv{\mat{A}} \mat{U})} \mat{V} \inv{\mat{A}}$. \\
-                Simpler: $\inv{(\mat{I} + \mat{U} \mat{V})} = \mat{I} - \mat{U} \inv{(\mat{I} + \mat{V} \mat{U})} \mat{V}$.
+            \item Woodbury's identity: $\inv{(\mat{I} + \mat{U} \mat{V})} = \mat{I} - \mat{U} \inv{(\mat{I} + \mat{V} \mat{U})} \mat{V}$.
             \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with
                 $|\Xi| \leq \delta$ is linearly independent.
             \item Sign function: $\mathrm{sgn}(z) = \begin{cases} +1 & z \geq 0 \\ -1 & z < 0 \end{cases}$.
             \item $\mat{M}$ is positive (semi-)definite if $\transpose{\vec{x}} \mat{M} \vec{x} \geq 0$ (PSD) or $\transpose{\vec{x}} \mat{M} \vec{x} > 0$ (PD) for all $\vec{x}$.
-            \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
+            \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. \\
+                If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
             \item $\tanh(z) = 2 \sigma(2z) - 1$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$.
+            \item $\mathrm{ReLU}(z) = \frac{|z| + z}{2}$, $|z| = \mathrm{ReLU}(z) + \mathrm{ReLU}(-z)$.
+            \item $\mathrm{Cov}(\vec{x}) = \E[(\vec{x}-\E[\vec{x}])\transpose{(\vec{x} - \E[\vec{x}])}] = \E[\vec{x}\transpose{\vec{x}}] - \E[\vec{x}] \transpose{\E[\vec{x}]}$.
             \item Integration by part: $\int u\mathrm{d}v = uv - \int v\mathrm{d}u$.
             \item Geometric series: $\sum_{k=0}^{\infty} ar^k = \frac{a}{1-r}$ if $|r| < 1$.
             \item $\log(1+x) \approx x$ for small $x$.
@@ -88,7 +90,7 @@
             \vec{z} = \mat{W} \vec{x} & \implies \pdv{L}{\mat{W}} = \pdv{L}{\vec{z}} \transpose{\vec{x}} \\
             \vec{z} = f(\vec{x}) \text{ element-wise} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} \odot f'(\vec{x})   \\
             \vec{z} = \transpose{\vec{x}}\mat{A}\vec{x} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} (\mat{A}+\transpose{\mat{A}})\vec{x} \\
-            \vec{z} = \| \mat{A} \vec{x} \|^2 & \implies \pdv{L}{\vec{x}} = 2 \pdv{L}{\vec{z}} \transpose{\mat{A}} \mat{A} \vec{x} \\
+            \vec{z} = \frac{1}{2} \| \mat{A} \vec{x} \|^2 & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} \transpose{\mat{A}} \mat{A} \vec{x} \\
             \vec{z} = \mathrm{softmax}(\vec{x}) & \implies \pdv{\vec{z}}{\vec{x}} = \mathrm{diag}(\vec{z}) - \vec{z}\transpose{\vec{z}} \\
             \sigma'(z) & = \sigma(z) (1-\sigma(z)) \\
             \tanh'(z) & = 1 - z^2 \\
@@ -152,7 +154,7 @@
 
     \begin{subtopic}{Smoothness}
         \begin{align*}
-            & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq \| \vec{x} - \vec{y} \|                                                 \\
+            & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq L \| \vec{x} - \vec{y} \|                                                 \\
             & f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
         \end{align*}
     \end{subtopic}
@@ -695,8 +697,11 @@
             (coupling matrix), \[
                 \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}, \quad \mat{D} = \mathrm{diag}(\vec{d}), \quad d_m = 1 + \sum_{n=1}^{M} a_{nm}.
             \]
-            Now, $\bar{\mat{A}}\mat{X}$ computes the average feature over neighbors and the node itself. GCNs
-            introduce learnable parameters $\mat{W}$: \[
+            Element-wise: \[
+                \bar{a}_{ij} = \frac{a_{ij} + \delta_{ij}}{\sqrt{d_i d_j}}, \quad \delta_{ij} = \mathbb{1}\{ i = j \}.
+            \]
+            Now, $\bar{\mat{A}}\mat{X}$ computes the average feature over neighbors and the node itself.
+            GCNs introduce learnable parameters $\mat{W}$: \[
                 f[\mat{W}](\mat{X}, \mat{A}) = \sigma(\bar{\mat{A}} \mat{X} \mat{W}).
             \]
             This is an equivariant function, which can be stacked. Then, we can use the final representations
