@@ -2,16 +2,20 @@
 
 \usepackage[a4paper, margin=0.25cm]{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage{multicol}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
 \usepackage{derivative}
 \usepackage[skip=.5\baselineskip-0.5pt]{parskip}
-\usepackage[extreme, mathspacing=normal, leadingfraction=0.85]{savetrees}
+\usepackage[mathspacing=normal]{savetrees}
 \usepackage[document]{ragged2e}
 \usepackage{enumitem}
+\usepackage{microtype}
 
-\usepackage[osf,sc]{mathpazo}
+\usepackage{mathpazo}
+\usepackage[scaled=0.90]{helvet}
+\usepackage[scaled=0.85]{beramono}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
 
 \usepackage{color,soul}
 \usepackage{xcolor}
@@ -23,12 +27,17 @@
 \title{Deep Learning Cheatsheet}
 
 \newenvironment{topic}[1]
-{\textbf{\sffamily \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}}}
+{\textbf{\sffamily \footnotesize \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}}}
 {}
 
 \newenvironment{subtopic}[1]
-{\begin{center}\textbf{\sffamily #1}\end{center}}
+{\vspace{0.1cm} \begin{center}\textbf{\footnotesize \sffamily #1}\end{center}}
 {}
+
+\renewcommand{\det}[1]{|#1|}
+\renewcommand{\mat}[1]{\ensuremath{\mathbf{#1}}}
+\renewcommand{\vec}[1]{\ensuremath{\mathbold{#1}}}
+\renewcommand{\Var}{\mathbb{V}}
 
 \begin{document}
 
@@ -38,76 +47,115 @@
 
     \scriptsize
 
-    \begin{itemize}
-        \item Closed form of KL for Gaussians:
-              \begin{align*}
-                  D_{KL} & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
-                         & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
-              \end{align*}
-        \item Cosine theorem: \[
-                  \| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle.
-              \]
-        \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with
-              $|\Xi| \leq \delta$ is linearly independent.
-        \item Gaussian arithmetic:
-              \begin{align*}
-                   & \vec{x} \sim \mathcal{N}(\vec{\mu}_{\vec{x}}, \mat{\Sigma}_{\vec{x}}), \vec{y} \sim \mathcal{N}(\vec{\mu}_{\vec{y}}, \mat{\Sigma}_{\vec{y}}) \\
-                   & \implies \vec{x} + \vec{y} \sim \mathcal{N}(\vec{\mu}_{\vec{x}} + \vec{\mu}_{\vec{y}}, \mat{\Sigma}_{\vec{x}} + \mat{\Sigma}_{\vec{y}})      \\
-                   & \vec{x} \sim \mathcal{N}(\vec{\mu}, \mat{\Sigma}), \mat{M} \in \R^{m \times d}                                                               \\
-                   & \implies \vec{y} = \mat{M} \vec{x} \sim \mathcal{N}(\mat{M} \vec{\mu}, \mat{M}\mat{\Sigma}\transpose{\mat{M}}).
-              \end{align*}
-        \item Sign function $\mathrm{sgn}(z) = \mathbb{1}\{ z \geq 0 \}$.
-        \item Cosine angle $\cos \angle{(\vec{x},\vec{y})} = \frac{\transpose{\vec{x}} \vec{y}}{\| \vec{x} \| \|
-                      \vec{y} \|}$.
-        \item Gradients:
-              \begin{align*}
-                   & \vec{z} = \mat{W} \vec{x}                                        \\
-                   & \implies \pdv{L}{\mat{W}} = \pdv{L}{\vec{z}} \transpose{\vec{x}} \\
-                   & \vec{h} = f(\vec{z}) \text{ element-wise}                        \\
-                   & \implies \pdv{L}{\vec{z}} = \pdv{L}{\vec{h}} \odot f'(\vec{z})   \\
-                   & \pdv{L}{x_i} = \sum_{j=1}^{m} \pdv{L}{y_j} \pdv{y_j}{x_i} \\
-                   & \pdv{\transpose{\vec{x}\mat{A}\vec{x}}}{\vec{x}} = (\mat{A}+\transpose{\mat{A}})\vec{x}.
-              \end{align*}
+    \begin{subtopic}{General}
+        \begin{itemize}[left=0pt]
+            \item Cosine theorem: $\| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle$.
+            \item $\frac{1}{\sqrt{d}} \| \vec{x} \|_2 \leq \| \vec{x} \|_{\infty} \leq \| \vec{x} \|_2 \leq \| \vec{x} \|_1 \leq \sqrt{d} \| \vec{x} \|_2$.
+            \item Cosine angle: $\cos \angle{(\vec{x},\vec{y})} = \frac{\transpose{\vec{x}} \vec{y}}{\| \vec{x} \| \|
+                        \vec{y} \|}$.
+            \item Cauchy-Schwarz: $|\langle \vec{x}, \vec{y} \rangle| \leq \| \vec{x} \| \| \vec{y} \|$.
+            \item Completing the square: If $\mat{M}$ is symmetric and invertible:
+                \begin{align*}
+                    \transpose{\vec{x}} \mat{M} \vec{x} - 2 \transpose{\vec{b}} \vec{x} & = \transpose{(\vec{x} - \inv{\mat{M}} \vec{b})} \mat{M} (\vec{x} - \inv{\mat{M}} \vec{b}) \\
+                                                                                        & \quad \quad - \transpose{\vec{b}} \inv{\mat{M}} \vec{b}.
+                \end{align*}
+            \item Woodbury's identity: $\inv{(\mat{A} + \mat{U} \mat{C} \mat{V})} = \inv{\mat{A}} - \inv{\mat{A}} \mat{U} \inv{(\inv{\mat{C}} + \mat{V} \inv{\mat{A}} \mat{U})} \mat{V} \inv{\mat{A}}$. \\
+                Simpler: $\inv{(\mat{I} + \mat{U} \mat{V})} = \mat{I} - \mat{U} \inv{(\mat{I} + \mat{V} \mat{U})} \mat{V}$.
+            \item Points of $\mathcal{S}$ are in general position if any subset $\Xi \subseteq \mathcal{S}$ with
+                $|\Xi| \leq \delta$ is linearly independent.
+            \item Sign function: $\mathrm{sgn}(z) = \begin{cases} +1 & z \geq 0 \\ -1 & z < 0 \end{cases}$.
+            \item $\mat{M}$ is positive (semi-)definite if $\transpose{\vec{x}} \mat{M} \vec{x} \geq 0$ (PSD) or $\transpose{\vec{x}} \mat{M} \vec{x} > 0$ (PD) for all $\vec{x}$.
+            \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
+            \item $\tanh(z) = 2 \sigma(2z) - 1$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$.
+            \item Integration by part: $\int u\mathrm{d}v = uv - \int v\mathrm{d}u$.
+            \item Geometric series: $\sum_{k=0}^{\infty} ar^k = \frac{a}{1-r}$ if $|r| < 1$.
+            \item $\log(1+x) \approx x$ for small $x$.
+            \item $1-x \leq \exp(-x) \implies (1-\epsilon)^n \leq \exp(-n \epsilon)$.
+            \item For increasing $f$, $\argmax_{x} x = \argmax_{x} f(x)$.
+            \item Group $(\mathcal{G}, \circ)$ satisfies (1) \textit{Associativity}: $(g \circ h) \circ k = f
+                    \circ (h \circ k)$ for all $g,h,k \in \mathcal{G}$; (2) \textit{Identity}: There exists a
+                unique $e \in \mathcal{G}$ satisfying $g \circ e = e \circ g = g$ for all $g \in
+                    \mathcal{G}$; (3) \textit{Inverse}: For each $g \in \mathcal{G}$ there is a unique inverse
+                $\inv{g} \in \mathcal{G}$ such that $g \circ \inv{g}  = \inv{g} \circ g = e$; (4) \textit{Closure}:
+                For every $g, h \in \mathcal{G}$, we have $g \circ h \in \mathcal{G}$.
+        \end{itemize}
+    \end{subtopic}
 
-        \item Information theory:
-            \begin{align*}
-                H(p) & \doteq \E_{X \sim p}[-\log p(X)] \\
-                D_{\mathrm{KL}}(p\|q) & \doteq \E_{X \sim p}\lft[ -\log \lft( \frac{q(X)}{p(X)} \rgt) \rgt] \\
-                H(p, q) & \doteq \E_{X \sim p}[-\log q(X)] \\
-                H(p, q) & = H(p) + D_{\mathrm{KL}}(p\|q) \\
-                \mathrm{I}(p; q) & = H(p) - H(p \mid q) \\
-            \end{align*}
+    \begin{subtopic}{Gradients}
+        \textit{Make sure to always type-check gradients!}
+        \begin{align*}
+            \vec{z} = \transpose{\vec{a}} \vec{x} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} \vec{a} \\
+            \vec{z} = \mat{W} \vec{x} & \implies \pdv{L}{\mat{W}} = \pdv{L}{\vec{z}} \transpose{\vec{x}} \\
+            \vec{z} = f(\vec{x}) \text{ element-wise} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} \odot f'(\vec{x})   \\
+            \vec{z} = \transpose{\vec{x}}\mat{A}\vec{x} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} (\mat{A}+\transpose{\mat{A}})\vec{x} \\
+            \vec{z} = \| \mat{A} \vec{x} \|^2 & \implies \pdv{L}{\vec{x}} = 2 \pdv{L}{\vec{z}} \transpose{\mat{A}} \mat{A} \vec{x} \\
+            \vec{z} = \mathrm{softmax}(\vec{x}) & \implies \pdv{\vec{z}}{\vec{x}} = \mathrm{diag}(\vec{z}) - \vec{z}\transpose{\vec{z}} \\
+            \sigma'(z) & = \sigma(z) (1-\sigma(z)) \\
+            \tanh'(z) & = 1 - z^2 \\
+            \cos'(z) & = -\sin(z) \\
+            \sin'(z) & = \cos(z) \\
+            \mathrm{ReLU}'(z) & = \mathbb{1}\{ z \geq 0 \} \\
+            |x|' & = \frac{x}{|x|} \\
+            \lft( \frac{f}{g} \rgt)'(x) & = \frac{f'(x) g(x) - f(x) g'(x)}{g^2(x)} \\
+            \pdv{L}{x_i} & = \sum_{j=1}^{m} \pdv{L}{y_j} \pdv{y_j}{x_i}.
+        \end{align*}
+    \end{subtopic}
 
-        \item Probability review:
-            \begin{align*}
-                p(X \mid Y) & = \frac{p(Y \mid Y) p(X)}{p(Y)} \\
-                p(X_{1:n}) & = p(X_1) \prod_{i=2}^n p(X_i \mid X_{1:i-1}) \\
-                p(X_{1:i-1},X_{i+1:n}) & = \sum_{x_i} p(X_{1:i-1}, X_i=x_i, X_{i+1:n}).
-            \end{align*}
+    \begin{subtopic}{Information theory}
+        \begin{align*}
+            H(p) & \doteq \E_{X \sim p}[-\log p(X)] \\
+            D_{\mathrm{KL}}(p\;\|\;q) & \doteq \E_{X \sim p}\lft[ -\log \lft( \frac{q(X)}{p(X)} \rgt) \rgt] \\
+            H(p, q) & \doteq \E_{X \sim p}[-\log q(X)] \\
+            H(p, q) & = H(p) + D_{\mathrm{KL}}(p\;\|\;q) \\
+            \mathrm{I}(p; q) & = H(p) - H(p \mid q) \\
+        \end{align*}
+    \end{subtopic}
 
-        \item $\mat{M}$ is positive (semi-)definite if $\transpose{\vec{x}} \mat{M} \vec{x} \geq 0$ (PSD) or $\transpose{\vec{x}} \mat{M} \vec{x} > 0$ (PD) for all $\vec{x}$.
-        \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
-        \item $\tanh(z) = 2 \sigma(2z) - 1$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$.
-        \item Integration by part: $\int u\mathrm{d}v = uv - \int v\mathrm{d}u$.
+    \begin{subtopic}{Probability}
+        \begin{align*}
+            p(X \mid Y) & = \frac{p(Y \mid X) p(X)}{p(Y)} \\
+            p(X_{1:n}) & = p(X_1) \prod_{i=2}^n p(X_i \mid X_{1:i-1}) \\
+            p(X_{1:i-1},X_{i+1:n}) & = \sum_{x_i} p(X_{1:i-1}, X_i=x_i, X_{i+1:n}).
+        \end{align*}
+    \end{subtopic}
 
-        \item Convexity:
-              \begin{align*}
-                   & f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) \\
-                   & f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle       \\
-                   & \langle \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle \geq 0       \\
-                   & \text{$\hess{f(\vec{x})}{}$ is positive semi-definite.}
-              \end{align*}
+    \vfill\null
+    \columnbreak
 
-        \item $L$-smoothness:
-              \begin{align*}
-                   & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq \| \vec{x} - \vec{y} \|                                                 \\
-                   & f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
-              \end{align*}
+    \begin{subtopic}{Gaussian}
+        Definition: \[
+            \mathcal{N}(\vec{x}; \vec{\mu}, \mat{\Sigma}) \doteq \frac{1}{\sqrt{(2\pi)^{d} \det{\mat{\Sigma}}}} \exp \lft( -\frac{1}{2} \transpose{(\vec{x}-\vec{\mu})} \inv{\mat{\Sigma}} (\vec{x} - \vec{\mu}) \rgt).
+        \]
 
-        \item Geometric series: $\sum_{k=0}^{\infty} ar^k = \frac{a}{1-r}$ if $|r| < 1$.
-        \item $\log(1+x) \approx x$ for small $x$.
+        Arithmetic:
+        \begin{align*}
+            \vec{x} + \vec{y} & \sim \mathcal{N}(\vec{\mu}_{\vec{x}} + \vec{\mu}_{\vec{y}}, \mat{\Sigma}_{\vec{x}} + \mat{\Sigma}_{\vec{y}})      \\
+            \mat{M} \vec{x} & \sim \mathcal{N}(\mat{M} \vec{\mu}, \mat{M}\mat{\Sigma}\transpose{\mat{M}}).
+        \end{align*}
 
-    \end{itemize}
+        Let $p_1 = \mathcal{N}(\vec{\mu}_1, \mat{\Sigma}_1)$ and $p_2 = \mathcal{N}(\vec{\mu}_2, \mat{\Sigma}_2)$, then
+        \begin{align*}
+            H(p_1) & = \frac{d}{2} \log(2\pi e) + \frac{1}{2} \log \det{\mat{\Sigma}_1} \\
+            D_{\mathrm{KL}}(p_1 \;\|\; p_2) & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
+                             & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
+        \end{align*}
+    \end{subtopic}
+
+    \begin{subtopic}{Convexity}
+        \begin{align*}
+            & f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) \\
+            & f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle       \\
+            & \langle \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle \geq 0       \\
+            & \text{$\hess{f(\vec{x})}{}$ is positive semi-definite.}
+        \end{align*}
+    \end{subtopic}
+
+    \begin{subtopic}{Smoothness}
+        \begin{align*}
+            & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq \| \vec{x} - \vec{y} \|                                                 \\
+            & f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
+        \end{align*}
+    \end{subtopic}
 
     \begin{topic}{Connectionism}
 
@@ -175,7 +223,7 @@
             Or: $x_i \gets \mathrm{sgn}(H_i)$, where $H_i \doteq \sum_{j=1}^{d} w_{ij} x_j - b_i$.
 
             Hebbian learning (neurons frequently in the same state reinforce): \[
-                \mat{W} = \frac{1}{d} \sum_{t=1}^{n} \vec{x}_t \transpose{\vec{x}_t}.
+                \mat{W} = \frac{1}{d} \lft( \sum_{t=1}^{n} \vec{x}_t \transpose{\vec{x}_t} - \mat{I}_d \rgt).
             \]
             Pattern $\vec{x}_t$ is memorized if meta-stable: update rule makes no updates to it: \[
                 x_{ti} = \mathrm{sgn}(x_{ti} + C_{ti}), \quad C_{ti} \doteq \frac{1}{d} \sum_{j=1}^{d} \sum_{r\neq t}^{n} x_{ri}x_{rj}x_{tj}.
@@ -316,6 +364,9 @@
                 h(\vec{\theta}_T) - h(\vec{\theta}^\star) \leq \lft( 1 - \frac{\mu}{L} \rgt)^T (h(\vec{\theta}_0) - h(\vec{\theta}^\star)).
             \]
             Proof: Sufficient decrease $\to$ PL $\to$ Subtract $h(\vec{\theta}^\star)$ both sides.
+
+            Newton's method: $\vec{\theta}^{t+1} = \vec{\theta}^t - \inv{\hess{h(\vec{\theta}^t)}{}} \grad{h(\vec{\theta}^t)}{}$.
+            
         \end{subtopic}
 
         \begin{subtopic}{Acceleration, adaptivity, and momentum}
@@ -412,6 +463,11 @@
                 (\tens{X} * \tens{W})[c,i,j] = \sum_{r=1}^{C_{in}} \sum_{k=-K}^{K} \sum_{l=-K}^{K} w_{c,r,k,l} x_{r,i-k,j-l}.
             \]
             Fully connected in channels and local in spatial dimensions.
+
+            Output size ($x$: input, $p$: padding, $d$: dilation, $k$: kernel, $s$: stride): \[
+                \lft\lfloor \frac{x+2p-d(k-1)-1}{s} + 1 \rgt\rfloor.
+            \]
+            
         \end{subtopic}
 
     \end{topic}
@@ -423,12 +479,15 @@
         Dependent on application, compute output variables: \[
             \vec{y}_t = G[\vec{\varphi}](\vec{z}_t).
         \]
+
         Elman RNN: \[
             F[\mat{U},\mat{V}](\vec{z},\vec{x}) = \phi(\mat{U}\vec{z} + \mat{V}\vec{x}), \quad G[\mat{W}](\vec{z}) = \psi(\mat{W}\vec{z}).
         \]
+
         Bidirectional RNNs do both ways and concatenate. Stacked RNNS connect layers horizontally: \[
             \vec{z}_{t,l} = \phi(\mat{U}_l \vec{z}_{t-1,l} + \mat{V}_l \vec{z}_{t,l-1}), \quad \vec{z}_{t,0} = \vec{x}_t.
         \]
+
         Let $L = \sum_{t=1}^{T} \ell(\hat{\vec{y}}_t, \vec{y}_t)$, then we have gradients: \[
             \pdv{L}{\mat{U}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{U}}, \quad \pdv{L}{\mat{V}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{V}},
         \]
@@ -487,6 +546,9 @@
                 \vec{y}_t = \mathrm{MLP}(\mathrm{Re}(\mat{G}\vec{\zeta}_t)), \quad \mat{G} \in \mathbb{C}^{k \times m}.
             \]
         \end{subtopic}
+
+        \vfill\null
+        \columnbreak
 
         \begin{subtopic}{Sequence learning}
             Generate sequence step-by-step, given another sequence: \[
@@ -554,7 +616,7 @@
             additional layers on top that operate on the contextualized BERT tokens.
 
             Two pre-training stages:
-            \begin{enumerate}
+            \begin{enumerate}[left=0pt]
                 \item Predicting masked out tokens using its left and right context as input (Cloze test; trains BERT's
                       understanding of language);
                 \item Binary next sentence classification, where the model must classify two sentences as being
@@ -685,6 +747,9 @@
 
     \end{topic}
 
+    \vfill\null
+    \columnbreak
+
     \begin{topic}{Tricks of the trade}
 
         \begin{subtopic}{Initialization}
@@ -730,20 +795,28 @@
 
         \begin{subtopic}{Normalization}
             Goal: Make all units more similar. A unit $f: \R^d \to \R$ can be normalized by \[
-                \bar{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
+                \tilde{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
             \]
             This removes 2 DOF (bias and variance) $\to$ Explicitly parameterize: \[
-                \overline{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x}).
+                \tilde{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x}).
             \]
-            BatchNorm approximates $\E[f]$ and $\Var[f]$ over a mini-batch.
+            BatchNorm approximates $\E[f]$ and $\Var[f]$ over a mini-batch: \[
+                \E[f] \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} f(\vec{x}), \quad \Var[f] \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} (f(\vec{x}) - \E[f])^2.
+            \]
 
             Normalization is very effective and sometimes essential. We used to believe that it was because it
             helped combat covariance shift. However, a modern motivation shows that normalization is the same
             as weight normalization and scaling by $\nicefrac{\| \vec{w} \|_{\mat{I}}}{\| \vec{w}
                 \|_{\mat{\Sigma}}}$, where $\mat{\Sigma} = \E[\vec{x}\transpose{\vec{x}}]$.
 
-            Layer normalization estimates mean and variance over the feature dimension instead of batch
-            dimension.
+            LayerNorm normalizes over the feature dimension instead of batch dimension: \[
+                \E[f] = \frac{1}{d} \sum_{i=1}^{d} f_i(\vec{x}), \quad \Var[f] = \frac{1}{d} \sum_{i=1}^{d} (f_i(\vec{x}) - \E[f])^2.
+            \]
+            And, the data is normalized by \[
+                \tilde{f}_i = \frac{f_i - \E[f]}{\sqrt{\Var[f]}}.
+            \]
+            Layers need to have a sufficient width $d$ to get stable statistics, but it is not batch
+            dependent anymore.
         \end{subtopic}
 
         \begin{subtopic}{Weight normalization}
@@ -958,7 +1031,7 @@
             generalization guarantees can be given if $\mathcal{F}$ can be fit to any labeling.
 
             Randomization experiments with CIFAR-10 observations:
-            \begin{enumerate}
+            \begin{enumerate}[left=0pt]
                 \item DNNs can perfectly fit the training data;
                 \item When randomly replacing training labels, the models can still perfectly fit the data
                       (memorization);
@@ -976,21 +1049,27 @@
             found by small-batch SGD, weight averaging, or entropy SGD.
         \end{subtopic}
 
+        \vfill\null
+        \columnbreak
+
         \begin{subtopic}{PAC-Bayesian}
             For any $p \gg q$ and $p$-measurable $X$, \[
-                \E_q[X] \leq D_{\mathrm{KL}}(q \| p) + \log \E_p[\exp(X)].
+                \E_q[X] \leq D_{\mathrm{KL}}(q \;\|\; p) + \log \E_p[\exp(X)].
+            \]
+            We also have (not important for proof of next lemma) \[
+                \mathbb{P}(X \geq t) \leq \frac{\E[X]}{t}.
             \]
 
             For a fixed $p$, any $q$, and $\epsilon \in (0,1)$, we have the following with probability greater
             than or equal to $\epsilon$, \[
-                \E_q[\ell(f)] - \E_q[\hat{\ell}(f)] \leq \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
+                \E_q[\ell(f)] - \E_q[\hat{\ell}(f)] \leq \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \;\|\; p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
             \]
             Here, $p$ is a prior over parameters, $q$ the posterior, and we bound the expected generalization
             gap over stochastic classifiers $\to$ $\bigo{\nicefrac{1}{\sqrt{n}}}$ bound on generalization
             error. However, it only applies to stochastic classifiers, not single classifiers.
 
             This motivated the PAC Bayes loss function \[
-                \ell_{\mathrm{PAC}}(q) \doteq \E_q[\hat{\ell}] + \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \| p) + \log \frac{2\sqrt{n}}{\epsilon} \rgt)}.
+                \ell_{\mathrm{PAC}}(q) \doteq \E_q[\hat{\ell}] + \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \;\|\; p) + \log \frac{2\sqrt{n}}{\epsilon} \rgt)}.
             \]
             Effectively just a regularization term. The KL term can be computed in closed form if prior and
             posterior are Gaussian.
@@ -1009,7 +1088,7 @@
             VAE optimizes log-likelihood of data $\to$ Intractable $\to$ ELBO:
             \begin{align*}
                 \log p[\vec{\theta}](\vec{x}) & \geq \E_{p[\vec{\vartheta}](\vec{z} \mid \vec{x})} [\log p[\vec{\theta}](\vec{x} \mid \vec{z})] \\
-                                              & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \| p(\vec{z})).
+                                              & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \;\|\; p(\vec{z})).
             \end{align*}
             $p[\vec{\vartheta}]$ is the encoder distribution and $p[\vec{\theta}]$ is the decoder
             distribution. This is effectively a reconstruction loss with a regularization term, where
@@ -1039,10 +1118,15 @@
             \]
             Minimizing the logistic log-likelihood w.r.t.\ this discriminator gives the following loss for the
             generator, \[
-                \ell^\star(\vec{\theta}) = D_{\mathrm{JS}}(p \| p[\vec{\theta}]) - \log 2,
+                \ell^\star(\vec{\theta}) = D_{\mathrm{JS}}(p \;\|\; p[\vec{\theta}]) - \log 2,
             \]
-            where $D_{\mathrm{JS}}(p \| q) = H(\nicefrac{p + p[\vec{\theta}]}{2}) - \nicefrac{H(p) +
-                    H(p[\vec{\theta}])}{2}$. But, the optimal classifier is intractable, so we train a parametrized one
+            where
+            \begin{align*}
+                D_{\mathrm{JS}}(p \;\|\; q) & \doteq H\lft(\frac{p + q}{2} \rgt) - \frac{H(p) + H(q)}{2} \\
+                D_{\mathrm{JS}}(p \;\|\; q) & \doteq \frac{1}{2} D_{\mathrm{KL}}\lft( p \;\middle\|\; \frac{p+q}{2} \rgt) + \frac{1}{2} D_{\mathrm{KL}}\lft( q \;\middle\|\; \frac{p+q}{2} \rgt).
+            \end{align*}
+
+            But, the optimal classifier is intractable, so we train a parametrized one
             $q[\vec{\varphi}]$, \[
                 \vec{\theta}^\star, \vec{\varphi}^\star \in \argmin_{\vec{\theta}} \argmax_{\vec{\varphi}} \ell(\vec{\theta}, \vec{\varphi}),
             \]
@@ -1098,8 +1182,8 @@
             where \[
                 \ell_t = \begin{cases}
                     \E_q[\log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1)]                                                          & t = 0     \\
-                    -D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \| p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) & 0 < t < T \\
-                    -D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \| \pi)                                                          & t = T.
+                    -D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \;\|\; p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) & 0 < t < T \\
+                    -D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \;\|\; \pi)                                                          & t = T.
                 \end{cases}
             \]
             The KL divergences can be analytically computed because all $q_t$ are Gaussians an we parameterized
@@ -1132,9 +1216,7 @@
                 \ell(\vec{\theta} \mid \vec{x}_0) = \frac{1}{T} \sum_{t=1}^{T} \lft[ \| \vec{\epsilon} - \vec{\epsilon}[\vec{\theta}](\vec{x}_t, t) \|^2 \;\middle|\; \vec{x}_0 \rgt].
             \]
 
-            Entropy bound: \[
-                H(\vec{x}_{t-1} \mid \vec{x}_t) \leq H(\vec{x}_t \mid \vec{x}_{t-1}).
-            \]
+            Entropy bound: $H(\vec{x}_{t-1} \mid \vec{x}_t) \leq H(\vec{x}_t \mid \vec{x}_{t-1})$.
             The entropy of the reverse process is bounded by the entropy of the forward process.
         \end{subtopic}
 
