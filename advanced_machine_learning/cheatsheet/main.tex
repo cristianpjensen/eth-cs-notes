@@ -1,0 +1,635 @@
+\documentclass[9pt]{extarticle}
+
+\usepackage[a4paper, margin=0.25cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
+\usepackage{derivative}
+\usepackage[skip=.5\baselineskip-3pt]{parskip}
+\usepackage[mathspacing=normal, leadingfraction=0.8]{savetrees}
+\usepackage[document]{ragged2e}
+\usepackage{enumitem}
+
+\usepackage{microtype}
+
+\usepackage{mathpazo}
+\usepackage[scaled=0.90]{helvet}
+\usepackage[scaled=0.85]{beramono}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage{color,soul}
+\usepackage{xcolor}
+
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+\input{../../commands}
+
+\setlength{\columnseprule}{0.4pt}
+
+\title{Deep Learning Cheatsheet}
+
+\newenvironment{topic}[1]
+{\textbf{\sffamily \colorbox{black}{\rlap{\textbf{\textcolor{white}{#1}}}\hspace{\linewidth}\hspace{-2\fboxsep}}}}
+{}
+
+% \newenvironment{subtopic}[1]
+% {\begin{center}\textbf{\sffamily #1}\end{center}}
+% {}
+
+\newenvironment{subtopic}[1]
+{\textbf{\sffamily #1:}}
+{}
+
+\renewcommand{\det}[1]{|#1|}
+\renewcommand{\mat}[1]{\ensuremath{\mathbf{#1}}}
+\renewcommand{\vec}[1]{\ensuremath{\mathbold{#1}}}
+\renewcommand{\Var}{\mathbb{V}}
+
+\begin{document}
+
+\setlength{\columnsep}{0.25cm}
+
+\begin{multicols*}{3}
+
+    \begin{itemize}[left=0pt]
+        \item $\mathcal{N}(\vec{x}; \vec{\mu}, \mat{\Sigma}) \doteq (2\pi)^{-\nicefrac{n}{2}}
+                  \det{\mat{\Sigma}}^{-\nicefrac{1}{2}} \exp \lft( -\frac{1}{2}\transpose{(\vec{x} - \vec{\mu})}
+                  \inv{\mat{\Sigma}}(\vec{x} - \vec{\mu}) \rgt)$.
+
+        \item If $\begin{bmatrix} \vec{x}_1 \\ \vec{x}_2 \end{bmatrix} \sim \mathcal{N}\lft( \begin{bmatrix} \vec{\mu}_1 \\ \vec{\mu}_2 \end{bmatrix}, \begin{bmatrix} \mat{\Sigma}_{11} & \mat{\Sigma}_{12} \\ \mat{\Sigma}_{21} & \mat{\Sigma}_{22} \end{bmatrix} \rgt)$.
+              Then: $\vec{x}_2 \mid \vec{x}_1 = \vec{z} \sim \mathcal{N}\lft( \bar{\vec{\mu}}, \bar{\mat{\Sigma}}
+                  \rgt)$, where
+              \begin{align*}
+                  \bar{\vec{\mu}}    & = \vec{\mu}_2 + \mat{\Sigma}_{21} \inv{\mat{\Sigma}_{11}} (\vec{z} - \vec{\mu}_1)  \\
+                  \bar{\mat{\Sigma}} & = \mat{\Sigma}_{22} - \mat{\Sigma}_{21} \inv{\mat{\Sigma}_{11}} \mat{\Sigma}_{12}.
+              \end{align*}
+
+        \item Gaussians KL: $D_{\mathrm{KL}} = \frac{1}{2} [ \log
+                      \nicefrac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \mathrm{tr}(\inv{\mat{\Sigma}_2}
+                      \mat{\Sigma}_1) + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 -
+                      \vec{\mu}_1) ]$.
+
+        \item Gaussian entropy: $H = \frac{d}{2} \log(2\pi e) + \frac{1}{2} \log \det{\mat{\Sigma}}$.
+
+        \item Projection: $\mathrm{proj}_{\vec{b}} (\vec{a}) = \frac{\transpose{\vec{a}} \vec{b}}{\| \vec{b}
+                      \|^2} \vec{b}$.
+
+        \item Bayes.\ has 3 steps: (1) def.\ prior, (2) def.\ likelihood, and (3) Bayes rule to compute
+              posterior.
+    \end{itemize}
+
+    \begin{topic}{Paradigms of data science}
+        Frequentism (optimize likelihood, MLE): $\vec{\theta}^\star \in \argmax_{\vec{\theta} \in \Theta} \sum_{i=1}^{n} \log p(\vec{x}_i \mid \vec{\theta})$.
+
+        Bayesianism (optimize posterior, MAP): $\vec{\theta}^\star \in \argmax_{\vec{\theta} \in \Theta}
+            \log p(\vec{\theta}) + \sum_{i=1}^{n} \log p(\vec{x}_i \vec{\theta})$.
+
+        Statistical learning (optimize risk): \\ $f^\star \in \argmax_{f \in \mathcal{F}} \mathcal{R}(f)
+            \doteq \E_{X,Y}[\ell(Y, f(X))]$ \\ $\hat{f}_n \in \argmax_{f \in \mathcal{F}}
+            \hat{\mathcal{R}}_n(f) \doteq \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f(\vec{x}_i))$.
+    \end{topic}
+
+    \begin{topic}{Anomaly detection}
+        Objects $\mathcal{X} \subseteq \R^d$ with normal class $\mathcal{N} \subseteq \mathcal{X}$.
+        Construct $\phi: \mathcal{X} \to \{ 0,1 \}$ such that $\phi(\vec{x}) =
+            \mathbb{1}\{\vec{x} \not\in \mathcal{N}\}$. Anomaly is an ``unlikely event'' $\Rightarrow$
+        Fit distribution to $\mathcal{X}$ and score according to $p(\vec{x})$.
+
+        \begin{subtopic}{PCA}
+            Proj.\ $\mathcal{X}$ to low-dim.\ $\Rightarrow$ $\Pi(\mathcal{N})$ is simpler.
+
+            Linearly project $\R^d$ to $\R^{d^-}$ such that maximum variance is preserved. Base case $d^- = 1$:
+            Find $\vec{u}$ with $\| \vec{u} \| = 1$ s.t.\ $\vec{x} \mapsto \transpose{\vec{u}} \vec{x}$. Sample
+            mean and variance of reduced dataset: $\E[\transpose{\vec{u}} \vec{x}] = \transpose{\vec{u}}
+                \E[\vec{x}]$ and $\Var[\transpose{\vec{u}} \vec{x}] = \transpose{\vec{u}} \mathrm{Cov}(\vec{x})
+                \vec{u}$. We want maximum variance so we have: $\vec{u}^\star \in \argmax_{\| \vec{u} \|=1}
+                \transpose{\vec{u}} \mathrm{Cov}(\vec{x}) \vec{u}$. Solvable by $\pdv{\mathcal{L}}{\vec{u}}
+                \overset{!}{=} \vec{0}$. Easy to find that $\vec{u}^\star$ is eigenvector with maximum eigenvalue.
+            Then project it out ($\mathcal{X}_1 = \{ \vec{x} - \mathrm{proj}_{\vec{u}_1}(\vec{x}) \} = \{
+                \vec{x} - \transpose{\vec{u}_1} \vec{x} \cdot \vec{u}_1 \}$) and do the same for next dimension
+
+        \end{subtopic}
+
+        \begin{subtopic}{GMM}
+            Lin.\ proj.\ onto low-dim.\ spaces resemble Gaussian dist.\ $\Rightarrow$ Fit
+            GMM to $\Pi(\mathcal{X})$.
+
+            Fit $p(\vec{x}; \vec{\theta}) = \sum_{j=1}^{k} \pi_j \mathcal{N}(\vec{x}; \vec{\mu}_j,
+                \mat{\Sigma}_j)$ to data with EM algorithm. Can derive $\log p(\mat{X}; \vec{\theta}) = M(q,
+                \vec{\theta}) + \E(q, \vec{\theta})$, where $M(q, \vec{\theta}) \doteq \E_q [\log
+                    \nicefrac{p(\mat{X},z; \vec{\theta})}{q(z)}]$ and $E(q, \vec{\theta}) \doteq \E_q [\log
+                    \nicefrac{q(z)}{p(z \mid \mat{X}; \vec{\theta})}]$. Properties: $\log p(\mat{X}; \vec{\theta}) \geq
+                M(q, \vec{\theta})$ and $\log p(\mat{X}; \vec{\theta}) = M(q^\star, \vec{\theta})$ where $q^\star =
+                p(\cdot \mid \mat{X}; \vec{\theta})$. Alg.: Iteratively $q^\star \in \argmin_q E(q,
+                \vec{\theta}_{t-1})$ and $\vec{\theta}_t \in \argmax_{\vec{\theta}} M(q^\star, \vec{\theta})$.
+            These can be done in closed form for GMM.
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Density estimation}
+        MLE properties: (1) \textit{Consistency}: $\lim_{n\to\infty} \hat{\theta}^{\mathrm{MLE}}_n =
+            \vec{\theta}$; (2) \textit{Equivariance}: If $\hat{\vec{\theta}}$ is the MLE of $\vec{\theta}$,
+        then $g(\hat{\vec{\theta}})$ is the MLE of $g(\vec{\theta})$; (3) \textit{Asymptotically normal}:
+        In the limit of $n$, $\nicefrac{\hat{\vec{\theta}} - \vec{\theta}}{\sqrt{n}}$ converges to
+        $\mathcal{N}(\vec{0}, \inv{\mathcal{I}(\vec{\theta})})$; (4) \textit{Asymptotically efficient}: In
+        the limit of $n$, MLE has smallest variance among unbiased estimators.
+
+        Rao-Cram\'er bound: For any unbiased estimator, \[
+            \Var[\hat{\theta}(\vec{y})] \geq \frac{(\pdv*{b_{\hat{\theta}}}{\theta} + 1)^2}{\mathcal{I}_n(\theta)} + b^2_{\hat{\theta}},
+        \]
+        where $\mathcal{I}_n(\theta) \doteq \E_{\vec{y} \mid \theta}[(\pdv*{\log p(\vec{y} \mid
+                    \theta)}{\theta})^2]$ and $b_{\hat{\theta}} \doteq \E_{\vec{y}\mid \theta}[\hat{\theta}(\vec{y})] -
+            \theta$. If unbiased: $\Var[\hat{\theta}(\vec{y})] \geq \nicefrac{1}{\mathcal{I}_n(\theta)}$. And
+        MLE: $\lim_{n\to \infty} \Var[\hat{\theta}^{\mathrm{MLE}}(\vec{y})] =
+            \nicefrac{1}{\mathcal{I}_n(\theta)}$.
+    \end{topic}
+
+    \begin{topic}{Regression}
+        Minimize loss: $\ell(f) = \frac{1}{n} \sum_{i=1}^{n} (f(\vec{x}_i) - y_i)^2$.
+
+        \begin{subtopic}{Linear regression}
+            Assume $Y \mid \vec{X} = \vec{x} \sim \mathcal{N}(\transpose{\vec{\beta}_\star} \vec{x},
+                \sigma^2)$. We parameterize $f(\vec{x}; \vec{\beta}) = \transpose{\vec{\beta}} \vec{x}$.
+
+            Ordinary least squares estimator: \[
+                \hat{\vec{\beta}} = \inv{(\transpose{\mat{X}} \mat{X})} \transpose{\mat{X}} \vec{y}, \quad \mat{X} \in \R^{n \times d}, \vec{y} \in \R^n.
+            \]
+
+            Potential problems:
+            \begin{enumerate}[left=0pt]
+                \item Remove outliers, because linear models are heavily influenced by them;
+                \item Standardize data, because features on different scales result in unstable matrix inversion;
+                \item ``Curse of dimensionality'': In high dimensionality, logistic regression
+                      outputs overconfident outputs, due to overestimation of weights;
+                \item Collinear features result in unstable matrix inversion due to small eigenvalues.
+            \end{enumerate}
+
+            Risk decomposition: $\E[(\hat{f}(\vec{X}) - Y)^2] = (\E[\hat{f}(\vec{X})] - \E[y])^2 +
+                \Var[\hat{f}(\vec{X})] + \Var[y]$.
+
+            Gauss-Markov: OLSE is the unique minimum-variance unbiased linear estimator. \textit{Note} that
+            this does not mean it is best, because adding some bias may decrease variance considerably.
+        \end{subtopic}
+
+        \begin{subtopic}{Regularization}
+            Ridge: Gaussian prior $\vec{\beta} \sim \mathcal{N}(\vec{0}, \lambda \mat{I})$. \\
+            LASSO: Laplacian Gaussian $\vec{\beta} \sim \mathrm{Lap}(\vec{0}, \lambda \mat{I})$. \\
+            $\ell_1$ results in sparse weights (better interpretation) and the sign of features remain.
+        \end{subtopic}
+
+        \begin{subtopic}{Polynomial regression}
+            Feature map with all polynomials $\phi(\vec{x})$ and perform lin.\ reg.\ in this space: $\psi(\vec{x}; \vec{\beta}) = \transpose{\vec{\beta}} \phi(\vec{x})$.
+            Problem: Infinitely dimensional $\Rightarrow$ Ill-defined inner product. Solution: Fix by
+            introducing data-dependent scalar, specifically: \[
+                \phi(\vec{x}) = \exp \lft( -\frac{1}{2} \| \vec{x} \|^2 \rgt) \lft[ \frac{\prod_{i=1}^d x_i^{\alpha_i}}{\sqrt{\prod_{i=1}^d \alpha_i!}} \rgt]_{\vec{\alpha} \in \mathbb{N}^d}.
+            \]
+            This results in the RBF kernel: $\langle \phi(\vec{x}), \phi(\vec{x}') \rangle = \exp (
+                -\nicefrac{\| \vec{x} - \vec{x}' \|^2}{2} )$. Now compute OLSE in this space: $\hat{\vec{\beta}} =
+                \inv{(\transpose{\mat{\Phi}} \mat{\Phi})} \transpose{\mat{\Phi}} \vec{y}, \quad \mat{\Phi} \in
+                \R^{n \times \infty}$. Problem: Cannot compute $\transpose{\mat{\Phi}} \mat{\Phi} \in \R^{\infty
+                    \times \infty}$. Solution: Rewrite OLSE: $\hat{\vec{\beta}} = \transpose{\mat{\Phi}}
+                \inv{(\mat{\Phi} \transpose{\mat{\Phi}})} \vec{y}$. Prediction only contains kernel evaluations:
+            $\psi(\vec{x}) = \transpose{\vec{k}(\vec{x})} \inv{\mat{K}} \vec{y}$. Problem: $\bigo{n^3}$
+            runtime.
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Causality}
+        Causal fallacies where one might conclude $X$ causes $Y$: (1) Reverse causality: $Y$ causes $X$;
+        (2) Third-cause fallacy: $Z$ causes $X$ and $Y$; (3) Bidirectional causation: $X$ causes $Y$ and
+        $Y$ causes $X$.
+
+        Domain shift: Test samples are drawn from different distribution than training set.
+
+        Shortcut learning: Spurious correlation between causal and non-causal features in the training
+        depend on environment. \incfig{anti-causal-graph} \incfig{d-separation} Necessary conditions for
+        counterfactual invariance: Anti-causal: $f(\mat{X}) \perp \mat{W} \mid Y$. Causal without selection
+        (but possibly confounded): $f(\mat{X}) \perp \mat{W}$. Causal without confounded (but possibly
+        selection): $f(\mat{X}) \perp \mat{W} \mid Y$ as long as $\mat{X} \perp Y \mid
+            \mat{X}_{\mat{W}^{\perp}}, \mat{W}$.
+
+    \end{topic}
+
+    \begin{topic}{Gaussian processes}
+        Outputs are modeled as $\vec{y} = \mat{X} \vec{\beta} + \vec{\epsilon}, \vec{\epsilon} \sim
+            \mathcal{N}(\vec{0}, \mat{I})$. Thus: $\vec{y} \mid \mat{X}, \vec{\beta} \sim
+            \mathcal{N}\lft(\mat{X} \vec{\beta}, \sigma^2 \mat{I}\rgt)$. BLR extends linear reg.\ with prior on
+        $\vec{\beta}$: $\vec{\beta} \sim \mathcal{N}\lft(\vec{0}, \inv{\mat{\Lambda}}\rgt)$.
+
+        Posterior: $\vec{\beta} \mid \mat{X}, \vec{y} \sim \mathcal{N}(\tilde{\vec{\mu}},
+            \tilde{\mat{\Sigma}})$, where \[
+            \tilde{\vec{\mu}} = -\frac{1}{\sigma^2} \tilde{\mat{\Sigma}} \transpose{\mat{X}} \vec{y}, \quad \tilde{\mat{\Sigma}} = \sigma^2 \inv{\lft( \transpose{\mat{X}} \mat{X} + \sigma^2 \mat{\Lambda} \rgt)}.
+        \]
+        Joint distribution over outputs (using prior): \[
+            \vec{y} \mid \mat{X} \sim \mathcal{N}\lft(\vec{0}, \mat{X}\inv{\mat{\Lambda}} \transpose{\mat{X}} + \sigma^2 \mat{I}\rgt).
+        \]
+        Prediction: $y^\star \mid \vec{x}^\star, \mat{X}, \vec{y} \sim \mathcal{N} \lft( \vec{\mu}^\star,
+            \mat{\Sigma}^\star \rgt)$, where
+        \begin{align*}
+            \vec{\mu}^\star    & = \transpose{\vec{k}} \inv{(\mat{K} + \sigma^2 \mat{I})} \vec{y}      \\
+            \mat{\Sigma}^\star & = k - \transpose{\vec{k}} \inv{(\mat{K} + \sigma^2 \mat{I})} \vec{k}.
+        \end{align*}
+        Problem: $\bigo{n^3}$ runtime.
+
+        \begin{subtopic}{Kernels}
+            \textit{Linear kernel}: $k(\vec{x}, \vec{x}') = \transpose{\vec{x}} \vec{x}'$;
+            \textit{Polynomial kernel}: $k(\vec{x}, \vec{x}') = ( \transpose{\vec{x}} \vec{x}' + 1 )^p$;
+            \textit{RBF kernel}: $k(\vec{x},\vec{x}') = \exp ( -\nicefrac{\| \vec{x} - \vec{x}' \|^2}{\ell^2})$;
+            \textit{Sigmoid kernel}: $\tanh(\kappa \transpose{\vec{x}} \vec{x}') - b$.
+
+            If $k_1$ and $k_2$ are valid kernels and $c > 0$, then the following are: $k_1 + k_2$, $k_1 \cdot
+                k_2$, $c \cdot k_1$, and $\exp \circ k_1$.
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Uncertainty quantification}
+        \begin{subtopic}{Statistical model validation}
+            Methods to evaluate $\hat{f}$ (or algorithm $\mathcal{A}$) that is trained on data
+            $\mathcal{Z}$:
+            \begin{itemize}[left=0pt]
+                \item Cross-validation: Partition $\mathcal{Z} = \bigcup_{k=1}^K \mathcal{Z}_k$ and produce $K$
+                      estimators $\hat{f}^{-k}$ from $\mathcal{Z} \backslash \mathcal{Z}_k$. Then estimate risk by \[
+                          \mathcal{R}^{\mathrm{CV}}(\mathcal{A}) = \frac{1}{n} \sum_{i=1}^{n} \ell(y_i \hat{f}^{-k(i)}(\vec{x}_i)),
+                      \]
+                      where $k$ maps $i$ to the partition such that $\vec{x}_i \in \mathcal{Z}_{k(i)}$;
+                \item Bootstrap: Used for measuring dist.\ over stat.\ params. Draw $B$ bootstrap samples $\Rightarrow$
+                      Compute parameter for each $\Rightarrow$ Compute statistics. Can also use for empirical risk: \[
+                          \hat{\mathcal{R}}^{\mathrm{BS}}(\mathcal{A}) \doteq \frac{1}{n\cdot B} \sum_{b=1}^{B} \sum_{i=1}^{n} \ell(y_i, \hat{f}^{*b}(\vec{x}_i)).
+                      \]
+                      Problem: Overly optimistic. Solution: \[
+                          \mathcal{R}^{\mathrm{BS}}(\mathcal{A}) \doteq \frac{1}{n} \sum_{i=1}^{n} \frac{1}{|\mathcal{C}^{-i}|} \sum_{b \in \mathcal{C}^{-i}} \ell(y_i, \hat{f}^{*b}(\vec{x}_i)).
+                      \]
+                      Correct for optimism of $\hat{\mathcal{R}}^{\mathrm{BS}}$ by combining with
+                      $\mathcal{R}^{\mathrm{BS}}$: $\mathcal{R}^{(0.632)} = 0.368 \hat{\mathcal{R}}^{\mathrm{BS}} + 0.632
+                          \mathcal{R}^{\mathrm{BS}}$. $0.632$ is the prob.\ that a sample appears at least once in a
+                      bootstrap sample of size $n$.
+            \end{itemize}
+
+        \end{subtopic}
+
+        \begin{subtopic}{Uncertainty in linear models}
+            OLSE has distribution over estimators: $\hat{\vec{\beta}} \sim \mathcal{N}(\vec{\beta}^\star, \sigma^2 \inv{(\transpose{\mat{X}} \mat{X})})$.
+            Unbiased estimator of $\sigma^2$: $\hat{\sigma}^2 = \frac{1}{n-d} \sum_{i=1}^{n}
+                (\transpose{\hat{\vec{\beta}}} \vec{x}_i - y_i)$. Then we have $1-\alpha$ confidence interval for
+            $\beta_j^\star$: \[
+                \hat{\beta}_j \pm z_{\nicefrac{\alpha}{2}} \epsilon(\hat{\beta}_j),
+            \]
+            where $z_{\nicefrac{\alpha}{2}} = \inv{\Phi}(\nicefrac{\alpha}{2})$, $\Phi$ is standard Gaussian
+            CFG, and $\epsilon(\hat{\beta}_j)$ is $j$-th diagonal of $\hat{\sigma}^2 \inv{(\transpose{\mat{X}}
+                    \mat{X})}$.
+
+        \end{subtopic}
+
+        \begin{subtopic}{Statistical testing}
+            Null hypothesis: $H_0: \theta^\star \in \Theta$. Alternative hypothesis $H_1: \theta^\star \in
+                \Theta$. We are given $n$ samples $x_1, \ldots, x_n \sim p(\cdot \mid \theta^\star)$ and a test
+            statistic $t: \mathcal{X}^n \to \R$. The goal is to find a critical value $c \in \R$ such that
+            $\mathbb{P}(t(X_1,\ldots,X_n) \geq c \mid \theta)$ is low when $\theta \in \Theta_0$ and high when
+            $\theta \in \Theta_1$.
+
+            We want to minimize the prob.\ of choosing $H_1$ when $H_0$ holds (worst possible situation). We
+            quantify this notion of risk as $\alpha_c \doteq \sup_{\theta \in \Theta_0} \mathbb{P}(t(x_1,
+                \ldots, x_n) \geq c \mid \theta)$. Problem: $\alpha_c \to 0$ as $c \to \infty$, so $c^\star \to
+                \infty$ minimizes the risk, but then we never accept $H_1$. Solution: Run test on realization
+            $t(x_1, \ldots, x_n)$ and compute risk of least risky critical value that would incorrectly reject
+            $H_0$: $p = \inf_{c \in \R} \{ \alpha_c \mid t(x_1, \ldots, x_n) \geq c \}$.
+
+            This is the $p$-value: \\ $p \doteq \sup_{\theta \in \Theta_0} \mathbb{P}(t(X_1, \ldots, X_n) \geq
+                t(x_1, \ldots, x_n) \mid \theta)$. Intuition: Inverse prob.\ of $x_{1:n}$ being an outlier.
+
+            \textit{Wald test}: $W = \nicefrac{(\hat{\theta} - \theta_0)^2}{\hat{\sigma}^2}$, where
+            $H_0: \theta = \theta_0$ and $H_1: \theta \neq \theta_0$.
+        \end{subtopic}
+
+        \begin{subtopic}{Bayesian neural networks}
+            (S)GD only yields single point estimate of weights $\Rightarrow$ Define prior
+            $\vec{\theta} \sim \mathcal{N}(\vec{0}, \sigma^2 \mat{I})$ and likelihood $p(\mathcal{Z}
+                \mid \vec{\theta}) = \prod_{\vec{x},y \in \mathcal{Z}} p(y \mid \vec{x}, \vec{\theta})$
+            $\Rightarrow$ Posterior with Bayes rule. Problem: $p(\mathcal{Z})$ is intractable.
+            Solution: Variational inference with isotropic Gaussians and find
+            \begin{align*}
+                q^\star & \in \argmin_{\vec{\mu}, \sigma > 0} D_{\mathrm{KL}} (\mathcal{N}(\vec{\mu}, \sigma^2 \mat{I}) \;\|\; p(\vec{\theta} \mid \mathcal{Z})) \\
+                        & = \argmin_{\vec{\mu}, \sigma > 0} \E_{\vec{\theta} \sim \mathcal{N}} [\log \mathcal{N}(\vec{\theta}; \vec{\mu}, \sigma^2 \mat{I})      \\
+                        & \quad \quad \quad - \log p(\mathcal{Z} \mid \vec{\theta}) - \log p(\vec{\theta})].
+            \end{align*}
+            Let $F(\vec{\mu}, \sigma, \vec{\theta}) = \log \mathcal{N}(\vec{\theta}; \vec{\mu}, \sigma^2 \mat{I}) - \log p(\mathcal{Z} \mid \vec{\theta}) - \log p(\vec{\theta})$. Then, we can apply SGD with the following gradients:
+            \begin{align*}
+                \grad{}{\vec{\mu}} & = \E_{\vec{\epsilon}} [\grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\theta}} + \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\mu}}]                           \\
+                \grad{}{\sigma}    & = \E_{\vec{\epsilon}} [\transpose{\vec{\epsilon}} \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\vec{\theta}}] + \grad{F(\vec{\mu}, \sigma, \vec{\theta})}{\sigma}],
+            \end{align*}
+            where $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$ and $\vec{\theta} = \vec{\mu} + \sigma \vec{\epsilon}$.
+
+        \end{subtopic}
+
+        \begin{subtopic}{Information-based transductive learning}
+            We are given domain $\mathcal{X}$ that contains safe area $\mathcal{S} \subseteq \mathcal{X}$ and
+            area of interest $\mathcal{A} \subseteq \mathcal{X}$. We have an unknown $f^\star$ that we want to
+            explore within $\mathcal{A}$, but we can only query (noisy) observations in $\mathcal{S}$: \[
+                y_{\vec{x}} = f^\star(\vec{x}) + \epsilon_{\vec{x}}, \quad \E_{\epsilon_{\vec{x}}} = 0.
+            \]
+            We are given a history of points $\mathcal{D}_{n-1}$ and need to compute which point will give the
+            most additional information. ITL selects the next point as: \[
+                \vec{x}_n \in \argmax_{\vec{x} \in \mathcal{S}} \mathrm{I}(\vec{f}_{\mathcal{A}}; y_{\vec{x}} \mid \mathcal{D}_{n-1}).
+            \]
+            If $f \sim \mathrm{GP}(\mu, k)$, then \[
+                \mathrm{I}(\vec{f}_{\mathcal{A}}; y_{\vec{x}} \mid \mathcal{D}_{n-1}) = \frac{1}{2} \log \frac{\Var[y_{\vec{x}} \mid \mathcal{D}_{n-1}]}{\Var[y_{\vec{x}} \mid \vec{f}_{\mathcal{A}}, \mathcal{D}_{n-1}]}.
+            \]
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Convex optimization and SVMs}
+        \begin{align*}
+            \text{minimize}   & \quad f(\vec{x})                                    \\
+            \text{subject to} & \quad g_i(\vec{x}) = 0, \quad \forall i \in [n]     \\
+                              & \quad h_j(\vec{x}) \leq 0, \quad \forall j \in [m],
+        \end{align*}
+        where $f$ and $h_j$ are convex and $g_i$ are affine.
+
+        Lagrangian: $\mathcal{L}(\vec{x}, \vec{\lambda}, \vec{\alpha}) \doteq f(\vec{x}) + \sum_{i=1}^{n}
+            \lambda_i g_i(\vec{x}) + \sum_{j=1}^{m} \alpha_j h_j(\vec{x})$. Lagrange dual function:
+        $\theta(\vec{\lambda}, \vec{\alpha}) \doteq \inf_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x},
+            \vec{\lambda}, \vec{\alpha})$.
+
+        Weak duality: Let $\vec{x} \in \mathcal{C}$, $\vec{\alpha} \geq \vec{0}$, then
+        $\theta(\vec{\lambda}, \vec{\alpha}) \leq f(\vec{x})$. Thus: $\max_{\vec{\lambda}, \vec{\alpha}
+                \geq \vec{0}} \theta(\vec{\lambda}, \vec{\alpha}) \leq \min_{\vec{x} \in \mathcal{C}} f(\vec{x})$.
+
+        If there is a Slater point (exists $\vec{x} \in \mathcal{C}$ such that $h_j(\vec{x}) < 0$ for all
+        $j$) then strong duality: $\max_{\vec{\lambda}, \vec{\alpha} \geq \vec{0}} \theta(\vec{\lambda},
+            \vec{\alpha}) = \min_{\vec{x} \in \mathcal{C}} f(\vec{x})$.
+
+        If all $g_i$ and $h_j$ are differentiable, KKT conditions provide necessary (and sufficient for
+        convex programming) conditions for strong duality:
+        \begin{align*}
+            \alpha_j^\star h_j(\vec{x}^\star)                                                   & = 0, \quad \forall j \in [m] \\
+            \grad{\mathcal{L}(\vec{x}^\star, \vec{\lambda}^\star, \vec{\alpha}^\star)}{\vec{x}} & = \vec{0}.
+        \end{align*}
+        Or, condition 2: $\vec{x}^\star \in \argmin_{\vec{x} \in \mathcal{X}} \mathcal{L}(\vec{x}, \vec{\lambda}^\star, \vec{\alpha}^\star)$.
+
+        \begin{subtopic}{Support vector machine}
+            We want to linearly separate a dataset with maximum margin $\Rightarrow$ Model as convex program
+            with constraint for each data point: $f[\vec{w},b](\vec{x},y) = y (\transpose{\vec{w}}\vec{x} + b) \geq \epsilon > 0$.
+
+            Margin ($\vec{x}^+$ and $\vec{x}^-$ are support vectors):
+            \begin{align*}
+                2 \cdot m(\vec{w},b) & = \| \mathrm{proj}_{\vec{w}}(\vec{x}^+) - \mathrm{proj}_{\vec{w}}(\vec{x}^-) \| \\
+                                     & = |\transpose{\bar{\vec{w}}} (\vec{x}^+ - \vec{x}^-)|.
+            \end{align*}
+            Ill-posed problem because infinite number of solutions $\Rightarrow$ Only one solution satisfies \[
+                \transpose{\vec{w}} \vec{x}^+ +b = 1, \quad \transpose{\vec{w}} \vec{x}^- + b = -1.
+            \]
+            Then, $m(\vec{w},b) = \nicefrac{1}{\| \vec{w} \|}$.
+            \begin{align*}
+                \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2                                                     \\
+                \text{subject to} & \quad 1 - y_i \lft( \transpose{\vec{w}}\vec{x}_i + b \rgt) \leq 0, \forall i \in [n].
+            \end{align*}
+            $\vec{w}^\star = \sum_{i=1}^{n} \alpha^\star_i y_i \vec{x}_i$, $b^\star = -\frac{1}{2} \lft( \transpose{\vec{w}_{\star}} \vec{x}^+ + \transpose{\vec{w}_{\star}} \vec{x}^- \rgt)$,
+            where $\vec{\alpha}^\star$ is the dual solution.
+
+        \end{subtopic}
+
+        \begin{subtopic}{SVM variations}
+            Soft-margin introduces slackness in case data is not linearly separable:
+            \begin{align*}
+                \text{minimize}   & \quad \frac{1}{2} \| \vec{w} \|^2 + C \sum_{i=1}^{n} \xi_i                                \\
+                \text{subject to} & \quad y_i \lft(\transpose{\vec{w}} \vec{x}_i +b \rgt) \geq 1 - \xi_i, \quad \xi_i \geq 0.
+            \end{align*}
+            Optimal slackness parameters: \[
+                \xi_i^\star = \max \lft\{ 0, 1 - y_i \lft(\transpose{\vec{w}_{\star}} \vec{x}_i + b^\star\rgt) \rgt\}.
+            \]
+
+            If data is not linearly separable, use features and their kernels: $\transpose{\vec{w}_{\star}}
+                \phi(\vec{x}) = \sum_{i=1}^{n} \alpha_i^\star y_i k(\vec{x}_i, \vec{x})$.
+
+            We can generalize the margin notion to multi-class by introducing weights $\vec{w}_z$ per class.
+            The margin is defined as the maximum $m \in \R$ s.t.\ \[
+                m \leq \lft( \transpose{\vec{w}_{z_i}} \vec{y}_i + b_{z_i} \rgt) - \max_{z \neq z_i} \lft\{ \transpose{\vec{w}_z} \vec{y}_i + b_z \rgt\}.
+            \]
+            New optimization problem:
+            \begin{align*}
+                \text{min}  & \quad \frac{1}{2} \| \vec{w} \|^2 = \frac{1}{2} \sum_{z=1}^{k} \| \vec{w}_z \|^2                                                                \\
+                \text{s.t.} & \quad \lft( \transpose{\vec{w}_{z_i}} \vec{y}_i + b_{z_i} \rgt) - \max_{z \neq z_i} \lft\{ \transpose{\vec{w}_z} \vec{y}_i + b_z \rgt\} \geq 1.
+            \end{align*}
+
+            Structural SVMs can have infinitely many classes. So, we need to define a joint feature map $\psi$
+            such that $f_{\vec{w}}(\vec{x}, \vec{y}) = \transpose{\vec{w}} \psi(\vec{x}, \vec{y})$. This is
+            used to perform classification: $c(\vec{x}) = \argmax_{\vec{y} \in \mathcal{Y}}
+                f_{\vec{w}}(\vec{x}, \vec{y})$.
+
+            We need to construct an algorithm to efficiently compute this argmax and an algorithm to compute
+            the max in the below optimization problem. Some structures are closer than others $\Rightarrow$
+            Introduce a loss function $\Delta$:
+            \begin{align*}
+                \text{min} & \quad \frac{1}{2} \| \vec{w} \|^2 \quad \text{s.t.} \quad \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}_i)                               \\
+                           & \quad  - \max_{\vec{y} \neq \vec{y}_i} \lft\{ \transpose{\vec{w}} \psi(\vec{x}_i, \vec{y}) + \Delta(\vec{y}, \vec{y}_i) \rgt\} \geq 0.
+            \end{align*}
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Ensembles}
+        If we average $B$ estimators into $\hat{f}$, it has
+        \begin{gather*}
+            \mathrm{bias}(\hat{f}) = \frac{1}{B} \sum_{b=1}^{B} \mathrm{bias}(\hat{f}_b)                                                                                     \\
+            \Var[\hat{f}]          = \frac{1}{B^2} \sum_{b=1}^{B} \Var[\hat{f}_b] + \frac{1}{B^2} \sum_{b=1}^{B} \sum_{b' \neq b}^{B} \mathrm{Cov}(\hat{f}_b, \hat{f}_{b'}).
+        \end{gather*}
+        If the covariances are low, the variance is significantly decreased while the bias remains the same.
+
+        \begin{subtopic}{Bagging}
+            $B$ times take a bootstrap sample and train a classifier. This works well because
+            covariances are small due to using different subsets for training and the variances are
+            similar because each subsample behaves similarly on average.
+
+            Random forests do this with (very deep) decision trees. Very deep because they have low bias and
+            high variance, which is reduced by ensembling.
+
+        \end{subtopic}
+
+        \begin{subtopic}{AdaBoost}
+            AdaBoost reduces covariance by using a different weighting for each estimator. The weights are
+            determined by the error of previous classifiers.
+            \begin{align*}
+                w_i^{(b+1)} & = w_i^{(b)} \exp(\alpha_b \mathbb{1}\{ c_b(\vec{x}_i) \neq y_i \})                                   \\
+                \alpha_b    & = \log \lft( \nicefrac{1-\epsilon_b}{\epsilon_b} \rgt)                                               \\
+                \epsilon_b  & = \sum_{i=1}^{n} \frac{w_i^{(b)}}{\sum_{j=1}^{n} w_j^{(b)}} \mathbb{1}\{ c_b(\vec{x}_i) \neq y_i \}.
+            \end{align*}
+            Final classifier: $\hat{c}(\vec{x}) = \mathrm{sgn}(\sum_{b=1}^{B} \alpha_b c_b(\vec{x}))$.
+
+            It can be shown that AdaBoost fits an additive model in base learners optimizing the exponential
+            loss $\E[\exp(-yf(\vec{x}))]$ via Newton-like updates.
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Stable diffusion}
+
+        \begin{subtopic}{Diffusion models}
+            Iteratively denoise. Continuous:
+            \begin{align*}
+                \mathrm{d}\vec{x}^+_t & = \vec{\mu}(\vec{x}_t, t) \mathrm{d}t + \sigma(\vec{x}_t, t) \mathrm{d}\omega_t                                \\
+                \mathrm{d}\vec{x}^-_t & = \lft[ \vec{\mu}(\vec{x}_t, t) - \sigma^2(\vec{x}_t, t) \grad{\log p_t(\vec{x}_t)}{\vec{x}} \rgt] \mathrm{d}t \\
+                                      & \quad \quad + \sigma(\vec{x}_t, t) \mathrm{d}\bar{\omega}_t.
+            \end{align*}
+
+            DDPM scheduler: $\vec{x}_{t+1} = \sqrt{1-\beta_t} \vec{x}_t + \sqrt{\beta_t} \vec{\epsilon}, \quad
+                \vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$. Backward process: $\vec{x}_{t-1} =
+                \frac{1}{\sqrt{\alpha_t}} \lft( \vec{x}_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}}
+                \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \rgt) + \sqrt{\beta_t} \vec{z}$, where $\alpha_t =
+                1-\beta_t$ and $\bar{\alpha}_t = \prod_{\tau=1}^t \alpha_t$.
+
+            Diffusion models are trained by sampling $\vec{x}_0 \sim p_0$, $t \sim \mathrm{Unif}(\{ 1, \ldots,
+                T \})$, $\vec{\epsilon} \sim \mathcal{N}(\vec{0}, \mat{I})$ and performing gradient step on $\ell =
+                \| \vec{\epsilon} - \vec{\epsilon}_{\vec{\theta}}(\vec{x}_t, t) \|^2$.
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Non-parametric Bayesian methods}
+        Beta distribution ($x \in [0,1]$, $\alpha,\beta > 0$): $\mathrm{Beta}(x; \alpha, \beta) \propto
+            x^{\alpha-1} (1-x)^{\beta-1}$. Dirichlet generalizes ($\vec{x} \in \Delta^{n-1}$):
+        $\mathrm{Dir}(\vec{x}; \vec{\alpha}) \propto \prod_{k=1}^n x_k^{\alpha_k - 1}$.
+
+        Problem: Need to know $K$ (\#clusters) beforehand.
+
+        A Dirichlet process $\mathrm{DP}(\alpha, H)$ is a distribution over probability distributions on a
+        space $\Theta$, where $\alpha$ is a concentration parameter. A sample $G \sim \mathrm{DP}(\alpha,
+            H)$ is a function $G: \Theta \to \R_{\geq 0}$ such that $\int_{\Theta} G(\theta)\mathrm{d}\theta =
+            1$. For every partition $(T_1, \ldots, T_k)$ of $\Theta$ and $G \sim \mathrm{DP}(\alpha, H)$, we
+        have \[
+            (G(T_1), ., G(T_k)) \sim \mathrm{Dir}(\alpha H(T_1), ., \alpha H(T_k)).
+        \]
+        Dir can be sampled recursively by stick-breaking:
+        \begin{gather*}
+            \beta_i \sim \mathrm{beta}\lft( \alpha_i, \prod_{k=i+1}^K \alpha_k \rgt), \quad \rho_i = \beta_i \prod_{j=1}^{i-1} (1-\beta_j) \\
+            (\rho_{i+1}, \ldots, \rho_K) \sim \mathrm{Dir}(\alpha_{i+1}, \ldots, \alpha_K).
+        \end{gather*}
+        Still limited to fixed $K$. GEM distribution fixes this by fixing $\alpha$ such that
+        $\beta_i \sim \mathrm{Beta}(1, \alpha)$ for all $i$. Recursion:
+        \begin{gather*}
+            \beta_i \sim \mathrm{Beta}(1, \alpha)                     \\
+            \rho_i = \beta_i \prod_{j=1}^{i-1} (1-\beta_j), \quad \rho_K = \beta_k \lft( 1- \sum_{i=1}^{K-1} \rho_i \rgt).
+        \end{gather*}
+        Keep sampling cluster probabilities until satisfied.
+
+        If $(\rho_1, \rho_2, \ldots) \sim \mathrm{GEM}(\alpha)$ and $\theta_k \sim H$, then this is sample
+        from $\mathrm{DP}(\alpha, H)$: $G(\theta) = \sum_{k=1}^{\infty} \rho_k \delta_{\theta_k}(\theta)$.
+
+        \begin{subtopic}{Chinese restaurant process}
+            \[
+                P(\text{$n+1$ joins table $\theta$} \mid \mathcal{P}) = \begin{cases}
+                    \frac{|\theta|}{\alpha+n} & \theta \in P \\
+                    \frac{\alpha}{\alpha+n}   & \text{else}.
+                \end{cases}
+            \]
+            Probability of partition $\mathcal{P}$ can be written as \[
+                P(\mathcal{P}) = \alpha^{|\mathcal{P}|} \frac{\alpha!}{(N+\alpha)!} \prod_{\tau \in \mathcal{P}} (|\tau| -1)!.
+            \]
+            Problem is exchangeable. $\E[|\mathcal{P}|] \in \bigo{\alpha \log N}$.
+
+        \end{subtopic}
+
+        \begin{subtopic}{DPMM}
+            Assume $\Theta = \R$ with $\mu \in \Theta$ corresponding to $\mathcal{N}(\mu, \sigma)$ for fixed
+            $\sigma > 0$ and $H = \mathcal{N}(\mu_0, \sigma_0)$ for fixed $\mu_0,\sigma_0$. DPMM: Cluster probs
+            are sampled from GEM: $(\rho_1, \rho_2, \ldots) \sim \mathrm{GEM}(\alpha)$. Cluster centers are
+            sampled from base measure: $\mu_1, \mu_2, \ldots \sim \mathcal{N}(\mu_0, \sigma_0)$. Clusters are
+            assigned: $z_i \sim \mathrm{Cat}(\rho_1, \rho_2, \ldots), \forall i \in [n]$. Data points are
+            sampled: $x_i \sim \mathcal{N}(\mu_{z_i}, \sigma), \forall i \in [n]$. This process is
+            exchangeable. To fit a DPMM, we use a collapsed Gibbs sampling formulation: $p(z_i = k \mid
+                \vec{z}^{-i}, \vec{x}, \alpha, \vec{\mu}) \propto p(z_i = k \mid \vec{z}^{-i}, \alpha) p(x_i \mid
+                \vec{x}^{-i}, z_i=k, \vec{z}^{-i}, \vec{\mu})$. Prior is as in CRP: \[
+                p(z_i = k \mid \vec{z}^{-i}, \alpha) = \begin{cases}
+                    \frac{N_k^{-i}}{\alpha+N-1} & \text{existing $k$} \\
+                    \frac{\alpha}{\alpha+N-1}   & \text{else}.
+                \end{cases}
+            \]
+            Likelihood (right term) is cond.\ on cluster $k$: \[
+                \ell = \begin{cases}
+                    p(x_i \mid \vec{x}_k^{-i}, \vec{\mu}) = \frac{p(x_i, \vec{x}_k^{-i} \mid \vec{\mu})}{p(\vec{x}_k^{-i} \mid \vec{\mu})} & \text{existing $k$} \\
+                    p(x_i \mid \vec{\mu})                                                                                                  & \text{else}.
+                \end{cases}
+            \]
+
+        \end{subtopic}
+
+    \end{topic}
+
+    \begin{topic}{Statistical learning theory}
+
+        \begin{subtopic}{PAC learning}
+            \textit{Definition}: A learning algorithm $\mathcal{A}$ can learn a concept $c \in
+                \mathcal{C}$ if there exists $\mathrm{poly}(\cdot, \cdot, \cdot)$ such that for any
+            distribution $p$ on $\mathcal{X}$ and $\epsilon,\delta \in (0,\nicefrac{1}{2})$, if
+            $\mathcal{A}$ receives a sample of size $n \geq \mathrm{poly}(\nicefrac{1}{\epsilon},
+                \nicefrac{1}{\delta}, \mathrm{size}(c))$, then $\mathcal{A}$ outputs $\hat{c}$ such
+            that \[
+                \mathbb{P}(\mathcal{R}(\hat{c}) \leq \epsilon) \geq 1-\delta.
+            \]
+            This probability is taken over the randomness of $\mathcal{Z}$ and $\mathcal{A}$.
+
+            $\mathcal{C}$ is PAC learnable from $\mathcal{H}$ if there is an $\mathcal{A}$ that can learn any $c \in \mathcal{C}$.
+
+            If $\mathcal{A}$ runs polynomial in only $\nicefrac{1}{\delta}$ and $\nicefrac{1}{\epsilon}$, then
+            $\mathcal{C}$ is efficiently PAC learnable.
+
+            In the stochastic setting, $y$ is also random and not deterministically decided by a concept $c \in
+                \mathcal{C}$. Now the criterium is \[
+                \mathbb{P}_{\mathcal{Z} \sim p}(\mathcal{R}(\hat{c}) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) \leq \epsilon) \geq 1-\delta.
+            \]
+
+        \end{subtopic}
+
+        \begin{subtopic}{Vapnik-Chervonenkis}
+            VC dimension is the cardinality of the largest set of points that $\mathcal{C}$ can shatter.
+
+            \textit{Vapnik and Chervonenkis}: Assume a finite concept class and $\mathcal{R}(c^\star) = 0$ and define
+            $c_n^\star \in \{ c \in \mathcal{C} \mid \hat{\mathcal{R}}_n(c) = 0 \}$. Then, for every $n \in
+                \mathbb{N}$ and $\epsilon > 0$, \[
+                \mathbb{P}(\mathcal{R}(\hat{c}^\star_n) > \epsilon) \leq |\mathcal{C}| \exp(-n \epsilon).
+            \]
+            And: $\E[\mathcal{R}(\hat{c}_n^\star)] \leq \frac{1 + \log |\mathcal{C}|}{n}$.
+
+            \textit{VC inequality}: $\mathbb{P}(\mathcal{R}(\hat{c}_n^\star) - \inf_{c \in \mathcal{C}} \mathcal{R}(c) > \epsilon) \leq \mathbb{P}(\sup_{c \in \mathcal{C}} |\hat{\mathcal{R}}_n(c) - \mathcal{R}(c)| > \frac{\epsilon}{2})$.
+
+            \textit{Hoeffding}: Let $X_i \in [a_i, b_i]$ be i.i.d.\ and $S_n = \sum_{i=1}^{n} X_i$, then for any $t >
+                0$, \[
+                \mathbb{P}(S_n - \E[S_n] \geq t) \leq \exp \lft( -\frac{2t^2}{\sum_{i=1}^{n} (b_i - a_i)^2} \rgt).
+            \]
+            Same bound for $\leq -t$.
+
+            As a result: $\mathbb{P}(\tilde{S}_n - \E[\tilde{S}_n] \geq \epsilon) \leq \exp \lft( -\frac{2n
+                    \epsilon^2}{\sum_{i=1}^{n} \nicefrac{(b_i - a_i)^2}{n}} \rgt)$, where $\tilde{S}_n =
+                \nicefrac{S_n}{n}$.
+
+            Assume $|\mathcal{C}| \leq N$, then for all $\epsilon > 0$, \[
+                \mathbb{P}(\sup_{c \in \mathcal{C}} |\hat{\mathcal{R}}_n(c) - \mathcal{R}(c)| > \epsilon) \leq 2N\exp(-2n \epsilon^2).
+            \]
+
+            We can deal with infinite $|\mathcal{C}|$ by representing hypotheses by the classifications that
+            they yield. Or measuring the VC dimension of $\mathcal{C}$.
+
+        \end{subtopic}
+
+    \end{topic}
+
+\end{multicols*}
+
+\end{document}

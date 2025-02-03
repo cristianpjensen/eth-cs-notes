@@ -93,6 +93,13 @@ jobs:
         latexmk_shell_escape: true
         working_directory: advanced_machine_learning/summary
 
+    - name: Advanced Machine Learning (cheatsheet)
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: main.tex
+        latexmk_shell_escape: true
+        working_directory: advanced_machine_learning/cheatsheet
+
     - name: Deep Learning (summary)
       uses: xu-cheng/latex-action@v3
       with:
@@ -122,6 +129,7 @@ jobs:
         file machine_perception/cheatsheet/main.pdf | grep -q ' PDF '
         file computational_intelligence_lab/summary/main.pdf | grep -q ' PDF '
         file advanced_machine_learning/summary/main.pdf | grep -q ' PDF '
+        file advanced_machine_learning/cheatsheet/main.pdf | grep -q ' PDF '
         file deep_learning/summary/main.pdf | grep -q ' PDF '
         file deep_learning/cheatsheet/main.pdf | grep -q ' PDF '
 
@@ -151,6 +159,7 @@ jobs:
         cp -f machine_perception/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/machine_perception/cheatsheet.pdf"
         cp -f computational_intelligence_lab/summary/main.pdf "$GITHUB_WORKSPACE/deploy/computational_intelligence_lab/summary.pdf"
         cp -f advanced_machine_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning/summary.pdf"
+        cp -f advanced_machine_learning/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/advanced_machine_learning/cheatsheet.pdf"
         cp -f deep_learning/summary/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning/summary.pdf"
         cp -f deep_learning/cheatsheet/main.pdf "$GITHUB_WORKSPACE/deploy/deep_learning/cheatsheet.pdf"
 
