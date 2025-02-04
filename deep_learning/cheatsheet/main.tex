@@ -1,11 +1,11 @@
 \documentclass[10pt]{article}
 
-\usepackage[a4paper, margin=0.25cm]{geometry}
+\usepackage[a4paper, margin=0.5cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{multicol}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,mathrsfs,bbm,mathtools,nicefrac,bm,centernot,colonequals,dsfont}
 \usepackage{derivative}
-\usepackage[skip=.5\baselineskip-0.5pt]{parskip}
+\usepackage[skip=.5\baselineskip-2pt]{parskip}
 \usepackage[mathspacing=normal]{savetrees}
 \usepackage[document]{ragged2e}
 \usepackage{enumitem}
@@ -31,7 +31,7 @@
 {}
 
 \newenvironment{subtopic}[1]
-{\vspace{0.1cm} \begin{center}\textbf{\footnotesize \sffamily #1}\end{center}}
+{\begin{center}\textbf{\footnotesize \sffamily #1}\end{center}}
 {}
 
 \renewcommand{\det}[1]{|#1|}
@@ -39,9 +39,11 @@
 \renewcommand{\vec}[1]{\ensuremath{\mathbold{#1}}}
 \renewcommand{\Var}{\mathbb{V}}
 
+\newcommand{\Break}{\vfill\null\columnbreak}
+
 \begin{document}
 
-\setlength{\columnsep}{0.25cm}
+\setlength{\columnsep}{0.2cm}
 
 \begin{multicols*}{3}
 
@@ -49,7 +51,7 @@
 
     \begin{subtopic}{General}
         \begin{itemize}[left=0pt]
-            \item Cosine theorem: $\| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle$.
+            \item \hl{Cosine theorem: $\| \vec{x}-\vec{y} \|^2 = \| \vec{x} \|^2 + \| \vec{y} \|^2 - 2\langle \vec{x},\vec{y} \rangle$}.
             \item $\frac{1}{\sqrt{d}} \| \vec{x} \|_2 \leq \| \vec{x} \|_{\infty} \leq \| \vec{x} \|_2 \leq \| \vec{x} \|_1 \leq \sqrt{d} \| \vec{x} \|_2$.
             \item Cosine angle: $\cos \angle{(\vec{x},\vec{y})} = \frac{\transpose{\vec{x}} \vec{y}}{\| \vec{x} \| \|
                         \vec{y} \|}$.
@@ -66,7 +68,8 @@
             \item $\mat{M}$ is positive (semi-)definite if $\transpose{\vec{x}} \mat{M} \vec{x} \geq 0$ (PSD) or $\transpose{\vec{x}} \mat{M} \vec{x} > 0$ (PD) for all $\vec{x}$.
             \item $\mathrm{rank}(\mat{A}\mat{B}) \leq \min \{ \mathrm{rank}(\mat{A}), \mathrm{rank}(\mat{B}) \}$. \\
                 If $\mat{A} \in \R^{m \times n}$, then $\mathrm{rank}(\mat{A}) \leq \min \{ m,n \}$.
-            \item $\tanh(z) = 2 \sigma(2z) - 1$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$.
+            \item $\tanh(z) = \nicefrac{\exp(x) - \exp(-x)}{\exp(x) + \exp(-x)}$, $\sigma(z) = \nicefrac{1}{1+\exp(-z)}$, $\mathrm{ReLU}(z) = \begin{cases} z & z \geq 0 \\ 0 & z < 0 \end{cases}$.
+            \item $\tanh(z) = 2 \sigma(2z) - 1$.
             \item $\mathrm{ReLU}(z) = \frac{|z| + z}{2}$, $|z| = \mathrm{ReLU}(z) + \mathrm{ReLU}(-z)$.
             \item $\mathrm{Cov}(\vec{x}) = \E[(\vec{x}-\E[\vec{x}])\transpose{(\vec{x} - \E[\vec{x}])}] = \E[\vec{x}\transpose{\vec{x}}] - \E[\vec{x}] \transpose{\E[\vec{x}]}$.
             \item Integration by part: $\int u\mathrm{d}v = uv - \int v\mathrm{d}u$.
@@ -84,7 +87,7 @@
     \end{subtopic}
 
     \begin{subtopic}{Gradients}
-        \textit{Make sure to always type-check gradients!}
+        \hl{\textit{Make sure to always type-check gradients!}}
         \begin{align*}
             \vec{z} = \transpose{\vec{a}} \vec{x} & \implies \pdv{L}{\vec{x}} = \pdv{L}{\vec{z}} \vec{a} \\
             \vec{z} = \mat{W} \vec{x} & \implies \pdv{L}{\mat{W}} = \pdv{L}{\vec{z}} \transpose{\vec{x}} \\
@@ -121,8 +124,7 @@
         \end{align*}
     \end{subtopic}
 
-    \vfill\null
-    \columnbreak
+    \Break
 
     \begin{subtopic}{Gaussian}
         Definition: \[
@@ -137,26 +139,33 @@
 
         Let $p_1 = \mathcal{N}(\vec{\mu}_1, \mat{\Sigma}_1)$ and $p_2 = \mathcal{N}(\vec{\mu}_2, \mat{\Sigma}_2)$, then
         \begin{align*}
-            H(p_1) & = \frac{d}{2} \log(2\pi e) + \frac{1}{2} \log \det{\mat{\Sigma}_1} \\
-            D_{\mathrm{KL}}(p_1 \;\|\; p_2) & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} \\
-                             & \quad \quad \quad + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
+            H & = \frac{d}{2} \log(2\pi e) + \frac{1}{2} \log \det{\mat{\Sigma}_1} \\
+            D_{\mathrm{KL}} & = \frac{1}{2} \biggl[ \log \frac{\det{\mat{\Sigma}_2}}{\det{\mat{\Sigma}_1}} - d + \tr{\inv{\mat{\Sigma}_2} \mat{\Sigma}_1} + \transpose{(\vec{\mu}_2 - \vec{\mu}_1)} \inv{\mat{\Sigma}_2} (\vec{\mu}_2 - \vec{\mu}_1) \biggr].
         \end{align*}
     \end{subtopic}
 
     \begin{subtopic}{Convexity}
-        \begin{align*}
-            & f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) \\
-            & f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle       \\
-            & \langle \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle \geq 0       \\
-            & \text{$\hess{f(\vec{x})}{}$ is positive semi-definite.}
-        \end{align*}
+        \begin{gather*}
+            f(\lambda \vec{x} + (1-\lambda) \vec{y}) \leq \lambda f(\vec{x}) + (1-\lambda) f(\vec{y}) \\
+            f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle       \\
+            \langle \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle \geq 0       \\
+            \colorbox{yellow}{$\displaystyle \| \hess{f(\vec{x})}{} \|_2 \geq 0$}.
+        \end{gather*}
+    \end{subtopic}
+
+    \begin{subtopic}{Strong convexity}
+        \begin{gather*}
+            f(\vec{y}) \geq f(\vec{x}) + \langle \grad{f(\vec{x})}{}, \vec{y} - \vec{x} \rangle + \frac{\mu}{2} \| \vec{x} - \vec{y} \|^2 \\
+            \colorbox{yellow}{$\displaystyle \| \hess{f(\vec{x})}{} \|_2 \geq \mu$}.
+        \end{gather*}
     \end{subtopic}
 
     \begin{subtopic}{Smoothness}
-        \begin{align*}
-            & \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq L \| \vec{x} - \vec{y} \|                                                 \\
-            & f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2.
-        \end{align*}
+        \begin{gather*}
+            \| \grad{f(\vec{x})}{} - \grad{f(\vec{y})}{} \| \leq L \| \vec{x} - \vec{y} \|                                                 \\
+            f(\vec{x}) \leq f(\vec{y}) + \langle \grad{f(\vec{y})}{}, \vec{x} - \vec{y} \rangle + \frac{L}{2} \| \vec{x} - \vec{y} \|^2 \\
+            \colorbox{yellow}{$\displaystyle \| \hess{f(\vec{x})}{} \|_2 \leq L$}.
+        \end{gather*}
     \end{subtopic}
 
     \begin{topic}{Connectionism}
@@ -189,8 +198,8 @@
             Convergence can be proven by using $\transpose{\vec{w}} \vec{w}_t \geq t \gamma$ and $\| \vec{w}_t
                 \| \leq R \sqrt{t}$, where $\| \vec{w} \| = 1$, $\gamma[\vec{w}](\mathcal{S}) > 0$, and $R =
                 \max_{\vec{x} \in \mathcal{S}} \| \vec{x} \|$. Then, bound $1 \geq \cos\angle{(\vec{w},\vec{w}_t)}
-                = \nicefrac{\transpose{\vec{w}} \vec{w}_t}{\| \vec{w} \| \| \vec{w}_t \|}$. We convergence within
-            $\lfloor \nicefrac{R^2}{\gamma^2} \rfloor$ iterations.
+                = \nicefrac{\transpose{\vec{w}} \vec{w}_t}{\| \vec{w} \| \| \vec{w}_t \|}$. \hl{It converges within
+                $\lfloor \nicefrac{R^2}{\gamma^2} \rfloor$ iterations.}
 
             Number of unique classifications: \[
                 \mathcal{C}(\mathcal{S},d) = \lft| \lft\{ \vec{y} \in \{ -1,+1 \}^n \;\middle|\; \exists \vec{w} : \forall i : y_i (\transpose{\vec{w}}\vec{x}_i) > 0 \rgt\} \rgt|
@@ -222,7 +231,7 @@
                     -1 & \mathrm{otherwise}.
                 \end{cases}
             \]
-            Or: $x_i \gets \mathrm{sgn}(H_i)$, where $H_i \doteq \sum_{j=1}^{d} w_{ij} x_j - b_i$.
+            \hl{Or: $x_i \gets \mathrm{sgn}(H_i)$, where $H_i \doteq \sum_{j=1}^{d} w_{ij} x_j - b_i$.}
 
             Hebbian learning (neurons frequently in the same state reinforce): \[
                 \mat{W} = \frac{1}{d} \lft( \sum_{t=1}^{n} \vec{x}_t \transpose{\vec{x}_t} - \mat{I}_d \rgt).
@@ -231,6 +240,9 @@
                 x_{ti} = \mathrm{sgn}(x_{ti} + C_{ti}), \quad C_{ti} \doteq \frac{1}{d} \sum_{j=1}^{d} \sum_{r\neq t}^{n} x_{ri}x_{rj}x_{tj}.
             \]
             If cross-talk $|C_{ti}| < 1$ for all $i$, then $\vec{x}_t$ is meta-stable.
+
+            If i.i.d.\ random signs, then $C_{ti} \sim \mathcal{N}(0, \nicefrac{n}{d})$. At
+            $\nicefrac{d}{n} \approx 0.138$, ``avalanche of errors'' occurs.
         \end{subtopic}
 
     \end{topic}
@@ -238,9 +250,8 @@
     \begin{topic}{Feedforward networks}
 
         \begin{subtopic}{Regression models}
-            Mean-squared error \[
-                \ell[\vec{\theta}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{n} \lft( f[\vec{\theta}](\vec{x}_i) - y_i \rgt)^2.
-            \]
+            Mean-squared error: $\ell[\vec{\theta}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{n} \lft( f[\vec{\theta}](\vec{x}_i) - y_i \rgt)^2$.
+
             Linear model: $\ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \| \transpose{\mat{X}} \vec{w} - \vec{y}
                 \|^2$ $\to$ Closed form solution: $\vec{w}^\star = \inv{\lft( \transpose{\mat{X}}\mat{X}
                     \rgt)}\transpose{\mat{X}} \vec{y}$.
@@ -249,7 +260,7 @@
             Binary cross-entropy loss: \[
                 \ell[\vec{\theta}](\mathcal{S}) = -\frac{1}{n} \sum_{i=1}^{n} y_i \log \sigma(f[\vec{\theta}](\vec{x}_i)) + (1-y_i)\log(1-f[\vec{\theta}](\vec{x}_i)).
             \] (Multi-class) Cross-entropy loss: \[
-                \ell[\vec{\theta}](\vec{x},y) = -\log \mathrm{softmax}(f[\vec{\theta}](\vec{x}))_y.
+                \ell[\vec{\theta}](\vec{x},y) = -\log \mathrm{softmax}_y(f[\vec{\theta}](\vec{x})).
             \]
         \end{subtopic}
 
@@ -266,10 +277,9 @@
         \end{subtopic}
 
         \begin{subtopic}{Residual networks}
-            Residual layers: \[
-                F[\mat{W},\vec{b}](\vec{x}) = \vec{x} + \phi(\mat{W}\vec{x} + \vec{b}) - \phi(\vec{0}).
-            \]
-            Then, $F[\vec{0}, \vec{0}] = \mathrm{Id}$. This makes it such that the model learns how to
+            Residual layers: $F[\mat{W},\vec{b}](\vec{x}) = \vec{x} + \phi(\mat{W}\vec{x} + \vec{b}) - \phi(\vec{0})$.
+
+            Then: $F[\vec{0}, \vec{0}] = \mathrm{Id}$. This makes it such that the model learns how to
             incrementally learn a better representation, rather than having to learn it at every layer. If
             input and output have different dimensionality, linearly project $\vec{x}$. Using this
             architecture, the depth can be increased significantly, because gradients propagate better.
@@ -303,7 +313,7 @@
             \]
             The number of cells is a proxy for the complexity of a network. Consider a ReLU network with $L$
             layers of $m > n$ width. The number of linear regions is lower bounded by \[
-                R(m,L) \geq R(m) \lfloor \nicefrac{m}{n} \rfloor^{n(L-1)}.
+                \colorbox{yellow}{$\displaystyle R(m,L) \geq R(m) \lfloor \nicefrac{m}{n} \rfloor^{n(L-1)}$}.
             \]
             Thus, complexity is related to depth.
 
@@ -327,16 +337,17 @@
                 \vec{\delta}_{\ell} = \pdv{h(\vec{\theta})}{\vec{h}_{\ell}}.
             \]
             We have a recurrence, \[
-                \vec{\delta}_{\ell} = \transpose{\lft[ \pdv{\vec{h}_{\ell+1}}{\vec{h}_{\ell}} \rgt]} \vec{\delta}_{\ell+1}, \quad \vec{\delta}_L = \pdv{h(\vec{\theta})}{\vec{h}_L}.
+                \colorbox{yellow}{$\displaystyle \vec{\delta}_{\ell} = \vec{\delta}_{\ell+1} \pdv{\vec{h}_{\ell+1}}{\vec{h}_{\ell}}$}, \quad \vec{\delta}_L = \pdv{h(\vec{\theta})}{\vec{h}_L}.
             \]
             Then, to compute parameter gradients, \[
-                \pdv{h(\vec{\theta})}{\vec{\theta}_{\ell}} = \vec{\delta}_{\ell} \pdv{\vec{h}_{\ell}}{\vec{\theta}_{\ell}}.
+                \colorbox{yellow}{$\displaystyle \pdv{h(\vec{\theta})}{\vec{\theta}_{\ell}} = \pdv{h(\vec{\theta})}{\vec{h}_{\ell}} \pdv{\vec{h}_{\ell}}{\vec{\theta}_{\ell}} = \vec{\delta}_{\ell} \pdv{\vec{h}_{\ell}}{\vec{\theta}_{\ell}}$}.
             \]
+            Forward propagation: $\bigo{\text{\# parameters}}$ passes. Backpropagation: $\bigo{\text{\# outputs}}$ passes.
         \end{subtopic}
 
         \begin{subtopic}{Gradient descent}
             Update rule: \[
-                \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{\vec{\theta}}, \quad \eta > 0, \quad h(\vec{\theta}) \doteq \ell \circ F[\vec{\theta}].
+                \colorbox{yellow}{$\displaystyle \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{\vec{\theta}}$}, \quad \eta > 0, \quad h(\vec{\theta}) \doteq \ell \circ F[\vec{\theta}].
             \]
             Discretization of ODE: \[
                 \mathrm{d}\vec{\theta} = -\grad{h(\vec{\theta})}{} \mathrm{d}t.
@@ -350,7 +361,7 @@
             \]
             Or: $\| \hess{h(\vec{\theta})}{} \|_2 \leq L$ for all $\vec{\theta}$. If $\eta = \nicefrac{1}{L}$,
             then we have sufficient decrease, \[
-                h(\vec{\theta}') \leq h(\vec{\theta}) - \frac{1}{2L} \| \grad{h(\vec{\theta})}{} \|^2, \quad \forall \vec{\theta},\vec{\theta}'.
+                \colorbox{yellow}{$\displaystyle h(\vec{\theta}_{t+1}) \leq h(\vec{\theta}_t) - \frac{1}{2L} \| \grad{h(\vec{\theta}_t)}{} \|^2$}, \quad \forall t.
             \]
             Let $h$ be $L$-smooth and $\eta=\nicefrac{1}{L}$, then an $\epsilon$-critical point will be found
             in at most \[
@@ -359,7 +370,7 @@
             Proof: Sufficient decrease $\to$ Telescoping sum and $\min \leq \sum$.
 
             $h$ satisfies PL-inequality with $\mu > 0$ if \[
-                \frac{1}{2} \| \grad{h(\vec{\theta})}{} \|^2 \geq \mu (h(\vec{\theta}) - h(\vec{\theta}^\star)), \quad \forall \vec{\theta}.
+                \colorbox{yellow}{$\displaystyle \frac{1}{2} \| \grad{h(\vec{\theta})}{} \|^2 \geq \mu (h(\vec{\theta}) - h(\vec{\theta}^\star))$}, \quad \forall \vec{\theta}.
             \]
             Intuition: If $\vec{\theta}$ has small gradient, then it is near-optimal. Let $h$ be $L$-smooth and
             $\mu$-PL and $\eta = \nicefrac{1}{L}$, then \[
@@ -377,7 +388,7 @@
             \]
 
             Momentum intuition: If gradient is stable, we can make bolder steps. Heavy Ball: \[
-                \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{} + \beta (\vec{\theta}^t - \vec{\theta}^{t-1}), \quad \beta \in [0,1].
+                \colorbox{yellow}{$\displaystyle \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \grad{h(\vec{\theta}^t)}{} + \beta (\vec{\theta}^t - \vec{\theta}^{t-1})$}, \quad \beta \in [0,1].
             \]
             Assuming constant gradient $\vec{\delta}$, we have \[
                 \vec{\theta}^{t+1} = \vec{\theta}^t - \eta \lft( \sum_{\tau=1}^{t-1} \beta^{\tau} \rgt) \vec{\delta}.
@@ -412,27 +423,24 @@
     \begin{topic}{Convolutional networks}
 
         \begin{subtopic}{Convolution}
-            Integral operator: \[
-                (Tf)(u) \doteq \int_{t_1}^{t_2} H(u,t) f(t) \mathrm{d}t.
-            \]
-            Fourier transform: \[
-                (\mathcal{F}f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi itu} f(t) \mathrm{d}t.
-            \]
-            Convolution: \[
-                (f * h)(u) \doteq \int_{-\infty}^{\infty} h(u-t) f(t) \mathrm{d}t.
-            \]
+            Integral operator: $(Tf)(u) \doteq \int_{t_1}^{t_2} H(u,t) f(t) \mathrm{d}t$.
+
+            Fourier transform: $(\mathcal{F}f)(u) \doteq \int_{-\infty}^\infty e^{-2\pi itu} f(t) \mathrm{d}t$.
+
+            Convolution: $(f * h)(u) \doteq \int_{-\infty}^{\infty} h(u-t) f(t) \mathrm{d}t$.
+
             Commutative: $f * h = h * f$, Shift-equivariant: $f_{\Delta} * h = (f * h)_{\Delta}$, Convolution
-            as Fourier: $f * h = \mathcal{F}^{-1}(\mathcal{F}f \cdot \mathcal{F}h)$. All proofs are done by
+            as Fourier: $f * h = \mathcal{F}^{-1}(\mathcal{F}f \cdot \mathcal{F}h)$ $\Rightarrow$ Can
+            do convolution in $\bigo{n \log n}$ with Fast Fourier Transform. All proofs are done by
             defining new variables dependent on existing ones. Linear shift-equivariant operator $\iff$
             Convolution.
 
             Discrete convolution: \[
-                (f * h)[u] = \sum_{t=-\infty}^{\infty} f[t]h[u-t].
+                \colorbox{yellow}{$\displaystyle (f * h)[u] = \sum_{t=-\infty}^{\infty} f[t]h[u-t]$}.
             \]
-            Cross-correlation: \[
-                (f \star h)[u] = \sum_{t=-\infty}^{\infty} f[t] h[u+t].
-            \]
-            Toeplitz matrix $\mat{H}_n^h \in \R^{(n+m-1)\times n}$ \[
+            Cross-correlation: $(f \star h)[u] = \sum_{t=-\infty}^{\infty} f[t] h[u+t]$.
+
+            Toeplitz matrix $\mat{H}_n^h \in \R^{(n+m-1)\times n}$: \[
                 \mat{H}_n^h \doteq
                 \begin{bmatrix}
                     h_1    & 0      & \cdots & 0      & 0       \\
@@ -467,7 +475,7 @@
             Fully connected in channels and local in spatial dimensions.
 
             Output size ($x$: input, $p$: padding, $d$: dilation, $k$: kernel, $s$: stride): \[
-                \lft\lfloor \frac{x+2p-d(k-1)-1}{s} + 1 \rgt\rfloor.
+                \colorbox{yellow}{$\displaystyle \lft\lfloor \frac{x+2p-d(k-1)-1}{s} + 1 \rgt\rfloor$}.
             \]
             
         \end{subtopic}
@@ -486,7 +494,7 @@
             F[\mat{U},\mat{V}](\vec{z},\vec{x}) = \phi(\mat{U}\vec{z} + \mat{V}\vec{x}), \quad G[\mat{W}](\vec{z}) = \psi(\mat{W}\vec{z}).
         \]
 
-        Bidirectional RNNs do both ways and concatenate. Stacked RNNS connect layers horizontally: \[
+        Bidirectional RNNs do both ways and concatenate. Stacked RNNs connect layers horizontally: \[
             \vec{z}_{t,l} = \phi(\mat{U}_l \vec{z}_{t-1,l} + \mat{V}_l \vec{z}_{t,l-1}), \quad \vec{z}_{t,0} = \vec{x}_t.
         \]
 
@@ -494,11 +502,12 @@
             \pdv{L}{\mat{U}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{U}}, \quad \pdv{L}{\mat{V}} = \sum_{t=1}^{T} \pdv{L}{\vec{z}_t} \pdv{\vec{z}_t}{\mat{V}},
         \]
         where \[
-            \pdv{L}{\vec{z}_t} = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \prod_{j=t+1}^i \dot{\mat{\Phi}}_j \mat{U},
+            \colorbox{yellow}{$\displaystyle \pdv{L}{\vec{z}_t} = \sum_{i=t}^{T} \pdv{\ell(\hat{\vec{y}}_i, \vec{y}_i)}{\hat{\vec{y}}_i} \pdv{\hat{\vec{y}}_i}{\vec{z}_i} \prod_{j=t+1}^i \dot{\mat{\Phi}}_j \mat{U}$},
         \]
-        where $\dot{\Phi}_j = \mathrm{diag}(\phi'(\mat{U}\vec{z}_{j-1} + \mat{V}\vec{x}_j))$. This is only
-        stable if $\| \dot{\mat{\Phi}}_j \mat{U} \|_2 = 1$, which is almost never the case $\to$
-        exploding/vanishing gradient.
+        where $\dot{\mat{\Phi}}_j = \mathrm{diag}(\phi'(\mat{U}\vec{z}_{j-1} + \mat{V}\vec{x}_j))$. This is only
+        stable if $\| \dot{\mat{\Phi}}_j \mat{U} \|_2 = 1$. \hl{For most activation functions: $\| \dot{\mat{\Phi}} \|_2 \leq
+            \alpha$. So, $\| \mat{U} \|_2 > \nicefrac{1}{\alpha}$ $\Rightarrow$ Exploding gradient,
+        $\| \mat{U} \|_2 < \nicefrac{1}{\alpha}$ $\Rightarrow$ Vanishing gradient.}
 
         \begin{subtopic}{Gated memory}
             Solve vanishing gradient by gating.
@@ -537,20 +546,19 @@
             in polar coordinate form via modulus $r$ and phase $\phi$: \[
                 z = r(\cos(\phi) \sin(\phi) i), \quad r = |z|.
             \]
-            Thus, $r_i = \exp(-\exp(\nu_i)) \in (0,1)$. Thus, at initialization we sample \[
+            Thus, \hl{$r_i = \exp(-\exp(\nu_i)) \in (0,1)$.} Thus, at initialization we sample \[
                 \phi_i \sim \mathrm{Unif}([0,2\pi]), \quad r_i \sim \mathrm{Unif}(I), \quad I \subseteq [0,1].
             \]
             And compute $\nu_i = \log(-\log r_i)$. The modulus always remains upper bounded by $1$. This is
             equivalent to Glorot initialization.
 
-            We do not lose any representational power, because we can put all representational power into the
+            \hl{We do not lose any representational power,} because we can put all representational power into the
             output map: \[
                 \vec{y}_t = \mathrm{MLP}(\mathrm{Re}(\mat{G}\vec{\zeta}_t)), \quad \mat{G} \in \mathbb{C}^{k \times m}.
             \]
         \end{subtopic}
 
-        \vfill\null
-        \columnbreak
+        \Break
 
         \begin{subtopic}{Sequence learning}
             Generate sequence step-by-step, given another sequence: \[
@@ -581,7 +589,7 @@
                 \mat{Q} = \mat{X} \mat{W}_Q, \quad \mat{K} = \mat{X} \mat{W}_K, \quad \mat{V} = \mat{X}\mat{W}_V,
             \]
             where $\mat{W}_Q, \mat{W}_K \in \R^{d\times d_k}$ and $\mat{W}_V \in \R^{d \times d_v}$. Attention: \[
-                \mat{\Xi} = \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt) \mat{V}.
+                \colorbox{yellow}{$\displaystyle \mat{\Xi} = \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt) \mat{V}$}.
             \]
             Multi-headed self-attention performs attention $h$ times in parallel.
         \end{subtopic}
@@ -614,8 +622,8 @@
         \begin{subtopic}{BERT}
             BERT is a transformer-based pretrained language model that is used for finetuning on
             downstream NLP tasks. BERT tokenizes uses WordPiece tokenization and prepends a
-            \texttt{[CLS]} token. When the weights of the encoders are pretrained, we can place
-            additional layers on top that operate on the contextualized BERT tokens.
+            \texttt{[CLS]} token. \hl{When the weights of the encoders are pretrained, we can place
+            additional layers on top that operate on the contextualized BERT tokens.}
 
             Two pre-training stages:
             \begin{enumerate}[left=0pt]
@@ -628,8 +636,8 @@
 
         \begin{subtopic}{Vision transformer}
             ViT adapts the transformer to images by treating projected $16 \times 16$ image patches
-            as tokens. A possible reason for this model's effectiveness is that this architecture
-            carries less inductive bias than CNN-based models. In general, this seems to be beneficial
+            as tokens. \hl{A possible reason for this model's effectiveness is that this architecture
+            carries less inductive bias than CNN-based models.} In general, this seems to be beneficial
             for very large datasets.
         \end{subtopic}
 
@@ -645,7 +653,7 @@
             where $\mat{P}$ is a permutation matrix.
 
             $f$ (arbitrary number of inputs and same number of outputs) is equivariant iff \[
-                f(\mat{X}) = \mat{P} f(\mat{P} \mat{X}).
+                f(\mat{X}) = \transpose{\mat{P}} f(\mat{P} \mat{X}).
             \]
 
             We want models that have these properties by design.
@@ -681,10 +689,10 @@
 
         \begin{subtopic}{Graph neural networks}
             Let $\mat{A}$ be the adjacency matrix of an undirected graph. $f$ is order-invariant on a graph if \[
-                f(\mat{X},\mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}}).
+                \colorbox{yellow}{$\displaystyle f(\mat{X},\mat{A}) = f(\mat{P}\mat{X}, \mat{P}\mat{A}\transpose{\mat{P}})$}.
             \]
             And equivariant if \[
-                f(\mat{X}, \mat{A}) = \transpose{\mat{P}} f(\mat{P}\mat{X},\mat{P}\mat{A}\transpose{\mat{P}}).
+                \colorbox{yellow}{$\displaystyle f(\mat{X}, \mat{A}) = \transpose{\mat{P}} f(\mat{P}\mat{X},\mat{P}\mat{A}\transpose{\mat{P}})$}.
             \]
             Let $\mat{X}_m = \{ \{ \vec{x}_n \mid a_{nm} = 1 \} \}$ (multiset of neighbors' features). $\phi$
             takes $\vec{x}_m$ and $\mat{X}_m$ as input (any pair of isomorphic graphs result in same feature
@@ -695,17 +703,18 @@
 
             Graph convolutional networks (GCNs) aggregates local neighborhoods with a fixed set of weights
             (coupling matrix), \[
-                \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}, \quad \mat{D} = \mathrm{diag}(\vec{d}), \quad d_m = 1 + \sum_{n=1}^{M} a_{nm}.
+                \colorbox{yellow}{$\displaystyle \bar{\mat{A}} \doteq \mat{D}^{-\nicefrac{1}{2}} (\mat{A} + \mat{I}) \mat{D}^{-\nicefrac{1}{2}}$}, \quad \mat{D} = \mathrm{diag}(\vec{d}), \quad d_m = 1 + \sum_{n=1}^{M} a_{nm}.
             \]
             Element-wise: \[
                 \bar{a}_{ij} = \frac{a_{ij} + \delta_{ij}}{\sqrt{d_i d_j}}, \quad \delta_{ij} = \mathbb{1}\{ i = j \}.
             \]
             Now, $\bar{\mat{A}}\mat{X}$ computes the average feature over neighbors and the node itself.
             GCNs introduce learnable parameters $\mat{W}$: \[
-                f[\mat{W}](\mat{X}, \mat{A}) = \sigma(\bar{\mat{A}} \mat{X} \mat{W}).
+                \colorbox{yellow}{$\displaystyle f[\mat{W}](\mat{X}, \mat{A}) = \sigma(\bar{\mat{A}} \mat{X} \mat{W})$}.
             \]
             This is an equivariant function, which can be stacked. Then, we can use the final representations
-            to do graph classification or node classification.
+            to do graph classification or node classification. \hl{Note that $\| \bar{\mat{A}} \|_2 \leq
+            1$, so the values will not explode.}
 
             Limitations: Requires a depth equal to diameter of graph to exchange information between all nodes;
             In very deep GCNs, node features become indistinguishable due to smoothing of $\bar{\mat{A}}$;
@@ -721,9 +730,15 @@
             Here, $\vec{x}_{ij}$ is an edge feature.
 
             Despite better adaptivity, GATs are still message-passing algorithms. Such algorithms have inherent
-            limitations in the type of graphs they can distinguish. The Weisfeiler-Lehman graph isomorphism
-            test computes whether there exists an isomorphism between two graphs. It can be shown that GCNs and
-            GATs cannot distinguish graphs beyond the WL-test.
+            limitations in the type of graphs they can distinguish. The Weisfeiler-Lehman (WL) isomorphism
+            test checks whether two graphs are \emph{potentially} isomorphic. It does so in linear time. \hl{It can be shown that GCNs and
+            GATs cannot distinguish graphs beyond the WL-test.}
+
+            1-WL: (1) Every node starts with the same color; (2) If a vertex $v$ has neighbors with
+            colors $\{ c_1, \ldots, c_k \}$, then $c_v$ gets a new color encoding $[c_v, \{\{ c_1,
+            \ldots, c_k \}\}]$. If the color partitions of the two graphs are different, the graphs
+            cannot be isomorphic. If the color partitions are equivalent, the graphs are potentially
+            isomorphic.
         \end{subtopic}
 
         \begin{subtopic}{Spectral graph theory}
@@ -732,7 +747,7 @@
             \]
             The Fourier basis can be defined as the eigenfunction of the Laplacian.
 
-            Graph Laplacian: $\mat{L} = \mat{D} - \mat{A}$. Degree-normalized Laplacian: $\tilde{\mat{L}} =
+            Graph Laplacian: \hl{$\mat{L} = \mat{D} - \mat{A}$}. Degree-normalized Laplacian: $\tilde{\mat{L}} =
                 \mat{D}^{-\nicefrac{1}{2}} (\mat{D} - \mat{A}) \mat{D}^{-\nicefrac{1}{2}}$. We can generalize
             Fourier transform to graphs: Diagonalize $\mat{L} = \mat{U} \mat{\Lambda} \transpose{\mat{U}}$
             (exists because symmetric and PSD) and $\mat{U}$ can be seen as graph Fourier basis and
@@ -744,7 +759,7 @@
                 G[\vec{\theta}](\mat{L}) \mat{X} = \mat{U} G[\vec{\theta}](\mat{\Lambda}) \transpose{\mat{U}} \mat{X}.
             \]
             Problem: Eigendecomposition of $\mat{L}$ takes $\bigo{M^3}$. Solution: Use polynomial kernels: \[
-                \mat{U} \lft( \sum_{k=0}^{K} \alpha_k \mat{\Lambda} \rgt) \transpose{\mat{U}} \mat{X} = \sum_{k=1}^{K} \alpha_k \mat{L}^k \mat{X}.
+                \colorbox{yellow}{$\displaystyle \mat{U} \lft( \sum_{k=0}^{K} \alpha_k \mat{\Lambda} \rgt) \transpose{\mat{U}} \mat{X} = \sum_{k=1}^{K} \alpha_k \mat{L}^k \mat{X}$}.
             \]
             Here, the polynomial order $K$ defines the kernel size (or neighborhood size). $\vec{\alpha} \in
                 \R^K$ are parameters.
@@ -752,18 +767,15 @@
 
     \end{topic}
 
-    \vfill\null
-    \columnbreak
-
     \begin{topic}{Tricks of the trade}
 
         \begin{subtopic}{Initialization}
             Parameters are typically chosen with a fixed variance by sampling from \[
                 \vec{\theta} \sim \mathcal{N}(0, \sigma^2), \quad \vec{\theta} \sim \mathrm{Unif}([-\sqrt{3}\sigma,\sqrt{3}\sigma]).
             \]
-            LeCun init, $\sigma = \nicefrac{1}{\sqrt{n}}$, preserves input variance. Glorot init, $\sigma =
-                \sqrt{\nicefrac{2}{n+m}}$, normalizes magnitude of gradient (intuition: backpropagation combines
-            $n$-dim input and $m$-dim output). Kaiming init, $\sigma = \sqrt{\nicefrac{2}{n}}$, is designed to
+            LeCun init, \hl{$\sigma = \nicefrac{1}{\sqrt{n}}$}, preserves input variance. Glorot init, \hl{$\sigma =
+            \sqrt{\nicefrac{2}{n+m}}$}, normalizes magnitude of gradient (intuition: backpropagation combines
+            $n$-dim input and $m$-dim output). Kaiming init, \hl{$\sigma = \sqrt{\nicefrac{2}{n}}$}, is designed to
             be used with ReLU by observing that only half of the units are active in expectation. Orthogonal
             init considers the weights holistically by initializing as orthogonal matrix (benefit: eigenvalues
             are $\pm 1$).
@@ -771,7 +783,7 @@
 
         \begin{subtopic}{Weight decay}
             \[
-                \vec{\theta}_{t+1} = \vec{\theta}_t - \eta (\grad{h(\vec{\theta}_t)}{} - \mu \vec{\theta}_t) = (1-\eta \mu) \vec{\theta}_t - \grad{h(\vec{\theta}_t)}{}.
+                \colorbox{yellow}{$\displaystyle \vec{\theta}_{t+1} = \vec{\theta}_t - \eta (\grad{h(\vec{\theta}_t)}{} - \mu \vec{\theta}_t) = (1-\eta \mu) \vec{\theta}_t - \grad{h(\vec{\theta}_t)}{}$}.
             \]
             Equivalent to (1) gradient descent with $\ell_2$ regularization, (2) Bayesian prior that weights
             are sampled from normal distribution, (3) Lagrangian with constraint $\| \vec{\theta} \| \leq \mu$.
@@ -800,12 +812,11 @@
 
         \begin{subtopic}{Normalization}
             Goal: Make all units more similar. A unit $f: \R^d \to \R$ can be normalized by \[
-                \tilde{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
+                \bar{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
             \]
-            This removes 2 DOF (bias and variance) $\to$ Explicitly parameterize: \[
-                \tilde{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x}).
-            \]
-            BatchNorm approximates $\E[f]$ and $\Var[f]$ over a mini-batch: \[
+            This removes 2 DOF (bias and variance) $\Rightarrow$ Explicitly parameterize: \hl{$\tilde{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x})$.}
+
+            BatchNorm approximates $\E[f]$ and $\Var[f]$ over a \hl{mini-batch}: \[
                 \E[f] \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} f(\vec{x}), \quad \Var[f] \approx \frac{1}{|\mathcal{B}|} \sum_{\vec{x} \in \mathcal{B}} (f(\vec{x}) - \E[f])^2.
             \]
 
@@ -814,11 +825,11 @@
             as weight normalization and scaling by $\nicefrac{\| \vec{w} \|_{\mat{I}}}{\| \vec{w}
                 \|_{\mat{\Sigma}}}$, where $\mat{\Sigma} = \E[\vec{x}\transpose{\vec{x}}]$.
 
-            LayerNorm normalizes over the feature dimension instead of batch dimension: \[
+            LayerNorm normalizes over the \hl{feature dimension} instead of batch dimension: \[
                 \E[f] = \frac{1}{d} \sum_{i=1}^{d} f_i(\vec{x}), \quad \Var[f] = \frac{1}{d} \sum_{i=1}^{d} (f_i(\vec{x}) - \E[f])^2.
             \]
             And, the data is normalized by \[
-                \tilde{f}_i = \frac{f_i - \E[f]}{\sqrt{\Var[f]}}.
+                \bar{f}_i = \frac{f_i - \E[f]}{\sqrt{\Var[f]}}.
             \]
             Layers need to have a sufficient width $d$ to get stable statistics, but it is not batch
             dependent anymore.
@@ -826,7 +837,7 @@
 
         \begin{subtopic}{Weight normalization}
             Normalize weights before applying them: \[
-                f[\vec{v},\gamma](\vec{x}) = \phi(\transpose{\vec{w}}\vec{x}), \quad \vec{w} = \frac{\gamma}{\| \vec{v} \|_2} \vec{v}.
+                \colorbox{yellow}{$\displaystyle f[\vec{v},\gamma](\vec{x}) = \phi(\transpose{\vec{w}}\vec{x}), \quad \vec{w} = \frac{\gamma}{\| \vec{v} \|_2} \vec{v}$}.
             \]
             Gradients: \[
                 \pdv{h}{\gamma} = \pdv{h}{\vec{w}} \pdv{\vec{w}}{\gamma}, \quad \pdv{h}{\vec{v}} = \frac{\gamma}{\| \vec{v} \|} \pdv{h}{\vec{w}} \lft( \mat{I} - \frac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|^2} \rgt).
@@ -882,10 +893,10 @@
                 \dot{\vec{\theta}}_t = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) \grad{f[\vec{\theta}_t](\vec{x})}{}.
             \]
             Functional gradient flow: \[
-                \dot{f}_j[\vec{\theta}_t] = \transpose{\dot{\vec{\theta}_t}} \grad{f[\vec{\theta}_t](\vec{x}_j)}{} = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) k[\vec{\theta}_t](\vec{x}_i, \vec{x}_j).
+                \dot{f}_j[\vec{\theta}_t] = \transpose{\dot{\vec{\theta}}_t} \grad{f[\vec{\theta}_t](\vec{x}_j)}{} = \sum_{i=1}^{n} (y_i - f[\vec{\theta}_t](\vec{x}_i)) k[\vec{\theta}_t](\vec{x}_i, \vec{x}_j).
             \]
             In matrix form: \[
-                \dot{\vec{f}}[\vec{\theta}_t] = \mat{K}[\vec{\theta}_t](\vec{y} - \vec{f}[\vec{\theta}_t]), \quad \dot{\vec{f}}[\vec{\theta}_t] = -\mat{K}[\vec{\theta}_t] \grad{\ell(\vec{\theta}_t)}{\vec{f}[\vec{\theta}]}.
+                \text{\hl{$\dot{\vec{f}}[\vec{\theta}_t] = \mat{K}[\vec{\theta}_t](\vec{y} - \vec{f}[\vec{\theta}_t])$}}, \quad \dot{\vec{f}}[\vec{\theta}_t] = -\mat{K}[\vec{\theta}_t] \grad{\ell(\vec{\theta}_t)}{\vec{f}[\vec{\theta}]}.
             \]
             NTK $\mat{K}[\vec{\theta}_t]$ governs the evolution of the joint sample predictions. Problem: NTK
             has a dependence on the parameters.
@@ -893,11 +904,10 @@
 
         \begin{subtopic}{Infinite width}
             In practice it has been found that as the width $m$ of a model is scaled, the parameters stay
-            more closely to their initialization during gradient descent. It can be shown (under
+            more closely to their initialization during gradient descent. \hl{It can be shown (under
             basic assumptions) that the NTK converges in probability to a deterministic limit as the
-            model is scaled to infinite width: \[
-                k[\vec{\theta}] \xrightarrow{m \to \infty} k_{\infty}.
-            \]
+            model is scaled to infinite width:} $k[\vec{\theta}] \xrightarrow{m \to \infty} k_{\infty}$.
+
             The deterministic limit depends only on the law of initialization. Under these training dynamics,
             minimizing MSE equates to solving a kernel regression problem with $k_{\infty}$. This provides
             insight into why overparameterization works so well in practice, despite having the ability to
@@ -985,9 +995,7 @@
             Linear networks assume a random Gaussian weight vector: \[
                 \vec{w} \sim \mathcal{N}\lft(\vec{0}, \frac{\sigma^2}{d} \mat{I}_d\rgt).
             \]
-            Outputs are computed by $y_i = \transpose{\vec{w}}\vec{x}_i$. Vectorized: \[
-                \vec{y} = \mat{X} \vec{w}.
-            \]
+            Outputs are computed by $y_i = \transpose{\vec{w}}\vec{x}_i$. Vectorized: $\vec{y} = \mat{X} \vec{w}$.
             This is a Gaussian vector: \[
                 \vec{y} \sim \mathcal{N}\lft(\vec{0}, \frac{\sigma^2}{d} \transpose{\mat{X}} \mat{X} \rgt).
             \]
@@ -1000,8 +1008,8 @@
             deep preactivation process is ``near normal'' for high-dimensional inputs.
 
             We can extend this to non-linear networks. But, the activations are no longer Gaussian due to the
-            non-linearity. However, due to CLT, they are effectively shaped back into Gaussians when they
-            propagate to the next layer. The mean function and kernels are computed by \[
+            non-linearity. \hl{However, due to CLT, they are effectively shaped back into Gaussians when they
+            propagate to the next layer.} The mean function and kernels are computed by \[
                 \mu(\vec{x}^{\ell}) = \E[\phi(\mat{W}^{\ell-1} \vec{x}^{\ell-1})], \quad k^{\ell}(\vec{x}_i, \vec{x}_j) = \E[\phi(\vec{x}^{\ell-1}_i) \phi(\vec{x}^{\ell-1}_j)].
             \]
             We can now use kernel regression: \[
@@ -1027,7 +1035,7 @@
             \]
             $\mathcal{F}$ shatters $\mathcal{S}$ if $|\mathcal{F}(\mathcal{S})| = 2^n$ (every
             possible labeling is realized by some function $f \in \mathcal{F}$). VC dimensionality is defined as \[
-                \mathrm{VC}(\mathcal{F}) = \max_{n \in \mathbb{N}} \sup_{|\mathcal{S}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
+                \mathrm{VC}(\mathcal{F}) = \argmax_{n \in \mathbb{N}} \sup_{|\mathcal{S}|=n} \mathbb{1}\{ \mathcal{F}(n) = 2^n \}.
             \]
             Under uniform convergence, VC inequality holds: \[
                 \mathbb{P}\lft( \sup_{f \in \mathcal{F}} |\hat{\ell}(f) - \ell(f)| > \epsilon \rgt) \leq 8 |\mathcal{F}(n)| \exp \lft( -\frac{n \epsilon^2}{32} \rgt),
@@ -1054,16 +1062,8 @@
             found by small-batch SGD, weight averaging, or entropy SGD.
         \end{subtopic}
 
-        \vfill\null
-        \columnbreak
-
         \begin{subtopic}{PAC-Bayesian}
-            For any $p \gg q$ and $p$-measurable $X$, \[
-                \E_q[X] \leq D_{\mathrm{KL}}(q \;\|\; p) + \log \E_p[\exp(X)].
-            \]
-            We also have (not important for proof of next lemma) \[
-                \mathbb{P}(X \geq t) \leq \frac{\E[X]}{t}.
-            \]
+            For any $p \gg q$ and $p$-measurable $X$: $\E_q[X] \leq D_{\mathrm{KL}}(q \;\|\; p) + \log \E_p[\exp(X)]$.
 
             For a fixed $p$, any $q$, and $\epsilon \in (0,1)$, we have the following with probability greater
             than or equal to $\epsilon$, \[
@@ -1176,7 +1176,7 @@
                 \mathrm{tr}(\mat{I}) = \dim(\vec{x}_0)$, then energy is conserved throughout the process.
 
             Closed form ($\bar{\alpha}_t = \prod_{\tau=1}^t (1-\beta_{\tau})$): \[
-                \vec{x}_t \sim \mathcal{N}(\sqrt{\bar{\alpha}_t}, (1-\bar{\alpha}_t) \mat{I}).
+                \colorbox{yellow}{$\displaystyle \vec{x}_t \sim \mathcal{N}(\sqrt{\bar{\alpha}_t}, (1-\bar{\alpha}_t) \mat{I})$}.
             \]
             Backward process: \[
                 \vec{x}_{t-1} \sim \mathcal{N}(\vec{\mu}[\vec{\theta}](\vec{x}_t, t), \mat{\Sigma}[\vec{\theta}](\vec{x}_t, t)).
@@ -1185,11 +1185,11 @@
                 \log p[\vec{\theta}](\vec{x}_0) \geq \sum_{t=0}^{T} \ell_t,
             \]
             where \[
-                \ell_t = \begin{cases}
+                \colorbox{yellow}{$\displaystyle \ell_t = \begin{cases}
                     \E_q[\log p[\vec{\theta}](\vec{x}_0 \mid \vec{x}_1)]                                                          & t = 0     \\
                     -D_{\mathrm{KL}}(q(\vec{x}_t \mid \vec{x}_{t-1}, \vec{x}_0) \;\|\; p[\vec{\theta}](\vec{x}_t \mid \vec{x}_{t+1})) & 0 < t < T \\
                     -D_{\mathrm{KL}}(q(\vec{x}_T \mid \vec{x}_0) \;\|\; \pi)                                                          & t = T.
-                \end{cases}
+                \end{cases}$}
             \]
             The KL divergences can be analytically computed because all $q_t$ are Gaussians an we parameterized
             the network as a Gaussian. The $q$ targets are derived as \[
@@ -1258,11 +1258,17 @@
             Robust training systematically makes models robust to adversarial attacks by extending the loss function to neighborhoods of training points: \[
                 \ell(\vec{x}) \mapsto \max_{\vec{\eta} : \| \vec{\eta} \|_p \leq \epsilon} \ell(\vec{x} + \vec{\eta}).
             \]
-            This can be solved with projected gradient ascent. For $p=2$, we have \[
-                \vec{\eta}_{t+1} = \epsilon \Pi(\vec{\eta}_t + \alpha \grad{\ell(\vec{x} + \vec{\eta}_t)}{\vec{x}}), \quad \Pi(\vec{z}) \doteq \frac{\vec{z}}{\| \vec{z} \|_2}.
+            This can be solved with projected gradient ascent: \[
+                \vec{\eta}_{t+1} = \Pi(\vec{\eta}_t + \alpha \grad{\ell(\vec{x} + \vec{\eta}_t)}{\vec{\eta}}).
             \]
-            Fast gradient sign method performs one iteration with $p=\infty$ resulting in $\vec{\eta} =
-                \epsilon\cdot\mathrm{sgn}(\grad{\ell(\vec{x})}{\vec{x}})$
+            Fast gradient sign method (FGSM) performs one iteration with $p=\infty$ resulting in \hl{$\vec{\eta} =
+            \epsilon\cdot\mathrm{sgn}(\grad{\ell(\vec{x})}{\vec{x}})$}.
+
+                Projection onto $\ell_1$-ball has no closed form, but doable in $\bigo{n\log n}$.
+
+            Projection onto $\ell_2$-ball: $\Pi_{\| \cdot \|_2 \leq \epsilon}(\vec{x}) = \frac{\epsilon \vec{x}}{\max \{ \epsilon, \| \vec{x} \|_2 \}}$.
+
+            Projection onto $\ell_{\infty}$-ball: $\Pi_{\| \cdot \|_{\infty} \leq \epsilon}(\vec{x}) = [\mathrm{clamp}(x_i; -\epsilon, \epsilon)]_{i \in [d]}$.
 
         \end{subtopic}
 
