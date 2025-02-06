@@ -207,7 +207,7 @@
             Assume that points are in general position. Cover's theorem: \[
                 \mathcal{C}(n+1,d) = 2 \sum_{i=0}^{d-1} \begin{pmatrix} n \\ i \end{pmatrix}.
             \]
-            Proof: Base cases are both 2 and adding a point has two cases $\to$ Recurrence: \[
+            Proof: Base cases are both 2 and adding a point has two cases $\Rightarrow$ Recurrence: \[
                 \mathcal{C}(n+1,d) = \mathcal{C}(n,d) + \mathcal{C}(n,d-1).
             \]
             For $n \leq d$, we have $\mathcal{C}(n,d) = 2^n$. After $n=2d$, there is a steep decrease in number
@@ -253,7 +253,7 @@
             Mean-squared error: $\ell[\vec{\theta}](\mathcal{S}) = \frac{1}{2} \sum_{i=1}^{n} \lft( f[\vec{\theta}](\vec{x}_i) - y_i \rgt)^2$.
 
             Linear model: $\ell[\vec{w}](\mathcal{S}) = \frac{1}{2} \| \transpose{\mat{X}} \vec{w} - \vec{y}
-                \|^2$ $\to$ Closed form solution: $\vec{w}^\star = \inv{\lft( \transpose{\mat{X}}\mat{X}
+                \|^2$ $\Rightarrow$ Closed form solution: $\vec{w}^\star = \inv{\lft( \transpose{\mat{X}}\mat{X}
                     \rgt)}\transpose{\mat{X}} \vec{y}$.
 
             Logistic regression (binary outputs) use sigmoid: $\sigma(z) \doteq \nicefrac{1}{1 + \exp(-z)}$.
@@ -267,13 +267,13 @@
         \begin{subtopic}{Layers and units}
             Mapping: $f[\mat{W},\vec{b}](\vec{x}) = \phi(\mat{W}\vec{x}+\vec{b})$, where $\phi$ is a pointwise activation function. DNNs compose: $G = F_L[\vec{\theta}_L] \circ \cdots \circ F_1[\vec{\theta}_1]$.
 
-            Intermediate layers are permutation symmetric: $\mat{F}[\mat{W},\vec{b}](\vec{x}) = \inv{\mat{P}}
-                \phi(\mat{P}\mat{W}\vec{x} + \mat{P}\vec{b}) = \inv{\mat{P}} F[\mat{P} \mat{W},
-                        \mat{P}\vec{b}](\vec{x})$ $\to$ Parameters are not unique.
+            Intermediate layers are permutation symmetric: $\mat{F}[\mat{W},\vec{b}](\vec{x}) = \transpose{\mat{P}}
+                \phi(\mat{P}\mat{W}\vec{x} + \mat{P}\vec{b}) = \transpose{\mat{P}} F[\mat{P} \mat{W},
+                        \mat{P}\vec{b}](\vec{x})$ $\Rightarrow$ Parameters are not unique.
         \end{subtopic}
 
         \begin{subtopic}{Linear networks}
-            Linear layers are closed under composition $\to$ We do not gain representational power from composing them.
+            Linear layers are closed under composition $\Rightarrow$ We do not gain representational power from composing them.
         \end{subtopic}
 
         \begin{subtopic}{Residual networks}
@@ -296,7 +296,7 @@
                 \mathcal{G}_{n} = \mathrm{span} \{ \sigma(\transpose{\vec{w}}\vec{x} + b) \mid \vec{w} \in \R^n, b \in \R \}.
             \]
             This set universally approximates $\mathcal{C}(\R^n)$. But, it does not provide insight into how
-            depth affects performance $\to$ Barron: Let $f: \R^n \to \R$ with finite $\mathcal{C}_f$ and any $r
+            depth affects performance $\Rightarrow$ Barron: Let $f: \R^n \to \R$ with finite $\mathcal{C}_f$ and any $r
                 > 0$, there is a sequence of one hidden layer MLPs $(g_m)_{m \in \N}$ such that \[
                 \int_{r \mathbb{B}} (f(\vec{x}) - g_m(\vec{x}))^2 \mu(\mathrm{d}\vec{x}) \leq \bigo{\nicefrac{1}{m}},
             \]
@@ -355,7 +355,7 @@
             Trajectory outcome (point where $\grad{h(\vec{\theta})}{} = \vec{0}$) depends on initial
             conditions.
 
-            Gradient descent can only be successful if gradients change slowly $\to$ Smoothness: $h$ is
+            Gradient descent can only be successful if gradients change slowly $\Rightarrow$ Smoothness: $h$ is
             $L$-smooth if \[
                 \| \grad{h(\vec{\theta})}{} - \grad{h(\vec{\theta})'}{} \| \leq L \| \vec{\theta} - \vec{\theta}' \|, \quad \forall \vec{\theta},\vec{\theta}'.
             \]
@@ -367,7 +367,7 @@
             in at most \[
                 T = \frac{2L}{\epsilon^2} (h(\vec{\theta}^0) - h(\vec{\theta}^\star)).
             \]
-            Proof: Sufficient decrease $\to$ Telescoping sum and $\min \leq \sum$.
+            Proof: Sufficient decrease $\Rightarrow$ Telescoping sum and $\min \leq \sum$.
 
             $h$ satisfies PL-inequality with $\mu > 0$ if \[
                 \colorbox{yellow}{$\displaystyle \frac{1}{2} \| \grad{h(\vec{\theta})}{} \|^2 \geq \mu (h(\vec{\theta}) - h(\vec{\theta}^\star))$}, \quad \forall \vec{\theta}.
@@ -376,7 +376,7 @@
             $\mu$-PL and $\eta = \nicefrac{1}{L}$, then \[
                 h(\vec{\theta}_T) - h(\vec{\theta}^\star) \leq \lft( 1 - \frac{\mu}{L} \rgt)^T (h(\vec{\theta}_0) - h(\vec{\theta}^\star)).
             \]
-            Proof: Sufficient decrease $\to$ PL $\to$ Subtract $h(\vec{\theta}^\star)$ both sides.
+            Proof: Sufficient decrease $\Rightarrow$ PL $\Rightarrow$ Subtract $h(\vec{\theta}^\star)$ both sides.
 
             Newton's method: $\vec{\theta}^{t+1} = \vec{\theta}^t - \inv{\hess{h(\vec{\theta}^t)}{}} \grad{h(\vec{\theta}^t)}{}$.
             
@@ -395,7 +395,7 @@
             \]
             Thus, learning rate increases in case of a stable gradient.
 
-            Adaptivity intuition: Different parameters behave differently $\to$ Parameter-specific learning
+            Adaptivity intuition: Different parameters behave differently $\Rightarrow$ Parameter-specific learning
             rates:
             \begin{align*}
                 \theta_i^{t+1} & = \theta_i^t - \eta_i^t \partial_i h(\vec{\theta}^t)                                                                       \\
@@ -413,7 +413,7 @@
         \end{subtopic}
 
         \begin{subtopic}{Stochastic gradient descent}
-            When the dataset is too large, computing the full gradient is infeasible $\to$ Estimate
+            When the dataset is too large, computing the full gradient is infeasible $\Rightarrow$ Estimate
             gradient with a mini-batch (SGD). SGD outperforms GD in practice, because it has a lower
             chance of getting stuck in a local optimum due to variance in the gradient estimator.
         \end{subtopic}
@@ -435,9 +435,8 @@
             defining new variables dependent on existing ones. Linear shift-equivariant operator $\iff$
             Convolution.
 
-            Discrete convolution: \[
-                \colorbox{yellow}{$\displaystyle (f * h)[u] = \sum_{t=-\infty}^{\infty} f[t]h[u-t]$}.
-            \]
+            Discrete convolution: \hl{$(f * h)[u] = \sum_{t=-\infty}^{\infty} f[t]h[u-t]$}.
+
             Cross-correlation: $(f \star h)[u] = \sum_{t=-\infty}^{\infty} f[t] h[u+t]$.
 
             Toeplitz matrix $\mat{H}_n^h \in \R^{(n+m-1)\times n}$: \[
@@ -474,25 +473,23 @@
             \]
             Fully connected in channels and local in spatial dimensions.
 
-            Output size ($x$: input, $p$: padding, $d$: dilation, $k$: kernel, $s$: stride): \[
-                \colorbox{yellow}{$\displaystyle \lft\lfloor \frac{x+2p-d(k-1)-1}{s} + 1 \rgt\rfloor$}.
+            Output size ($x$: input, $p$: padding, $k$: kernel, $s$: stride): \[
+                \colorbox{yellow}{$\displaystyle \lft\lfloor \frac{x+2p-k}{s} + 1 \rgt\rfloor$}.
             \]
+
+            Inception: (1) Use $1 \times 1$ convolutions to reduce channels; (2) Use multiple filter
+            sizes and concatenate solving trade-off between channels and kernel size; (3) Softmax at
+            intermediate layers for better error propagation.
             
         \end{subtopic}
 
     \end{topic}
 
     \begin{topic}{Recurrent neural networks}
-        Activations are computed recursively to handle variable-length data, \[
-            \vec{z}_t = F[\vec{\theta}](\vec{z}_{t-1},\vec{x}_t).
-        \]
-        Dependent on application, compute output variables: \[
-            \vec{y}_t = G[\vec{\varphi}](\vec{z}_t).
-        \]
+        Activations are computed recursively to handle variable-length data: $\vec{z}_t = F[\vec{\theta}](\vec{z}_{t-1},\vec{x}_t)$.
+        Dependent on application, compute output variables: $\vec{y}_t = G[\vec{\varphi}](\vec{z}_t)$.
 
-        Elman RNN: \[
-            F[\mat{U},\mat{V}](\vec{z},\vec{x}) = \phi(\mat{U}\vec{z} + \mat{V}\vec{x}), \quad G[\mat{W}](\vec{z}) = \psi(\mat{W}\vec{z}).
-        \]
+        Elman RNN: $F[\mat{U},\mat{V}](\vec{z},\vec{x}) = \phi(\mat{U}\vec{z} + \mat{V}\vec{x})$, $G[\mat{W}](\vec{z}) = \psi(\mat{W}\vec{z})$.
 
         Bidirectional RNNs do both ways and concatenate. Stacked RNNs connect layers horizontally: \[
             \vec{z}_{t,l} = \phi(\mat{U}_l \vec{z}_{t-1,l} + \mat{V}_l \vec{z}_{t,l-1}), \quad \vec{z}_{t,0} = \vec{x}_t.
@@ -514,10 +511,10 @@
 
             LSTM ($\vec{z}_t$: cell state, $\vec{\zeta}_t$: hidden state):
             \begin{align*}
-                \vec{z}_t         & = \sigma(\mat{F}\tilde{\vec{x}}_t) \odot \vec{z}_{t-1} + \sigma(\mat{G}\tilde{\vec{x}}_t) \odot \tanh(\mat{V}\tilde{\vec{x}}_t) \\
-                \tilde{\vec{x}}_t & = [\vec{\zeta}_{t-1}, \vec{x}_t]                                                                                                \\
-                \vec{\zeta}_t     & = \sigma(\mat{H}\tilde{\vec{x}}_t) \odot \tanh(\mat{U}\vec{z}_t).
+                \vec{z}_t         & = \underbrace{\sigma(\mat{F}\tilde{\vec{x}}_t) \odot \vec{z}_{t-1}}_{\text{forget gate}} + \underbrace{\sigma(\mat{G}\tilde{\vec{x}}_t) \odot \tanh(\mat{V}\tilde{\vec{x}}_t)}_{\text{storage gate}}, \quad \tilde{\vec{x}}_t = [\vec{\zeta}_{t-1}, \vec{x}_t]                                                                                                \\
+                \vec{\zeta}_t     & = \underbrace{\sigma(\mat{H}\tilde{\vec{x}}_t) \odot \tanh(\mat{U}\vec{z}_t)}_{\text{output gate}}.
             \end{align*}
+            $\vec{z}_t$ is only modified by $\odot$ and $+$, which allows for easy error propagation.
 
             GRU simplifies the LSTM to only 3 weight matrices:
             \begin{align*}
@@ -525,6 +522,8 @@
                 \tilde{\vec{x}}_t & = [\vec{z}_{t-1}, \vec{x}_t]                                                                                                         \\
                 \tilde{\vec{z}}_t & = \tanh(\mat{V}[\vec{\zeta}_t \odot \vec{z}_{t-1}, \vec{x}_t]), \quad \vec{\zeta}_t = \sigma(\mat{H}[\vec{z}_{t-1} \vec{x}_t]).
             \end{align*}
+
+            Gradient clipping solves exploding gradient
         \end{subtopic}
 
         \begin{subtopic}{Linear recurrent model}
@@ -533,15 +532,12 @@
             \]
 
             We can ensure that the gradients do not explode by parametrizing the GRU smartly. The LRU has
-            hidden state evolution in a discrete time linear system: \[
-                \vec{z}_{t+1} = \mat{A} \vec{z}_t + \mat{B} \vec{x}_t.
-            \]
+            hidden state evolution in a discrete time linear system: $\vec{z}_{t+1} = \mat{A} \vec{z}_t + \mat{B} \vec{x}_t$.
+
             Diagonalize $\mat{A} = \mat{P}\mat{\Lambda}\inv{\mat{P}}$, where $\mat{\Lambda} =
                 \mathrm{diag}(\lambda_1, \ldots, \lambda_m), \lambda_i \in \mathbb{C}$. This linear system is
             stable if the modulus of the eigenvalues is bounded by $1$. Thus, we parameterize them such that
-            the moduli can only be in $(0,1)$ in the following way, \[
-                \lambda_i = \exp(-\exp(\nu_i))(\cos(\phi_i) + \sin(\phi_i)i).
-            \]
+            the moduli can only be in $(0,1)$ in the following way: $\lambda_i = \exp(-\exp(\nu_i))(\cos(\phi_i) + \sin(\phi_i)i)$.
             This uses $\exp(\theta i) = \cos(\theta) + \sin(\theta)i$ and that we can represent complex numbers
             in polar coordinate form via modulus $r$ and phase $\phi$: \[
                 z = r(\cos(\phi) \sin(\phi) i), \quad r = |z|.
@@ -578,6 +574,8 @@
                 a_{ij} = \mathrm{softmax}_j(\mathrm{MLP}([\vec{z}_{i-1}, \vec{\zeta}_j])), \quad \vec{c}_t = \sum_{i=1}^{m} a_{ti} \vec{\zeta}_i.
             \]
             This allows for alignment between input and output sequence.
+
+            Problem with teacher forcing: Mismatch between test and train.
         \end{subtopic}
 
     \end{topic}
@@ -591,7 +589,7 @@
             where $\mat{W}_Q, \mat{W}_K \in \R^{d\times d_k}$ and $\mat{W}_V \in \R^{d \times d_v}$. Attention: \[
                 \colorbox{yellow}{$\displaystyle \mat{\Xi} = \mathrm{softmax} \lft( \frac{\mat{Q} \transpose{\mat{K}}}{\sqrt{d_k}} \rgt) \mat{V}$}.
             \]
-            Multi-headed self-attention performs attention $h$ times in parallel.
+            Multi-headed SA performs attention $h$ times in parallel.
         \end{subtopic}
 
         \begin{subtopic}{Cross-attention}
@@ -604,7 +602,7 @@
         \end{subtopic}
 
         \begin{subtopic}{Positional encoding}
-            Attention is permutation equivariant $\to$ Add positional encoding matrix $\mat{P} \in \R^{T \times d}$ with \[
+            Attention is permutation equivariant $\Rightarrow$ Add positional encoding matrix $\mat{P} \in \R^{T \times d}$ with \[
                 p_{tk} = \begin{cases}
                     \sin(t \omega_k) & k \mod 2 = 0  \\
                     \cos(t \omega_k) & k \mod 1 = 0,
@@ -632,6 +630,7 @@
                 \item Binary next sentence classification, where the model must classify two sentences as being
                       consecutive or not (trains BERT to infer relationships between sentences).
             \end{enumerate}
+            Sentences are separated by \texttt{[SEP]}.
         \end{subtopic}
 
         \begin{subtopic}{Vision transformer}
@@ -801,8 +800,8 @@
         \end{subtopic}
 
         \begin{subtopic}{Dropout}
-            Randomly disable subset of parameters during training $\to$ Units become less dependent
-            on one another $\to$ Instead of units being specialized, they become generally useful.
+            Randomly disable subset of parameters during training $\Rightarrow$ Units become less dependent
+            on one another $\Rightarrow$ Instead of units being specialized, they become generally useful.
 
             Two view: (1) regularization and (2) ensemble of networks: \[
                 p[\vec{\theta}](\vec{y} \mid \vec{x}) = \sum_{\vec{b} \in \{ 0,1 \}^P} p(\vec{b}) p[\vec{\theta} \odot \vec{b}](\vec{y} \mid \vec{x}).
@@ -811,7 +810,8 @@
         \end{subtopic}
 
         \begin{subtopic}{Normalization}
-            Goal: Make all units more similar. A unit $f: \R^d \to \R$ can be normalized by \[
+            Goal: Make all units more similar. Norm.\ is beneficial because the gradient no longer
+            depends on scale of data $\Rightarrow$ High LR without risk of divergence. A unit $f: \R^d \to \R$ can be normalized by \[
                 \bar{f} = \frac{f - \E[f(\vec{x})]}{\sqrt{\Var[f(\vec{x})]}}.
             \]
             This removes 2 DOF (bias and variance) $\Rightarrow$ Explicitly parameterize: \hl{$\tilde{f}[\mu,\gamma](\vec{x}) = \mu + \gamma \bar{f}(\vec{x})$.}
@@ -843,7 +843,7 @@
                 \pdv{h}{\gamma} = \pdv{h}{\vec{w}} \pdv{\vec{w}}{\gamma}, \quad \pdv{h}{\vec{v}} = \frac{\gamma}{\| \vec{v} \|} \pdv{h}{\vec{w}} \lft( \mat{I} - \frac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|^2} \rgt).
             \]
             Here $\mat{I} - \nicefrac{\vec{w}\transpose{\vec{w}}}{\| \vec{w} \|^2}$ is the projection matrix
-            onto the complement of $\vec{w}$ $\to$ The direction of $\vec{w}$ is projected out.
+            onto the complement of $\vec{w}$ $\Rightarrow$ The direction of $\vec{w}$ is projected out.
         \end{subtopic}
 
         \begin{subtopic}{Data augmentation}
@@ -1049,7 +1049,7 @@
                 \item When randomly replacing training labels, the models can still perfectly fit the data
                       (memorization);
                 \item The training time does not increase much when labels are randomized;
-                \item When randomly shuffling pixels, the models can also perfectly fit the data $\to$ Inductive bias of
+                \item When randomly shuffling pixels, the models can also perfectly fit the data $\Rightarrow$ Inductive bias of
                       CNNs does not provide much benefit in this regard.
             \end{enumerate}
             These findings are unexplainable by the above theory.
@@ -1070,7 +1070,7 @@
                 \E_q[\ell(f)] - \E_q[\hat{\ell}(f)] \leq \sqrt{\frac{2}{n} \lft( D_{\mathrm{KL}}(q \;\|\; p) + \log \frac{2 \sqrt{n}}{\epsilon} \rgt)}.
             \]
             Here, $p$ is a prior over parameters, $q$ the posterior, and we bound the expected generalization
-            gap over stochastic classifiers $\to$ $\bigo{\nicefrac{1}{\sqrt{n}}}$ bound on generalization
+            gap over stochastic classifiers $\Rightarrow$ $\bigo{\nicefrac{1}{\sqrt{n}}}$ bound on generalization
             error. However, it only applies to stochastic classifiers, not single classifiers.
 
             This motivated the PAC Bayes loss function \[
@@ -1090,7 +1090,15 @@
             autoencoder with MSE loss is PCA of covariance matrix $\frac{1}{n} \transpose{\mat{X}}
                 \mat{X}$ and taking $m$ principal eigenvectors. Intuition: Retain as much variance as possible.
 
-            VAE optimizes log-likelihood of data $\to$ Intractable $\to$ ELBO:
+            Linear factor analysis: Model latents with $p(\vec{x}) = \int p(\vec{z})
+                p(\vec{x}\mid \vec{z}) \mathrm{d}\vec{z}$. $\vec{z} \sim \mathcal{N}(\vec{0},
+                \mat{I})$. $\vec{x} = \vec{\mu} + \mat{W} \vec{z} + \vec{\eta}$, $\vec{\eta} \sim
+                \mathcal{N}(\vec{0}, \mat{\Sigma})$. $\vec{\mu}^\star = \frac{1}{2} \sum_{i=1}^{n}
+                \vec{x}_i$. $\vec{x} \sim \mathcal{N}(\vec{\mu}^\star, \mat{W} \transpose{\mat{W}}
+                + \mat{\Sigma})$ (identifiable up to orthogonal transformation). $\vec{z} \mid \vec{x}$
+                can be found and approaches PCA when $\sigma \to 0$ in $\mat{\Sigma}$.
+
+            VAE optimizes log-likelihood of data $\Rightarrow$ Intractable $\Rightarrow$ ELBO:
             \begin{align*}
                 \log p[\vec{\theta}](\vec{x}) & \geq \E_{p[\vec{\vartheta}](\vec{z} \mid \vec{x})} [\log p[\vec{\theta}](\vec{x} \mid \vec{z})] \\
                                               & \quad \quad \quad - D_{\mathrm{KL}}(p[\vec{\vartheta}](\vec{z} \mid \vec{x}) \;\|\; p(\vec{z})).
@@ -1240,13 +1248,13 @@
                 f(\vec{x}) = \argmax \{ \transpose{\vec{w}_1} \vec{x} + b_1, \transpose{\vec{w}_2}\vec{x} + b_2 \}.
             \]
             Assume $\vec{x}$ is classified as $1$ and we want to find $\vec{\eta}$ such that $\vec{x} +
-                \vec{\eta}$ is classified as $2$ such that $\| \vec{\eta} \|_2$ is minimized $\to$ Convex program:
+                \vec{\eta}$ is classified as $2$ such that $\| \vec{\eta} \|_2$ is minimized $\Rightarrow$ Convex program:
             \begin{align*}
                 \text{minimize}   & \quad \frac{1}{2} \| \vec{\eta} \|_2^2                                               \\
                 \text{subject to} & \quad \transpose{(\vec{w}_1 - \vec{w}_2)} (\vec{x} + \vec{\eta}) + b_1 - b_2 \leq 0.
             \end{align*}
-            Set gradient of Lagrangian to zero $\to$ $\vec{\eta}^\star = \lambda (\vec{w}_2 -
-                \vec{w}_1)$. Then, find $\lambda$ that satisfies constraint $\to$ $\lambda \geq
+            Set gradient of Lagrangian to zero $\Rightarrow$ $\vec{\eta}^\star = \lambda (\vec{w}_2 -
+                \vec{w}_1)$. Then, find $\lambda$ that satisfies constraint $\Rightarrow$ $\lambda \geq
                 \nicefrac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_1 - \vec{w}_2 \|_2^2}$. Thus: \[
                 \vec{\eta}^\star = \frac{f_1(\vec{x}) - f_2(\vec{x})}{\| \vec{w}_2 - \vec{w}_1 \|_2^2} (\vec{w}_2 - \vec{w}_1).
             \]
